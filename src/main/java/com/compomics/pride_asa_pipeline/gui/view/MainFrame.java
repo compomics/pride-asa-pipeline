@@ -31,6 +31,10 @@ public class MainFrame extends javax.swing.JFrame {
         return pipelinePanel;
     }
 
+    public JPanel getModificationsParentPanel() {
+        return modificationsParentPanel;
+    }
+        
     public JMenuItem getModificationsViewMenuItem() {
         return modificationsViewMenuItem;
     }

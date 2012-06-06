@@ -22,14 +22,14 @@ public class JdbcSpectrumRepository extends JdbcDaoSupport implements SpectrumRe
 
     @Override
     public double[] getMzValuesBySpectrumId(long spectrumId) {
-        //LOGGER.debug("Loading mz values for spectrum " + spectrumId);
+        LOGGER.debug("Loading mz values for spectrum " + spectrumId);
         double[] mzValues = getJdbcTemplate().queryForObject(SELECT_SPECTRUM_MZVALUES_BY_SPECTRUM_ID, new Base64DecoderMapper(), spectrumId);         
         return mzValues;
     }
 
     @Override
     public double[] getIntensitiesBySpectrumId(long spectrumId) {
-        //LOGGER.debug("Loading intensities for spectrum " + spectrumId);
+        LOGGER.debug("Loading intensities for spectrum " + spectrumId);
         double[] intensities = getJdbcTemplate().queryForObject(SELECT_SPECTRUM_INTENSITIES_BY_SPECTRUM_ID, new Base64DecoderMapper(), spectrumId);        
         return intensities;
     }
