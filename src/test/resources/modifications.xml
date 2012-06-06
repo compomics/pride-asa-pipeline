@@ -1,0 +1,64 @@
+
+<modifications>
+    <modification>
+        <name>Acetylation</name>
+        <monoIsotopicMassShift>42.01056</monoIsotopicMassShift>
+        <averageMassShift>42.0367</averageMassShift>
+        <position>any</position>
+        <affectedAminoAcids>
+            <affectedAminoAcid>K</affectedAminoAcid>
+        </affectedAminoAcids>
+        <psimodAccession>MOD:00064</psimodAccession>
+        <psimodName>N6-acetyl-L-lysine</psimodName>
+    </modification>
+    <modification>
+        <name>Terminal Acetylation</name>
+        <!-- Convention: terminal modifications start with "Terminal " -->
+        <!-- <monoIsotopicMassShift>42.010565</monoIsotopicMassShift> --> <!-- mass different at last comma. program currently can't cope with modifications which have exactly same mass -->
+        <monoIsotopicMassShift>42.01057</monoIsotopicMassShift>
+        <averageMassShift>42.0368</averageMassShift>
+        <position>N-terminus</position>
+        <affectedAminoAcids>
+            <!--<affectedAminoAcid>*</affectedAminoAcid>--> <!-- * is wildcard for all amino acids -->
+            <affectedAminoAcid>A</affectedAminoAcid>
+            <affectedAminoAcid>M</affectedAminoAcid>
+            <affectedAminoAcid>S</affectedAminoAcid>
+            <affectedAminoAcid>K</affectedAminoAcid>
+        </affectedAminoAcids>
+        <psimodAccession>MOD:00408</psimodAccession>
+        <psimodName>N-acetylated residue</psimodName>
+    </modification>
+    <modification>
+        <name>Carboxyamidomethylation</name>
+        <monoIsotopicMassShift>57.02146</monoIsotopicMassShift>
+        <averageMassShift>57.0513</averageMassShift>
+        <position>any</position>
+        <affectedAminoAcids>
+            <affectedAminoAcid>Y</affectedAminoAcid>
+        </affectedAminoAcids>
+        <psimodAccession>MOD:01060</psimodAccession>
+        <psimodName>Carboxyamidomethyl Cystenyl</psimodName>
+    </modification>
+    <modification>
+        <name>Oxidation</name>
+        <monoIsotopicMassShift>15.994915</monoIsotopicMassShift>
+        <averageMassShift>15.9994</averageMassShift>
+        <position>any</position>
+        <affectedAminoAcids>
+            <affectedAminoAcid>K</affectedAminoAcid>
+        </affectedAminoAcids>
+        <psimodAccession>MOD:00719</psimodAccession>
+        <psimodName>oxidation to L-methionine sulfoxide</psimodName>
+    </modification>
+    <modification>
+        <name>Terminal Oxidation</name>
+        <monoIsotopicMassShift>15.994915</monoIsotopicMassShift>
+        <averageMassShift>15.9994</averageMassShift>
+        <position>C-terminus</position>
+        <affectedAminoAcids>
+            <affectedAminoAcid>A</affectedAminoAcid>
+        </affectedAminoAcids>
+        <psimodAccession>MOD:00719</psimodAccession>
+        <psimodName>oxidation to L-methionine sulfoxide</psimodName>
+    </modification>
+</modifications>
