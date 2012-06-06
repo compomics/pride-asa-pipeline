@@ -143,6 +143,7 @@
           class="com.compomics.pride_asa_pipeline.gui.controller.MainController">
         <property name="prideSpectrumAnnotator" ref="prideSpectrumAnnotator"/>
         <property name="experimentProcessController" ref="experimentProcessController"/>
+        <property name="modificationsController" ref="modificationsController"/>
     </bean>
     
     <bean id="experimentProcessController"
@@ -155,6 +156,11 @@
     <bean id="pipelineProgressController"
           class="com.compomics.pride_asa_pipeline.gui.controller.PipelineProgressController">
           <property name="experimentProcessController" ref="experimentProcessController"/>    
+    </bean>
+    
+    <bean id="modificationsController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.ModificationsController"> 
+          <property name="modificationService" ref="modificationService"/>
     </bean>
                                       
 </beans>

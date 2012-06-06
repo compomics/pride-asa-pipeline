@@ -31,7 +31,7 @@ public class ExperimentProcessController {
     private MainController mainController;
     //child controllers
     private PipelineProgressController pipelineProgressController;
-    //service
+    //services
     private ExperimentService experimentService;
 
     public ExperimentProcessController() {

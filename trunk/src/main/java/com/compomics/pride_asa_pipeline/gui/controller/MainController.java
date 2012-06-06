@@ -25,6 +25,7 @@ public class MainController implements ActionListener {
     private MainFrame mainFrame;
     //child controllers
     private ExperimentProcessController experimentProcessController;
+    private ModificationsController modificationsController;
     //services
     private PrideSpectrumAnnotator prideSpectrumAnnotator;
 
@@ -38,6 +39,14 @@ public class MainController implements ActionListener {
     public void setExperimentProcessController(ExperimentProcessController experimentProcessController) {
         this.experimentProcessController = experimentProcessController;
     }
+
+    public ModificationsController getModificationsController() {
+        return modificationsController;
+    }
+
+    public void setModificationsController(ModificationsController modificationsController) {
+        this.modificationsController = modificationsController;
+    }        
 
     public PrideSpectrumAnnotator getPrideSpectrumAnnotator() {
         return prideSpectrumAnnotator;
@@ -73,6 +82,7 @@ public class MainController implements ActionListener {
 
         //init child controllers
         experimentProcessController.init();
+        modificationsController.init();
 
         //add panel components                        
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -81,6 +91,7 @@ public class MainController implements ActionListener {
         gridBagConstraints.weighty = 1.0;
 
         mainFrame.getExperimentProcessParentPanel().add(experimentProcessController.getExperimentProcessPanel(), gridBagConstraints);
+        mainFrame.getModificationsParentPanel().add(modificationsController.getModificationsPanel());
 
         //add action listeners        
         mainFrame.getPipelineViewMenuItem().addActionListener(this);
