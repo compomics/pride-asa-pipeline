@@ -1,11 +1,16 @@
 package com.compomics.pride_asa_pipeline.modification.impl;
 
+import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.modification.ModificationParser;
+import com.compomics.pride_asa_pipeline.modification.ModificationMarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -13,6 +18,7 @@ import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.filter.Filter;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 
 /**
  * Simple DOM parser to read modification definitions from a provided input
@@ -22,11 +28,11 @@ import org.jdom.input.SAXBuilder;
  * @author Florian Reisinger Date: 08-Sep-2009
  * @since 0.1
  */
-public class ModificationParserImpl implements ModificationParser {
-
-    private static final Logger LOGGER = Logger.getLogger(ModificationParserImpl.class);
+public class ModificationMarshallerImpl implements ModificationMarshaller {
+    
+    private static final Logger LOGGER = Logger.getLogger(ModificationMarshallerImpl.class);
     private Document document = null;
-    private boolean useMonoIsotopicMasses = true;
+    private boolean useMonoIsotopicMasses = PropertiesConfigurationHolder.getInstance().getBoolean("modification.use_monoisotopic_mass");
 
     /**
      * Boolean flag that specifies whether or not the monoisotopic or average
@@ -47,11 +53,11 @@ public class ModificationParserImpl implements ModificationParser {
     public void setUseMonoIsotopicMasses(boolean useMonoIsotopicMasses) {
         this.useMonoIsotopicMasses = useMonoIsotopicMasses;
     }
-
+    
     @Override
-    public Set<Modification> parse(File modificationFile) {
+    public Set<Modification> unmarshall(File modificationFile) {
         SAXBuilder builder = new SAXBuilder();
-
+        
         try {
             document = builder.build(modificationFile);
         } catch (JDOMException e) {
@@ -59,13 +65,13 @@ public class ModificationParserImpl implements ModificationParser {
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
-
+        
         Set<Modification> result = new HashSet<Modification>();
-
+        
         if (document != null) {
             Element eRoot = document.getRootElement();
-
-
+            
+            
             Filter modFilter = new ElementFilter("modification");
             Iterator<Element> modIter = eRoot.getDescendants(modFilter);
             while (modIter.hasNext()) {
@@ -101,17 +107,45 @@ public class ModificationParserImpl implements ModificationParser {
                 if (modNameEle != null) {
                     modName = modNameEle.getValue();
                 }
-
+                
                 result.add(new Modification(name, mass, position, affectedAminoAcids, modAccession, modName));
             }
-
-
-
         }
-
+        
         return result;
     }
-
+    
+    @Override
+    public File marshall(Set<Modification> modifications) {
+        File modificationsFile = new File(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name" + "_new"));
+        
+        try {
+            //add root element
+            Document doc = new Document(new Element("modifications"));
+            for (Modification modification : modifications) {
+                Element modificationElement = new Element("modification");
+                Element nameElement = new Element("name");
+                if (modification.getName() != null) {
+                    nameElement.setText(modification.getModificationName());
+                }
+                Element monoIsotopicMassShiftElement = new Element("monoIsotopicMassShift");  
+                Element averageMassShiftElement = new Element("averageMassShift");  
+                if (useMonoIsotopicMasses) {
+                }
+                doc.getRootElement().
+                        addContent(new Element("Stanza").addContent(new Element("Line").setText("Once, upon a midnight dreary")).
+                        addContent(new Element("Line").setText("While I pondered, weak and weary")));
+            }
+            
+            
+            new XMLOutputter().output(doc, System.out);
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        }
+        
+        return modificationsFile;
+    }
+    
     private Modification.Location readPosition(Element eModification) {
         Modification.Location position;
         String txtPosition = eModification.getChild("position").getValue();

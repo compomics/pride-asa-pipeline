@@ -1,5 +1,7 @@
 package com.compomics.pride_asa_pipeline.model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,6 +19,7 @@ public class Modification implements Comparable<Modification>, ModificationFacad
     private Set<AminoAcid> affectedAminoAcids;
     private String modificationAccession;
     private String modificationName;
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public static enum Location {
 
@@ -29,7 +32,7 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         this.name = modifiationName;
         this.massShift = massShift;
         this.modificationAccession = modificationAccession;
-        this.modificationName = modifiationName;        
+        this.modificationName = modifiationName;
         this.location = location;
         affectedAminoAcids = new HashSet<AminoAcid>();
         //affectedAminoAcids.addAll(Arrays.asList(AminoAcid.values()));
@@ -52,8 +55,20 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         return modificationAccession;
     }
 
+    public void setModificationAccession(String modificationAccession) {
+        String oldModificationAccession = this.modificationAccession;
+        this.modificationAccession = modificationAccession;
+        propertyChangeSupport.firePropertyChange("modificationAccession", oldModificationAccession, modificationAccession);
+    }
+
     public String getModificationName() {
         return modificationName;
+    }
+
+    public void setModificationName(String modificationName) {
+        String oldModificationName = modificationName;
+        this.modificationName = modificationName;
+        propertyChangeSupport.firePropertyChange("modificationName", oldModificationName, modificationName);
     }
 
     @Override
@@ -61,9 +76,21 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         return name;
     }
 
+    public void setName(String name) {
+        String oldName = this.name;
+        this.name = name;
+        propertyChangeSupport.firePropertyChange("name", oldName, name);
+    }
+
     @Override
     public double getMassShift() {
         return massShift;
+    }
+
+    public void setMassShift(double massShift) {
+        double oldMassShift = this.massShift;
+        this.massShift = massShift;
+        propertyChangeSupport.firePropertyChange("massShift", oldMassShift, massShift);
     }
 
     public Location getLocation() {
@@ -71,11 +98,19 @@ public class Modification implements Comparable<Modification>, ModificationFacad
     }
 
     public void setLocation(Location location) {
+        Location oldLocation = this.location;
         this.location = location;
-    }    
+        propertyChangeSupport.firePropertyChange("location", oldLocation, location);
+    }
 
     public Set<AminoAcid> getAffectedAminoAcids() {
         return affectedAminoAcids;
+    }
+
+    public void setAffectedAminoAcids(Set<AminoAcid> affectedAminoAcids) {
+        Set<AminoAcid> oldAffectedAminoAcids = this.affectedAminoAcids;
+        this.affectedAminoAcids = affectedAminoAcids;
+        propertyChangeSupport.firePropertyChange("affectedAminoAcids", oldAffectedAminoAcids, affectedAminoAcids);
     }
 
     @Override
@@ -125,5 +160,13 @@ public class Modification implements Comparable<Modification>, ModificationFacad
     @Override
     public String toString() {
         return getName();
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
     }
 }
