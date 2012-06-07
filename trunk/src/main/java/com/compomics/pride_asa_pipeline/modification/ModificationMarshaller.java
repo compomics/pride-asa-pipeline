@@ -12,14 +12,22 @@ import java.util.Set;
  *
  * @author niels
  */
-public interface ModificationParser {
+public interface ModificationMarshaller {
 
     /**
-     * Parses the given modifications XML file and returns a set of
+     * Unmarchalls the given modifications XML file and returns a set of
      * modifications
      *
      * @param modificationFile the modifications XML file to be parsed
      * @return the set of modifications
      */
-    Set<Modification> parse(File modificationFile);
+    Set<Modification> unmarshall(File modificationFile);
+    
+    /**
+     * Marshalls the set of modifications to an XML file
+     *
+     * @param modifications the modifications set
+     * @return the modifications XML file
+     */
+    File marshall(Set<Modification> modifications);
 }

@@ -12,7 +12,7 @@ import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.modification.OmssaModiciationMarshaller;
-import com.compomics.pride_asa_pipeline.modification.impl.ModificationParserImpl;
+import com.compomics.pride_asa_pipeline.modification.impl.ModificationMarshallerImpl;
 import com.compomics.pride_asa_pipeline.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import java.io.File;
@@ -28,16 +28,16 @@ import org.apache.log4j.Logger;
 public class ModificationServiceImpl implements ModificationService {
 
     private static final Logger LOGGER = Logger.getLogger(ModificationServiceImpl.class);
-    private ModificationParserImpl modificationParser;
+    private ModificationMarshallerImpl modificationParser;
     private ModificationRepository modificationRepository;
     private OmssaModiciationMarshaller omssaModiciationMarshaller;
     private Set<Modification> pipelineModifications;
 
-    public ModificationParserImpl getModificationParser() {
+    public ModificationMarshallerImpl getModificationParser() {
         return modificationParser;
     }
 
-    public void setModificationParser(ModificationParserImpl modificationParser) {
+    public void setModificationParser(ModificationMarshallerImpl modificationParser) {
         this.modificationParser = modificationParser;
     }
 
@@ -59,7 +59,7 @@ public class ModificationServiceImpl implements ModificationService {
         
     @Override
     public Set<Modification> loadPipelineModifications(String modificationFileName) {
-        //return the modifications or first parse them from the specified
+        //return the modifications or first unmarshall them from the specified
         //configuration file if not done so before
         if (pipelineModifications == null) {
             pipelineModifications = new HashSet<Modification>();
@@ -76,7 +76,7 @@ public class ModificationServiceImpl implements ModificationService {
                 LOGGER.warn("Specified modification file " + modificationFileName + " does not exist or could not be accessed! ");
             } else {
                 //read the file and create Modification objects for all its entries                
-                pipelineModifications.addAll(modificationParser.parse(modificationFile));
+                pipelineModifications.addAll(modificationParser.unmarshall(modificationFile));
             }
         }
         return pipelineModifications;

@@ -88,8 +88,8 @@
         <property name="zenArcher" ref="zenArcher"/>     
     </bean>
     
-    <bean id="modificationParser"
-          class="com.compomics.pride_asa_pipeline.modification.impl.ModificationParserImpl">        
+    <bean id="modificationMarshaller"
+          class="com.compomics.pride_asa_pipeline.modification.impl.ModificationMarshallerImpl">        
     </bean>
     
     <bean id="peptideVariationsGenerator"

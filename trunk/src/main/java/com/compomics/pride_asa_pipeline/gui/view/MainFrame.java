@@ -103,6 +103,7 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().add(pipelinePanel, "pipelinePanel");
 
         modificationsParentPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        modificationsParentPanel.setLayout(new java.awt.GridBagLayout());
         getContentPane().add(modificationsParentPanel, "modificationsParentPanel");
 
         pipelineParamsParentPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));

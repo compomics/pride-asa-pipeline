@@ -4,7 +4,9 @@
  */
 package com.compomics.pride_asa_pipeline.gui.view;
 
+import javax.swing.JComboBox;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 
 /**
  *
@@ -19,8 +21,24 @@ public class ModificationsPanel extends javax.swing.JPanel {
         initComponents();
     }
 
-    public JTable getModifcationTable() {
-        return modifcationTable;
+    public JTable getModifcationsTable() {
+        return modifcationsTable;
+    }
+
+    public JTextField getModAccessionTextField() {
+        return modAccessionTextField;
+    }
+
+    public JComboBox getModLocationComboBox() {
+        return modLocationComboBox;
+    }
+
+    public JTextField getModMassShiftTextField() {
+        return modMassShiftTextField;
+    }
+
+    public JTextField getModNameTextField() {
+        return modNameTextField;
     }        
 
     /**
@@ -31,31 +49,162 @@ public class ModificationsPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        modifcationTable = new javax.swing.JTable();
+        modifcationsTable = new javax.swing.JTable();
+        editModificationPanel = new javax.swing.JPanel();
+        modNameLabel = new javax.swing.JLabel();
+        modNameTextField = new javax.swing.JTextField();
+        modAccessionLabel = new javax.swing.JLabel();
+        modAccessionTextField = new javax.swing.JTextField();
+        modMassShiftLabel = new javax.swing.JLabel();
+        modMassShiftTextField = new javax.swing.JTextField();
+        modLocationLabel = new javax.swing.JLabel();
+        modLocationComboBox = new javax.swing.JComboBox();
+        addModificationButton = new javax.swing.JButton();
+        removeModificationButton = new javax.swing.JButton();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
 
-        jScrollPane1.setViewportView(modifcationTable);
+        setLayout(new java.awt.GridBagLayout());
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(25, 25));
+
+        modifcationsTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane1.setViewportView(modifcationsTable);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.5;
+        add(jScrollPane1, gridBagConstraints);
+
+        editModificationPanel.setLayout(new java.awt.GridBagLayout());
+
+        modNameLabel.setText("name");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        editModificationPanel.add(modNameLabel, gridBagConstraints);
+
+        modNameTextField.setMinimumSize(new java.awt.Dimension(60, 20));
+        modNameTextField.setPreferredSize(new java.awt.Dimension(200, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.weightx = 0.6;
+        editModificationPanel.add(modNameTextField, gridBagConstraints);
+
+        modAccessionLabel.setText("accession");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        editModificationPanel.add(modAccessionLabel, gridBagConstraints);
+
+        modAccessionTextField.setPreferredSize(new java.awt.Dimension(200, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.weightx = 0.6;
+        editModificationPanel.add(modAccessionTextField, gridBagConstraints);
+
+        modMassShiftLabel.setText("mass shift");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        editModificationPanel.add(modMassShiftLabel, gridBagConstraints);
+
+        modMassShiftTextField.setPreferredSize(new java.awt.Dimension(200, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.weightx = 0.6;
+        editModificationPanel.add(modMassShiftTextField, gridBagConstraints);
+
+        modLocationLabel.setText("location");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        editModificationPanel.add(modLocationLabel, gridBagConstraints);
+
+        modLocationComboBox.setPreferredSize(new java.awt.Dimension(200, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.weightx = 0.6;
+        editModificationPanel.add(modLocationComboBox, gridBagConstraints);
+
+        addModificationButton.setText("add");
+        addModificationButton.setPreferredSize(new java.awt.Dimension(69, 23));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.weightx = 0.2;
+        editModificationPanel.add(addModificationButton, gridBagConstraints);
+
+        removeModificationButton.setText("remove");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.weightx = 0.2;
+        editModificationPanel.add(removeModificationButton, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        editModificationPanel.add(filler1, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.5;
+        add(editModificationPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addModificationButton;
+    private javax.swing.JPanel editModificationPanel;
+    private javax.swing.Box.Filler filler1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable modifcationTable;
+    private javax.swing.JLabel modAccessionLabel;
+    private javax.swing.JTextField modAccessionTextField;
+    private javax.swing.JComboBox modLocationComboBox;
+    private javax.swing.JLabel modLocationLabel;
+    private javax.swing.JLabel modMassShiftLabel;
+    private javax.swing.JTextField modMassShiftTextField;
+    private javax.swing.JLabel modNameLabel;
+    private javax.swing.JTextField modNameTextField;
+    private javax.swing.JTable modifcationsTable;
+    private javax.swing.JButton removeModificationButton;
     // End of variables declaration//GEN-END:variables
 }

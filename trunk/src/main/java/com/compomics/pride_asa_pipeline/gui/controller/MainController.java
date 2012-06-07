@@ -91,7 +91,7 @@ public class MainController implements ActionListener {
         gridBagConstraints.weighty = 1.0;
 
         mainFrame.getExperimentProcessParentPanel().add(experimentProcessController.getExperimentProcessPanel(), gridBagConstraints);
-        mainFrame.getModificationsParentPanel().add(modificationsController.getModificationsPanel());
+        mainFrame.getModificationsParentPanel().add(modificationsController.getModificationsPanel(), gridBagConstraints);
 
         //add action listeners        
         mainFrame.getPipelineViewMenuItem().addActionListener(this);
