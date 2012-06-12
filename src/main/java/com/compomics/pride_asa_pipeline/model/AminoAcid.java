@@ -76,7 +76,7 @@ public enum AminoAcid {
 
     @Override
     public String toString() {
-        return name + " " + letter + " " + mass;
+        return name;
     }
 
     public static AminoAcid getAA(char c) {

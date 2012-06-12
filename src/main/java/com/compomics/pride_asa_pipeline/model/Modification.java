@@ -1,10 +1,10 @@
 package com.compomics.pride_asa_pipeline.model;
 
+import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
  * Date: 11-Jan-2008
@@ -14,12 +14,13 @@ import java.util.Set;
 public class Modification implements Comparable<Modification>, ModificationFacade {
 
     private String name;
-    private double massShift;
+    private double monoIsotopicMassShift;
+    private double averageMassShift;
     private Location location;
     private Set<AminoAcid> affectedAminoAcids;
-    private String modificationAccession;
-    private String modificationName;
-    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private String accession;
+    private String accessionValue;
+    private final SwingPropertyChangeSupport propertyChangeSupport = new SwingPropertyChangeSupport(this);
 
     public static enum Location {
 
@@ -28,47 +29,64 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         NON_TERMINAL
     }
 
-    public Modification(double massShift, Location location, String modificationAccession, String modifiationName) {
-        this.name = modifiationName;
-        this.massShift = massShift;
-        this.modificationAccession = modificationAccession;
-        this.modificationName = modifiationName;
+    public Modification(double massShift, Location location, String accession, String accessionValue) {
+        this.name = accessionValue;
         this.location = location;
+        this.monoIsotopicMassShift = massShift;
+        this.averageMassShift = massShift;
+        this.accession = accession;
+        this.accessionValue = accessionValue;
         affectedAminoAcids = new HashSet<AminoAcid>();
-        //affectedAminoAcids.addAll(Arrays.asList(AminoAcid.values()));
     }
 
-    public Modification(String name, double massShift, Location location, Set<AminoAcid> affectedAminoAcids) {
+    public Modification(String name, double monoIsotopicMassShift, double averageMassShift, Location location, Set<AminoAcid> affectedAminoAcids, String accession, String accessionValue) {
         this.name = name;
-        this.massShift = massShift;
+        this.monoIsotopicMassShift = monoIsotopicMassShift;
+        this.averageMassShift = averageMassShift;
         this.location = location;
         this.affectedAminoAcids = affectedAminoAcids;
+        this.accession = accession;
+        this.accessionValue = accessionValue;
     }
 
-    public Modification(String name, double massShift, Location location, Set<AminoAcid> affectedAminoAcids, String modificationAccession, String modificationName) {
-        this(name, massShift, location, affectedAminoAcids);
-        this.modificationAccession = modificationAccession;
-        this.modificationName = modificationName;
+    public double getAverageMassShift() {
+        return averageMassShift;
     }
 
-    public String getModificationAccession() {
-        return modificationAccession;
+    public void setAverageMassShift(double averageMassShift) {
+        double oldAverageMassShift = this.averageMassShift;
+        this.averageMassShift = averageMassShift;
+        propertyChangeSupport.firePropertyChange("averageMassShift", oldAverageMassShift, averageMassShift);
     }
 
-    public void setModificationAccession(String modificationAccession) {
-        String oldModificationAccession = this.modificationAccession;
-        this.modificationAccession = modificationAccession;
-        propertyChangeSupport.firePropertyChange("modificationAccession", oldModificationAccession, modificationAccession);
+    public double getMonoIsotopicMassShift() {
+        return monoIsotopicMassShift;
     }
 
-    public String getModificationName() {
-        return modificationName;
+    public void setMonoIsotopicMassShift(double monoIsotopicMassShift) {
+        double oldMonoIsotopicMassShift = this.monoIsotopicMassShift;
+        this.monoIsotopicMassShift = monoIsotopicMassShift;
+        propertyChangeSupport.firePropertyChange("monoIsotopicMassShift", oldMonoIsotopicMassShift, monoIsotopicMassShift);
     }
 
-    public void setModificationName(String modificationName) {
-        String oldModificationName = modificationName;
-        this.modificationName = modificationName;
-        propertyChangeSupport.firePropertyChange("modificationName", oldModificationName, modificationName);
+    public String getAccession() {
+        return accession;
+    }
+
+    public void setAccession(String accession) {
+        String oldAccession = this.accession;
+        this.accession = accession;
+        propertyChangeSupport.firePropertyChange("accession", oldAccession, accession);
+    }
+
+    public String getAccessionValue() {
+        return accessionValue;
+    }
+
+    public void setAccessionValue(String accessionValue) {
+        String oldAccessionValue = accessionValue;
+        this.accessionValue = accessionValue;
+        propertyChangeSupport.firePropertyChange("accessionValue", oldAccessionValue, accessionValue);
     }
 
     @Override
@@ -84,14 +102,12 @@ public class Modification implements Comparable<Modification>, ModificationFacad
 
     @Override
     public double getMassShift() {
-        return massShift;
-    }
-
-    public void setMassShift(double massShift) {
-        double oldMassShift = this.massShift;
-        this.massShift = massShift;
-        propertyChangeSupport.firePropertyChange("massShift", oldMassShift, massShift);
-    }
+        if (PropertiesConfigurationHolder.getInstance().getBoolean("modification.use_monoisotopic_mass")) {
+            return monoIsotopicMassShift;
+        } else {
+            return averageMassShift;
+        }
+    }    
 
     public Location getLocation() {
         return location;
@@ -129,7 +145,10 @@ public class Modification implements Comparable<Modification>, ModificationFacad
 
         Modification that = (Modification) o;
 
-        if (Double.compare(that.massShift, massShift) != 0) {
+        if (Double.compare(that.monoIsotopicMassShift, monoIsotopicMassShift) != 0) {
+            return false;
+        }
+        if (Double.compare(that.averageMassShift, averageMassShift) != 0) {
             return false;
         }
         if (affectedAminoAcids != null ? !affectedAminoAcids.equals(that.affectedAminoAcids) : that.affectedAminoAcids != null) {
@@ -147,15 +166,14 @@ public class Modification implements Comparable<Modification>, ModificationFacad
 
     @Override
     public int hashCode() {
-        int result;
-        long temp;
-        result = name != null ? name.hashCode() : 0;
-        temp = massShift != +0.0d ? Double.doubleToLongBits(massShift) : 0L;
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + (location != null ? location.hashCode() : 0);
-        result = 31 * result + (affectedAminoAcids != null ? affectedAminoAcids.hashCode() : 0);
-        return result;
-    }
+        int hash = 7;
+        hash = 79 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 79 * hash + (int) (Double.doubleToLongBits(this.monoIsotopicMassShift) ^ (Double.doubleToLongBits(this.monoIsotopicMassShift) >>> 32));
+        hash = 79 * hash + (int) (Double.doubleToLongBits(this.averageMassShift) ^ (Double.doubleToLongBits(this.averageMassShift) >>> 32));
+        hash = 79 * hash + (this.location != null ? this.location.hashCode() : 0);
+        hash = 79 * hash + (this.affectedAminoAcids != null ? this.affectedAminoAcids.hashCode() : 0);
+        return hash;
+    }    
 
     @Override
     public String toString() {

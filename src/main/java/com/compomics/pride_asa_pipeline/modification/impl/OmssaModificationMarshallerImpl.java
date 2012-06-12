@@ -29,7 +29,7 @@ public class OmssaModificationMarshallerImpl implements OmssaModiciationMarshall
                     for (AminoAcid aminoAcid : modification.getAffectedAminoAcids()) {
                         userMod = new UserMod();
                         userMod.setMass(modification.getMassShift());
-                        userMod.setModificationName(modification.getModificationAccession());
+                        userMod.setModificationName(modification.getAccession());
                         userMod.setLocationType(getLocationAsLocationTypeEnum(modification.getLocation()));
                         userMod.setLocation(String.valueOf(aminoAcid.letter()));
 
@@ -38,7 +38,7 @@ public class OmssaModificationMarshallerImpl implements OmssaModiciationMarshall
                 } else {
                     userMod = new UserMod();
                     userMod.setMass(modification.getMassShift());
-                    userMod.setModificationName(modification.getModificationAccession());
+                    userMod.setModificationName(modification.getAccession());
                     userMod.setLocationType(getLocationAsLocationTypeEnum(modification.getLocation()));
 
                     userModCollection.add(userMod);

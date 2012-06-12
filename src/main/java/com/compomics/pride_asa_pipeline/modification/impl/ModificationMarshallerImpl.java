@@ -5,6 +5,7 @@ import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.modification.ModificationMarshaller;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -29,35 +30,17 @@ import org.jdom.output.XMLOutputter;
  * @since 0.1
  */
 public class ModificationMarshallerImpl implements ModificationMarshaller {
-    
+
     private static final Logger LOGGER = Logger.getLogger(ModificationMarshallerImpl.class);
+    private static final String N_TERMINAL_LOCATION_STRING = "N-terminus";
+    private static final String NON_TERMINAL_LOCATION_STRING = "any";
+    private static final String C_TERMINAL_LOCATION_STRING = "C-terminus";
     private Document document = null;
-    private boolean useMonoIsotopicMasses = PropertiesConfigurationHolder.getInstance().getBoolean("modification.use_monoisotopic_mass");
 
-    /**
-     * Boolean flag that specifies whether or not the monoisotopic or average
-     * mass shift is used. Note: default value for this flag is 'true'.
-     *
-     * @return the boolean defining the mass shift usage.
-     */
-    public boolean isUseMonoIsotopicMasses() {
-        return useMonoIsotopicMasses;
-    }
-
-    /**
-     * Boolean flag to specifiy whether or not to use the monoisotopic or
-     * average mass shift. Note: default value for this flag is 'true'.
-     *
-     * @param useMonoIsotopicMasses the boolean to set the mass shift usage.
-     */
-    public void setUseMonoIsotopicMasses(boolean useMonoIsotopicMasses) {
-        this.useMonoIsotopicMasses = useMonoIsotopicMasses;
-    }
-    
     @Override
     public Set<Modification> unmarshall(File modificationFile) {
         SAXBuilder builder = new SAXBuilder();
-        
+
         try {
             document = builder.build(modificationFile);
         } catch (JDOMException e) {
@@ -65,13 +48,13 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
-        
+
         Set<Modification> result = new HashSet<Modification>();
-        
+
         if (document != null) {
             Element eRoot = document.getRootElement();
-            
-            
+
+
             Filter modFilter = new ElementFilter("modification");
             Iterator<Element> modIter = eRoot.getDescendants(modFilter);
             while (modIter.hasNext()) {
@@ -87,16 +70,11 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
                         affectedAminoAcids.add(AminoAcid.getAA(letter));
                     }
                 }
-                String massElement;
-                if (useMonoIsotopicMasses) {
-                    massElement = "monoIsotopicMassShift";
-                } else {
-                    massElement = "averageMassShift";
-                }
 
                 //get all the values from the XML elements
                 String name = eModification.getChild("name").getValue();
-                double mass = Double.parseDouble(eModification.getChild(massElement).getValue());
+                double monoIsotopicMassShift = Double.parseDouble(eModification.getChild("monoIsotopicMassShift").getValue());
+                double averageMassShift = Double.parseDouble(eModification.getChild("averageMassShift").getValue());
                 Element modAccEle = eModification.getChild("psimodAccession");
                 String modAccession = null;
                 if (modAccEle != null) {
@@ -107,58 +85,80 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
                 if (modNameEle != null) {
                     modName = modNameEle.getValue();
                 }
-                
-                result.add(new Modification(name, mass, position, affectedAminoAcids, modAccession, modName));
+
+                result.add(new Modification(name, monoIsotopicMassShift, averageMassShift, position, affectedAminoAcids, modAccession, modName));
             }
         }
-        
+
         return result;
     }
-    
+
     @Override
     public File marshall(Set<Modification> modifications) {
         File modificationsFile = new File(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name" + "_new"));
-        
+
         try {
             //add root element
             Document doc = new Document(new Element("modifications"));
             for (Modification modification : modifications) {
                 Element modificationElement = new Element("modification");
+
                 Element nameElement = new Element("name");
-                if (modification.getName() != null) {
-                    nameElement.setText(modification.getModificationName());
-                }
-                Element monoIsotopicMassShiftElement = new Element("monoIsotopicMassShift");  
-                Element averageMassShiftElement = new Element("averageMassShift");  
-                if (useMonoIsotopicMasses) {
-                }
-                doc.getRootElement().
-                        addContent(new Element("Stanza").addContent(new Element("Line").setText("Once, upon a midnight dreary")).
-                        addContent(new Element("Line").setText("While I pondered, weak and weary")));
+                nameElement.setText(modification.getAccessionValue());
+                modificationElement.addContent(nameElement);
+
+                Element monoIsotopicMassShiftElement = new Element("monoIsotopicMassShift");
+                monoIsotopicMassShiftElement.setText(Double.toString(modification.getMonoIsotopicMassShift()));
+                modificationElement.addContent(monoIsotopicMassShiftElement);
+
+                Element averageMassShiftElement = new Element("averageMassShift");
+                averageMassShiftElement.setText(Double.toString(modification.getAverageMassShift()));
+                modificationElement.addContent(averageMassShiftElement);
+
+                Element locationElement = new Element("location");
+                locationElement.setText(getPositionAsString(modification.getLocation()));
+                modificationElement.addContent(locationElement);
+
+                //add to root element
+                doc.addContent(modificationElement);
             }
-            
-            
-            new XMLOutputter().output(doc, System.out);
+
+            XMLOutputter xmlOutputter = new XMLOutputter();
+            FileWriter fileWriter = new FileWriter(modificationsFile);
+            new XMLOutputter().output(doc, fileWriter);
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage(), ex);
         }
-        
+
         return modificationsFile;
     }
-    
+
     private Modification.Location readPosition(Element eModification) {
         Modification.Location position;
         String txtPosition = eModification.getChild("position").getValue();
-        if (txtPosition.equals("any")) {
+        if (txtPosition.equals(NON_TERMINAL_LOCATION_STRING)) {
             position = Modification.Location.NON_TERMINAL;
-        } else if (txtPosition.equals("N-terminus")) {
+        } else if (txtPosition.equals(N_TERMINAL_LOCATION_STRING)) {
             position = Modification.Location.N_TERMINAL;
-        } else if (txtPosition.equals("C-terminus")) {
+        } else if (txtPosition.equals(C_TERMINAL_LOCATION_STRING)) {
             position = Modification.Location.C_TERMINAL;
         } else {
             throw new IllegalArgumentException("Modification position '"
                     + txtPosition + "' is not recognised.");
         }
         return position;
+    }
+
+    private String getPositionAsString(Modification.Location location) {
+        String locationString = "";
+        if (location.equals(Modification.Location.N_TERMINAL)) {
+            locationString = N_TERMINAL_LOCATION_STRING;
+        } else if (location.equals(Modification.Location.NON_TERMINAL)) {
+            locationString = NON_TERMINAL_LOCATION_STRING;
+        } else {
+            locationString = C_TERMINAL_LOCATION_STRING;
+        }
+
+        return locationString;
     }
 }
