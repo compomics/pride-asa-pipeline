@@ -28,18 +28,18 @@ import org.apache.log4j.Logger;
 public class ModificationServiceImpl implements ModificationService {
 
     private static final Logger LOGGER = Logger.getLogger(ModificationServiceImpl.class);
-    private ModificationMarshallerImpl modificationParser;
+    private ModificationMarshallerImpl modificationMarshaller;
     private ModificationRepository modificationRepository;
     private OmssaModiciationMarshaller omssaModiciationMarshaller;
     private Set<Modification> pipelineModifications;
 
-    public ModificationMarshallerImpl getModificationParser() {
-        return modificationParser;
+    public ModificationMarshallerImpl getModificationMarshaller() {
+        return modificationMarshaller;
     }
 
-    public void setModificationParser(ModificationMarshallerImpl modificationParser) {
-        this.modificationParser = modificationParser;
-    }
+    public void setModificationMarshaller(ModificationMarshallerImpl modificationMarshaller) {
+        this.modificationMarshaller = modificationMarshaller;
+    }    
 
     public ModificationRepository getModificationRepository() {
         return modificationRepository;
@@ -76,7 +76,7 @@ public class ModificationServiceImpl implements ModificationService {
                 LOGGER.warn("Specified modification file " + modificationFileName + " does not exist or could not be accessed! ");
             } else {
                 //read the file and create Modification objects for all its entries                
-                pipelineModifications.addAll(modificationParser.unmarshall(modificationFile));
+                pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationFile));
             }
         }
         return pipelineModifications;

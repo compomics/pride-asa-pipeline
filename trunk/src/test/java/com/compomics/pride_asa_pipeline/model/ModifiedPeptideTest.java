@@ -47,7 +47,7 @@ public class ModifiedPeptideTest {
         Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
         modifiedAAs.add(AminoAcid.getAA('N'));
         double modMassShift = 12.34;
-        Modification modification = new Modification("testModification", modMassShift, Modification.Location.NON_TERMINAL, modifiedAAs);
+        Modification modification = new Modification("testModification", modMassShift, modMassShift, Modification.Location.NON_TERMINAL, modifiedAAs, "mod", "mod");
 
         //add modification
         modifiedPeptide.setNTModification(6, modification);
@@ -95,7 +95,7 @@ public class ModifiedPeptideTest {
         Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
         modifiedAAs.add(AminoAcid.getAA('A'));
         double modMassShift = 12.34;
-        Modification modification = new Modification("testModification", modMassShift, Modification.Location.N_TERMINAL, modifiedAAs);
+        Modification modification = new Modification("testModification", modMassShift, modMassShift, Modification.Location.N_TERMINAL, modifiedAAs, "mod", "mod");
 
         //add modification
         modifiedPeptide.setNTermMod(modification);
@@ -139,7 +139,7 @@ public class ModifiedPeptideTest {
         Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
         modifiedAAs.add(AminoAcid.getAA('Y'));
         double modMassShift = 12.34;
-        Modification modification = new Modification("testModification", modMassShift, Modification.Location.C_TERMINAL, modifiedAAs);
+        Modification modification = new Modification("testModification", modMassShift, modMassShift, Modification.Location.C_TERMINAL, modifiedAAs, "mod", "mod");
 
         //add modification
         modifiedPeptide.setCTermMod(modification);
@@ -184,11 +184,11 @@ public class ModifiedPeptideTest {
         Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
         modifiedAAs.add(AminoAcid.getAA('A'));
         double mod1MassShift = 12.34;
-        Modification modification_1 = new Modification("testModification_1", mod1MassShift, Modification.Location.NON_TERMINAL, modifiedAAs);
+        Modification modification_1 = new Modification("testModification_1", mod1MassShift, mod1MassShift, Modification.Location.NON_TERMINAL, modifiedAAs, "mod1", "mod1");
 
         //create modification_2
         double mod2MassShift = 19.88;
-        Modification modification_2 = new Modification("testModification_2", mod2MassShift, Modification.Location.N_TERMINAL, modifiedAAs);
+        Modification modification_2 = new Modification("testModification_2", mod2MassShift, mod2MassShift, Modification.Location.N_TERMINAL, modifiedAAs, "mod2", "mod2");
 
         //add modifications
         modifiedPeptide.setNTModification(0, modification_1);
@@ -234,11 +234,11 @@ public class ModifiedPeptideTest {
         Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
         modifiedAAs.add(AminoAcid.getAA('Y'));
         double mod1MassShift = 12.34;
-        Modification modification_1 = new Modification("testModification_1", mod1MassShift, Modification.Location.NON_TERMINAL, modifiedAAs);
+        Modification modification_1 = new Modification("testModification_1", mod1MassShift, mod1MassShift, Modification.Location.NON_TERMINAL, modifiedAAs, "mod1", "mod1");
 
         //create modification_2
         double mod2MassShift = 19.88;
-        Modification modification_2 = new Modification("testModification_2", mod2MassShift, Modification.Location.C_TERMINAL, modifiedAAs);
+        Modification modification_2 = new Modification("testModification_2", mod2MassShift, mod2MassShift, Modification.Location.C_TERMINAL, modifiedAAs, "mod2", "mod2");
 
         //add modifications
         modifiedPeptide.setNTModification(modifiedPeptide.length() - 1, modification_1);

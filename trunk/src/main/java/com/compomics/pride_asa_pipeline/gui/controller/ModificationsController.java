@@ -5,17 +5,20 @@
 package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.gui.binding.LoggingBindingListener;
 import com.compomics.pride_asa_pipeline.gui.view.ModificationsPanel;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import javax.swing.ListModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import org.jdesktop.beansbinding.*;
 import org.jdesktop.observablecollections.ObservableCollections;
 import org.jdesktop.observablecollections.ObservableList;
+import org.jdesktop.swingbinding.JListBinding;
 import org.jdesktop.swingbinding.JTableBinding;
 import org.jdesktop.swingbinding.JTableBinding.ColumnBinding;
 import org.jdesktop.swingbinding.SwingBindings;
@@ -27,8 +30,11 @@ import org.jdesktop.swingbinding.SwingBindings;
 public class ModificationsController {
 
     //model
+    //private DefaultListModel affectedAminoAcidListModel;
     private BindingGroup bindingGroup;
     private ObservableList<Modification> modificationsBindingList;
+    private ObservableList<AminoAcid> aminoAcidsBindingList;
+    private ObservableList<AminoAcid> affectedAminoAcidsBindingList;
     //view
     private ModificationsPanel modificationsPanel;
     //parent controller
@@ -60,24 +66,31 @@ public class ModificationsController {
         }
 
         //init bindings
-
         //table binding
         modificationsBindingList = ObservableCollections.observableList(getModificationsAsList(
                 modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name"))));
         bindingGroup = new BindingGroup();
-        JTableBinding modificationsTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ, modificationsBindingList, modificationsPanel.getModifcationsTable());
+        JTableBinding modificationsTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsBindingList, modificationsPanel.getModifcationsTable());
 
         //Add column bindings
         ColumnBinding columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${name}"));
         columnBinding.setColumnName("Name");
         columnBinding.setColumnClass(String.class);
 
-        columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${modificationAccession}"));
+        columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${accession}"));
         columnBinding.setColumnName("Accession");
         columnBinding.setColumnClass(String.class);
 
-        columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${massShift}"));
-        columnBinding.setColumnName("Mass shift");
+        columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${accessionValue}"));
+        columnBinding.setColumnName("Accession value");
+        columnBinding.setColumnClass(String.class);
+
+        columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${monoIsotopicMassShift}"));
+        columnBinding.setColumnName("Monoisotopic mass shift");
+        columnBinding.setColumnClass(String.class);
+
+        columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${averageMassShift}"));
+        columnBinding.setColumnName("Average mass shift");
         columnBinding.setColumnClass(String.class);
 
         columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${location}"));
@@ -87,19 +100,137 @@ public class ModificationsController {
         bindingGroup.addBinding(modificationsTableBinding);
 
         //selected modication in table bindings
-        Binding nameBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsPanel.getModifcationsTable(), ELProperty.create("${selectedElement.name}"), modificationsPanel.getModNameTextField(), BeanProperty.create("text"));
+        Binding nameBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsPanel.getModifcationsTable(), ELProperty.create("${selectedElement.name}"), modificationsPanel.getModNameTextField(), BeanProperty.create("text"), "name");
+        nameBinding.setValidator(new RequiredStringValidator());
         bindingGroup.addBinding(nameBinding);
 
-        Binding accessionBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsPanel.getModifcationsTable(), ELProperty.create("${selectedElement.modificationAccession}"), modificationsPanel.getModAccessionTextField(), BeanProperty.create("text"));
+        Binding accessionBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsPanel.getModifcationsTable(), ELProperty.create("${selectedElement.accession}"), modificationsPanel.getModAccessionTextField(), BeanProperty.create("text"), "accession");
+        accessionBinding.setValidator(new RequiredStringValidator());
         bindingGroup.addBinding(accessionBinding);
 
-        Binding massShiftBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsPanel.getModifcationsTable(), ELProperty.create("${selectedElement.massShift}"), modificationsPanel.getModMassShiftTextField(), BeanProperty.create("text"));
-        bindingGroup.addBinding(massShiftBinding);
+        Binding accessionValueBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsPanel.getModifcationsTable(), ELProperty.create("${selectedElement.accessionValue}"), modificationsPanel.getModAccessionValueTextField(), BeanProperty.create("text"), "accession value");
+        accessionValueBinding.setValidator(new RequiredStringValidator());
+        bindingGroup.addBinding(accessionValueBinding);
 
-        Binding locationBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsPanel.getModifcationsTable(), ELProperty.create("${selectedElement.location}"), modificationsPanel.getModLocationComboBox(), BeanProperty.create("selectedItem"));
+        Binding monoIsotopicMassShiftBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsPanel.getModifcationsTable(), ELProperty.create("${selectedElement.monoIsotopicMassShift}"), modificationsPanel.getModMonoIsotopicMassShiftTextField(), BeanProperty.create("text"), "monoIsotopicMassShift");
+        monoIsotopicMassShiftBinding.setConverter(new DoubleConverter());
+        bindingGroup.addBinding(monoIsotopicMassShiftBinding);
+
+        Binding averageMassShiftBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsPanel.getModifcationsTable(), ELProperty.create("${selectedElement.averageMassShift}"), modificationsPanel.getModAverageMassShiftTextField(), BeanProperty.create("text"), "averageMassShift");
+        averageMassShiftBinding.setConverter(new DoubleConverter());
+        bindingGroup.addBinding(averageMassShiftBinding);
+
+        Binding locationBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsPanel.getModifcationsTable(), ELProperty.create("${selectedElement.location}"), modificationsPanel.getModLocationComboBox(), BeanProperty.create("selectedItem"), "location");
         bindingGroup.addBinding(locationBinding);
 
+        //amino acid list bindings
+        aminoAcidsBindingList = ObservableCollections.observableList(getAminoAcidsAsList());
+        JListBinding aminoAcidsBinding = SwingBindings.createJListBinding(AutoBinding.UpdateStrategy.READ_WRITE, aminoAcidsBindingList, modificationsPanel.getAminoAcidsList());
+        bindingGroup.addBinding(aminoAcidsBinding);
+
+        affectedAminoAcidsBindingList = ObservableCollections.observableList(new ArrayList<AminoAcid>());
+        JListBinding affectedAminoAcidsBinding = SwingBindings.createJListBinding(AutoBinding.UpdateStrategy.READ_WRITE, affectedAminoAcidsBindingList, modificationsPanel.getAffectedAminoAcidsList());
+        bindingGroup.addBinding(affectedAminoAcidsBinding);
+
+        bindingGroup.addBindingListener(new LoggingBindingListener(modificationsPanel.getBindingLoggingLabel()));
+
         bindingGroup.bind();
+
+        //add listeners
+        modificationsPanel.getModifcationsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent lse) {
+                if (!lse.getValueIsAdjusting()) {
+                    if (modificationsPanel.getModifcationsTable().getSelectedRow() != -1) {
+                        Modification selectedModification = modificationsBindingList.get(modificationsPanel.getModifcationsTable().getSelectedRow());
+                        affectedAminoAcidsBindingList.clear();
+                        affectedAminoAcidsBindingList.addAll(selectedModification.getAffectedAminoAcids());
+
+                        aminoAcidsBindingList.clear();
+                        for (AminoAcid aminoAcid : AminoAcid.values()) {
+                            if (!selectedModification.getAffectedAminoAcids().contains(aminoAcid)) {
+                                aminoAcidsBindingList.add(aminoAcid);
+                            }
+                        }
+
+                        //disable remove button if there's only one affected amino acid
+                        changeRemoveAminoAcidButtonState(selectedModification);
+                    }
+                }
+            }
+        });
+
+        modificationsPanel.getAddAminoAcidButton().addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                Object[] selectedValues = modificationsPanel.getAminoAcidsList().getSelectedValues();
+
+                Modification selectedModification = modificationsBindingList.get(modificationsPanel.getModifcationsTable().getSelectedRow());
+
+                for (Object o : selectedValues) {
+                    AminoAcid aminoAcid = (AminoAcid) o;
+                    affectedAminoAcidsBindingList.add(aminoAcid);
+                    Collections.sort(affectedAminoAcidsBindingList);
+                    aminoAcidsBindingList.remove(aminoAcid);
+                    selectedModification.getAffectedAminoAcids().add(aminoAcid);
+
+                    //enable remove button if there's more then one affected amino acid
+                    changeRemoveAminoAcidButtonState(selectedModification);
+
+                    modificationsPanel.getModifcationsTable().updateUI();
+                }
+            }
+        });
+
+        modificationsPanel.getRemoveAminoAcidButton().addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                Object[] selectedValues = modificationsPanel.getAffectedAminoAcidsList().getSelectedValues();
+
+                Modification selectedModification = modificationsBindingList.get(modificationsPanel.getModifcationsTable().getSelectedRow());
+
+                for (Object o : selectedValues) {
+                    AminoAcid aminoAcid = (AminoAcid) o;
+                    aminoAcidsBindingList.add(aminoAcid);
+                    affectedAminoAcidsBindingList.remove(aminoAcid);
+                    Collections.sort(aminoAcidsBindingList);
+                    selectedModification.getAffectedAminoAcids().remove(aminoAcid);
+
+                    //disable remove button if there's only one affected amino acid
+                    changeRemoveAminoAcidButtonState(selectedModification);
+
+                    modificationsPanel.getModifcationsTable().updateUI();
+                }
+            }
+        });
+
+        modificationsPanel.getAddModificationButton().addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                Set<AminoAcid> affectedAminoAcids = new HashSet<AminoAcid>();
+                affectedAminoAcids.add(AminoAcid.Ala);
+                modificationsBindingList.add(new Modification("mod" + modificationsBindingList.size(), 0.0, 0.0, Modification.Location.NON_TERMINAL, affectedAminoAcids, "accession", "accessionValue"));
+                modificationsPanel.getModifcationsTable().getSelectionModel().setSelectionInterval(modificationsBindingList.size() - 1, modificationsBindingList.size() - 1);
+            }
+        });
+
+        modificationsPanel.getRemoveModificationButton().addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                if (modificationsPanel.getModifcationsTable().getSelectedRow() != -1) {
+                    modificationsBindingList.remove(modificationsPanel.getModifcationsTable().getSelectedRow());
+                    modificationsPanel.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);
+                    
+                    //disable remove button if there's only one modification
+                    changeRemoveModificationButtonState();
+                }
+            }
+        });
     }
 
     private List<Modification> getModificationsAsList(Set<Modification> modificationSet) {
@@ -109,5 +240,61 @@ public class ModificationsController {
         }
 
         return modifications;
+    }
+
+    private List<AminoAcid> getAminoAcidsAsList() {
+        List<AminoAcid> aminoAcids = new ArrayList<AminoAcid>();
+        for (AminoAcid aminoAcid : AminoAcid.values()) {
+            aminoAcids.add(aminoAcid);
+        }
+
+        return aminoAcids;
+    }
+
+    private void changeRemoveAminoAcidButtonState(Modification modification) {
+        if (modification.getAffectedAminoAcids().size() == 1) {
+            modificationsPanel.getRemoveAminoAcidButton().setEnabled(Boolean.FALSE);
+        } else {
+            modificationsPanel.getRemoveAminoAcidButton().setEnabled(Boolean.TRUE);
+        }
+    }
+    
+    private void changeRemoveModificationButtonState() {
+        if (modificationsBindingList.size() == 1) {
+            modificationsPanel.getRemoveModificationButton().setEnabled(Boolean.FALSE);
+        } else {
+            modificationsPanel.getRemoveModificationButton().setEnabled(Boolean.TRUE);
+        }
+    }
+
+    private class DoubleConverter extends Converter<Double, String> {
+
+        @Override
+        public String convertForward(Double s) {
+            return String.valueOf(s);
+        }
+
+        @Override
+        public Double convertReverse(String t) {
+            double value;
+            try {
+                value = (t == null) ? 0 : Double.parseDouble(t);
+            } catch (NumberFormatException e) {
+                value = 0.0;
+            }
+
+            return value;
+        }
+    }
+
+    private class RequiredStringValidator extends Validator<String> {
+
+        @Override
+        public Result validate(String arg) {
+            if ((arg == null) || (arg.length() == 0)) {
+                return new Validator.Result(null, "Empty value");
+            }
+            return null;
+        }
     }
 }

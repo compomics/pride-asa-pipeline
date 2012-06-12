@@ -45,7 +45,7 @@
     
     <bean id="modificationService"
           class="com.compomics.pride_asa_pipeline.service.impl.ModificationServiceImpl">
-        <property name="modificationParser" ref="modificationParser"/>
+        <property name="modificationMarshaller" ref="modificationMarshaller"/>
         <property name="modificationRepository" ref="modificationRepository"/>
         <property name="omssaModiciationMarshaller" ref="omssaModificationMarshaller"/>
     </bean>                                
