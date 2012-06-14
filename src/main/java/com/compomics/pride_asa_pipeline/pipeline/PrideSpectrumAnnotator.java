@@ -168,7 +168,7 @@ public class PrideSpectrumAnnotator {
         ModificationHolder modificationHolder = new ModificationHolder();
 
         //add the pipeline modifications
-        modificationHolder.addModifications(modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name")));
+        modificationHolder.addModifications(modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_path")));
 
         //add the modifications found in pride for the given experiment
         if(PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_modifications")){

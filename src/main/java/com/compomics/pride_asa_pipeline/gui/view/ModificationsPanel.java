@@ -37,7 +37,7 @@ public class ModificationsPanel extends javax.swing.JPanel {
 
     public JTextField getModMonoIsotopicMassShiftTextField() {
         return modMonoIsotopicMassShiftTextField;
-    }    
+    }
 
     public JTextField getModNameTextField() {
         return modNameTextField;
@@ -73,8 +73,16 @@ public class ModificationsPanel extends javax.swing.JPanel {
 
     public JTextField getModAccessionValueTextField() {
         return modAccessionValueTextField;
-    }            
-    
+    }
+
+    public JButton getExportButton() {
+        return exportButton;
+    }
+
+    public JButton getImportButton() {
+        return importButton;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -107,13 +115,16 @@ public class ModificationsPanel extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         addAminoAcidButton = new javax.swing.JButton();
         removeAminoAcidButton = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        addModificationButton = new javax.swing.JButton();
-        removeModificationButton = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 32767));
         modAccessionValueLabel = new javax.swing.JLabel();
         modAccessionValueTextField = new javax.swing.JTextField();
         bindingLoggingLabel = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        addModificationButton = new javax.swing.JButton();
+        removeModificationButton = new javax.swing.JButton();
+        importButton = new javax.swing.JButton();
+        exportButton = new javax.swing.JButton();
+        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -128,6 +139,7 @@ public class ModificationsPanel extends javax.swing.JPanel {
 
             }
         ));
+        modifcationsTable.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jScrollPane1.setViewportView(modifcationsTable);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -301,33 +313,6 @@ public class ModificationsPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.6;
         editModificationPanel.add(jPanel1, gridBagConstraints);
-
-        jPanel3.setLayout(new java.awt.GridBagLayout());
-
-        addModificationButton.setText("add");
-        addModificationButton.setPreferredSize(new java.awt.Dimension(100, 30));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.weightx = 0.6;
-        jPanel3.add(addModificationButton, gridBagConstraints);
-
-        removeModificationButton.setText("remove");
-        removeModificationButton.setPreferredSize(new java.awt.Dimension(100, 30));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.weightx = 0.6;
-        jPanel3.add(removeModificationButton, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        editModificationPanel.add(jPanel3, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -356,21 +341,77 @@ public class ModificationsPanel extends javax.swing.JPanel {
 
         bindingLoggingLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         bindingLoggingLabel.setForeground(new java.awt.Color(255, 0, 0));
+        bindingLoggingLabel.setMinimumSize(new java.awt.Dimension(80, 25));
+        bindingLoggingLabel.setPreferredSize(new java.awt.Dimension(80, 25));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.2;
         editModificationPanel.add(bindingLoggingLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.6;
         add(editModificationPanel, gridBagConstraints);
+
+        jPanel3.setLayout(new java.awt.GridBagLayout());
+
+        addModificationButton.setText("add");
+        addModificationButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        addModificationButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        addModificationButton.setPreferredSize(new java.awt.Dimension(80, 25));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        jPanel3.add(addModificationButton, gridBagConstraints);
+
+        removeModificationButton.setText("remove");
+        removeModificationButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        removeModificationButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        removeModificationButton.setPreferredSize(new java.awt.Dimension(80, 25));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        jPanel3.add(removeModificationButton, gridBagConstraints);
+
+        importButton.setText("import");
+        importButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        importButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        importButton.setPreferredSize(new java.awt.Dimension(80, 25));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        jPanel3.add(importButton, gridBagConstraints);
+
+        exportButton.setText("export");
+        exportButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        exportButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        exportButton.setPreferredSize(new java.awt.Dimension(80, 25));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        jPanel3.add(exportButton, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel3.add(filler2, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.weightx = 1.0;
+        add(jPanel3, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addAminoAcidButton;
@@ -380,7 +421,10 @@ public class ModificationsPanel extends javax.swing.JPanel {
     private javax.swing.JList aminoAcidsList;
     private javax.swing.JLabel bindingLoggingLabel;
     private javax.swing.JPanel editModificationPanel;
+    private javax.swing.JButton exportButton;
     private javax.swing.Box.Filler filler1;
+    private javax.swing.Box.Filler filler2;
+    private javax.swing.JButton importButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

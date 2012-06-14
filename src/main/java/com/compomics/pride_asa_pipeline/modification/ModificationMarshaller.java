@@ -6,6 +6,7 @@ package com.compomics.pride_asa_pipeline.modification;
 
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.io.File;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -22,12 +23,13 @@ public interface ModificationMarshaller {
      * @return the set of modifications
      */
     Set<Modification> unmarshall(File modificationFile);
-    
+
     /**
-     * Marshalls the set of modifications to an XML file
+     * Marshalls the collection of modifications to the modifications.xml file
      *
-     * @param modifications the modifications set
-     * @return the modifications XML file
+     * 
+     * @param modificationFilePath the modification file path
+     * @param modifications the modifications collection
      */
-    File marshall(Set<Modification> modifications);
+    void marshall(String modificationFilePath, Collection<Modification> modifications);
 }

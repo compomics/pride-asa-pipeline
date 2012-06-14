@@ -30,7 +30,6 @@ import org.jdesktop.swingbinding.SwingBindings;
 public class ModificationsController {
 
     //model
-    //private DefaultListModel affectedAminoAcidListModel;
     private BindingGroup bindingGroup;
     private ObservableList<Modification> modificationsBindingList;
     private ObservableList<AminoAcid> aminoAcidsBindingList;
@@ -68,33 +67,39 @@ public class ModificationsController {
         //init bindings
         //table binding
         modificationsBindingList = ObservableCollections.observableList(getModificationsAsList(
-                modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name"))));
+                modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_path"))));
         bindingGroup = new BindingGroup();
         JTableBinding modificationsTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsBindingList, modificationsPanel.getModifcationsTable());
 
         //Add column bindings
         ColumnBinding columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${name}"));
         columnBinding.setColumnName("Name");
+        columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(String.class);
 
         columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${accession}"));
         columnBinding.setColumnName("Accession");
+        columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(String.class);
 
         columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${accessionValue}"));
         columnBinding.setColumnName("Accession value");
+        columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(String.class);
 
         columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${monoIsotopicMassShift}"));
         columnBinding.setColumnName("Monoisotopic mass shift");
+        columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(String.class);
 
         columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${averageMassShift}"));
         columnBinding.setColumnName("Average mass shift");
+        columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(String.class);
 
         columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${location}"));
         columnBinding.setColumnName("Location");
+        columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(Modification.Location.class);
 
         bindingGroup.addBinding(modificationsTableBinding);
@@ -215,6 +220,9 @@ public class ModificationsController {
                 affectedAminoAcids.add(AminoAcid.Ala);
                 modificationsBindingList.add(new Modification("mod" + modificationsBindingList.size(), 0.0, 0.0, Modification.Location.NON_TERMINAL, affectedAminoAcids, "accession", "accessionValue"));
                 modificationsPanel.getModifcationsTable().getSelectionModel().setSelectionInterval(modificationsBindingList.size() - 1, modificationsBindingList.size() - 1);
+
+                //enable remove button if there's only one modification
+                changeRemoveModificationButtonState();
             }
         });
 
@@ -225,14 +233,37 @@ public class ModificationsController {
                 if (modificationsPanel.getModifcationsTable().getSelectedRow() != -1) {
                     modificationsBindingList.remove(modificationsPanel.getModifcationsTable().getSelectedRow());
                     modificationsPanel.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);
-                    
+
                     //disable remove button if there's only one modification
                     changeRemoveModificationButtonState();
                 }
             }
         });
+
+        modificationsPanel.getImportButton().addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //modificationService.savePipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_path"), modificationsBindingList);
+                modificationService.savePipelineModifications("C:\\Users\\niels\\Documents\\annotation_test\\aaaaaaaaaaaaaa.xml", modificationsBindingList);
+            }
+        });
+        
+        modificationsPanel.getExportButton().addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+            }
+        });
     }
 
+    /**
+     * Gets the pipeline modifications as a list.
+     *
+     * @param modificationSet the set of modifications
+     * @return the list of modifications
+     */
     private List<Modification> getModificationsAsList(Set<Modification> modificationSet) {
         List<Modification> modifications = new ArrayList<Modification>();
         for (Modification modification : modificationSet) {
@@ -242,6 +273,12 @@ public class ModificationsController {
         return modifications;
     }
 
+    /**
+     * Gets the amino acids as list. Arrays.asList(AminoAcid.values()) doesn't
+     * work with the binding.
+     *
+     * @return the list of amino acids
+     */
     private List<AminoAcid> getAminoAcidsAsList() {
         List<AminoAcid> aminoAcids = new ArrayList<AminoAcid>();
         for (AminoAcid aminoAcid : AminoAcid.values()) {
@@ -251,14 +288,26 @@ public class ModificationsController {
         return aminoAcids;
     }
 
-    private void changeRemoveAminoAcidButtonState(Modification modification) {
-        if (modification.getAffectedAminoAcids().size() == 1) {
+    /**
+     * Changes the state of the removeAminoAcidButton (enable or disabled)
+     * depending on the size of the affected amino acids of the selected
+     * modification
+     *
+     * @param selectedModification the selected modification
+     */
+    private void changeRemoveAminoAcidButtonState(Modification selectedModification) {
+        if (selectedModification.getAffectedAminoAcids().size() == 1) {
             modificationsPanel.getRemoveAminoAcidButton().setEnabled(Boolean.FALSE);
         } else {
             modificationsPanel.getRemoveAminoAcidButton().setEnabled(Boolean.TRUE);
         }
     }
-    
+
+    /**
+     * Changes the state of the removeModificationButton (enable or disabled)
+     * depending on the number of pipeline modifications
+     *
+     */
     private void changeRemoveModificationButtonState() {
         if (modificationsBindingList.size() == 1) {
             modificationsPanel.getRemoveModificationButton().setEnabled(Boolean.FALSE);
@@ -267,6 +316,10 @@ public class ModificationsController {
         }
     }
 
+    /**
+     * Converter class used for binding. In case of a NumberFormatException, the
+     * value of the bound field is set 0.0
+     */
     private class DoubleConverter extends Converter<Double, String> {
 
         @Override
@@ -287,12 +340,15 @@ public class ModificationsController {
         }
     }
 
+    /**
+     * Validator class used for binding. Checks if the bound field is not empty
+     */
     private class RequiredStringValidator extends Validator<String> {
 
         @Override
         public Result validate(String arg) {
             if ((arg == null) || (arg.length() == 0)) {
-                return new Validator.Result(null, "Empty value");
+                return new Validator.Result(null, "Empty value: previous value will be restored.");
             }
             return null;
         }
