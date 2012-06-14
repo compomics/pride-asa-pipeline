@@ -268,7 +268,7 @@ public class ModifiedPeptideTest {
      */
     @Test
     public void testEquals() throws UnknownAAException {
-        Set<Modification> modifications = modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name"));
+        Set<Modification> modifications = modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_path"));
 
         Peptide peptide = new Peptide(1, 1256, new AminoAcidSequence("AAAKENKKNYYY"));
 

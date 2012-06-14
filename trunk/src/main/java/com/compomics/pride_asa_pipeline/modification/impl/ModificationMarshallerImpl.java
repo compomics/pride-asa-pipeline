@@ -1,25 +1,21 @@
 package com.compomics.pride_asa_pipeline.modification.impl;
 
-import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.modification.ModificationMarshaller;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.filter.ElementFilter;
-import org.jdom.filter.Filter;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.filter.ElementFilter;
+import org.jdom2.filter.Filter;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 /**
  * Simple DOM parser to read modification definitions from a provided input
@@ -59,7 +55,7 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
             Iterator<Element> modIter = eRoot.getDescendants(modFilter);
             while (modIter.hasNext()) {
                 Element eModification = modIter.next();
-                Modification.Location position = readPosition(eModification);
+                Modification.Location location = readLocation(eModification);
                 List<Element> eAffectedAAs = eModification.getChild("affectedAminoAcids").getChildren("affectedAminoAcid");
                 Set<AminoAcid> affectedAminoAcids = new HashSet<AminoAcid>();
                 for (Element eAffectedAA : eAffectedAAs) {
@@ -75,18 +71,18 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
                 String name = eModification.getChild("name").getValue();
                 double monoIsotopicMassShift = Double.parseDouble(eModification.getChild("monoIsotopicMassShift").getValue());
                 double averageMassShift = Double.parseDouble(eModification.getChild("averageMassShift").getValue());
-                Element modAccEle = eModification.getChild("psimodAccession");
+                Element modAccEle = eModification.getChild("accession");
                 String modAccession = null;
                 if (modAccEle != null) {
                     modAccession = modAccEle.getValue();
                 }
-                Element modNameEle = eModification.getChild("psimodName");
-                String modName = null;
-                if (modNameEle != null) {
-                    modName = modNameEle.getValue();
+                Element modAccessionValueEle = eModification.getChild("accessionValue");
+                String modAccessionValue = null;
+                if (modAccessionValueEle != null) {
+                    modAccessionValue = modAccessionValueEle.getValue();
                 }
 
-                result.add(new Modification(name, monoIsotopicMassShift, averageMassShift, position, affectedAminoAcids, modAccession, modName));
+                result.add(new Modification(name, monoIsotopicMassShift, averageMassShift, location, affectedAminoAcids, modAccession, modAccessionValue));
             }
         }
 
@@ -94,12 +90,13 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
     }
 
     @Override
-    public File marshall(Set<Modification> modifications) {
-        File modificationsFile = new File(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name" + "_new"));
+    public void marshall(String modificationFilePath, Collection<Modification> modifications) {
+        File modificationsFile = new File(modificationFilePath);        
 
         try {
             //add root element
-            Document doc = new Document(new Element("modifications"));
+            Document doc = new Document();
+            Element rootElement = new Element("modifications");
             for (Modification modification : modifications) {
                 Element modificationElement = new Element("modification");
 
@@ -119,23 +116,47 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
                 locationElement.setText(getPositionAsString(modification.getLocation()));
                 modificationElement.addContent(locationElement);
 
+                Element affectedAminoAcidsElement = new Element("affectedAminoAcids");
+
+                if (modification.getAffectedAminoAcids().size() == AminoAcid.values().length) {
+                    Element affectedAminoAcidElement = new Element("affectedAminoAcid");
+                    affectedAminoAcidElement.setText("*");
+                    affectedAminoAcidsElement.addContent(affectedAminoAcidElement);
+                } else {
+                    for (AminoAcid aminoAcid : modification.getAffectedAminoAcids()) {
+                        Element affectedAminoAcidElement = new Element("affectedAminoAcid");
+                        affectedAminoAcidElement.setText(String.valueOf(aminoAcid.letter()));
+                        affectedAminoAcidsElement.addContent(affectedAminoAcidElement);
+                    }
+                }
+                modificationElement.addContent(affectedAminoAcidsElement);
+
+                Element accessionElement = new Element("accession");
+                accessionElement.setText(modification.getAccession());
+                modificationElement.addContent(accessionElement);
+
+                Element accessionValueElement = new Element("accessionValue");
+                accessionValueElement.setText(modification.getAccessionValue());
+                modificationElement.addContent(accessionValueElement);
+
                 //add to root element
-                doc.addContent(modificationElement);
+                rootElement.addContent(modificationElement);
             }
 
+            doc.addContent(rootElement);
+
             XMLOutputter xmlOutputter = new XMLOutputter();
-            FileWriter fileWriter = new FileWriter(modificationsFile);
-            new XMLOutputter().output(doc, fileWriter);
+            xmlOutputter.setFormat(Format.getPrettyFormat());
+            FileOutputStream fileOutputStream = new FileOutputStream(modificationsFile);
+            xmlOutputter.output(doc, fileOutputStream);
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage(), ex);
         }
-
-        return modificationsFile;
     }
 
-    private Modification.Location readPosition(Element eModification) {
+    private Modification.Location readLocation(Element eModification) {
         Modification.Location position;
-        String txtPosition = eModification.getChild("position").getValue();
+        String txtPosition = eModification.getChild("location").getValue();
         if (txtPosition.equals(NON_TERMINAL_LOCATION_STRING)) {
             position = Modification.Location.NON_TERMINAL;
         } else if (txtPosition.equals(N_TERMINAL_LOCATION_STRING)) {

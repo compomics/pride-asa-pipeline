@@ -5,14 +5,13 @@
 package com.compomics.pride_asa_pipeline.service.impl;
 
 import com.compomics.omssa.xsd.UserModCollection;
-import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Modification.Location;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.modification.ModificationMarshaller;
 import com.compomics.pride_asa_pipeline.modification.OmssaModiciationMarshaller;
-import com.compomics.pride_asa_pipeline.modification.impl.ModificationMarshallerImpl;
 import com.compomics.pride_asa_pipeline.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import java.io.File;
@@ -28,18 +27,18 @@ import org.apache.log4j.Logger;
 public class ModificationServiceImpl implements ModificationService {
 
     private static final Logger LOGGER = Logger.getLogger(ModificationServiceImpl.class);
-    private ModificationMarshallerImpl modificationMarshaller;
+    private ModificationMarshaller modificationMarshaller;
     private ModificationRepository modificationRepository;
     private OmssaModiciationMarshaller omssaModiciationMarshaller;
     private Set<Modification> pipelineModifications;
 
-    public ModificationMarshallerImpl getModificationMarshaller() {
+    public ModificationMarshaller getModificationMarshaller() {
         return modificationMarshaller;
     }
 
-    public void setModificationMarshaller(ModificationMarshallerImpl modificationMarshaller) {
+    public void setModificationMarshaller(ModificationMarshaller modificationMarshaller) {
         this.modificationMarshaller = modificationMarshaller;
-    }    
+    }
 
     public ModificationRepository getModificationRepository() {
         return modificationRepository;
@@ -56,30 +55,25 @@ public class ModificationServiceImpl implements ModificationService {
     public void setOmssaModiciationMarshaller(OmssaModiciationMarshaller omssaModiciationMarshaller) {
         this.omssaModiciationMarshaller = omssaModiciationMarshaller;
     }
-        
+
     @Override
-    public Set<Modification> loadPipelineModifications(String modificationFileName) {
+    public Set<Modification> loadPipelineModifications(String modificationsFilePath) {
         //return the modifications or first unmarshall them from the specified
         //configuration file if not done so before
         if (pipelineModifications == null) {
-            pipelineModifications = new HashSet<Modification>();
-            File modificationFile = null;
-            //check if it exists
-            URL url = this.getClass().getClassLoader().getResource(modificationFileName);
-            try {
-                modificationFile = new File(url.toURI());
-            } catch (URISyntaxException e) {
-                //this should not happen, since we get the URL from the ClassLoader
-                LOGGER.error("URL " + url.toString() + " for resource could did not match expected syntax!");
-            }
-            if (modificationFile == null || !modificationFile.exists() || !modificationFile.canRead()) {
-                LOGGER.warn("Specified modification file " + modificationFileName + " does not exist or could not be accessed! ");
-            } else {
-                //read the file and create Modification objects for all its entries                
-                pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationFile));
-            }
+            loadPipelineModificationsFromFile(modificationsFilePath);
         }
         return pipelineModifications;
+    }
+
+    @Override
+    public void savePipelineModifications(String modificationsFilePath, Collection<Modification> newPipelineModifications) {
+        modificationMarshaller.marshall(modificationsFilePath, newPipelineModifications);
+        //replace the current pipeline modifications
+        pipelineModifications.clear();
+        for (Modification modification : newPipelineModifications) {
+            pipelineModifications.add(modification);
+        }
     }
 
     @Override
@@ -131,7 +125,7 @@ public class ModificationServiceImpl implements ModificationService {
         Set<Modification> modifications = getUsedModifications(spectrumAnnotatorResult);
         return omssaModiciationMarshaller.marshallModifications(modifications);
     }
-        
+
     /**
      * Adds a modification to the modifications. If the modification is already
      * present, check if the location needs to be updated.
@@ -151,6 +145,30 @@ public class ModificationServiceImpl implements ModificationService {
             }
         } else {
             modifications.put(modification.getName(), modification);
+        }
+    }
+
+    /**
+     * Loads the modifications from file.
+     *
+     * @param modificationFilePath the modifications file path
+     */
+    private void loadPipelineModificationsFromFile(String modificationsFilePath) {
+        pipelineModifications = new HashSet<Modification>();
+        File modificationFile = null;
+        //check if it exists
+        URL url = this.getClass().getClassLoader().getResource(modificationsFilePath);
+        try {
+            modificationFile = new File(url.toURI());
+        } catch (URISyntaxException e) {
+            //this should not happen, since we get the URL from the ClassLoader
+            LOGGER.error("URL " + url.toString() + " for resource could did not match expected syntax!");
+        }
+        if (modificationFile == null || !modificationFile.exists() || !modificationFile.canRead()) {
+            LOGGER.warn("Specified modification file " + modificationsFilePath + " does not exist or could not be accessed! ");
+        } else {
+            //read the file and create Modification objects for all its entries                
+            pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationFile));
         }
     }
 }

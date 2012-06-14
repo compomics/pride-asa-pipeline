@@ -8,6 +8,7 @@ import com.compomics.omssa.xsd.UserModCollection;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -25,12 +26,20 @@ public interface ModificationService {
      * modification file after the first call of this method will therefore have
      * no effect.
      *
-     * @param modificationFileName the modification XML file name
+     * @param modificationsFilePath the modifications XML file path
      * @return the set of modifications as specified in the modification file or
      * null if the modification file does not exist or could not be parsed.
      */
-    Set<Modification> loadPipelineModifications(String modificationFileName);
-
+    Set<Modification> loadPipelineModifications(String modificationsFilePath);
+    
+    /**
+     * Saves the pipeline modifications to the modifications.xml file
+     * 
+     * @param modificationsFilePath the modifications XML file path
+     * @param pipelineModifications the collections of pipeline modifications
+     */
+    void savePipelineModifications(String modificationsFilePath, Collection<Modification> pipelineModifications);
+            
     /**
      * Loads the experiment modifications from pride
      *

@@ -70,7 +70,7 @@ public class MainFrame extends javax.swing.JFrame {
         helpMenu = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(700, 700));
+        setPreferredSize(new java.awt.Dimension(800, 800));
         getContentPane().setLayout(new java.awt.CardLayout());
 
         pipelinePanel.setLayout(new java.awt.GridBagLayout());
