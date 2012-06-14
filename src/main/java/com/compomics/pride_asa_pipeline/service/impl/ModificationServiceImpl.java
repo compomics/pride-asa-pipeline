@@ -15,8 +15,6 @@ import com.compomics.pride_asa_pipeline.modification.OmssaModiciationMarshaller;
 import com.compomics.pride_asa_pipeline.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.*;
 import org.apache.log4j.Logger;
 
@@ -57,25 +55,32 @@ public class ModificationServiceImpl implements ModificationService {
     }
 
     @Override
-    public Set<Modification> loadPipelineModifications(String modificationsFilePath) {
+    public Set<Modification> loadPipelineModifications(String modificationsFileName) {
         //return the modifications or first unmarshall them from the specified
         //configuration file if not done so before
         if (pipelineModifications == null) {
-            loadPipelineModificationsFromFile(modificationsFilePath);
+            loadPipelineModificationsFromFile(modificationsFileName);
         }
         return pipelineModifications;
     }
 
     @Override
-    public void savePipelineModifications(String modificationsFilePath, Collection<Modification> newPipelineModifications) {
-        modificationMarshaller.marshall(modificationsFilePath, newPipelineModifications);
+    public boolean savePipelineModifications(String modificationsFileName, Collection<Modification> newPipelineModifications) {
+        boolean success = modificationMarshaller.marshall(modificationsFileName, newPipelineModifications);
         //replace the current pipeline modifications
         pipelineModifications.clear();
         for (Modification modification : newPipelineModifications) {
             pipelineModifications.add(modification);
         }
+        
+        return success;
     }
 
+    @Override
+    public boolean importPipelineModifications(File modificationsFile) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
     @Override
     public Set<Modification> loadExperimentModifications(List<Peptide> completePeptides) {
         Map<String, Modification> modificationMap = new HashMap<String, Modification>();
@@ -151,24 +156,10 @@ public class ModificationServiceImpl implements ModificationService {
     /**
      * Loads the modifications from file.
      *
-     * @param modificationFilePath the modifications file path
+     * @param modificationFileName the modifications file name
      */
-    private void loadPipelineModificationsFromFile(String modificationsFilePath) {
+    private void loadPipelineModificationsFromFile(String modificationsFileName) {
         pipelineModifications = new HashSet<Modification>();
-        File modificationFile = null;
-        //check if it exists
-        URL url = this.getClass().getClassLoader().getResource(modificationsFilePath);
-        try {
-            modificationFile = new File(url.toURI());
-        } catch (URISyntaxException e) {
-            //this should not happen, since we get the URL from the ClassLoader
-            LOGGER.error("URL " + url.toString() + " for resource could did not match expected syntax!");
-        }
-        if (modificationFile == null || !modificationFile.exists() || !modificationFile.canRead()) {
-            LOGGER.warn("Specified modification file " + modificationsFilePath + " does not exist or could not be accessed! ");
-        } else {
-            //read the file and create Modification objects for all its entries                
-            pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationFile));
-        }
+        pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationsFileName));
     }
 }

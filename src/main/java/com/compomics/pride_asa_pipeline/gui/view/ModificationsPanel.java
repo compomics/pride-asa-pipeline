@@ -11,12 +11,15 @@ import javax.swing.*;
  * @author Niels Hulstaert
  */
 public class ModificationsPanel extends javax.swing.JPanel {
-
+    
+    JFileChooser fileChooser;
+    
     /**
      * Creates new form ModificationsPanel
      */
     public ModificationsPanel() {
         initComponents();
+        fileChooser = new JFileChooser();
     }
 
     public JTable getModifcationsTable() {
@@ -75,13 +78,17 @@ public class ModificationsPanel extends javax.swing.JPanel {
         return modAccessionValueTextField;
     }
 
-    public JButton getExportButton() {
-        return exportButton;
+    public JButton getSaveButton() {
+        return saveButton;
     }
 
     public JButton getImportButton() {
         return importButton;
     }
+
+    public JFileChooser getFileChooser() {
+        return fileChooser;
+    }        
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -123,7 +130,7 @@ public class ModificationsPanel extends javax.swing.JPanel {
         addModificationButton = new javax.swing.JButton();
         removeModificationButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
-        exportButton = new javax.swing.JButton();
+        saveButton = new javax.swing.JButton();
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
 
         setLayout(new java.awt.GridBagLayout());
@@ -386,18 +393,18 @@ public class ModificationsPanel extends javax.swing.JPanel {
         importButton.setMinimumSize(new java.awt.Dimension(80, 25));
         importButton.setPreferredSize(new java.awt.Dimension(80, 25));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         jPanel3.add(importButton, gridBagConstraints);
 
-        exportButton.setText("export");
-        exportButton.setMaximumSize(new java.awt.Dimension(80, 25));
-        exportButton.setMinimumSize(new java.awt.Dimension(80, 25));
-        exportButton.setPreferredSize(new java.awt.Dimension(80, 25));
+        saveButton.setText("save");
+        saveButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        saveButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        saveButton.setPreferredSize(new java.awt.Dimension(80, 25));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        jPanel3.add(exportButton, gridBagConstraints);
+        jPanel3.add(saveButton, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -421,7 +428,6 @@ public class ModificationsPanel extends javax.swing.JPanel {
     private javax.swing.JList aminoAcidsList;
     private javax.swing.JLabel bindingLoggingLabel;
     private javax.swing.JPanel editModificationPanel;
-    private javax.swing.JButton exportButton;
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
     private javax.swing.JButton importButton;
@@ -446,5 +452,6 @@ public class ModificationsPanel extends javax.swing.JPanel {
     private javax.swing.JTable modifcationsTable;
     private javax.swing.JButton removeAminoAcidButton;
     private javax.swing.JButton removeModificationButton;
+    private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 }

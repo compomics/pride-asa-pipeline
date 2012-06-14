@@ -8,6 +8,7 @@ import com.compomics.omssa.xsd.UserModCollection;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -26,20 +27,32 @@ public interface ModificationService {
      * modification file after the first call of this method will therefore have
      * no effect.
      *
-     * @param modificationsFilePath the modifications XML file path
+     * @param modificationsFileName the modifications XML file name
      * @return the set of modifications as specified in the modification file or
      * null if the modification file does not exist or could not be parsed.
      */
-    Set<Modification> loadPipelineModifications(String modificationsFilePath);
-    
+    Set<Modification> loadPipelineModifications(String modificationsFileName);
+
     /**
-     * Saves the pipeline modifications to the modifications.xml file
-     * 
-     * @param modificationsFilePath the modifications XML file path
+     * Saves the pipeline modifications to the modifications.xml file. Returns
+     * true if the modifications file could be saved, false otherwise.
+     *
+     * @param modificationsFileName the modifications XML file name
      * @param pipelineModifications the collections of pipeline modifications
+     * @return the success boolean
      */
-    void savePipelineModifications(String modificationsFilePath, Collection<Modification> pipelineModifications);
-            
+    boolean savePipelineModifications(String modificationsFileName, Collection<Modification> pipelineModifications);
+
+    /**
+     * Imports the pipeline modifications to the modifications.xml file. Returns
+     * true if the modifications file could be saved, false otherwise.
+     *
+     * @param modificationsFile the modifications file to be imported
+     * @param pipelineModifications the collections of pipeline modifications
+     * @return the success boolean
+     */
+    boolean importPipelineModifications(File modificationsFile);
+    
     /**
      * Loads the experiment modifications from pride
      *
@@ -57,7 +70,7 @@ public interface ModificationService {
      * @return the used modifications
      */
     Set<Modification> getUsedModifications(SpectrumAnnotatorResult spectrumAnnotatorResult);
-    
+
     /**
      * Gets the modifications that were actually used in the pipeline; i.e.
      * modifications that could be combined the explain a certain mass delta for

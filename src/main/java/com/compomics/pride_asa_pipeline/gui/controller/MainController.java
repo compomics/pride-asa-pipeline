@@ -6,11 +6,13 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.pipeline.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
+import org.springframework.context.ApplicationContext;
 
 /**
  *
@@ -46,7 +48,7 @@ public class MainController implements ActionListener {
 
     public void setModificationsController(ModificationsController modificationsController) {
         this.modificationsController = modificationsController;
-    }        
+    }
 
     public PrideSpectrumAnnotator getPrideSpectrumAnnotator() {
         return prideSpectrumAnnotator;

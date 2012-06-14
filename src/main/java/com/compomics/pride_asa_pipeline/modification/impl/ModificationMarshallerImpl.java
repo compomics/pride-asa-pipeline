@@ -3,10 +3,9 @@ package com.compomics.pride_asa_pipeline.modification.impl;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.modification.ModificationMarshaller;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -34,11 +33,11 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
     private Document document = null;
 
     @Override
-    public Set<Modification> unmarshall(File modificationFile) {
+    public Set<Modification> unmarshall(String modificationsFileName) {
         SAXBuilder builder = new SAXBuilder();
 
         try {
-            document = builder.build(modificationFile);
+            document = builder.build(getModificationsFileAsInputStream(modificationsFileName));
         } catch (JDOMException e) {
             LOGGER.error(e.getMessage(), e);
         } catch (IOException e) {
@@ -90,68 +89,75 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
     }
 
     @Override
-    public void marshall(String modificationFilePath, Collection<Modification> modifications) {
-        File modificationsFile = new File(modificationFilePath);        
+    public boolean marshall(String modificationsFileName, Collection<Modification> modifications) {
+        boolean success = Boolean.FALSE;
+        File modificationsFile = getModificationsFile(modificationsFileName);
+        if (modificationsFile.exists()) {
 
-        try {
-            //add root element
-            Document doc = new Document();
-            Element rootElement = new Element("modifications");
-            for (Modification modification : modifications) {
-                Element modificationElement = new Element("modification");
+            try {
+                //add root element
+                Document doc = new Document();
+                Element rootElement = new Element("modifications");
+                for (Modification modification : modifications) {
+                    Element modificationElement = new Element("modification");
 
-                Element nameElement = new Element("name");
-                nameElement.setText(modification.getAccessionValue());
-                modificationElement.addContent(nameElement);
+                    Element nameElement = new Element("name");
+                    nameElement.setText(modification.getAccessionValue());
+                    modificationElement.addContent(nameElement);
 
-                Element monoIsotopicMassShiftElement = new Element("monoIsotopicMassShift");
-                monoIsotopicMassShiftElement.setText(Double.toString(modification.getMonoIsotopicMassShift()));
-                modificationElement.addContent(monoIsotopicMassShiftElement);
+                    Element monoIsotopicMassShiftElement = new Element("monoIsotopicMassShift");
+                    monoIsotopicMassShiftElement.setText(Double.toString(modification.getMonoIsotopicMassShift()));
+                    modificationElement.addContent(monoIsotopicMassShiftElement);
 
-                Element averageMassShiftElement = new Element("averageMassShift");
-                averageMassShiftElement.setText(Double.toString(modification.getAverageMassShift()));
-                modificationElement.addContent(averageMassShiftElement);
+                    Element averageMassShiftElement = new Element("averageMassShift");
+                    averageMassShiftElement.setText(Double.toString(modification.getAverageMassShift()));
+                    modificationElement.addContent(averageMassShiftElement);
 
-                Element locationElement = new Element("location");
-                locationElement.setText(getPositionAsString(modification.getLocation()));
-                modificationElement.addContent(locationElement);
+                    Element locationElement = new Element("location");
+                    locationElement.setText(getPositionAsString(modification.getLocation()));
+                    modificationElement.addContent(locationElement);
 
-                Element affectedAminoAcidsElement = new Element("affectedAminoAcids");
+                    Element affectedAminoAcidsElement = new Element("affectedAminoAcids");
 
-                if (modification.getAffectedAminoAcids().size() == AminoAcid.values().length) {
-                    Element affectedAminoAcidElement = new Element("affectedAminoAcid");
-                    affectedAminoAcidElement.setText("*");
-                    affectedAminoAcidsElement.addContent(affectedAminoAcidElement);
-                } else {
-                    for (AminoAcid aminoAcid : modification.getAffectedAminoAcids()) {
+                    if (modification.getAffectedAminoAcids().size() == AminoAcid.values().length) {
                         Element affectedAminoAcidElement = new Element("affectedAminoAcid");
-                        affectedAminoAcidElement.setText(String.valueOf(aminoAcid.letter()));
+                        affectedAminoAcidElement.setText("*");
                         affectedAminoAcidsElement.addContent(affectedAminoAcidElement);
+                    } else {
+                        for (AminoAcid aminoAcid : modification.getAffectedAminoAcids()) {
+                            Element affectedAminoAcidElement = new Element("affectedAminoAcid");
+                            affectedAminoAcidElement.setText(String.valueOf(aminoAcid.letter()));
+                            affectedAminoAcidsElement.addContent(affectedAminoAcidElement);
+                        }
                     }
+                    modificationElement.addContent(affectedAminoAcidsElement);
+
+                    Element accessionElement = new Element("accession");
+                    accessionElement.setText(modification.getAccession());
+                    modificationElement.addContent(accessionElement);
+
+                    Element accessionValueElement = new Element("accessionValue");
+                    accessionValueElement.setText(modification.getAccessionValue());
+                    modificationElement.addContent(accessionValueElement);
+
+                    //add to root element
+                    rootElement.addContent(modificationElement);
                 }
-                modificationElement.addContent(affectedAminoAcidsElement);
 
-                Element accessionElement = new Element("accession");
-                accessionElement.setText(modification.getAccession());
-                modificationElement.addContent(accessionElement);
+                doc.addContent(rootElement);
 
-                Element accessionValueElement = new Element("accessionValue");
-                accessionValueElement.setText(modification.getAccessionValue());
-                modificationElement.addContent(accessionValueElement);
+                XMLOutputter xmlOutputter = new XMLOutputter();
+                xmlOutputter.setFormat(Format.getPrettyFormat());
+                FileOutputStream fileOutputStream = new FileOutputStream(modificationsFile);
+                xmlOutputter.output(doc, fileOutputStream);
 
-                //add to root element
-                rootElement.addContent(modificationElement);
+                success = Boolean.TRUE;
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage(), ex);
             }
-
-            doc.addContent(rootElement);
-
-            XMLOutputter xmlOutputter = new XMLOutputter();
-            xmlOutputter.setFormat(Format.getPrettyFormat());
-            FileOutputStream fileOutputStream = new FileOutputStream(modificationsFile);
-            xmlOutputter.output(doc, fileOutputStream);
-        } catch (IOException ex) {
-            LOGGER.error(ex.getMessage(), ex);
         }
+
+        return success;
     }
 
     private Modification.Location readLocation(Element eModification) {
@@ -181,5 +187,58 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
         }
 
         return locationString;
+    }
+
+    /**
+     * Gets the modifications file as an inputStream. If the modifications file
+     * is not found in the jar launcher folder, the modifications file on the
+     * classpath is used.
+     *
+     * @param modificationsFileName the modifications file name
+     * @return
+     */
+    private InputStream getModificationsFileAsInputStream(String modificationsFileName) {
+        InputStream inputStream = null;
+
+        try {
+            //first, try to find the modifications file in the jar launcher folder.
+            File modificationsFile = getModificationsFile(modificationsFileName);
+
+            if (modificationsFile.exists()) {
+                inputStream = new FileInputStream(modificationsFile);
+            } else {
+                //second, if not found try to find the file in the classpath
+                if (inputStream == null) {
+                    inputStream = ClassLoader.getSystemResourceAsStream(modificationsFileName);
+                }
+
+                if (inputStream == null) {
+                    inputStream = this.getClass().getClassLoader().getResourceAsStream(modificationsFileName);
+                }
+            }
+
+        } catch (FileNotFoundException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        }
+
+        return inputStream;
+    }
+
+    /**
+     * Gets the modifications file in the jar launcher folder.
+     *
+     * @param modificationsFileName
+     * @return
+     */
+    private File getModificationsFile(String modificationsFileName) {
+        String path = "" + this.getClass().getProtectionDomain().getCodeSource().getLocation();
+        path = path.substring(5, path.lastIndexOf("/"));
+//        path = path + "/resources" + File.separator + modificationsFileName;
+        path = path + File.separator + modificationsFileName;
+        path = path.replace("%20", " ");
+
+        File file = new File(path);
+
+        return file;
     }
 }

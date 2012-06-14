@@ -10,11 +10,16 @@ import com.compomics.pride_asa_pipeline.gui.view.ModificationsPanel;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
+import com.compomics.util.io.filefilters.MgfFileFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.*;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 import org.jdesktop.beansbinding.*;
 import org.jdesktop.observablecollections.ObservableCollections;
 import org.jdesktop.observablecollections.ObservableList;
@@ -44,6 +49,14 @@ public class ModificationsController {
     public ModificationsController() {
     }
 
+    public MainController getMainController() {
+        return mainController;
+    }
+
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
+    }
+
     public ModificationsPanel getModificationsPanel() {
         return modificationsPanel;
     }
@@ -64,10 +77,45 @@ public class ModificationsController {
             modificationsPanel.getModLocationComboBox().addItem(location);
         }
 
+        //init filechooser
+        //get file chooser
+        JFileChooser fileChooser = modificationsPanel.getFileChooser();
+        //select only files
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        //select multiple file
+        fileChooser.setMultiSelectionEnabled(Boolean.FALSE);
+        //set MGF file filter
+        fileChooser.setFileFilter(new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+                if (f.isDirectory()) {
+                    return true;
+                }
+
+                int index = f.getName().lastIndexOf(".");
+                String extension = f.getName().substring(index + 1);
+                if (extension != null) {
+                    if (extension.equals("xml")) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
+                return false;
+            }
+
+            @Override
+            public String getDescription() {
+                return ("only xml.");
+            }
+        });
+
         //init bindings
         //table binding
         modificationsBindingList = ObservableCollections.observableList(getModificationsAsList(
-                modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_path"))));
+                modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name"))));
         bindingGroup = new BindingGroup();
         JTableBinding modificationsTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsBindingList, modificationsPanel.getModifcationsTable());
 
@@ -244,16 +292,25 @@ public class ModificationsController {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                //modificationService.savePipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_path"), modificationsBindingList);
-                modificationService.savePipelineModifications("C:\\Users\\niels\\Documents\\annotation_test\\aaaaaaaaaaaaaa.xml", modificationsBindingList);
+                //in response to the button click, show open dialog 
+                int returnVal = modificationsPanel.getFileChooser().showOpenDialog(modificationsPanel);                
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = modificationsPanel.getFileChooser().getSelectedFile();
+                }
             }
         });
-        
-        modificationsPanel.getExportButton().addActionListener(new ActionListener() {
+
+        modificationsPanel.getSaveButton().addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                
+                boolean success = modificationService.savePipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name"), modificationsBindingList);
+
+                if (success) {
+                    mainController.showMessageDialog("Save successful", "The modifications were saved successfully.", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    mainController.showMessageDialog("Save unsuccessful", "The modifications could not be saved to file. They will however be used in the pipeline.", JOptionPane.WARNING_MESSAGE);
+                }
             }
         });
     }
