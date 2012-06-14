@@ -96,7 +96,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.compomics.pride_asa_pipeline.gui.view.MainFrame</mainClass>
+                            <mainClass>com.compomics.pride_asa_pipeline.PrideAsaPipelineStarter</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
                         </manifest>
@@ -110,14 +110,14 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.3</version>
                 <executions>
-<!--                    <execution>
+                    <execution>
                         <id>copy-package-resources</id>
                         <phase>package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/resources
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}
                             </outputDirectory>
                             <resources>
                                 <resource>
@@ -128,7 +128,7 @@
                                 </resource>
                             </resources>
                         </configuration>
-                    </execution>-->
+                    </execution>
                     <execution>
                         <id>copy-package-license</id>
                         <phase>package</phase>

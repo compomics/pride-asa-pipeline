@@ -160,6 +160,7 @@
     
     <bean id="modificationsController"
           class="com.compomics.pride_asa_pipeline.gui.controller.ModificationsController"> 
+          <property name="mainController" ref="mainController"/>
           <property name="modificationService" ref="modificationService"/>
     </bean>
                                       

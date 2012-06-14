@@ -38,7 +38,7 @@ public class ModificationCombinationSolverTest {
         if (modificationCombinationSolver.getModificationHolder() == null) {
             //add the pipeline modifications
             ModificationHolder modificationHolder = new ModificationHolder();
-            modificationHolder.addModifications(modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_path")));
+            modificationHolder.addModifications(modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name")));
 
             //set the modification combination holder
             modificationCombinationSolver.setModificationHolder(modificationHolder);

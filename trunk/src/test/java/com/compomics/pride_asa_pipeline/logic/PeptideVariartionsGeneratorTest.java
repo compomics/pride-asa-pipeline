@@ -34,7 +34,7 @@ public class PeptideVariartionsGeneratorTest {
     @Before
     public void loadModifications() {
         if (modifications == null) {
-            modifications = modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_path"));
+            modifications = modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name"));
         }
     }
 
