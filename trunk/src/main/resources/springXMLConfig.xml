@@ -6,7 +6,7 @@
     
     <!-- Property placeholder-->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="location" value="pride_asa_pipeline.properties"/>
+        <property name="location" value="resources/pride_asa_pipeline.properties"/>
     </bean>
     
     <!-- pipeline beans -->

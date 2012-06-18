@@ -19,7 +19,7 @@ public class PropertiesConfigurationHolder extends PropertiesConfiguration {
 
     static {
         try {
-            ourInstance = new PropertiesConfigurationHolder("pride_asa_pipeline.properties");
+            ourInstance = new PropertiesConfigurationHolder("resources/pride_asa_pipeline.properties");
         } catch (ConfigurationException e) {
             LOGGER.error(e.getMessage(), e);
         }
