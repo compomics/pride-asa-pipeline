@@ -16,14 +16,14 @@
         <org.springframework.version>3.1.0.RELEASE</org.springframework.version>
     </properties>
     
-    <distributionManagement>
-        <!-- use the following if you're not using a snapshot version. -->
+<!--    <distributionManagement>
+         use the following if you're not using a snapshot version. 
         <snapshotRepository>
             <id>genesis-maven2-repo</id>
             <name>Genesis Maven Repository</name>
             <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
         </snapshotRepository>       
-    </distributionManagement>
+    </distributionManagement>-->
     
     <!-- Licence -->
     <licenses>
@@ -117,14 +117,15 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/resources
                             </outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>src/main/resources</directory>
-                                    <includes>
+                                    <directory>src/main/resources/resources</directory>
+<!--                                    <includes>
                                         <include>modifications.xml</include>
-                                    </includes>
+                                        <include>pride_asa_pipeline.properties</include>
+                                    </includes>-->
                                 </resource>
                             </resources>
                         </configuration>
@@ -187,15 +188,10 @@
             <layout>default</layout>
         </repository>
         <repository>
-            <id>unknown-jars-temp-repo</id>
-            <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
-            <url>file:${project.basedir}/lib</url>
-        </repository>
-        <repository>
-            <url>http://download.java.net/maven/2/</url>
-            <id>beans-binding</id>
+            <id>genesis-maven-repo</id>
+            <name>Genesis maven repository</name>
+            <url>http://genesis.UGent.be/maven</url>
             <layout>default</layout>
-            <name>Repository for library Library[beans-binding]</name>
         </repository>
     </repositories>
 

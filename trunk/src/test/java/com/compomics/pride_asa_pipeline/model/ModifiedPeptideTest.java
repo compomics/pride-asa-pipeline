@@ -6,6 +6,8 @@ package com.compomics.pride_asa_pipeline.model;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.Set;
 import static junit.framework.Assert.*;
@@ -267,7 +269,7 @@ public class ModifiedPeptideTest {
      *
      */
     @Test
-    public void testEquals() throws UnknownAAException {
+    public void testEquals() throws UnknownAAException {        
         Set<Modification> modifications = modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name"));
 
         Peptide peptide = new Peptide(1, 1256, new AminoAcidSequence("AAAKENKKNYYY"));
