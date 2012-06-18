@@ -4,6 +4,9 @@ import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.modification.ModificationMarshaller;
 import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.*;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
@@ -207,13 +210,13 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
             if (modificationsFile.exists()) {
                 inputStream = new FileInputStream(modificationsFile);
             } else {
-                //second, if not found try to find the file in the classpath
-                if (inputStream == null) {
-                    inputStream = ClassLoader.getSystemResourceAsStream(modificationsFileName);
-                }
-
+                //second, if not found try to find the file in the classpath                
                 if (inputStream == null) {
                     inputStream = this.getClass().getClassLoader().getResourceAsStream(modificationsFileName);
+                }
+                
+                if (inputStream == null) {
+                    inputStream = ClassLoader.getSystemResourceAsStream(modificationsFileName);
                 }
             }
 
@@ -233,7 +236,6 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
     private File getModificationsFile(String modificationsFileName) {
         String path = "" + this.getClass().getProtectionDomain().getCodeSource().getLocation();
         path = path.substring(5, path.lastIndexOf("/"));
-//        path = path + "/resources" + File.separator + modificationsFileName;
         path = path + File.separator + modificationsFileName;
         path = path.replace("%20", " ");
 
