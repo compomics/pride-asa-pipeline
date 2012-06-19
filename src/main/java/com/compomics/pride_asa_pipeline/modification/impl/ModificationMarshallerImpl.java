@@ -193,12 +193,10 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
     }
 
     /**
-     * Gets the modifications file as an inputStream. If the modifications file
-     * is not found in the jar launcher folder, the modifications file on the
-     * classpath is used.
+     * Gets the modifications file in the jar launcher folder.
      *
      * @param modificationsFileName the modifications file name
-     * @return
+     * @return the modifications file
      */
     private InputStream getModificationsFileAsInputStream(String modificationsFileName) {
         InputStream inputStream = null;
@@ -214,7 +212,7 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
                 if (inputStream == null) {
                     inputStream = this.getClass().getClassLoader().getResourceAsStream(modificationsFileName);
                 }
-                
+
                 if (inputStream == null) {
                     inputStream = ClassLoader.getSystemResourceAsStream(modificationsFileName);
                 }
@@ -230,10 +228,22 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
     /**
      * Gets the modifications file in the jar launcher folder.
      *
-     * @param modificationsFileName
-     * @return
+     * @param modificationsFileName the modifications file name
+     * @return the modifications file
      */
     private File getModificationsFile(String modificationsFileName) {
+        File file = new File(modificationsFileName);
+
+        return file;
+    }
+
+    /**
+     * Gets the modifications file in the jar launcher folder.
+     *
+     * @param modificationsFileName the modifications file name
+     * @return the modifications file
+     */
+    private File getModificationsFile_old(String modificationsFileName) {
         String path = "" + this.getClass().getProtectionDomain().getCodeSource().getLocation();
         path = path.substring(5, path.lastIndexOf("/"));
         path = path + File.separator + modificationsFileName;

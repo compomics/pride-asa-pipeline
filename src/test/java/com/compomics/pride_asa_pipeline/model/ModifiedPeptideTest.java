@@ -6,8 +6,6 @@ package com.compomics.pride_asa_pipeline.model;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.Set;
 import static junit.framework.Assert.*;
