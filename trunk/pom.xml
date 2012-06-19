@@ -16,14 +16,14 @@
         <org.springframework.version>3.1.0.RELEASE</org.springframework.version>
     </properties>
     
-<!--    <distributionManagement>
-         use the following if you're not using a snapshot version. 
+    <distributionManagement>
+        <!--         use the following if you're not using a snapshot version. -->
         <snapshotRepository>
             <id>genesis-maven2-repo</id>
             <name>Genesis Maven Repository</name>
             <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
         </snapshotRepository>       
-    </distributionManagement>-->
+    </distributionManagement>
     
     <!-- Licence -->
     <licenses>
@@ -99,7 +99,7 @@
                             <mainClass>com.compomics.pride_asa_pipeline.PrideAsaPipelineStarter</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
-                        </manifest>
+                        </manifest>                        
                     </archive>
                     <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
                 </configuration>
