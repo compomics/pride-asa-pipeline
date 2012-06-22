@@ -218,11 +218,12 @@ public class ModificationsController {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                List<AminoAcid> selectedValues = modificationsPanel.getAminoAcidsList().getSelectedValuesList();
+                Object[] selectedValues = modificationsPanel.getAminoAcidsList().getSelectedValues();
 
                 Modification selectedModification = modificationsBindingList.get(modificationsPanel.getModifcationsTable().getSelectedRow());
 
-                for (AminoAcid aminoAcid : selectedValues) {
+                for (Object o : selectedValues) {
+                    AminoAcid aminoAcid = (AminoAcid) o;
                     affectedAminoAcidsBindingList.add(aminoAcid);
                     Collections.sort(affectedAminoAcidsBindingList);
                     aminoAcidsBindingList.remove(aminoAcid);
@@ -240,11 +241,12 @@ public class ModificationsController {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                List<AminoAcid> selectedValues = modificationsPanel.getAffectedAminoAcidsList().getSelectedValuesList();
+                Object[] selectedValues = modificationsPanel.getAffectedAminoAcidsList().getSelectedValues();
 
                 Modification selectedModification = modificationsBindingList.get(modificationsPanel.getModifcationsTable().getSelectedRow());
 
-                for (AminoAcid aminoAcid : selectedValues) {
+                for (Object o : selectedValues) {
+                    AminoAcid aminoAcid = (AminoAcid) o;
                     aminoAcidsBindingList.add(aminoAcid);
                     affectedAminoAcidsBindingList.remove(aminoAcid);
                     Collections.sort(aminoAcidsBindingList);
