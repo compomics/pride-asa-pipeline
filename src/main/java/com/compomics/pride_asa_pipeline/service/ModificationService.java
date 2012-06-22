@@ -62,6 +62,14 @@ public interface ModificationService {
     Set<Modification> loadExperimentModifications(List<Peptide> completePeptides);
 
     /**
+     * Loads the experiment modifications from a pride experiment
+     *
+     * @param experimentId the experiment identifier
+     * @return the list of modifications
+     */
+    Set<Modification> loadExperimentModifications(long experimentId);
+
+    /**
      * Gets the modifications that were actually used in the pipeline; i.e.
      * modifications that could be combined the explain a certain mass delta for
      * a precursor.
