@@ -7,6 +7,7 @@ package com.compomics.pride_asa_pipeline;
 import com.compomics.pride_asa_pipeline.gui.controller.MainController;
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
+import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -14,7 +15,9 @@ import org.springframework.context.ApplicationContext;
  * @author Niels Hulstaert
  */
 public class PrideAsaPipelineStarter {
-
+    
+    private static final Logger LOGGER = Logger.getLogger(PrideAsaPipelineStarter.class);
+    
     public static void main(String[] args) {
         launch();
     }
@@ -37,13 +40,13 @@ public class PrideAsaPipelineStarter {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            LOGGER.error(ex.getMessage(), ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            LOGGER.error(ex.getMessage(), ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            LOGGER.error(ex.getMessage(), ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            LOGGER.error(ex.getMessage(), ex);
         }
         //</editor-fold>
 

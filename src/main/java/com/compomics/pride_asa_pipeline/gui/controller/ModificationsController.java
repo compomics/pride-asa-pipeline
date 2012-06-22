@@ -218,12 +218,11 @@ public class ModificationsController {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                Object[] selectedValues = modificationsPanel.getAminoAcidsList().getSelectedValues();
+                List<AminoAcid> selectedValues = modificationsPanel.getAminoAcidsList().getSelectedValuesList();
 
                 Modification selectedModification = modificationsBindingList.get(modificationsPanel.getModifcationsTable().getSelectedRow());
 
-                for (Object o : selectedValues) {
-                    AminoAcid aminoAcid = (AminoAcid) o;
+                for (AminoAcid aminoAcid : selectedValues) {
                     affectedAminoAcidsBindingList.add(aminoAcid);
                     Collections.sort(affectedAminoAcidsBindingList);
                     aminoAcidsBindingList.remove(aminoAcid);
@@ -241,12 +240,11 @@ public class ModificationsController {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                Object[] selectedValues = modificationsPanel.getAffectedAminoAcidsList().getSelectedValues();
+                List<AminoAcid> selectedValues = modificationsPanel.getAffectedAminoAcidsList().getSelectedValuesList();
 
                 Modification selectedModification = modificationsBindingList.get(modificationsPanel.getModifcationsTable().getSelectedRow());
 
-                for (Object o : selectedValues) {
-                    AminoAcid aminoAcid = (AminoAcid) o;
+                for (AminoAcid aminoAcid : selectedValues) {
                     aminoAcidsBindingList.add(aminoAcid);
                     affectedAminoAcidsBindingList.remove(aminoAcid);
                     Collections.sort(aminoAcidsBindingList);
@@ -293,7 +291,7 @@ public class ModificationsController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //in response to the button click, show open dialog 
-                int returnVal = modificationsPanel.getFileChooser().showOpenDialog(modificationsPanel);                
+                int returnVal = modificationsPanel.getFileChooser().showOpenDialog(modificationsPanel);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = modificationsPanel.getFileChooser().getSelectedFile();
                 }
