@@ -103,6 +103,16 @@ public class ModificationServiceImpl implements ModificationService {
     }
 
     @Override
+    public Set<Modification> loadExperimentModifications(long experimentId) {
+
+        Set<Modification> modifications = new HashSet<Modification>();
+        modifications.addAll(modificationRepository.getModificationsByExperimentId(experimentId));
+
+        return modifications;
+
+    }
+
+    @Override
     public Set<Modification> getUsedModifications(SpectrumAnnotatorResult spectrumAnnotatorResult) {
         Set<Modification> modifications = new HashSet<Modification>();
         for (ModifiedPeptide modifiedPeptide : spectrumAnnotatorResult.getModifiedPrecursors().values()) {
