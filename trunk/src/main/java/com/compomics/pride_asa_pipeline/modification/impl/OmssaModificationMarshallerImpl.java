@@ -31,7 +31,7 @@ public class OmssaModificationMarshallerImpl implements OmssaModiciationMarshall
                         userMod = new UserMod();
                         userMod.setFixed(false);
                         userMod.setMass(modification.getMassShift());
-                        userMod.setModificationName(modification.getAccession());
+                        userMod.setModificationName(modification.getName());
                         userMod.setLocationType(getLocationAsLocationTypeEnum(modification.getLocation()));
                         userMod.setLocation(String.valueOf(aminoAcid.letter()));
 
@@ -43,7 +43,7 @@ public class OmssaModificationMarshallerImpl implements OmssaModiciationMarshall
                     userMod = new UserMod();
                     userMod.setFixed(false);
                     userMod.setMass(modification.getMassShift());
-                    userMod.setModificationName(modification.getAccession());
+                    userMod.setModificationName(modification.getName());
                     userMod.setLocationType(getLocationAsLocationTypeEnum(modification.getLocation()));
 
                     userModCollection.add(userMod);
