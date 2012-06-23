@@ -6,8 +6,9 @@ import com.compomics.omssa.xsd.UserModCollection;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.modification.OmssaModiciationMarshaller;
-import java.util.Set;
 import org.apache.log4j.Logger;
+
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA. User: niels Date: 17/11/11 Time: 9:54 To change
@@ -28,15 +29,19 @@ public class OmssaModificationMarshallerImpl implements OmssaModiciationMarshall
                 if (!modification.getAffectedAminoAcids().isEmpty()) {
                     for (AminoAcid aminoAcid : modification.getAffectedAminoAcids()) {
                         userMod = new UserMod();
+                        userMod.setFixed(false);
                         userMod.setMass(modification.getMassShift());
                         userMod.setModificationName(modification.getAccession());
                         userMod.setLocationType(getLocationAsLocationTypeEnum(modification.getLocation()));
                         userMod.setLocation(String.valueOf(aminoAcid.letter()));
 
+
+
                         userModCollection.add(userMod);
                     }
                 } else {
                     userMod = new UserMod();
+                    userMod.setFixed(false);
                     userMod.setMass(modification.getMassShift());
                     userMod.setModificationName(modification.getAccession());
                     userMod.setLocationType(getLocationAsLocationTypeEnum(modification.getLocation()));
