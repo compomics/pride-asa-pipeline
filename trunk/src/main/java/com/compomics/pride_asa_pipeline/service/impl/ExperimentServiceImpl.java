@@ -8,17 +8,17 @@ import com.compomics.mslims.util.fileio.MascotGenericFile;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Identifications;
-import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import com.google.common.io.Files;
+import org.apache.log4j.Logger;
+
 import java.io.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -135,8 +135,17 @@ public class ExperimentServiceImpl implements ExperimentService {
                 mascotGenericFile = new MascotGenericFile();
                 Long spectrumId = (Long) spectrumMetadata.get("spectrum_id");
                 mascotGenericFile.setTitle(spectrumId.toString());
-                mascotGenericFile.setPrecursorMZ(Double.parseDouble(spectrumMetadata.get("precursor_mz").toString()));
-                mascotGenericFile.setCharge(Integer.parseInt(spectrumMetadata.get("precursor_charge_state").toString()));
+
+                Object lPrecursor_mz = spectrumMetadata.get("precursor_mz");
+                if (lPrecursor_mz != null) {
+                    mascotGenericFile.setPrecursorMZ(Double.parseDouble(lPrecursor_mz.toString()));
+                }
+
+                Object lPrecursor_charge_state = spectrumMetadata.get("precursor_charge_state");
+                if (lPrecursor_charge_state != null) {
+                    mascotGenericFile.setCharge(Integer.parseInt(lPrecursor_charge_state.toString()));
+                }
+
                 mascotGenericFile.setPeaks(spectrumService.getSpectrumPeakMapBySpectrumId(spectrumId));
                 //first mascot generic file has to start at the first line
                 //else insert empty line
