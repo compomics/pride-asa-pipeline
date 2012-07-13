@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.jdom2.JDOMException;
 
 /**
  *
@@ -27,32 +28,31 @@ public interface ModificationService {
      * modification file after the first call of this method will therefore have
      * no effect.
      *
-     * @param modificationsFileName the modifications XML file name
+     * @param modificationsFile the modifications XML file
      * @return the set of modifications as specified in the modification file or
      * null if the modification file does not exist or could not be parsed.
+     * @exception JDOMException
      */
-    Set<Modification> loadPipelineModifications(String modificationsFileName);
+    Set<Modification> loadPipelineModifications(File modificationsFile) throws JDOMException;
 
     /**
-     * Saves the pipeline modifications to the modifications.xml file. Returns
-     * true if the modifications file could be saved, false otherwise.
+     * Saves the pipeline modifications to the modifications.xml file.
      *
-     * @param modificationsFileName the modifications XML file name
+     * @param modificationsFile the modifications XML file
      * @param pipelineModifications the collections of pipeline modifications
-     * @return the success boolean
      */
-    boolean savePipelineModifications(String modificationsFileName, Collection<Modification> pipelineModifications);
+    void savePipelineModifications(File modificationsFile, Collection<Modification> pipelineModifications);
 
     /**
-     * Imports the pipeline modifications to the modifications.xml file. Returns
-     * true if the modifications file could be saved, false otherwise.
+     * Imports the pipeline modifications from a given the modifications.
      *
      * @param modificationsFile the modifications file to be imported
      * @param pipelineModifications the collections of pipeline modifications
-     * @return the success boolean
+     * @return the modifications set
+     * @exception JDOMException
      */
-    boolean importPipelineModifications(File modificationsFile);
-    
+    Set<Modification> importPipelineModifications(File modificationsFile) throws JDOMException;
+
     /**
      * Loads the experiment modifications from pride
      *

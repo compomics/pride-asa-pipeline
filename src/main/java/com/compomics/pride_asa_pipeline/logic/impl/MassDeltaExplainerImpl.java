@@ -79,7 +79,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
         while ((currentExplainedRatio - previousExplainedRatio) >= convergenceCriterion) {
             //try to explain all identifications
             for (Identification identification : identifications) {
-                Peptide peptide = identification.getPrecursor();
+                Peptide peptide = identification.getPeptide();
 
                 //get the (reported) peptide mass delta
                 double precursorMassDelta = 0.0;
@@ -150,7 +150,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
             previousExplainedRatio = currentExplainedRatio;
             //calculate the new ratio of explained precursors
             currentExplainedRatio = (double) possibleExplainedIdentifications.keySet().size() / (double) identifications.size();
-            LOGGER.debug("Explanation ration with " + modificationCombinationSizeLimit + " modifications: " + currentExplainedRatio);
+            LOGGER.debug("Explanation ratio with " + modificationCombinationSizeLimit + " modifications: " + currentExplainedRatio);
 
             //increase the number of considered modifications for the next round in case we are not reaching the convergence
             modificationCombinationSizeLimit++;

@@ -6,13 +6,11 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.pipeline.PrideSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
-import org.springframework.context.ApplicationContext;
 
 /**
  *
@@ -26,20 +24,21 @@ public class MainController implements ActionListener {
     //view
     private MainFrame mainFrame;
     //child controllers
-    private ExperimentProcessController experimentProcessController;
+    private ExperimentSelectionController experimentSelectionController;
     private ModificationsController modificationsController;
+    private PipelineResultController pipelineResultController;
     //services
     private PrideSpectrumAnnotator prideSpectrumAnnotator;
 
     public MainController() {
     }
 
-    public ExperimentProcessController getExperimentProcessController() {
-        return experimentProcessController;
+    public ExperimentSelectionController getExperimentSelectionController() {
+        return experimentSelectionController;
     }
 
-    public void setExperimentProcessController(ExperimentProcessController experimentProcessController) {
-        this.experimentProcessController = experimentProcessController;
+    public void setExperimentSelectionController(ExperimentSelectionController experimentSelectionController) {
+        this.experimentSelectionController = experimentSelectionController;
     }
 
     public ModificationsController getModificationsController() {
@@ -56,6 +55,14 @@ public class MainController implements ActionListener {
 
     public void setPrideSpectrumAnnotator(PrideSpectrumAnnotator prideSpectrumAnnotator) {
         this.prideSpectrumAnnotator = prideSpectrumAnnotator;
+    }
+
+    public PipelineResultController getPipelineResultController() {
+        return pipelineResultController;
+    }
+
+    public void setPipelineResultController(PipelineResultController pipelineResultController) {
+        this.pipelineResultController = pipelineResultController;
     }
 
     public MainFrame getMainFrame() {
@@ -83,8 +90,9 @@ public class MainController implements ActionListener {
         mainFrame = new MainFrame();
 
         //init child controllers
-        experimentProcessController.init();
+        experimentSelectionController.init();
         modificationsController.init();
+        pipelineResultController.init();
 
         //add panel components                        
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -92,8 +100,9 @@ public class MainController implements ActionListener {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
 
-        mainFrame.getExperimentProcessParentPanel().add(experimentProcessController.getExperimentProcessPanel(), gridBagConstraints);
+        mainFrame.getExperimentSelectionParentPanel().add(experimentSelectionController.getExperimentSelectionPanel(), gridBagConstraints);
         mainFrame.getModificationsParentPanel().add(modificationsController.getModificationsPanel(), gridBagConstraints);
+        mainFrame.getPipelineResultParentPanel().add(pipelineResultController.getPipelineResultPanel(), gridBagConstraints);
 
         //add action listeners        
         mainFrame.getPipelineViewMenuItem().addActionListener(this);
@@ -111,5 +120,9 @@ public class MainController implements ActionListener {
 
     public void showMessageDialog(String title, String message, int messageType) {
         JOptionPane.showMessageDialog(mainFrame.getContentPane(), message, title, messageType);
+    }
+
+    public void onPipelineFinished() {
+        pipelineResultController.updateIdentifications();
     }
 }

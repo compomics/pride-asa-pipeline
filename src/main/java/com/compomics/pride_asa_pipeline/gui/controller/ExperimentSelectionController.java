@@ -4,7 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
-import com.compomics.pride_asa_pipeline.gui.view.ExperimentProcessPanel;
+import com.compomics.pride_asa_pipeline.gui.view.ExperimentSelectionPanel;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,14 +19,14 @@ import org.apache.log4j.Logger;
  *
  * @author Niels Hulstaert
  */
-public class ExperimentProcessController {
+public class ExperimentSelectionController {
 
-    private static final Logger LOGGER = Logger.getLogger(ExperimentProcessController.class);
+    private static final Logger LOGGER = Logger.getLogger(ExperimentSelectionController.class);
     private static final String EXPERIMENT_ACCESSION_SEPARATOR = ":";    
     //model
     private Integer taxonomyId;
     //view
-    private ExperimentProcessPanel experimentProcessPanel;
+    private ExperimentSelectionPanel experimentSelectionPanel;
     //parent controller
     private MainController mainController;
     //child controllers
@@ -34,7 +34,7 @@ public class ExperimentProcessController {
     //services
     private ExperimentService experimentService;
 
-    public ExperimentProcessController() {
+    public ExperimentSelectionController() {
     }
 
     public ExperimentService getExperimentService() {
@@ -53,8 +53,8 @@ public class ExperimentProcessController {
         this.mainController = mainController;
     }
 
-    public ExperimentProcessPanel getExperimentProcessPanel() {
-        return experimentProcessPanel;
+    public ExperimentSelectionPanel getExperimentSelectionPanel() {
+        return experimentSelectionPanel;
     }
 
     public PipelineProgressController getPipelineProgressController() {
@@ -66,7 +66,7 @@ public class ExperimentProcessController {
     }
 
     public void init() {
-        experimentProcessPanel = new ExperimentProcessPanel();
+        experimentSelectionPanel = new ExperimentSelectionPanel();
 
         //init child controllers
         pipelineProgressController.init();
@@ -75,20 +75,20 @@ public class ExperimentProcessController {
         updateComboBox(experimentService.findAllExperimentAccessions());
 
         //disable taxonomy text field
-        experimentProcessPanel.getTaxonomyTextField().setEnabled(Boolean.FALSE);
+        experimentSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.FALSE);
 
         //add action listeners
-        experimentProcessPanel.getFilterCheckBox().addActionListener(new ActionListener() {
+        experimentSelectionPanel.getTaxonomyFilterCheckBox().addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                if (experimentProcessPanel.getFilterCheckBox().isSelected()) {
+                if (experimentSelectionPanel.getTaxonomyFilterCheckBox().isSelected()) {
                     //enable taxonomy text field
-                    experimentProcessPanel.getTaxonomyTextField().setEnabled(Boolean.TRUE);
+                    experimentSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.TRUE);
                     filterExperimentAccessions();
                 } else {
                     //disable taxonomy text field
-                    experimentProcessPanel.getTaxonomyTextField().setEnabled(Boolean.FALSE);
+                    experimentSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.FALSE);
                     //reset combo box                    
                     updateComboBox(experimentService.findAllExperimentAccessions());
                     taxonomyId = null;
@@ -96,7 +96,7 @@ public class ExperimentProcessController {
             }
         });
 
-        experimentProcessPanel.getTaxonomyTextField().addFocusListener(new FocusListener() {
+        experimentSelectionPanel.getTaxonomyTextField().addFocusListener(new FocusListener() {
 
             @Override
             public void focusGained(FocusEvent fe) {
@@ -108,7 +108,7 @@ public class ExperimentProcessController {
             }
         });
 
-        experimentProcessPanel.getProcessExperimentButton().addActionListener(new ActionListener() {
+        experimentSelectionPanel.getExperimentProcessButton().addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -117,39 +117,39 @@ public class ExperimentProcessController {
                 pipelineWorker.execute();
 
                 //disable process button
-                experimentProcessPanel.getProcessExperimentButton().setEnabled(Boolean.FALSE);
+                experimentSelectionPanel.getExperimentProcessButton().setEnabled(Boolean.FALSE);
             }
         });
     }
 
     private void filterExperimentAccessions() {
-        if (!experimentProcessPanel.getTaxonomyTextField().getText().isEmpty()) {
+        if (!experimentSelectionPanel.getTaxonomyTextField().getText().isEmpty()) {
             try {
-                Integer newTaxonomyId = Integer.parseInt(experimentProcessPanel.getTaxonomyTextField().getText());
+                Integer newTaxonomyId = Integer.parseInt(experimentSelectionPanel.getTaxonomyTextField().getText());
                 if (taxonomyId != newTaxonomyId) {
                     taxonomyId = newTaxonomyId;
                     updateComboBox(experimentService.findExperimentAccessionsByTaxonomy(taxonomyId));
                 }
             } catch (NumberFormatException e) {
                 mainController.showMessageDialog("Format error", "Please insert a correct taxonomy ID (e.g. Homo Sapiens ID: 9606)", JOptionPane.ERROR_MESSAGE);
-                experimentProcessPanel.getTaxonomyTextField().setText("");
+                experimentSelectionPanel.getTaxonomyTextField().setText("");
             }
         }
     }
 
     private void updateComboBox(Map<String, String> experimentAccessions) {
         //empty combo box
-        experimentProcessPanel.getExperimentSelectionComboBox().removeAllItems();
+        experimentSelectionPanel.getExperimentSelectionComboBox().removeAllItems();
         //load experiment accessions and fill combo box        
         for (String experimentAccession : experimentAccessions.keySet()) {
-            experimentProcessPanel.getExperimentSelectionComboBox().addItem(experimentAccession + EXPERIMENT_ACCESSION_SEPARATOR + " " + experimentAccessions.get(experimentAccession));
+            experimentSelectionPanel.getExperimentSelectionComboBox().addItem(experimentAccession + EXPERIMENT_ACCESSION_SEPARATOR + " " + experimentAccessions.get(experimentAccession));
         }
     }
 
     private String getExperimentAccesion() {
         String experimentAccession = null;
-        if (experimentProcessPanel.getExperimentSelectionComboBox().getSelectedItem() != null) {
-            String comboBoxString = experimentProcessPanel.getExperimentSelectionComboBox().getSelectedItem().toString();
+        if (experimentSelectionPanel.getExperimentSelectionComboBox().getSelectedItem() != null) {
+            String comboBoxString = experimentSelectionPanel.getExperimentSelectionComboBox().getSelectedItem().toString();
             experimentAccession = comboBoxString.substring(0, comboBoxString.indexOf(EXPERIMENT_ACCESSION_SEPARATOR));
         }
 
@@ -172,7 +172,9 @@ public class ExperimentProcessController {
         @Override
         protected void done() {
             //enable process button
-            experimentProcessPanel.getProcessExperimentButton().setEnabled(Boolean.FALSE);
+            experimentSelectionPanel.getExperimentProcessButton().setEnabled(Boolean.FALSE);
+            
+            mainController.onPipelineFinished();
             
             //hide progress bar
             pipelineProgressController.hideProgressBar();

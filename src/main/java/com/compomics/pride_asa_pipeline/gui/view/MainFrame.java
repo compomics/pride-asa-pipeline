@@ -23,8 +23,8 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
     }
 
-    public JPanel getExperimentProcessParentPanel() {
-        return experimentProcessParentPanel;
+    public JPanel getExperimentSelectionParentPanel() {
+        return experimentSelectionParentPanel;
     }
 
     public JPanel getPipelinePanel() {
@@ -47,6 +47,10 @@ public class MainFrame extends javax.swing.JFrame {
         return pipelineViewMenuItem;
     }
 
+    public JPanel getPipelineResultParentPanel() {
+        return pipelineResultParentPanel;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -58,8 +62,8 @@ public class MainFrame extends javax.swing.JFrame {
         java.awt.GridBagConstraints gridBagConstraints;
 
         pipelinePanel = new javax.swing.JPanel();
-        experimentProcessParentPanel = new javax.swing.JPanel();
-        experimentDetailParentPanel = new javax.swing.JPanel();
+        experimentSelectionParentPanel = new javax.swing.JPanel();
+        pipelineResultParentPanel = new javax.swing.JPanel();
         modificationsParentPanel = new javax.swing.JPanel();
         pipelineParamsParentPanel = new javax.swing.JPanel();
         menuBar = new javax.swing.JMenuBar();
@@ -70,14 +74,12 @@ public class MainFrame extends javax.swing.JFrame {
         helpMenu = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(800, 800));
+        setPreferredSize(new java.awt.Dimension(1000, 800));
         getContentPane().setLayout(new java.awt.CardLayout());
 
         pipelinePanel.setLayout(new java.awt.GridBagLayout());
 
-        experimentProcessParentPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        experimentProcessParentPanel.setPreferredSize(new java.awt.Dimension(10, 10));
-        experimentProcessParentPanel.setLayout(new java.awt.GridBagLayout());
+        experimentSelectionParentPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -85,12 +87,10 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.3;
-        pipelinePanel.add(experimentProcessParentPanel, gridBagConstraints);
+        pipelinePanel.add(experimentSelectionParentPanel, gridBagConstraints);
 
-        experimentDetailParentPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        experimentDetailParentPanel.setPreferredSize(new java.awt.Dimension(10, 10));
-        experimentDetailParentPanel.setRequestFocusEnabled(false);
-        experimentDetailParentPanel.setLayout(new java.awt.GridBagLayout());
+        pipelineResultParentPanel.setRequestFocusEnabled(false);
+        pipelineResultParentPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -98,7 +98,7 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.7;
-        pipelinePanel.add(experimentDetailParentPanel, gridBagConstraints);
+        pipelinePanel.add(pipelineResultParentPanel, gridBagConstraints);
 
         getContentPane().add(pipelinePanel, "pipelinePanel");
 
@@ -130,8 +130,7 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel experimentDetailParentPanel;
-    private javax.swing.JPanel experimentProcessParentPanel;
+    private javax.swing.JPanel experimentSelectionParentPanel;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JPanel modificationsParentPanel;
@@ -139,6 +138,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel pipelinePanel;
     private javax.swing.JPanel pipelineParamsParentPanel;
     private javax.swing.JMenuItem pipelineParamsViewMenuItem;
+    private javax.swing.JPanel pipelineResultParentPanel;
     private javax.swing.JMenuItem pipelineViewMenuItem;
     private javax.swing.JMenu viewMenu;
     // End of variables declaration//GEN-END:variables

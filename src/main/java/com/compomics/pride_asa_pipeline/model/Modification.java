@@ -84,7 +84,7 @@ public class Modification implements Comparable<Modification>, ModificationFacad
     }
 
     public void setAccessionValue(String accessionValue) {
-        String oldAccessionValue = accessionValue;
+        String oldAccessionValue = this.accessionValue;
         this.accessionValue = accessionValue;
         propertyChangeSupport.firePropertyChange("accessionValue", oldAccessionValue, accessionValue);
     }

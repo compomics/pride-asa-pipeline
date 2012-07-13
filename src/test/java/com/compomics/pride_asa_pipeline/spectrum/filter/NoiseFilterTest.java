@@ -8,10 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -26,6 +29,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration("classpath:springXMLConfig.xml")
 public class NoiseFilterTest {
 
+    private static final Logger LOGGER = Logger.getLogger(NoiseFilterTest.class);
     private static List<Peak> peakList;
     
     @Autowired
@@ -33,7 +37,8 @@ public class NoiseFilterTest {
 
     @BeforeClass
     public static void setUponce() throws Exception {
-        File file = new File(NoiseThresholdFinderTest.class.getClassLoader().getResource("Filter_TestData.txt").getPath());
+        Resource resource = new ClassPathResource("Filter_TestData.txt");
+        File file = resource.getFile();
 
         BufferedReader br = new BufferedReader(new FileReader(file));
         peakList = new ArrayList<Peak>();

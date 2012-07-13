@@ -84,12 +84,12 @@ public class Identifications {
      * @param identification the identification
      */
     public void addIdentification(Identification identification) {
-        if (identification.getPrecursor().getSequence().isAllMassesKnown()) {
+        if (identification.getPeptide().getSequence().isAllMassesKnown()) {
             completeIdentifications.add(identification);
-            completePeptides.add(identification.getPrecursor());
+            completePeptides.add(identification.getPeptide());
         } else {
             incompleteIdentifications.add(identification);
-            incompletePeptides.add(identification.getPrecursor());
+            incompletePeptides.add(identification.getPeptide());
         }
     }        
     

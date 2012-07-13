@@ -5,6 +5,7 @@
 package com.compomics.pride_asa_pipeline.service.impl;
 
 import com.compomics.omssa.xsd.UserModCollection;
+import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Modification.Location;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
@@ -17,6 +18,7 @@ import com.compomics.pride_asa_pipeline.service.ModificationService;
 import java.io.File;
 import java.util.*;
 import org.apache.log4j.Logger;
+import org.jdom2.JDOMException;
 
 /**
  *
@@ -55,32 +57,32 @@ public class ModificationServiceImpl implements ModificationService {
     }
 
     @Override
-    public Set<Modification> loadPipelineModifications(String modificationsFileName) {
+    public Set<Modification> loadPipelineModifications(File modificationsFile) throws JDOMException {
         //return the modifications or first unmarshall them from the specified
         //configuration file if not done so before
         if (pipelineModifications == null) {
-            loadPipelineModificationsFromFile(modificationsFileName);
+            loadPipelineModificationsFromFile(modificationsFile);
         }
         return pipelineModifications;
     }
 
     @Override
-    public boolean savePipelineModifications(String modificationsFileName, Collection<Modification> newPipelineModifications) {
-        boolean success = modificationMarshaller.marshall(modificationsFileName, newPipelineModifications);
+    public void savePipelineModifications(File modificationsFile, Collection<Modification> newPipelineModifications) {
+        modificationMarshaller.marshall(modificationsFile, newPipelineModifications);
         //replace the current pipeline modifications
         pipelineModifications.clear();
         for (Modification modification : newPipelineModifications) {
             pipelineModifications.add(modification);
         }
-        
-        return success;
     }
 
     @Override
-    public boolean importPipelineModifications(File modificationsFile) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Set<Modification> importPipelineModifications(File modificationsFile) throws JDOMException {
+        Set<Modification> modifications = modificationMarshaller.unmarshall(modificationsFile);
+
+        return modifications;
     }
-    
+
     @Override
     public Set<Modification> loadExperimentModifications(List<Peptide> completePeptides) {
         Map<String, Modification> modificationMap = new HashMap<String, Modification>();
@@ -115,7 +117,8 @@ public class ModificationServiceImpl implements ModificationService {
     @Override
     public Set<Modification> getUsedModifications(SpectrumAnnotatorResult spectrumAnnotatorResult) {
         Set<Modification> modifications = new HashSet<Modification>();
-        for (ModifiedPeptide modifiedPeptide : spectrumAnnotatorResult.getModifiedPrecursors().values()) {
+        for (Identification identification : spectrumAnnotatorResult.getModifiedPrecursors()) {
+            ModifiedPeptide modifiedPeptide = (ModifiedPeptide) identification.getPeptide();
             if (modifiedPeptide.getNTermMod() != null) {
                 modifications.add((Modification) modifiedPeptide.getNTermMod());
             }
@@ -168,8 +171,8 @@ public class ModificationServiceImpl implements ModificationService {
      *
      * @param modificationFileName the modifications file name
      */
-    private void loadPipelineModificationsFromFile(String modificationsFileName) {
+    private void loadPipelineModificationsFromFile(File modificationsFile) throws JDOMException {
         pipelineModifications = new HashSet<Modification>();
-        pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationsFileName));
+        pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationsFile));
     }
 }
