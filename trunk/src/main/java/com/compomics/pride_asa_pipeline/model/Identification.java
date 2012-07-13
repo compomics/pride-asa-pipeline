@@ -1,6 +1,5 @@
 package com.compomics.pride_asa_pipeline.model;
 
-import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
@@ -38,7 +37,7 @@ public class Identification {
         this.spectrumRef = spectrumRef;
     }
 
-    public Peptide getPrecursor() {
+    public Peptide getPeptide() {
         return peptide;
     }
     
@@ -60,6 +59,10 @@ public class Identification {
 
     public void setAnnotationData(AnnotationData annotationData) {
         this.annotationData = annotationData;
+    }
+    
+    public void setPeptide(Peptide peptide){
+        this.peptide = peptide;
     }
         
     public String toShortString() {

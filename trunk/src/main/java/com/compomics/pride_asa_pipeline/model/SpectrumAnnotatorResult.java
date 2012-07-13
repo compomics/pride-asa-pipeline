@@ -4,8 +4,8 @@
  */
 package com.compomics.pride_asa_pipeline.model;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Convenience class for holding the pipeline results
@@ -13,15 +13,15 @@ import java.util.Map;
  * @author Niels Hulstaert
  */
 public class SpectrumAnnotatorResult {
-    
+
     /**
      * The mass recalibration result
      */
     private MassRecalibrationResult massRecalibrationResult;
     /**
-     * The unexplainable identifications
+     * The unexplained identifications
      */
-    private List<Identification> unexplainableIdentifications;
+    private List<Identification> unexplainedIdentifications;
     /**
      * The unmodified identifications
      */
@@ -29,7 +29,13 @@ public class SpectrumAnnotatorResult {
     /**
      * The modified identifications
      */
-    private Map<Identification, ModifiedPeptide> modifiedPrecursors;
+    private List<Identification> modifiedPrecursors;   
+    
+    public SpectrumAnnotatorResult(){
+        unexplainedIdentifications = new ArrayList<Identification>();
+        unmodifiedPrecursors = new ArrayList<Identification>();
+        modifiedPrecursors = new ArrayList<Identification>();
+    }
 
     public MassRecalibrationResult getMassRecalibrationResult() {
         return massRecalibrationResult;
@@ -39,20 +45,20 @@ public class SpectrumAnnotatorResult {
         this.massRecalibrationResult = massRecalibrationResult;
     }
 
-    public Map<Identification, ModifiedPeptide> getModifiedPrecursors() {
+    public List<Identification> getModifiedPrecursors() {
         return modifiedPrecursors;
     }
 
-    public void setModifiedPrecursors(Map<Identification, ModifiedPeptide> modifiedPrecursors) {
+    public void setModifiedPrecursors(List<Identification> modifiedPrecursors) {
         this.modifiedPrecursors = modifiedPrecursors;
     }
 
-    public List<Identification> getUnexplainableIdentifications() {
-        return unexplainableIdentifications;
+    public List<Identification> getUnexplainedIdentifications() {
+        return unexplainedIdentifications;
     }
 
-    public void setUnexplainableIdentifications(List<Identification> unexplainableIdentifications) {
-        this.unexplainableIdentifications = unexplainableIdentifications;
+    public void setUnexplainedIdentifications(List<Identification> unexplainedIdentifications) {
+        this.unexplainedIdentifications = unexplainedIdentifications;
     }
 
     public List<Identification> getUnmodifiedPrecursors() {
@@ -62,5 +68,13 @@ public class SpectrumAnnotatorResult {
     public void setUnmodifiedPrecursors(List<Identification> unmodifiedPrecursors) {
         this.unmodifiedPrecursors = unmodifiedPrecursors;
     }
+    
+    public List<Identification> getAllIdentifications(){
+        List<Identification> allIdentifications = new ArrayList<Identification>();
+        allIdentifications.addAll(unmodifiedPrecursors);
+        allIdentifications.addAll(modifiedPrecursors);
+        allIdentifications.addAll(unexplainedIdentifications);
         
+        return allIdentifications;
+    }
 }

@@ -10,7 +10,7 @@ import com.compomics.pride_asa_pipeline.gui.view.ModificationsPanel;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
-import com.compomics.util.io.filefilters.MgfFileFilter;
+import com.compomics.pride_asa_pipeline.util.FileUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import org.apache.log4j.Logger;
 import org.jdesktop.beansbinding.*;
 import org.jdesktop.observablecollections.ObservableCollections;
 import org.jdesktop.observablecollections.ObservableList;
@@ -27,6 +28,8 @@ import org.jdesktop.swingbinding.JListBinding;
 import org.jdesktop.swingbinding.JTableBinding;
 import org.jdesktop.swingbinding.JTableBinding.ColumnBinding;
 import org.jdesktop.swingbinding.SwingBindings;
+import org.jdom2.JDOMException;
+import org.jdom2.input.JDOMParseException;
 
 /**
  *
@@ -34,7 +37,9 @@ import org.jdesktop.swingbinding.SwingBindings;
  */
 public class ModificationsController {
 
+    private static final Logger LOGGER = Logger.getLogger(ModificationsController.class);
     //model
+    private File modificationsFile;
     private BindingGroup bindingGroup;
     private ObservableList<Modification> modificationsBindingList;
     private ObservableList<AminoAcid> aminoAcidsBindingList;
@@ -47,6 +52,7 @@ public class ModificationsController {
     private ModificationService modificationService;
 
     public ModificationsController() {
+        modificationsFile = FileUtils.getFileByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
     }
 
     public MainController getMainController() {
@@ -86,7 +92,6 @@ public class ModificationsController {
         fileChooser.setMultiSelectionEnabled(Boolean.FALSE);
         //set MGF file filter
         fileChooser.setFileFilter(new FileFilter() {
-
             @Override
             public boolean accept(File f) {
                 if (f.isDirectory()) {
@@ -113,10 +118,21 @@ public class ModificationsController {
         });
 
         //init bindings
-        //table binding
-        modificationsBindingList = ObservableCollections.observableList(getModificationsAsList(
-                modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name"))));
         bindingGroup = new BindingGroup();
+        //table binding
+        try {
+            modificationsBindingList = ObservableCollections.observableList(getModificationsAsList(
+                    modificationService.loadPipelineModifications(modificationsFile)));
+        } catch (JDOMParseException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+            mainController.showMessageDialog("Import unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
+                    + "\n" + "Error on line " + ex.getLineNumber() + ", message: " + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+        } catch (JDOMException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+            mainController.showMessageDialog("Import unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
+                    + "\n" + "Error message: " + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+        }
+
         JTableBinding modificationsTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsBindingList, modificationsPanel.getModifcationsTable());
 
         //Add column bindings
@@ -161,7 +177,7 @@ public class ModificationsController {
         accessionBinding.setValidator(new RequiredStringValidator());
         bindingGroup.addBinding(accessionBinding);
 
-        Binding accessionValueBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsPanel.getModifcationsTable(), ELProperty.create("${selectedElement.accessionValue}"), modificationsPanel.getModAccessionValueTextField(), BeanProperty.create("text"), "accession value");
+        Binding accessionValueBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsPanel.getModifcationsTable(), ELProperty.create("${selectedElement.accessionValue}"), modificationsPanel.getModAccessionValueTextField(), BeanProperty.create("text"), "accessionValue");
         accessionValueBinding.setValidator(new RequiredStringValidator());
         bindingGroup.addBinding(accessionValueBinding);
 
@@ -191,7 +207,6 @@ public class ModificationsController {
 
         //add listeners
         modificationsPanel.getModifcationsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
             @Override
             public void valueChanged(ListSelectionEvent lse) {
                 if (!lse.getValueIsAdjusting()) {
@@ -215,7 +230,6 @@ public class ModificationsController {
         });
 
         modificationsPanel.getAddAminoAcidButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 Object[] selectedValues = modificationsPanel.getAminoAcidsList().getSelectedValues();
@@ -238,7 +252,6 @@ public class ModificationsController {
         });
 
         modificationsPanel.getRemoveAminoAcidButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 Object[] selectedValues = modificationsPanel.getAffectedAminoAcidsList().getSelectedValues();
@@ -261,7 +274,6 @@ public class ModificationsController {
         });
 
         modificationsPanel.getAddModificationButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 Set<AminoAcid> affectedAminoAcids = new HashSet<AminoAcid>();
@@ -269,13 +281,12 @@ public class ModificationsController {
                 modificationsBindingList.add(new Modification("mod" + modificationsBindingList.size(), 0.0, 0.0, Modification.Location.NON_TERMINAL, affectedAminoAcids, "accession", "accessionValue"));
                 modificationsPanel.getModifcationsTable().getSelectionModel().setSelectionInterval(modificationsBindingList.size() - 1, modificationsBindingList.size() - 1);
 
-                //enable remove button if there's only one modification
+                //disable remove button if there's only one modification
                 changeRemoveModificationButtonState();
             }
         });
 
         modificationsPanel.getRemoveModificationButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (modificationsPanel.getModifcationsTable().getSelectedRow() != -1) {
@@ -289,27 +300,49 @@ public class ModificationsController {
         });
 
         modificationsPanel.getImportButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 //in response to the button click, show open dialog 
                 int returnVal = modificationsPanel.getFileChooser().showOpenDialog(modificationsPanel);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File file = modificationsPanel.getFileChooser().getSelectedFile();
+                    File modificationsImportFile = modificationsPanel.getFileChooser().getSelectedFile();
+
+                    //import modifications and refill the binding list
+                    Set<Modification> importedModifications = null;
+                    try {
+                        importedModifications = modificationService.importPipelineModifications(modificationsImportFile);
+
+                        modificationsBindingList.clear();
+                        modificationsBindingList.addAll(importedModifications);
+
+                        //select first modification
+                        modificationsPanel.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);
+
+                        //disable remove button if there's only one modification
+                        changeRemoveModificationButtonState();
+                    } catch (JDOMParseException ex) {
+                        LOGGER.error(ex.getMessage(), ex);
+                        mainController.showMessageDialog("Import unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
+                                + "\n" + "Error on line " + ex.getLineNumber() + ", message: " + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+                    } catch (JDOMException ex) {
+                        LOGGER.error(ex.getMessage(), ex);
+                        mainController.showMessageDialog("Import unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
+                                + "\n" + "Error message: " + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         });
 
         modificationsPanel.getSaveButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                boolean success = modificationService.savePipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name"), modificationsBindingList);
-
-                if (success) {
-                    mainController.showMessageDialog("Save successful", "The modifications were saved successfully.", JOptionPane.INFORMATION_MESSAGE);
+                //check if modifications file in resources folder can be found
+                if (FileUtils.isExistingFile(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"))) {
+                    modificationService.savePipelineModifications(modificationsFile, modificationsBindingList);
                 } else {
-                    mainController.showMessageDialog("Save unsuccessful", "The modifications could not be saved to file. They will however be used in the pipeline.", JOptionPane.WARNING_MESSAGE);
+                    mainController.showMessageDialog("Save unsuccessful", "The modifications could not be saved to file. "
+                            + "\n" + "Please check if a \"modifications.xml\" file exists in the \"resources\" folder. "
+                            + "\n" + "The modifications will however be used in the pipeline.", JOptionPane.WARNING_MESSAGE);
                 }
             }
         });

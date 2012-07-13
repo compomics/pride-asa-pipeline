@@ -7,13 +7,18 @@ package com.compomics.pride_asa_pipeline.logic;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.*;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import static junit.framework.Assert.*;
+import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -32,9 +37,11 @@ public class PeptideVariartionsGeneratorTest {
     private Set<Modification> modifications;
 
     @Before
-    public void loadModifications() {
+    public void loadModifications() throws IOException, JDOMException {
         if (modifications == null) {
-            modifications = modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name"));
+            Resource resource = new ClassPathResource(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
+            File modificationsFile = resource.getFile();
+            modifications = modificationService.loadPipelineModifications(modificationsFile);
         }
     }
 

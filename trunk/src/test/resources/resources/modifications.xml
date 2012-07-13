@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<modifications>
+<modifications xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="modifications.xsd">
     <modification>
         <name>Acetylation</name>
         <monoIsotopicMassShift>42.01056</monoIsotopicMassShift>
@@ -13,7 +14,6 @@
     </modification>
     <modification>
         <name>Terminal Acetylation</name>
-        <!-- Convention: terminal modifications start with "Terminal " -->
         <!-- <monoIsotopicMassShift>42.010565</monoIsotopicMassShift> --> <!-- mass different at last comma. program currently can't cope with modifications which have exactly same mass -->
         <monoIsotopicMassShift>42.01057</monoIsotopicMassShift>
         <averageMassShift>42.0368</averageMassShift>

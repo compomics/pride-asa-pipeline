@@ -7,8 +7,6 @@ package com.compomics.pride_asa_pipeline.gui.appender;
 import com.compomics.pride_asa_pipeline.gui.controller.PipelineProgressController;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LoggingEvent;
 

@@ -99,7 +99,7 @@ public class ModifiedPeptide extends Peptide {
         } else if (index == this.modifications.length) {
             //consider index 'sequence length' as C-terminal modification
             this.cTermMod = modification;
-            // regular modification, e.g. within the sequence and not terminal
+            //regular modification, e.g. within the sequence and not terminal
         } else {
             modifications[index] = modification;
         }
@@ -107,7 +107,7 @@ public class ModifiedPeptide extends Peptide {
 
     public int getNumberNTModifications() {
         int cnt = 0;
-        // count all existing (not null) modifications
+        //count all existing (not null) modifications
         for (ModificationFacade m : modifications) {
             if (m != null) {
                 cnt++;

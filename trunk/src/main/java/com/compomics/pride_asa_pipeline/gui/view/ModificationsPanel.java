@@ -114,15 +114,12 @@ public class ModificationsPanel extends javax.swing.JPanel {
         modAverageMassShiftLabel = new javax.swing.JLabel();
         modAverageMassShiftTextField = new javax.swing.JTextField();
         affectedAminoAcidsLabel = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         aminoAcidsList = new javax.swing.JList();
         jScrollPane2 = new javax.swing.JScrollPane();
         affectedAminoAcidsList = new javax.swing.JList();
-        jPanel2 = new javax.swing.JPanel();
         addAminoAcidButton = new javax.swing.JButton();
         removeAminoAcidButton = new javax.swing.JButton();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 32767));
         modAccessionValueLabel = new javax.swing.JLabel();
         modAccessionValueTextField = new javax.swing.JTextField();
         bindingLoggingLabel = new javax.swing.JLabel();
@@ -131,7 +128,6 @@ public class ModificationsPanel extends javax.swing.JPanel {
         removeModificationButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
-        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -161,203 +157,138 @@ public class ModificationsPanel extends javax.swing.JPanel {
         editModificationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Modification details"));
         editModificationPanel.setMinimumSize(new java.awt.Dimension(100, 100));
         editModificationPanel.setPreferredSize(new java.awt.Dimension(300, 300));
-        editModificationPanel.setLayout(new java.awt.GridBagLayout());
 
         modNameLabel.setText("name");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        editModificationPanel.add(modNameLabel, gridBagConstraints);
 
         modNameTextField.setMinimumSize(new java.awt.Dimension(80, 20));
         modNameTextField.setPreferredSize(new java.awt.Dimension(300, 30));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.6;
-        editModificationPanel.add(modNameTextField, gridBagConstraints);
 
         modAccessionLabel.setText("accession");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        editModificationPanel.add(modAccessionLabel, gridBagConstraints);
 
         modAccessionTextField.setMinimumSize(new java.awt.Dimension(80, 20));
         modAccessionTextField.setPreferredSize(new java.awt.Dimension(300, 30));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.6;
-        editModificationPanel.add(modAccessionTextField, gridBagConstraints);
 
         modMonoIsotopicMassShiftLabel.setText("monoisotopic mass shift");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        editModificationPanel.add(modMonoIsotopicMassShiftLabel, gridBagConstraints);
 
         modMonoIsotopicMassShiftTextField.setMinimumSize(new java.awt.Dimension(80, 20));
         modMonoIsotopicMassShiftTextField.setPreferredSize(new java.awt.Dimension(300, 30));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.6;
-        editModificationPanel.add(modMonoIsotopicMassShiftTextField, gridBagConstraints);
 
         modLocationLabel.setText("location");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        editModificationPanel.add(modLocationLabel, gridBagConstraints);
 
         modLocationComboBox.setMinimumSize(new java.awt.Dimension(80, 20));
         modLocationComboBox.setPreferredSize(new java.awt.Dimension(300, 30));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.6;
-        editModificationPanel.add(modLocationComboBox, gridBagConstraints);
 
         modAverageMassShiftLabel.setText("average mass shift");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        editModificationPanel.add(modAverageMassShiftLabel, gridBagConstraints);
 
         modAverageMassShiftTextField.setMinimumSize(new java.awt.Dimension(80, 20));
         modAverageMassShiftTextField.setPreferredSize(new java.awt.Dimension(300, 30));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.6;
-        editModificationPanel.add(modAverageMassShiftTextField, gridBagConstraints);
 
         affectedAminoAcidsLabel.setText("affected amino acids");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.weighty = 1.0;
-        editModificationPanel.add(affectedAminoAcidsLabel, gridBagConstraints);
-
-        jPanel1.setMaximumSize(new java.awt.Dimension(500, 150));
-        jPanel1.setPreferredSize(new java.awt.Dimension(500, 150));
-        jPanel1.setLayout(new java.awt.GridBagLayout());
 
         jScrollPane3.setMaximumSize(new java.awt.Dimension(0, 0));
-        jScrollPane3.setMinimumSize(new java.awt.Dimension(0, 0));
-        jScrollPane3.setPreferredSize(new java.awt.Dimension(0, 0));
+        jScrollPane3.setMinimumSize(new java.awt.Dimension(20, 20));
+        jScrollPane3.setPreferredSize(new java.awt.Dimension(20, 20));
 
         jScrollPane3.setViewportView(aminoAcidsList);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.4;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jScrollPane3, gridBagConstraints);
-
         jScrollPane2.setMaximumSize(new java.awt.Dimension(0, 0));
-        jScrollPane2.setMinimumSize(new java.awt.Dimension(0, 0));
-        jScrollPane2.setPreferredSize(new java.awt.Dimension(0, 0));
+        jScrollPane2.setMinimumSize(new java.awt.Dimension(20, 20));
+        jScrollPane2.setPreferredSize(new java.awt.Dimension(20, 20));
 
         jScrollPane2.setViewportView(affectedAminoAcidsList);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.4;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jScrollPane2, gridBagConstraints);
-
-        jPanel2.setLayout(new java.awt.GridBagLayout());
-
         addAminoAcidButton.setText(">>>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        jPanel2.add(addAminoAcidButton, gridBagConstraints);
 
         removeAminoAcidButton.setText("<<<");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        jPanel2.add(removeAminoAcidButton, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 4;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jPanel2, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.6;
-        editModificationPanel.add(jPanel1, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 7;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.weighty = 1.0;
-        editModificationPanel.add(filler1, gridBagConstraints);
 
         modAccessionValueLabel.setText("accession value");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        editModificationPanel.add(modAccessionValueLabel, gridBagConstraints);
 
         modAccessionValueTextField.setMinimumSize(new java.awt.Dimension(80, 20));
         modAccessionValueTextField.setPreferredSize(new java.awt.Dimension(300, 30));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.6;
-        editModificationPanel.add(modAccessionValueTextField, gridBagConstraints);
 
         bindingLoggingLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         bindingLoggingLabel.setForeground(new java.awt.Color(255, 0, 0));
         bindingLoggingLabel.setMinimumSize(new java.awt.Dimension(80, 25));
         bindingLoggingLabel.setPreferredSize(new java.awt.Dimension(80, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        editModificationPanel.add(bindingLoggingLabel, gridBagConstraints);
+
+        javax.swing.GroupLayout editModificationPanelLayout = new javax.swing.GroupLayout(editModificationPanel);
+        editModificationPanel.setLayout(editModificationPanelLayout);
+        editModificationPanelLayout.setHorizontalGroup(
+            editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(editModificationPanelLayout.createSequentialGroup()
+                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(modLocationLabel)
+                    .addComponent(modAverageMassShiftLabel)
+                    .addComponent(modMonoIsotopicMassShiftLabel)
+                    .addComponent(modAccessionValueLabel)
+                    .addComponent(modAccessionLabel)
+                    .addComponent(affectedAminoAcidsLabel))
+                .addGap(48, 48, 48)
+                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(editModificationPanelLayout.createSequentialGroup()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(addAminoAcidButton, javax.swing.GroupLayout.DEFAULT_SIZE, 86, Short.MAX_VALUE)
+                            .addComponent(removeAminoAcidButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(128, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, editModificationPanelLayout.createSequentialGroup()
+                        .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(modMonoIsotopicMassShiftTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(modAccessionValueTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(modNameTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(modAccessionTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(modAverageMassShiftTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(modLocationComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))))
+            .addGroup(editModificationPanelLayout.createSequentialGroup()
+                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(bindingLoggingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 387, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(modNameLabel))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        editModificationPanelLayout.setVerticalGroup(
+            editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(editModificationPanelLayout.createSequentialGroup()
+                .addComponent(bindingLoggingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(modNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(modNameLabel))
+                .addGap(11, 11, 11)
+                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(modAccessionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(modAccessionLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(modAccessionValueTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(modAccessionValueLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(modMonoIsotopicMassShiftTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(modMonoIsotopicMassShiftLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(modAverageMassShiftTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(modAverageMassShiftLabel))
+                .addGap(14, 14, 14)
+                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(modLocationLabel)
+                    .addComponent(modLocationComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(editModificationPanelLayout.createSequentialGroup()
+                        .addGap(61, 61, 61)
+                        .addComponent(addAminoAcidButton)
+                        .addGap(37, 37, 37)
+                        .addComponent(removeAminoAcidButton))
+                    .addComponent(affectedAminoAcidsLabel)
+                    .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(0, Short.MAX_VALUE))
+        );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -368,49 +299,52 @@ public class ModificationsPanel extends javax.swing.JPanel {
         gridBagConstraints.weighty = 0.6;
         add(editModificationPanel, gridBagConstraints);
 
-        jPanel3.setLayout(new java.awt.GridBagLayout());
-
         addModificationButton.setText("add");
+        addModificationButton.setToolTipText("Click to add a modification.");
         addModificationButton.setMaximumSize(new java.awt.Dimension(80, 25));
         addModificationButton.setMinimumSize(new java.awt.Dimension(80, 25));
         addModificationButton.setPreferredSize(new java.awt.Dimension(80, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        jPanel3.add(addModificationButton, gridBagConstraints);
 
         removeModificationButton.setText("remove");
+        removeModificationButton.setToolTipText("Click to delete the selected modification");
         removeModificationButton.setMaximumSize(new java.awt.Dimension(80, 25));
         removeModificationButton.setMinimumSize(new java.awt.Dimension(80, 25));
         removeModificationButton.setPreferredSize(new java.awt.Dimension(80, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        jPanel3.add(removeModificationButton, gridBagConstraints);
 
         importButton.setText("import");
+        importButton.setToolTipText("Click to import a modification file.");
         importButton.setMaximumSize(new java.awt.Dimension(80, 25));
         importButton.setMinimumSize(new java.awt.Dimension(80, 25));
         importButton.setPreferredSize(new java.awt.Dimension(80, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        jPanel3.add(importButton, gridBagConstraints);
 
         saveButton.setText("save");
+        saveButton.setToolTipText("Click to save the modifications to the the modifications file.");
         saveButton.setMaximumSize(new java.awt.Dimension(80, 25));
         saveButton.setMinimumSize(new java.awt.Dimension(80, 25));
         saveButton.setPreferredSize(new java.awt.Dimension(80, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        jPanel3.add(saveButton, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        jPanel3.add(filler2, gridBagConstraints);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(importButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 344, Short.MAX_VALUE)
+                .addComponent(addModificationButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(removeModificationButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(importButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(addModificationButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(removeModificationButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -428,11 +362,7 @@ public class ModificationsPanel extends javax.swing.JPanel {
     private javax.swing.JList aminoAcidsList;
     private javax.swing.JLabel bindingLoggingLabel;
     private javax.swing.JPanel editModificationPanel;
-    private javax.swing.Box.Filler filler1;
-    private javax.swing.Box.Filler filler2;
     private javax.swing.JButton importButton;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

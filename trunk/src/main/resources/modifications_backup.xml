@@ -1,15 +1,16 @@
-
-<modifications>
+<?xml version="1.0" encoding="UTF-8"?>
+<modifications xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="modifications.xsd">
     <modification>
         <name>Acetylation</name>
         <monoIsotopicMassShift>42.01056</monoIsotopicMassShift>
         <averageMassShift>42.0367</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>K</affectedAminoAcid>
         </affectedAminoAcids>
-        <psimodAccession>MOD:00064</psimodAccession>
-        <psimodName>N6-acetyl-L-lysine</psimodName>
+        <accession>MOD:00064</accession>
+        <accessionValue>N6-acetyl-L-lysine</accessionValue>
     </modification>
     <modification>
         <name>Terminal Acetylation</name>
@@ -17,58 +18,61 @@
         <!-- <monoIsotopicMassShift>42.010565</monoIsotopicMassShift> --> <!-- mass different at last comma. program currently can't cope with modifications which have exactly same mass -->
         <monoIsotopicMassShift>42.01057</monoIsotopicMassShift>
         <averageMassShift>42.0368</averageMassShift>
-        <position>N-terminus</position>
+        <location>N-terminus</location>
         <affectedAminoAcids>
-            <!--<affectedAminoAcid>*</affectedAminoAcid>--> <!-- * is wildcard for all amino acids -->
+            <!--* is wildcard for all amino acids -->
+            <!--            <affectedAminoAcid>*</affectedAminoAcid>              -->
             <affectedAminoAcid>A</affectedAminoAcid>
             <affectedAminoAcid>M</affectedAminoAcid>
             <affectedAminoAcid>S</affectedAminoAcid>
             <affectedAminoAcid>K</affectedAminoAcid>
         </affectedAminoAcids>
-        <psimodAccession>MOD:00408</psimodAccession>
-        <psimodName>N-acetylated residue</psimodName>
+        <accession>MOD:00408</accession>
+        <accessionValue>N-acetylated residue</accessionValue>
     </modification>
     <modification>
         <name>Carboxyamidomethylation</name>
         <monoIsotopicMassShift>57.02146</monoIsotopicMassShift>
         <averageMassShift>57.0513</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>C</affectedAminoAcid>
         </affectedAminoAcids>
-        <psimodAccession>MOD:01060</psimodAccession>
-        <psimodName>Carboxyamidomethyl Cystenyl</psimodName>
+        <accession>MOD:01060</accession>
+        <accessionValue>Carboxyamidomethyl Cystenyl</accessionValue>
     </modification>
     <modification>
         <name>Oxidation</name>
         <monoIsotopicMassShift>15.994915</monoIsotopicMassShift>
         <averageMassShift>15.9994</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>M</affectedAminoAcid>
         </affectedAminoAcids>
-        <psimodAccession>MOD:00719</psimodAccession>
-        <psimodName>oxidation to L-methionine sulfoxide</psimodName>
+        <accession>MOD:00719</accession>
+        <accessionValue>oxidation to L-methionine sulfoxide</accessionValue>
     </modification>
     <modification>
         <name>Pyro-glutamation of Q</name>
         <monoIsotopicMassShift>-17.026549</monoIsotopicMassShift>
         <averageMassShift>-17.0305</averageMassShift>
-        <position>N-terminus</position>
+        <location>N-terminus</location>
         <affectedAminoAcids>
             <affectedAminoAcid>Q</affectedAminoAcid>
         </affectedAminoAcids>
-        <psimodAccession>MOD:00040</psimodAccession>
-        <psimodName>2-pyrrolidone-5-carboxylic acid (Gln)</psimodName>
+        <accession>MOD:00040</accession>
+        <accessionValue>2-pyrrolidone-5-carboxylic acid (Gln)</accessionValue>
     </modification>
     <modification>
         <name>Pyro-glutamation of E</name>
         <monoIsotopicMassShift>-18.010565</monoIsotopicMassShift>
         <averageMassShift>-18.0153</averageMassShift>
-        <position>N-terminus</position>
+        <location>N-terminus</location>
         <affectedAminoAcids>
             <affectedAminoAcid>E</affectedAminoAcid>
         </affectedAminoAcids>
+        <accession>MOD:00420</accession>
+        <accessionValue>2-pyrrolidone-5-carboxylic acid (Glu)</accessionValue>
     </modification>
 
 
@@ -77,18 +81,18 @@
         <name>Dimethyl</name>
         <monoIsotopicMassShift>32.056407</monoIsotopicMassShift>
         <averageMassShift>32.06</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>K</affectedAminoAcid>
         </affectedAminoAcids>
-        <psimodAccession>MOD:00552</psimodAccession>
-        <psimodName>Dimethyl:2H(4)</psimodName>
+        <accession>MOD:00552</accession>
+        <accessionValue>Dimethyl:2H(4)</accessionValue>
     </modification>
     <modification>
         <name>Phosphorylation</name>
         <monoIsotopicMassShift>79.966331</monoIsotopicMassShift>
         <averageMassShift>79.9799</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>S</affectedAminoAcid>
             <affectedAminoAcid>Y</affectedAminoAcid>
@@ -98,7 +102,7 @@
         <name>Dimethyl</name>
         <monoIsotopicMassShift>28.031300</monoIsotopicMassShift>
         <averageMassShift>28.0532</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>K</affectedAminoAcid>
             <affectedAminoAcid>R</affectedAminoAcid>
@@ -110,7 +114,7 @@
         <name>iodoacetamide-siteC</name>
         <monoIsotopicMassShift>57.021464</monoIsotopicMassShift>
         <averageMassShift>57.02146</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>C</affectedAminoAcid>
         </affectedAminoAcids>
@@ -122,7 +126,7 @@
         <name>iodoacetamide-siteC</name>
         <monoIsotopicMassShift>57.021464</monoIsotopicMassShift>
         <averageMassShift>57.0513</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>C</affectedAminoAcid>
         </affectedAminoAcids>
@@ -132,76 +136,76 @@
         <name>acetylated residue2</name>
         <monoIsotopicMassShift>42.01056</monoIsotopicMassShift>
         <averageMassShift>42.0367</averageMassShift>
-        <position>N-terminus</position>
+        <location>N-terminus</location>
         <affectedAminoAcids>
             &lt;!&ndash;<affectedAminoAcid>K</affectedAminoAcid>&ndash;&gt;
 			<affectedAminoAcid>A</affectedAminoAcid>
 			<affectedAminoAcid>M</affectedAminoAcid>
 			<affectedAminoAcid>S</affectedAminoAcid>
         </affectedAminoAcids>
-        <psimodAccession>MOD:00394</psimodAccession>
-        <psimodName>N6-acetyl-L-lysine</psimodName>
+        <accession>MOD:00394</accession>
+        <accessionValue>N6-acetyl-L-lysine</accessionValue>
     </modification>-->
 
     <!--<modification>
         <name>monohydroxylated residue</name>
         <monoIsotopicMassShift>15.994915</monoIsotopicMassShift>
         <averageMassShift>16.0</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>M</affectedAminoAcid>
         </affectedAminoAcids>
-        <psimodAccession>MOD:00425</psimodAccession>
-        <psimodName>N6-acetyl-L-lysine</psimodName>
+        <accession>MOD:00425</accession>
+        <accessionValue>N6-acetyl-L-lysine</accessionValue>
     </modification>
 
     <modification>
         <name>6x(13)C,4x(15)N labeled L-arginine</name>
         <monoIsotopicMassShift>10.008269</monoIsotopicMassShift>
         <averageMassShift>10.01</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>R</affectedAminoAcid>
         </affectedAminoAcids>
-        <psimodAccession>MOD:00587</psimodAccession>
-        <psimodName>N6-acetyl-L-lysine</psimodName>
+        <accession>MOD:00587</accession>
+        <accessionValue>N6-acetyl-L-lysine</accessionValue>
     </modification>
 
     <modification>
         <name>6x(13)C labeled residue</name>
         <monoIsotopicMassShift>6.020129</monoIsotopicMassShift>
         <averageMassShift>6.02</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>C</affectedAminoAcid>
         </affectedAminoAcids>
-        <psimodAccession>MOD:00544</psimodAccession>
-        <psimodName>N6-acetyl-L-lysine</psimodName>
+        <accession>MOD:00544</accession>
+        <accessionValue>N6-acetyl-L-lysine</accessionValue>
     </modification>
 
     <modification>
         <name>deamidated residue</name>
         <monoIsotopicMassShift>0.984016</monoIsotopicMassShift>
         <averageMassShift>0.98</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>R</affectedAminoAcid>
         </affectedAminoAcids>
-        <psimodAccession>MOD:00400</psimodAccession>
-        <psimodName>N6-acetyl-L-lysine</psimodName>
+        <accession>MOD:00400</accession>
+        <accessionValue>N6-acetyl-L-lysine</accessionValue>
     </modification>
 
     <modification>
         <name>deamidated residue</name>
         <monoIsotopicMassShift>56.026215</monoIsotopicMassShift>
         <averageMassShift>56.03</averageMassShift>
-        <position>any</position>
+        <location>any</location>
         <affectedAminoAcids>
             <affectedAminoAcid>K</affectedAminoAcid>
             <affectedAminoAcid>V</affectedAminoAcid>
         </affectedAminoAcids>
-        <psimodAccession>MOD:01232</psimodAccession>
-        <psimodName>N6-acetyl-L-lysine</psimodName>
+        <accession>MOD:01232</accession>
+        <accessionValue>N6-acetyl-L-lysine</accessionValue>
     </modification>-->
 
 </modifications>

@@ -18,23 +18,23 @@ public class PipelineProgressController {
     
     private int progress;
     //parent controller
-    private ExperimentProcessController experimentProcessController;
+    private ExperimentSelectionController experimentSelectionController;
     //view
     private PipelineProgressDialog pipelineProgressDialog;
 
     public PipelineProgressController() {
     }
 
-    public ExperimentProcessController getExperimentProcessController() {
-        return experimentProcessController;
+    public ExperimentSelectionController getExperimentSelectionController() {
+        return experimentSelectionController;
     }
 
-    public void setExperimentProcessController(ExperimentProcessController experimentProcessController) {
-        this.experimentProcessController = experimentProcessController;
+    public void setExperimentSelectionController(ExperimentSelectionController experimentProcessController) {
+        this.experimentSelectionController = experimentProcessController;
     }
 
     public void init() {
-        pipelineProgressDialog = new PipelineProgressDialog(experimentProcessController.getMainController().getMainFrame());
+        pipelineProgressDialog = new PipelineProgressDialog(experimentSelectionController.getMainController().getMainFrame());
 
         pipelineProgressDialog.getProgressBar().setMaximum(NUMBER_OF_PROGRESS_STEPS);
 

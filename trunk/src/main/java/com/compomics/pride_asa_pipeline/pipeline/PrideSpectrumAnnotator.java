@@ -9,8 +9,11 @@ import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import com.compomics.pride_asa_pipeline.spectrum.match.SpectrumMatcher;
+import com.compomics.pride_asa_pipeline.util.FileUtils;
+import java.io.File;
 import java.util.*;
 import org.apache.log4j.Logger;
+import org.jdom2.JDOMException;
 
 /**
  * Created by IntelliJ IDEA. User: niels Date: 9/11/11 Time: 13:22 To change
@@ -135,7 +138,7 @@ public class PrideSpectrumAnnotator {
 
     public void setSpectrumAnnotatorResult(SpectrumAnnotatorResult spectrumAnnotatorResult) {
         this.spectrumAnnotatorResult = spectrumAnnotatorResult;
-    }        
+    }
 
     /**
      * Public methods.
@@ -168,10 +171,15 @@ public class PrideSpectrumAnnotator {
         ModificationHolder modificationHolder = new ModificationHolder();
 
         //add the pipeline modifications
-        modificationHolder.addModifications(modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name")));
+        File modificationsFile = FileUtils.getFileByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
+        try {
+            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsFile));
+        } catch (JDOMException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        }
 
         //add the modifications found in pride for the given experiment
-        if(PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_modifications")){
+        if (PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_modifications")) {
             modificationHolder.addModifications(modificationService.loadExperimentModifications(identifications.getCompletePeptides()));
         }
 
@@ -196,19 +204,17 @@ public class PrideSpectrumAnnotator {
         //'modified precursors' or 'precursor variations' (e.g. the same peptide sequence,
         //but with different modifications on different locations).
         Map<Identification, Set<ModifiedPeptide>> precursorVariations = new HashMap<Identification, Set<ModifiedPeptide>>();
-        //ToDo: change for 'true possibilities'
         for (Identification identificationSet : possibleExplanations.keySet()) {
             Set<ModificationCombination> modifications = possibleExplanations.get(identificationSet);
-            Set<ModifiedPeptide> precursorVariationsSet = peptideVariationsGenerator.generateVariations(identificationSet.getPrecursor(), modifications);
+            Set<ModifiedPeptide> precursorVariationsSet = peptideVariationsGenerator.generateVariations(identificationSet.getPeptide(), modifications);
             precursorVariations.put(identificationSet, precursorVariationsSet);
-            //System.out.println("Modification variations for precursor " + iData.getPrecursor() + " : " + precursorVariations.size());
         }
         LOGGER.debug("Peptide variations found for " + precursorVariations.size() + " peptides.");
 
         return precursorVariations;
     }
 
-    public Map<Identification, ModifiedPeptide> findBestMatches(String experimentAccession, Map<Identification, Set<ModifiedPeptide>> precursorVariations) {
+    public List<Identification> findBestMatches(String experimentAccession, Map<Identification, Set<ModifiedPeptide>> precursorVariations) {
         //After we now have all the theoretical ions for all possible 'precursor variations',
         //we can try and find them in the real spectrum. This will give an indication as to
         //which 'variation' of the precursor is the most likely one.
@@ -219,15 +225,18 @@ public class PrideSpectrumAnnotator {
         //set fragment mass error for the identification scorer
         spectrumMatcher.getIdentificationScorer().setFragmentMassError(analyzerData.getFragmentMassError());
 
-        Map<Identification, ModifiedPeptide> bestMatches = new HashMap<Identification, ModifiedPeptide>();
+        List<Identification> bestMatches = new ArrayList<Identification>();
         for (Identification identification : precursorVariations.keySet()) {
             //load spectrum
             List<Peak> peaks = spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
-            ModifiedPeptide bestMatch = spectrumMatcher.findBestModifiedPeptideMatch(identification.getPrecursor(), precursorVariations.get(identification), peaks);
+            ModifiedPeptide bestMatch = spectrumMatcher.findBestModifiedPeptideMatch(identification.getPeptide(), precursorVariations.get(identification), peaks);
             if (bestMatch != null) {
-                bestMatches.put(identification, bestMatch);
+                identification.setPeptide(bestMatch);
+                bestMatches.add(identification);
             } else {
-                LOGGER.info("No best match found for precursor: " + identification.getPrecursor());
+                LOGGER.info("No best match found for precursor: " + identification.getPeptide());
+                //add to unexplained identifications
+                spectrumAnnotatorResult.getUnexplainedIdentifications().add(identification);
             }
         }
 
@@ -235,10 +244,10 @@ public class PrideSpectrumAnnotator {
     }
 
     public void annotate(String experimentAccession) {
-        LOGGER.info("Loading identification for experiment " + experimentAccession);
+        LOGGER.info("Loading identifications for experiment " + experimentAccession);
         loadExperimentIdentifications(experimentAccession);
-        LOGGER.debug("Finisher loading identification for experiment " + experimentAccession);
-        
+        LOGGER.debug("Finished loading identifications for experiment " + experimentAccession);
+
         ///////////////////////////////////////////////////////////////////////
         //FIRST STEP: find the systematic mass error (if there is one)
         LOGGER.info("Finding systematic mass errors");
@@ -260,19 +269,19 @@ public class PrideSpectrumAnnotator {
         //mass delta is smaller than the expected mass error)
         //-> the only precursors not in this map are those that carry a significant
         //modification, but nevertheless could not be explained!
-        int explainableIdentificationsSize = massDeltaExplanationsMap.size();
+        int explainedIdentificationsSize = massDeltaExplanationsMap.size();
         int completeIdentificationsSize = identifications.getCompleteIdentifications().size();
-        LOGGER.debug("Precursors for which no modification combination could be found: " + (completeIdentificationsSize - explainableIdentificationsSize));
-        List<Identification> unexplainableIdentifications = getUnexplainableIdentifications(identifications.getCompleteIdentifications(), massDeltaExplanationsMap.keySet());
-        assert (unexplainableIdentifications.size() == (completeIdentificationsSize - explainableIdentificationsSize));
-        for (Identification identification : unexplainableIdentifications) {
+        LOGGER.debug("Precursors for which no modification combination could be found: " + (completeIdentificationsSize - explainedIdentificationsSize));
+        List<Identification> unexplainedIdentifications = getUnexplainedIdentifications(identifications.getCompleteIdentifications(), massDeltaExplanationsMap.keySet());
+        assert (unexplainedIdentifications.size() == (completeIdentificationsSize - explainedIdentificationsSize));
+        for (Identification identification : unexplainedIdentifications) {
             try {
-                LOGGER.debug("Unresolved precursor: " + identification.getPrecursor().toString() + " with mass delta: " + identification.getPrecursor().calculateMassDelta());
+                LOGGER.debug("Unresolved precursor: " + identification.getPeptide().toString() + " with mass delta: " + identification.getPeptide().calculateMassDelta());
             } catch (AASequenceMassUnknownException e) {
                 LOGGER.error(e.getMessage(), e);
             }
         }
-        spectrumAnnotatorResult.setUnexplainableIdentifications(unexplainableIdentifications);
+        spectrumAnnotatorResult.setUnexplainedIdentifications(unexplainedIdentifications);
 
         //create new map with only the precursors that carry a significant mass delta
         //and were we have possible modification combinations
@@ -308,11 +317,11 @@ public class PrideSpectrumAnnotator {
         //               match them onto the peaks in the spectrum and decide
         //               which one is the best 'explanation' 
         LOGGER.info("finding best matches");
-        Map<Identification, ModifiedPeptide> modifiedPrecursors = findBestMatches(experimentAccession, modifiedPrecursorVariations);
+        List<Identification> modifiedPrecursors = findBestMatches(experimentAccession, modifiedPrecursorVariations);
         LOGGER.debug("finished finding best matches");
         spectrumAnnotatorResult.setModifiedPrecursors(modifiedPrecursors);
     }
-    
+
     /**
      * Private methods
      */
@@ -323,15 +332,16 @@ public class PrideSpectrumAnnotator {
             consideredChargeStates.add(Integer.parseInt(chargeState.toString()));
         }
     }
-    
+
     /**
-     * Gets the identifications that where the mass delta could't be explained by combining modifications
-     * 
+     * Gets the identifications that where the mass delta could't be explained
+     * by combining modifications
+     *
      * @param identifications all the experiment identifications
      * @param explainableIdentifications the explained identifications
      * @return the unexplained identifications
      */
-    private List<Identification> getUnexplainableIdentifications(List<Identification> identifications, Set<Identification> explainableIdentifications) {
+    private List<Identification> getUnexplainedIdentifications(List<Identification> identifications, Set<Identification> explainableIdentifications) {
         List<Identification> unexplainedIdentifications = new ArrayList<Identification>();
         for (Identification identification : identifications) {
             if (!explainableIdentifications.contains(identification)) {

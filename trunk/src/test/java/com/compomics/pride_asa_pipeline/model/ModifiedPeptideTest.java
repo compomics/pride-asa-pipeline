@@ -6,12 +6,18 @@ package com.compomics.pride_asa_pipeline.model;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
+import com.compomics.pride_asa_pipeline.util.FileUtils;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import static junit.framework.Assert.*;
+import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -267,8 +273,9 @@ public class ModifiedPeptideTest {
      *
      */
     @Test
-    public void testEquals() throws UnknownAAException {        
-        Set<Modification> modifications = modificationService.loadPipelineModifications(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file_name"));
+    public void testEquals() throws UnknownAAException, IOException, JDOMException {        
+        File modificationsFile = FileUtils.getFileByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
+        Set<Modification> modifications = modificationService.loadPipelineModifications(modificationsFile);
 
         Peptide peptide = new Peptide(1, 1256, new AminoAcidSequence("AAAKENKKNYYY"));
 
