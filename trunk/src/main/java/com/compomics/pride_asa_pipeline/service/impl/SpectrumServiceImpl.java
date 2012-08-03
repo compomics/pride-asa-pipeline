@@ -7,6 +7,7 @@ package com.compomics.pride_asa_pipeline.service.impl;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.repository.SpectrumRepository;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class SpectrumServiceImpl implements SpectrumService {
 
     private SpectrumRepository spectrumRepository;
+    private Map<Long, Map> spectrumCache = null;
 
     public SpectrumRepository getSpectrumRepository() {
         return spectrumRepository;
@@ -55,5 +57,15 @@ public class SpectrumServiceImpl implements SpectrumService {
         }
 
         return peaks;
+    }
+
+    @Override
+    public void cacheSpectra(List<Long> aSpectrumidCacheList) {
+        spectrumCache = spectrumRepository.getPeakMapsBySpectrumIdList(aSpectrumidCacheList);
+    }
+
+    @Override
+    public Map getCachedSpectrum(Long aSpectrumid) {
+        return spectrumCache.get(aSpectrumid);
     }
 }
