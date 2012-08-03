@@ -5,8 +5,10 @@
 package com.compomics.pride_asa_pipeline.service;
 
 import com.compomics.pride_asa_pipeline.model.Peak;
+
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -30,4 +32,8 @@ public interface SpectrumService {
      * @return the spectrum peaks
      */
     HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(long spectrumId);
+
+    void cacheSpectra(List<Long> aSpectrumidCacheList);
+
+    Map getCachedSpectrum(Long aSpectrumid);
 }

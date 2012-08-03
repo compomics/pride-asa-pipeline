@@ -5,23 +5,21 @@
 package com.compomics.pride_asa_pipeline.service.impl;
 
 import com.compomics.mslims.util.fileio.MascotGenericFile;
+import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Identifications;
 import com.compomics.pride_asa_pipeline.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
- *
  * @author niels
  */
 public class ExperimentServiceImpl implements ExperimentService {
@@ -30,6 +28,7 @@ public class ExperimentServiceImpl implements ExperimentService {
     private static final String MALDI_SOURCE_ACCESSION = "PSI:1000075";
     private ExperimentRepository experimentRepository;
     private SpectrumService spectrumService;
+    protected boolean iFirstMfgFile;
 
     public ExperimentRepository getExperimentRepository() {
         return experimentRepository;
@@ -121,47 +120,72 @@ public class ExperimentServiceImpl implements ExperimentService {
         //get spectra metadata
         List<Map<String, Object>> spectraMetadata = experimentRepository.getSpectraMetadata(experimentAccession);
 
+
         //create new mgf file from scratch
         MascotGenericFile mascotGenericFile = new MascotGenericFile();
         mascotGenericFile.setFilename(experimentAccession);
 
-        OutputStream outputStream = null;
+        BufferedOutputStream outputStream = null;
+
+
         try {
-            outputStream = new FileOutputStream(file);
+            outputStream = new BufferedOutputStream(new FileOutputStream(file));
 
-            boolean isFirstMfgFile = Boolean.TRUE;
+            HashMap<Long, Map> spectrumIdMap = new HashMap<Long, Map>();
             for (Map<String, Object> spectrumMetadata : spectraMetadata) {
-                //write identification data to stream
-                mascotGenericFile = new MascotGenericFile();
-                Long spectrumId = (Long) spectrumMetadata.get("spectrum_id");
-                mascotGenericFile.setTitle(spectrumId.toString());
-
-                Object lPrecursor_mz = spectrumMetadata.get("precursor_mz");
-                if (lPrecursor_mz != null) {
-                    mascotGenericFile.setPrecursorMZ(Double.parseDouble(lPrecursor_mz.toString()));
-                }
-
-                Object lPrecursor_charge_state = spectrumMetadata.get("precursor_charge_state");
-                if (lPrecursor_charge_state != null) {
-                    mascotGenericFile.setCharge(Integer.parseInt(lPrecursor_charge_state.toString()));
-                }
-
-                mascotGenericFile.setPeaks(spectrumService.getSpectrumPeakMapBySpectrumId(spectrumId));
-                //first mascot generic file has to start at the first line
-                //else insert empty line
-                if (isFirstMfgFile) {
-                    mascotGenericFile.setComments("");
-                    isFirstMfgFile = Boolean.FALSE;
-                } else {
-                    mascotGenericFile.setComments("\n\n");
-                }
-                mascotGenericFile.writeToStream(outputStream);
+                spectrumIdMap.put((Long) spectrumMetadata.get("spectrum_id"), spectrumMetadata);
             }
-        } catch (FileNotFoundException e) {
+            spectraMetadata = null;
+
+            int spectrumCacheSize = PropertiesConfigurationHolder.getInstance().getInt("spectrum.cache");
+            int spectrumCountRunner = 0;
+            iFirstMfgFile = Boolean.TRUE;
+
+            Iterator<Long> lSpectrumIdIterator = spectrumIdMap.keySet().iterator();
+            ArrayList<Long> lSpectrumidCacheList = Lists.newArrayList();
+
+            while (lSpectrumIdIterator.hasNext()) {
+                Long spectrumId = lSpectrumIdIterator.next();
+                lSpectrumidCacheList.add(spectrumId);
+                spectrumCountRunner++;
+
+                if (spectrumCountRunner % spectrumCacheSize == 0) {
+                    // Make the spectrumService cache the current list of spectrumIds
+                    spectrumService.cacheSpectra(lSpectrumidCacheList);
+
+                    // Flush the cache to the file!
+                    flushCachedSpectra(outputStream, spectrumIdMap, lSpectrumidCacheList);
+                    lSpectrumidCacheList = Lists.newArrayList();
+
+                } else {
+                    // continue!
+                }
+            }
+
+            // fence post!
+            if (lSpectrumidCacheList.size() > 0) {
+                spectrumService.cacheSpectra(lSpectrumidCacheList);
+                flushCachedSpectra(outputStream, spectrumIdMap, lSpectrumidCacheList);
+                lSpectrumidCacheList = Lists.newArrayList();
+            }
+
+            LOGGER.debug(String.format("finished writing %d spectra to %s", spectrumCountRunner, file.getAbsolutePath()));
+
+        } catch (
+                FileNotFoundException e
+                )
+
+        {
             LOGGER.error(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (
+                IOException e
+                )
+
+        {
             LOGGER.error(e.getMessage(), e);
-        } finally {
+        } finally
+
+        {
             if (outputStream != null) {
                 try {
                     outputStream.close();
@@ -172,5 +196,40 @@ public class ExperimentServiceImpl implements ExperimentService {
         }
 
         return file;
+    }
+
+    private void flushCachedSpectra(BufferedOutputStream aOutputStream, HashMap<Long, Map> aSpectrumIdMap, ArrayList<Long> aSpectrumidCache) throws IOException {
+        MascotGenericFile mascotGenericFile;
+        for (Long cachedSpectrumId : aSpectrumidCache) {
+            Map spectrumMetadata = aSpectrumIdMap.get(cachedSpectrumId);
+
+
+            //write identification data to stream
+            mascotGenericFile = new MascotGenericFile();
+
+            mascotGenericFile.setTitle(cachedSpectrumId.toString());
+
+            Object lPrecursor_mz = spectrumMetadata.get("precursor_mz");
+            if (lPrecursor_mz != null) {
+                mascotGenericFile.setPrecursorMZ(Double.parseDouble(lPrecursor_mz.toString()));
+            }
+
+            Object lPrecursor_charge_state = spectrumMetadata.get("precursor_charge_state");
+            if (lPrecursor_charge_state != null) {
+                mascotGenericFile.setCharge(Integer.parseInt(lPrecursor_charge_state.toString()));
+            }
+
+            mascotGenericFile.setPeaks((HashMap) spectrumService.getCachedSpectrum(cachedSpectrumId));
+
+            //first mascot generic file has to start at the first line
+            //else insert empty line
+            if (iFirstMfgFile) {
+                mascotGenericFile.setComments("");
+                iFirstMfgFile = Boolean.FALSE;
+            } else {
+                mascotGenericFile.setComments("\n\n");
+            }
+            mascotGenericFile.writeToStream(aOutputStream);
+        }
     }
 }

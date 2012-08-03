@@ -25,28 +25,36 @@ public class OmssaModificationMarshallerImpl implements OmssaModiciationMarshall
         if (!modificationSet.isEmpty()) {
             UserMod userMod = null;
             for (Modification modification : modificationSet) {
-                //add a separate modification for each affected amino acid
-                if (!modification.getAffectedAminoAcids().isEmpty()) {
-                    for (AminoAcid aminoAcid : modification.getAffectedAminoAcids()) {
+
+                if (modification != null) {
+                    //add a separate modification for each affected amino acid
+                    if (!modification.getAffectedAminoAcids().isEmpty()) {
+                        for (AminoAcid aminoAcid : modification.getAffectedAminoAcids()) {
+                            userMod = new UserMod();
+                            userMod.setFixed(false);
+                            userMod.setMass(modification.getMassShift());
+                            userMod.setModificationName(modification.getName());
+                            userMod.setLocationType(getLocationAsLocationTypeEnum(modification.getLocation()));
+                            userMod.setLocation(String.valueOf(aminoAcid.letter()));
+
+
+                            userModCollection.add(userMod);
+                        }
+                    } else {
                         userMod = new UserMod();
                         userMod.setFixed(false);
                         userMod.setMass(modification.getMassShift());
                         userMod.setModificationName(modification.getName());
-                        userMod.setLocationType(getLocationAsLocationTypeEnum(modification.getLocation()));
-                        userMod.setLocation(String.valueOf(aminoAcid.letter()));
-
-
+                        LocationTypeEnum lLocationType = getLocationAsLocationTypeEnum(modification.getLocation());
+                        userMod.setLocationType(lLocationType);
+                        if (lLocationType.equals(LocationTypeEnum.MODNP)) {
+                            userMod.setLocation("[");
+                        } else if (lLocationType.equals(LocationTypeEnum.MODCP)) {
+                            userMod.setLocation("]");
+                        }
 
                         userModCollection.add(userMod);
                     }
-                } else {
-                    userMod = new UserMod();
-                    userMod.setFixed(false);
-                    userMod.setMass(modification.getMassShift());
-                    userMod.setModificationName(modification.getName());
-                    userMod.setLocationType(getLocationAsLocationTypeEnum(modification.getLocation()));
-
-                    userModCollection.add(userMod);
                 }
             }
         }

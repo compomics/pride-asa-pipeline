@@ -27,10 +27,17 @@ public class ExperimentModificationMapper implements RowMapper<Modification> {
 
         String peptide = rs.getString("sequence");
         String modificationAccession = rs.getString("accession");
-        int modificationLocation = rs.getInt("location");
+        Integer modificationLocation = rs.getInt("location");
+
+
         String modificationName = rs.getString("name");
         double modificationMassDelta = rs.getDouble("mass_delta_value");
         String modificationConcatLocationName = rs.getString("gr");
+
+
+        if(modificationConcatLocationName == null){
+            return(null);
+        }
 
         Location location = null;
         int sequenceIndex = 0;
