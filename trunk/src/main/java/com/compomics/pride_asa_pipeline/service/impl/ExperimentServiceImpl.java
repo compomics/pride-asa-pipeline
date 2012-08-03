@@ -137,6 +137,9 @@ public class ExperimentServiceImpl implements ExperimentService {
             }
             spectraMetadata = null;
 
+            boolean spectrumLimit = PropertiesConfigurationHolder.getInstance().getBoolean("spectrum.limit");
+            int spectrumLimitSize = PropertiesConfigurationHolder.getInstance().getInt("spectrum.limit.size");
+
             int spectrumCacheSize = PropertiesConfigurationHolder.getInstance().getInt("spectrum.cache");
             int spectrumCountRunner = 0;
             iFirstMfgFile = Boolean.TRUE;
@@ -148,6 +151,11 @@ public class ExperimentServiceImpl implements ExperimentService {
                 Long spectrumId = lSpectrumIdIterator.next();
                 lSpectrumidCacheList.add(spectrumId);
                 spectrumCountRunner++;
+
+                if(spectrumLimit && spectrumLimitSize > spectrumCountRunner){
+                    LOGGER.debug(String.format("Spectrum limit enabled! Only writing %d MSMS spectra to %s", spectrumLimitSize, file.getName()));
+                    break;
+                }
 
                 if (spectrumCountRunner % spectrumCacheSize == 0) {
                     // Make the spectrumService cache the current list of spectrumIds
@@ -166,7 +174,6 @@ public class ExperimentServiceImpl implements ExperimentService {
             if (lSpectrumidCacheList.size() > 0) {
                 spectrumService.cacheSpectra(lSpectrumidCacheList);
                 flushCachedSpectra(outputStream, spectrumIdMap, lSpectrumidCacheList);
-                lSpectrumidCacheList = Lists.newArrayList();
             }
 
             LOGGER.debug(String.format("finished writing %d spectra to %s", spectrumCountRunner, file.getAbsolutePath()));
