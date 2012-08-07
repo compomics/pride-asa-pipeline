@@ -10,10 +10,11 @@ import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import com.compomics.pride_asa_pipeline.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.util.FileUtils;
-import java.io.File;
-import java.util.*;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
+
+import java.io.File;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA. User: niels Date: 9/11/11 Time: 13:22 To change
@@ -244,6 +245,10 @@ public class PrideSpectrumAnnotator {
     }
 
     public void annotate(String experimentAccession) {
+
+        LOGGER.info("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
+        spectrumAnnotatorResult = new SpectrumAnnotatorResult();
+
         LOGGER.info("Loading identifications for experiment " + experimentAccession);
         loadExperimentIdentifications(experimentAccession);
         LOGGER.debug("Finished loading identifications for experiment " + experimentAccession);

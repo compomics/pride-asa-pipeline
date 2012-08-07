@@ -6,10 +6,11 @@ package com.compomics.pride_asa_pipeline.data.mapper;
 
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData.ANALYZER_FAMILY;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.RowMapper;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -37,7 +38,7 @@ public class AnalyzerDataMapper implements RowMapper<AnalyzerData> {
         return analyzerData;
     }
 
-    private AnalyzerData getAnalyzerDataByAnalyzerType(String analyzerType) {
+    public static AnalyzerData getAnalyzerDataByAnalyzerType(String analyzerType) {
 
         /*
          * iontrap PSI:1000010	Analyzer Type	3D-Ion Trap iontrap PSI:1000010
