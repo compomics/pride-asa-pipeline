@@ -10,20 +10,18 @@ import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
-import java.util.Set;
 
 /**
- *
  * @author niels
  */
 public class Playground {
-    
+
     public static void main(String[] args) {
         //load application context
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
 //
-//
 //        ModificationService modificationService = (ModificationService) applicationContext.getBean("modificationService");
+//
 //        Set<Modification> lModificationSet = modificationService.loadExperimentModifications(1748);
 //
 //        System.out.println("printing pride-asap modfications");
@@ -46,19 +44,29 @@ public class Playground {
 
 //  modificationService.loadExperimentModifications(null);
 
+        ExperimentService experimentService = (ExperimentService) applicationContext.getBean("experimentService");
 
-        ExperimentService experimentService;
-        experimentService = (ExperimentService) applicationContext.getBean("experimentService");
         SpectrumService spectrumService = (SpectrumService) applicationContext.getBean("spectrumService");
-//        long numberOfPeptides = experimentService.getNumberOfPeptides("7662");
 
-//        File file = experimentService.getSpectraAsMgfFile("1748");
-
-        File file = experimentService.getSpectraAsMgfFile("7662");
+        File file = experimentService.getSpectraAsMgfFile("2");
         System.out.println(file.getAbsolutePath());
 
-        Set<String> lAccessions = experimentService.getProteinAccessions("7662");
-        System.out.println(String.format("%d unique protein accessions", lAccessions.size()));
+//
+//        File file = experimentService.getSpectraAsMgfFile("7662");
+//
+//        Set<String> lAccessions = experimentService.getProteinAccessions("7662");
+//        System.out.println(String.format("%d unique protein accessions", lAccessions.size()));
+
+//        ModificationService modificationService = (ModificationService) applicationContext.getBean("modificationService");
+//        PrideSpectrumAnnotator annotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
+////
+//        annotator.annotate("9333");
+//        Set<Modification> lUsedModifications = modificationService.getUsedModifications(annotator.getSpectrumAnnotatorResult());
+//
+//        for(Modification lModification : lUsedModifications){
+//            System.out.println(lModification.getName());
+//        }
+
 
 //        List<Long> spectrumIds = Lists.newArrayList();
 //        spectrumIds.add(4190355l);
@@ -79,5 +87,5 @@ public class Playground {
 //
 //        UserModCollection userModCollection = modificationService.getModificationsAsUserModCollection(spectrumAnnotatorResult);
     }
-    
+
 }
