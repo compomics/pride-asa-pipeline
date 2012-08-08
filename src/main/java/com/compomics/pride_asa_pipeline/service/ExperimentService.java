@@ -6,13 +6,12 @@ package com.compomics.pride_asa_pipeline.service;
 
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identifications;
-import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
+
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
 /**
- *
  * @author niels
  */
 public interface ExperimentService {
@@ -46,10 +45,10 @@ public interface ExperimentService {
      * charge 1.
      *
      * @param experimentAccession the experiment accession number
-     * @param chargeStates the set of charge states
+     * @param chargeStates        the set of charge states
      */
     void updateChargeStates(String experimentAccession, Set<Integer> chargeStates);
-    
+
     /**
      * Gets the experiment analyzer data
      *
@@ -57,36 +56,44 @@ public interface ExperimentService {
      * @return the experiment analyzer data
      */
     AnalyzerData getAnalyzerData(String experimentAccession);
-    
+
     /**
-     * Gets the number of spectra for a given experiment 
-     * 
+     * Gets the number of spectra for a given experiment
+     *
      * @param experimentAccession the experiment accession number
      * @return the number of spectra
      */
     long getNumberOfSpectra(String experimentAccession);
-    
+
     /**
-     * Gets protein accessions for a given experiment 
-     * 
+     * Gets protein accessions for a given experiment
+     *
      * @param experimentAccession the experiment accession number
      * @return the protein accession set
      */
     Set<String> getProteinAccessions(String experimentAccession);
-    
+
     /**
      * Gets the number of peptides for a given experiment
-     * 
+     *
      * @param experimentAccession the experiment accession number
      * @return the number of peptides
      */
     long getNumberOfPeptides(String experimentAccession);
-    
+
     /**
      * Gets the spectra as a file in mgf format
-     * 
+     *
      * @param experimentAccession the experiment accession number
+     * @param rebuildCache          If set to TRUE then the cache will first be rebuilt. Else not.
      * @return the spectra file
      */
-    File getSpectraAsMgfFile(String experimentAccession);
+    File getSpectrumCacheAsMgfFile(String experimentAccession, boolean rebuildCache);
+
+    /**
+     * Build up the spectrum cache for an entire experiment.
+     * @param experimentAccession
+     */
+    void buildSpectrumCacheForExperiment(String experimentAccession);
+
 }

@@ -116,63 +116,30 @@ public class ExperimentServiceImpl implements ExperimentService {
     }
 
     @Override
-    public File getSpectraAsMgfFile(String experimentAccession) {
+    public File getSpectrumCacheAsMgfFile(String experimentAccession, boolean rebuildCache) {
+
         File tempDir = Files.createTempDir();
         File file = new File(tempDir, experimentAccession + ".mgf");
+        LOGGER.debug(String.format("writing spectra from experiment %s to %s", experimentAccession, file.getAbsolutePath()));
 
-        //get spectra metadata
-        List<Map<String, Object>> spectraMetadata = experimentRepository.getSpectraMetadata(experimentAccession);
-
-
-        //create new mgf file from scratch
-        MascotGenericFile mascotGenericFile = new MascotGenericFile();
-        mascotGenericFile.setFilename(experimentAccession);
+        if (rebuildCache) {
+            LOGGER.debug(String.format("rebuilding spectrum cache for experiment %s", experimentAccession));
+            buildSpectrumCacheForExperiment(experimentAccession);
+        }
 
         BufferedOutputStream outputStream = null;
-
-
         try {
+            //create new mgf file from scratch
+            MascotGenericFile mascotGenericFile = new MascotGenericFile();
+            mascotGenericFile.setFilename(experimentAccession);
+
             outputStream = new BufferedOutputStream(new FileOutputStream(file));
-
-            HashMap<Long, Map> spectrumIdMap = new HashMap<Long, Map>();
-            for (Map<String, Object> spectrumMetadata : spectraMetadata) {
-                spectrumIdMap.put((Long) spectrumMetadata.get("spectrum_id"), spectrumMetadata);
-            }
-
-            int spectrumCountRunner = 0;
-            iFirstMfgFile = Boolean.TRUE;
-
-            Iterator<Long> lSpectrumIdIterator = spectrumIdMap.keySet().iterator();
-            ArrayList<Long> lSpectrumidCacheList = Lists.newArrayList();
-
-            while (lSpectrumIdIterator.hasNext()) {
-                Long spectrumId = lSpectrumIdIterator.next();
-                lSpectrumidCacheList.add(spectrumId);
-                spectrumCountRunner++;
-            }
-
-            if (lSpectrumidCacheList.size() > 0) {
-                spectrumService.cacheSpectra(lSpectrumidCacheList);
-                writeCachedSpectra(outputStream, spectrumIdMap, lSpectrumidCacheList);
-            }
-
-            LOGGER.debug(String.format("finished writing %d spectra to %s", spectrumCountRunner, file.getAbsolutePath()));
-
-        } catch (
-                FileNotFoundException e
-                )
-
-        {
+            writeCachedSpectra(outputStream, experimentAccession);
+        } catch (FileNotFoundException e) {
             LOGGER.error(e.getMessage(), e);
-        } catch (
-                IOException e
-                )
-
-        {
+        } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
-        } finally
-
-        {
+        } finally {
             if (outputStream != null) {
                 try {
                     outputStream.close();
@@ -184,12 +151,52 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         return file;
     }
+    @Override
+    public void buildSpectrumCacheForExperiment(String experimentAccession) {
 
-    private void writeCachedSpectra(BufferedOutputStream aOutputStream, HashMap<Long, Map> aSpectrumIdMap, ArrayList<Long> aSpectrumidCache) throws IOException {
-        MascotGenericFile mascotGenericFile;
+        // First clear the existing cache.
+        LOGGER.debug(String.format("clearing spectrum cache before starting to cache all spectra for experiment %s", experimentAccession));
+        spectrumService.clearCache();
+
+        //get spectra metadata
+        List<Map<String, Object>> spectraMetadata = experimentRepository.getSpectraMetadata(experimentAccession);
+
+
+        HashMap<Long, Map> spectrumIdMap = new HashMap<Long, Map>();
+        for (Map<String, Object> spectrumMetadata : spectraMetadata) {
+            spectrumIdMap.put((Long) spectrumMetadata.get("spectrum_id"), spectrumMetadata);
+        }
+
+        Iterator<Long> lSpectrumIdIterator = spectrumIdMap.keySet().iterator();
+        ArrayList<Long> lSpectrumidCacheList = Lists.newArrayList();
+
+        while (lSpectrumIdIterator.hasNext()) {
+            Long spectrumId = lSpectrumIdIterator.next();
+            lSpectrumidCacheList.add(spectrumId);
+        }
+
+        if (lSpectrumidCacheList.size() > 0) {
+            spectrumService.cacheSpectra(lSpectrumidCacheList);
+            LOGGER.debug(String.format("added %s entries to the spectrum Cache", lSpectrumidCacheList.size()));
+        }
+
+    }
+
+    private void writeCachedSpectra(BufferedOutputStream aOutputStream, String experimentAccession) throws IOException {
+        MascotGenericFile mascotGenericFile = null;
         PeakToMapFunction peakToMap = new PeakToMapFunction();
-        for (Long cachedSpectrumId : aSpectrumidCache) {
-            Map spectrumMetadata = aSpectrumIdMap.get(cachedSpectrumId);
+
+        //get spectra metadata
+        List<Map<String, Object>> spectraMetadata = experimentRepository.getSpectraMetadata(experimentAccession);
+
+
+        HashMap<Long, Map> spectrumIdMap = new HashMap<Long, Map>();
+        for (Map<String, Object> spectrumMetadata : spectraMetadata) {
+            spectrumIdMap.put((Long) spectrumMetadata.get("spectrum_id"), spectrumMetadata);
+        }
+
+        for (Long cachedSpectrumId : spectrumIdMap.keySet()) {
+            Map spectrumMetadata = spectrumIdMap.get(cachedSpectrumId);
 
 
             //write identification data to stream
@@ -219,6 +226,8 @@ public class ExperimentServiceImpl implements ExperimentService {
             }
             mascotGenericFile.writeToStream(aOutputStream);
         }
+        LOGGER.debug(String.format("finished writing %d spectra to %s", spectraMetadata.size(), mascotGenericFile.getFilename()));
+
     }
 
     /**

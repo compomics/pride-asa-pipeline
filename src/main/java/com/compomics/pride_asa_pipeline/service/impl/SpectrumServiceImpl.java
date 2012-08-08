@@ -54,7 +54,7 @@ public class SpectrumServiceImpl implements SpectrumService {
                 Peak peak = new Peak(mzValues[i], intensities[i]);
                 peaks.add(peak);
             }
-            
+
             //add spectrum peaks in cache
             spectrumPeaksCache.putInCache(spectrumId, peaks);
         }
