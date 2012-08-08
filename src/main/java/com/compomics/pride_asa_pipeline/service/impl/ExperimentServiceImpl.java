@@ -135,7 +135,7 @@ public class ExperimentServiceImpl implements ExperimentService {
             for (Map<String, Object> spectrumMetadata : spectraMetadata) {
                 spectrumIdMap.put((Long) spectrumMetadata.get("spectrum_id"), spectrumMetadata);
             }
-            spectraMetadata = null;
+
 
             boolean spectrumLimit = PropertiesConfigurationHolder.getInstance().getBoolean("spectrum.limit");
             int spectrumLimitSize = PropertiesConfigurationHolder.getInstance().getInt("spectrum.limit.size");
