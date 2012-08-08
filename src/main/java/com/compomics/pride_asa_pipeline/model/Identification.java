@@ -30,6 +30,8 @@ public class Identification {
      */
     private AnnotationData annotationData;
 
+    public Identification(){}
+    
     public Identification(Peptide peptide, String mzAccession, long spectrumId, long spectrumRef) {
         this.peptide = peptide;
         this.mzAccession = mzAccession;
@@ -40,7 +42,7 @@ public class Identification {
     public Peptide getPeptide() {
         return peptide;
     }
-    
+
     public String getMzAccession() {
         return mzAccession;
     }
@@ -60,11 +62,11 @@ public class Identification {
     public void setAnnotationData(AnnotationData annotationData) {
         this.annotationData = annotationData;
     }
-    
-    public void setPeptide(Peptide peptide){
+
+    public void setPeptide(Peptide peptide) {
         this.peptide = peptide;
     }
-        
+
     public String toShortString() {
         return new StringBuilder().append("IdentificationData{").append("mzAccession='").append(mzAccession).append('\'').append(", spectrumId=").append(spectrumId).append(", spectrumRef=").append(spectrumRef).append('}').toString();
     }

@@ -31,7 +31,7 @@ public class IdentificationScore {
     /**
      * The peptide length
      */
-    private int peptideLength;
+    private int peptideLength;    
 
     /**
      * Constructor

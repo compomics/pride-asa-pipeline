@@ -1,9 +1,6 @@
 package com.compomics.pride_asa_pipeline.model;
 
-import com.compomics.pride_asa_pipeline.spectrum.score.impl.IdentificationScorerImpl;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,7 +19,11 @@ public class AnnotationData {
      * The identification scoring result.
      */
     private IdentificationScore identificationScore;
-        
+    /**
+     * The filter noise threshold
+     */
+    private double noiseThreshold;
+       
     public List<FragmentIonAnnotation> getFragmentIonAnnotations() {
         return fragmentIonAnnotations;
     }
@@ -38,5 +39,13 @@ public class AnnotationData {
     public void setIdentificationScore(IdentificationScore identificationScore) {
         this.identificationScore = identificationScore;
     }
-       
+
+    public double getNoiseThreshold() {
+        return noiseThreshold;
+    }
+
+    public void setNoiseThreshold(double noiseThreshold) {
+        this.noiseThreshold = noiseThreshold;
+    }          
+    
 }

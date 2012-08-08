@@ -102,7 +102,7 @@ public class MainController implements ActionListener {
 
         mainFrame.getExperimentSelectionParentPanel().add(experimentSelectionController.getExperimentSelectionPanel(), gridBagConstraints);
         mainFrame.getModificationsParentPanel().add(modificationsController.getModificationsPanel(), gridBagConstraints);
-        mainFrame.getPipelineResultParentPanel().add(pipelineResultController.getPipelineResultPanel(), gridBagConstraints);
+        mainFrame.getIdentificationsParentPanel().add(pipelineResultController.getPipelineResultPanel(), gridBagConstraints);
 
         //add action listeners        
         mainFrame.getPipelineViewMenuItem().addActionListener(this);

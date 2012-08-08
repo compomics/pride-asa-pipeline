@@ -41,6 +41,7 @@
     <bean id="spectrumService"
           class="com.compomics.pride_asa_pipeline.service.impl.SpectrumServiceImpl">
         <property name="spectrumRepository" ref="spectrumRepository"/>
+        <property name="spectrumPeaksCache" ref="spectrumPeaksCache"/>
     </bean>
     
     <bean id="modificationService"
@@ -48,7 +49,12 @@
         <property name="modificationMarshaller" ref="modificationMarshaller"/>
         <property name="modificationRepository" ref="modificationRepository"/>
         <property name="omssaModiciationMarshaller" ref="omssaModificationMarshaller"/>
-    </bean>                                
+    </bean> 
+    
+    <bean id="spectrumPanelService"
+          class="com.compomics.pride_asa_pipeline.service.impl.SpectrumPanelServiceImpl">
+        <property name="spectrumService" ref="spectrumService"/>
+    </bean>                               
     
     <!-- repository beans -->
     <bean id="experimentRepository"
@@ -168,6 +174,12 @@
     <bean id="pipelineResultController"
           class="com.compomics.pride_asa_pipeline.gui.controller.PipelineResultController"> 
         <property name="mainController" ref="mainController"/>
+        <property name="spectrumPanelService" ref="spectrumPanelService"/>
+    </bean>
+    
+    <!-- other beans -->
+    <bean id="spectrumPeaksCache"
+          class="com.compomics.pride_asa_pipeline.cache.impl.SpectrumPeaksCache">        
     </bean>
                                       
 </beans>

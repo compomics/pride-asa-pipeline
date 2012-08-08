@@ -2,10 +2,9 @@ package com.compomics.pride_asa_pipeline.spectrum.match;
 
 import com.compomics.pride_asa_pipeline.model.AnnotationData;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
+import com.compomics.pride_asa_pipeline.model.ModifiedPeptidesMatchResult;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.model.Peptide;
-import com.compomics.pride_asa_pipeline.spectrum.filter.NoiseThresholdFinder;
-import com.compomics.pride_asa_pipeline.spectrum.filter.NoiseFilter;
 import com.compomics.pride_asa_pipeline.spectrum.score.IdentificationScorer;
 import java.util.List;
 import java.util.Set;
@@ -15,7 +14,7 @@ import java.util.Set;
  * this template use File | Settings | File Templates.
  */
 public interface SpectrumMatcher {
-    
+
     /**
      * Matches an unmodified peptide against a spectrum. The score result and
      * fragment ion annotation are returned as annotation data.
@@ -28,7 +27,7 @@ public interface SpectrumMatcher {
 
     /**
      * Finds the best matching modified peptide against a spectrum the scores
-     * and fragment annotation are added to the peptide
+     * and fragment annotation are added to the peptide.
      *
      * @see IdentificationScorer#score(uk.ac.ebi.pride.asa.model.Peptide,
      * java.util.List)
@@ -36,13 +35,13 @@ public interface SpectrumMatcher {
      * @param modifiedPeptides the set of modified peptides
      * @param peptide the identified peptide
      * @param peaks the spectrum peak list
-     * @return the best matching modified peptide
+     * @return the best matching modified peptides result
      */
-    ModifiedPeptide findBestModifiedPeptideMatch(Peptide peptide, Set<ModifiedPeptide> modifiedPeptides, List<Peak> peaks);
-    
+    ModifiedPeptidesMatchResult findBestModifiedPeptideMatch(Peptide peptide, Set<ModifiedPeptide> modifiedPeptides, List<Peak> peaks);
+
     /**
      * Gets the identification scorer
-     * 
+     *
      * @return the identification scorer
      */
     IdentificationScorer getIdentificationScorer();

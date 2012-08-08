@@ -221,18 +221,15 @@ public class PrideSpectrumAnnotator {
         //which 'variation' of the precursor is the most likely one.
 
         //for each precursor: try all ModifiedPeptide variations
-        //for all these variations: map against the spectra and assign a score
-
-        //set fragment mass error for the identification scorer
-        spectrumMatcher.getIdentificationScorer().setFragmentMassError(analyzerData.getFragmentMassError());
-
+        //for all these variations: map against the spectra and assign a score       
         List<Identification> bestMatches = new ArrayList<Identification>();
         for (Identification identification : precursorVariations.keySet()) {
             //load spectrum
             List<Peak> peaks = spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
-            ModifiedPeptide bestMatch = spectrumMatcher.findBestModifiedPeptideMatch(identification.getPeptide(), precursorVariations.get(identification), peaks);
-            if (bestMatch != null) {
-                identification.setPeptide(bestMatch);
+            ModifiedPeptidesMatchResult modifiedPeptidesMatchResult = spectrumMatcher.findBestModifiedPeptideMatch(identification.getPeptide(), precursorVariations.get(identification), peaks);
+            if (modifiedPeptidesMatchResult != null) {
+                identification.setPeptide(modifiedPeptidesMatchResult.getModifiedPeptide());
+                identification.setAnnotationData(modifiedPeptidesMatchResult.getAnnotationData());
                 bestMatches.add(identification);
             } else {
                 LOGGER.info("No best match found for precursor: " + identification.getPeptide());
@@ -266,6 +263,8 @@ public class PrideSpectrumAnnotator {
         //get analyzer data
         analyzerData = experimentService.getAnalyzerData(experimentAccession);
         LOGGER.info("Finding modification combinations");
+        //set fragment mass error for the identification scorer
+        spectrumMatcher.getIdentificationScorer().setFragmentMassError(analyzerData.getFragmentMassError());
         Map<Identification, Set<ModificationCombination>> massDeltaExplanationsMap = findModificationCombinations(massRecalibrationResult, identifications);
         LOGGER.debug("Finished finding modification combinations");
 
@@ -297,6 +296,10 @@ public class PrideSpectrumAnnotator {
                 significantMassDeltaExplanationsMap.put(identification, massDeltaExplanationsMap.get(identification));
             } else {
                 unmodifiedPrecursors.add(identification);
+
+                //score the unmodified identification
+                AnnotationData annotationData = spectrumMatcher.matchUnmodifiedPeptide(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()));
+                identification.setAnnotationData(annotationData);
             }
         }
         spectrumAnnotatorResult.setUnmodifiedPrecursors(unmodifiedPrecursors);
