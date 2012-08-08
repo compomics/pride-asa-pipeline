@@ -4,6 +4,8 @@
  */
 package com.compomics.pride_asa_pipeline.repository;
 
+import com.compomics.pride_asa_pipeline.model.Peak;
+
 import java.util.List;
 import java.util.Map;
 
@@ -31,10 +33,11 @@ public interface SpectrumRepository {
 
     /**
      * Gets Maps with spectrumid:peakMap structure
+     *
      * @param spectrumIds the spectrum IDs
      * @return the Map with spectrumIds as keys, and Maps (mass:intensity) as values
      */
-    Map<Long, Map> getPeakMapsBySpectrumIdList(List<Long> spectrumIds);
+    Map<Long, List<Peak>> getPeakMapsBySpectrumIdList(List<Long> spectrumIds);
 
     
 }

@@ -5,7 +5,6 @@
 package com.compomics.pride_asa_pipeline.playground;
 
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
-import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import org.springframework.context.ApplicationContext;
 
@@ -46,9 +45,9 @@ public class Playground {
 
         ExperimentService experimentService = (ExperimentService) applicationContext.getBean("experimentService");
 
-        SpectrumService spectrumService = (SpectrumService) applicationContext.getBean("spectrumService");
+//        SpectrumService spectrumService = (SpectrumService) applicationContext.getBean("spectrumService");
 
-        File file = experimentService.getSpectraAsMgfFile("2");
+        File file = experimentService.getSpectraAsMgfFile("2811");
         System.out.println(file.getAbsolutePath());
 
 //

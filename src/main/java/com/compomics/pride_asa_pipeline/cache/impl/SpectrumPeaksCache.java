@@ -18,7 +18,7 @@ import java.util.Map;
 public class SpectrumPeaksCache extends LinkedHashMap<Long, List<Peak>> implements Cache<Long, List<Peak>> {
 
     //set maximum cache size from properties file
-    private static final int MAXIMUM_CACHE_SIZE = PropertiesConfigurationHolder.getInstance().getInt("spectrum_peaks_cache.maximum_cache_size");
+    private int MAXIMUM_CACHE_SIZE = PropertiesConfigurationHolder.getInstance().getInt("spectrum_peaks_cache.maximum_cache_size");
 
     /**
      * Puts the given spectrum peak list in the cache. If the maximum cache size
@@ -57,6 +57,8 @@ public class SpectrumPeaksCache extends LinkedHashMap<Long, List<Peak>> implemen
 
     @Override
     public void clearCache() {
+        // Reset cache size.
+        MAXIMUM_CACHE_SIZE = PropertiesConfigurationHolder.getInstance().getInt("spectrum_peaks_cache.maximum_cache_size");
         this.clear();
     }
 }
