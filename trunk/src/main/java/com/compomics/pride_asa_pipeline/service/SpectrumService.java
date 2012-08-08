@@ -5,9 +5,9 @@
 package com.compomics.pride_asa_pipeline.service;
 
 import com.compomics.pride_asa_pipeline.model.Peak;
+
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -32,7 +32,16 @@ public interface SpectrumService {
      */
     HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(long spectrumId);
 
+    /**
+     * Fill the spectrum cache with the specified spectrumids
+     * @param aSpectrumidCacheList
+     */
     void cacheSpectra(List<Long> aSpectrumidCacheList);
 
-    Map getCachedSpectrum(Long aSpectrumid);
+    /**
+     * Clear the current cache.
+     */
+    void clearCache();
+
+
 }

@@ -8,11 +8,9 @@ import com.compomics.pride_asa_pipeline.cache.Cache;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.repository.SpectrumRepository;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.log4j.Logger;
+
+import java.util.*;
 
 /**
  *
@@ -23,7 +21,6 @@ public class SpectrumServiceImpl implements SpectrumService {
 
     private SpectrumRepository spectrumRepository;
     private Cache<Long, List<Peak>> spectrumPeaksCache;
-    private Map<Long, Map> spectrumCache = null;
 
     public SpectrumRepository getSpectrumRepository() {
         return spectrumRepository;
@@ -62,7 +59,7 @@ public class SpectrumServiceImpl implements SpectrumService {
             spectrumPeaksCache.putInCache(spectrumId, peaks);
         }
         else{
-            LOGGER.debug("found spectrum with ID: " + spectrumId + " in cache.");
+//            LOGGER.debug("found spectrum with ID: " + spectrumId + " in cache.");
         }
 
         return peaks;
@@ -84,11 +81,19 @@ public class SpectrumServiceImpl implements SpectrumService {
 
     @Override
     public void cacheSpectra(List<Long> aSpectrumidCacheList) {
-        spectrumCache = spectrumRepository.getPeakMapsBySpectrumIdList(aSpectrumidCacheList);
+        Map<Long,List<Peak>> lPeakMapsBySpectrumIdList = spectrumRepository.getPeakMapsBySpectrumIdList(aSpectrumidCacheList);
+        Set<Long> lSpectrumids = lPeakMapsBySpectrumIdList.keySet();
+        for (Long lSpectrumid : lSpectrumids) {
+            spectrumPeaksCache.putInCache(lSpectrumid, lPeakMapsBySpectrumIdList.get(lSpectrumid));
+        }
     }
 
+    /**
+     * Clear the current cache.
+     */
     @Override
-    public Map getCachedSpectrum(Long aSpectrumid) {
-        return spectrumCache.get(aSpectrumid);
+    public void clearCache() {
+        spectrumPeaksCache.clearCache();
     }
+
 }

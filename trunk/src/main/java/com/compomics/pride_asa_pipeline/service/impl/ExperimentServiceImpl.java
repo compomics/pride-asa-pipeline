@@ -5,17 +5,20 @@
 package com.compomics.pride_asa_pipeline.service.impl;
 
 import com.compomics.mslims.util.fileio.MascotGenericFile;
-import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Identifications;
+import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import org.apache.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.*;
 import java.util.*;
 
@@ -136,11 +139,6 @@ public class ExperimentServiceImpl implements ExperimentService {
                 spectrumIdMap.put((Long) spectrumMetadata.get("spectrum_id"), spectrumMetadata);
             }
 
-
-            boolean spectrumLimit = PropertiesConfigurationHolder.getInstance().getBoolean("spectrum.limit");
-            int spectrumLimitSize = PropertiesConfigurationHolder.getInstance().getInt("spectrum.limit.size");
-
-            int spectrumCacheSize = PropertiesConfigurationHolder.getInstance().getInt("spectrum.cache");
             int spectrumCountRunner = 0;
             iFirstMfgFile = Boolean.TRUE;
 
@@ -151,29 +149,11 @@ public class ExperimentServiceImpl implements ExperimentService {
                 Long spectrumId = lSpectrumIdIterator.next();
                 lSpectrumidCacheList.add(spectrumId);
                 spectrumCountRunner++;
-
-                if(spectrumLimit && spectrumLimitSize > spectrumCountRunner){
-                    LOGGER.debug(String.format("Spectrum limit enabled! Only writing %d MSMS spectra to %s", spectrumLimitSize, file.getName()));
-                    break;
-                }
-
-                if (spectrumCountRunner % spectrumCacheSize == 0) {
-                    // Make the spectrumService cache the current list of spectrumIds
-                    spectrumService.cacheSpectra(lSpectrumidCacheList);
-
-                    // Flush the cache to the file!
-                    flushCachedSpectra(outputStream, spectrumIdMap, lSpectrumidCacheList);
-                    lSpectrumidCacheList = Lists.newArrayList();
-
-                } else {
-                    // continue!
-                }
             }
 
-            // fence post!
             if (lSpectrumidCacheList.size() > 0) {
                 spectrumService.cacheSpectra(lSpectrumidCacheList);
-                flushCachedSpectra(outputStream, spectrumIdMap, lSpectrumidCacheList);
+                writeCachedSpectra(outputStream, spectrumIdMap, lSpectrumidCacheList);
             }
 
             LOGGER.debug(String.format("finished writing %d spectra to %s", spectrumCountRunner, file.getAbsolutePath()));
@@ -205,8 +185,9 @@ public class ExperimentServiceImpl implements ExperimentService {
         return file;
     }
 
-    private void flushCachedSpectra(BufferedOutputStream aOutputStream, HashMap<Long, Map> aSpectrumIdMap, ArrayList<Long> aSpectrumidCache) throws IOException {
+    private void writeCachedSpectra(BufferedOutputStream aOutputStream, HashMap<Long, Map> aSpectrumIdMap, ArrayList<Long> aSpectrumidCache) throws IOException {
         MascotGenericFile mascotGenericFile;
+        PeakToMapFunction peakToMap = new PeakToMapFunction();
         for (Long cachedSpectrumId : aSpectrumidCache) {
             Map spectrumMetadata = aSpectrumIdMap.get(cachedSpectrumId);
 
@@ -226,7 +207,7 @@ public class ExperimentServiceImpl implements ExperimentService {
                 mascotGenericFile.setCharge(Integer.parseInt(lPrecursor_charge_state.toString()));
             }
 
-            mascotGenericFile.setPeaks((HashMap) spectrumService.getCachedSpectrum(cachedSpectrumId));
+            mascotGenericFile.setPeaks(peakToMap.apply(spectrumService.getSpectrumPeaksBySpectrumId(cachedSpectrumId)));
 
             //first mascot generic file has to start at the first line
             //else insert empty line
@@ -237,6 +218,21 @@ public class ExperimentServiceImpl implements ExperimentService {
                 mascotGenericFile.setComments("\n\n");
             }
             mascotGenericFile.writeToStream(aOutputStream);
+        }
+    }
+
+    /**
+     * Helper function class to Convert the pride-asap
+     * List<Peak> instances in the HashMaps for the MascotGenericFile instance.
+     */
+    private class PeakToMapFunction implements Function<List<Peak>, HashMap> {
+        @Override
+        public HashMap apply(@Nullable List<Peak> aPeaks) {
+            HashMap lResult = Maps.newHashMap();
+            for (Peak lPeak : aPeaks) {
+                lResult.put(lPeak.getMzRatio(), lPeak.getIntensity());
+            }
+            return lResult;
         }
     }
 }
