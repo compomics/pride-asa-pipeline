@@ -4,6 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.gui.view;
 
+import javax.swing.JPanel;
 import javax.swing.JTable;
 
 /**
@@ -21,6 +22,10 @@ public class PipelineResultPanel extends javax.swing.JPanel {
 
     public JTable getIdentificationsTable() {
         return identificationsTable;
+    }
+
+    public JPanel getIdentificationDetailPanel() {
+        return identificationDetailPanel;
     }
 
     /**
@@ -81,18 +86,7 @@ public class PipelineResultPanel extends javax.swing.JPanel {
         identificationDetailPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Identification detail"));
         identificationDetailPanel.setMinimumSize(new java.awt.Dimension(20, 20));
         identificationDetailPanel.setPreferredSize(new java.awt.Dimension(20, 20));
-
-        org.jdesktop.layout.GroupLayout identificationDetailPanelLayout = new org.jdesktop.layout.GroupLayout(identificationDetailPanel);
-        identificationDetailPanel.setLayout(identificationDetailPanelLayout);
-        identificationDetailPanelLayout.setHorizontalGroup(
-            identificationDetailPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 508, Short.MAX_VALUE)
-        );
-        identificationDetailPanelLayout.setVerticalGroup(
-            identificationDetailPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 333, Short.MAX_VALUE)
-        );
-
+        identificationDetailPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;

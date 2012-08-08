@@ -67,7 +67,6 @@ public class JdbcExperimentRepository extends JdbcDaoSupport implements Experime
     public Map<String, String> getAnalyzerSources(String experimentAccession) {
         LOGGER.debug("Start loading analyzer sources for experiment " + experimentAccession);
         Map<String, String> analyzerSources = getJdbcTemplate().query(SELECT_ANALYZER_SOURCE_FOR_MALDI, new ResultSetExtractor<Map<String, String>>() {
-
             @Override
             public Map<String, String> extractData(ResultSet rs) throws SQLException, DataAccessException {
                 Map<String, String> analyzerSourceMap = new HashMap<String, String>();

@@ -17,7 +17,7 @@ import java.util.Map;
 public class PeptideModificationHolderCache extends LinkedHashMap<String, PeptideModificationHolder> implements Cache<String, PeptideModificationHolder> {
 
     //set maximum cache size from properties file
-    private static final int MAXIMUM_CACHE_SIZE = PropertiesConfigurationHolder.getInstance().getInt("cache.maximum_cache_size");
+    private static final int MAXIMUM_CACHE_SIZE = PropertiesConfigurationHolder.getInstance().getInt("modification_cache.maximum_cache_size");
     
     /**
      * Puts the given PeptideModificationHolder in the cache. If the maximum
@@ -34,7 +34,7 @@ public class PeptideModificationHolderCache extends LinkedHashMap<String, Peptid
     
     /**
      * Gets the PeptideModificationHolder by its key, the amino acid
-     * sequence. If nothing is found, null is returned
+     * sequence. If nothing is found, null is returned.
      *
      * @param aminoAcidSequenceString the amino acid sequence string key
      * @return the PeptideModificationHolder

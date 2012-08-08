@@ -4,11 +4,8 @@
  */
 package com.compomics.pride_asa_pipeline.gui.view;
 
-import com.compomics.pride_asa_pipeline.gui.controller.MainController;
-import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import org.springframework.context.ApplicationContext;
 
 /**
  *
@@ -47,8 +44,8 @@ public class MainFrame extends javax.swing.JFrame {
         return pipelineViewMenuItem;
     }
 
-    public JPanel getPipelineResultParentPanel() {
-        return pipelineResultParentPanel;
+    public JPanel getIdentificationsParentPanel() {
+        return identificationsParentPanel;
     }
 
     /**
@@ -63,7 +60,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         pipelinePanel = new javax.swing.JPanel();
         experimentSelectionParentPanel = new javax.swing.JPanel();
-        pipelineResultParentPanel = new javax.swing.JPanel();
+        pipelineResultTabbedPane = new javax.swing.JTabbedPane();
+        sumaryParentPanel = new javax.swing.JPanel();
+        identificationsParentPanel = new javax.swing.JPanel();
         modificationsParentPanel = new javax.swing.JPanel();
         pipelineParamsParentPanel = new javax.swing.JPanel();
         menuBar = new javax.swing.JMenuBar();
@@ -79,6 +78,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         pipelinePanel.setLayout(new java.awt.GridBagLayout());
 
+        experimentSelectionParentPanel.setMinimumSize(new java.awt.Dimension(20, 20));
+        experimentSelectionParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
         experimentSelectionParentPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -89,8 +90,17 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints.weighty = 0.3;
         pipelinePanel.add(experimentSelectionParentPanel, gridBagConstraints);
 
-        pipelineResultParentPanel.setRequestFocusEnabled(false);
-        pipelineResultParentPanel.setLayout(new java.awt.GridBagLayout());
+        pipelineResultTabbedPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Pipeline result"));
+        pipelineResultTabbedPane.setMinimumSize(new java.awt.Dimension(20, 20));
+        pipelineResultTabbedPane.setPreferredSize(new java.awt.Dimension(20, 20));
+
+        sumaryParentPanel.setLayout(new java.awt.GridBagLayout());
+        pipelineResultTabbedPane.addTab("Summary", sumaryParentPanel);
+
+        identificationsParentPanel.setRequestFocusEnabled(false);
+        identificationsParentPanel.setLayout(new java.awt.GridBagLayout());
+        pipelineResultTabbedPane.addTab("Identifications", identificationsParentPanel);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -98,7 +108,7 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.7;
-        pipelinePanel.add(pipelineResultParentPanel, gridBagConstraints);
+        pipelinePanel.add(pipelineResultTabbedPane, gridBagConstraints);
 
         getContentPane().add(pipelinePanel, "pipelinePanel");
 
@@ -132,14 +142,16 @@ public class MainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel experimentSelectionParentPanel;
     private javax.swing.JMenu helpMenu;
+    private javax.swing.JPanel identificationsParentPanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JPanel modificationsParentPanel;
     private javax.swing.JMenuItem modificationsViewMenuItem;
     private javax.swing.JPanel pipelinePanel;
     private javax.swing.JPanel pipelineParamsParentPanel;
     private javax.swing.JMenuItem pipelineParamsViewMenuItem;
-    private javax.swing.JPanel pipelineResultParentPanel;
+    private javax.swing.JTabbedPane pipelineResultTabbedPane;
     private javax.swing.JMenuItem pipelineViewMenuItem;
+    private javax.swing.JPanel sumaryParentPanel;
     private javax.swing.JMenu viewMenu;
     // End of variables declaration//GEN-END:variables
 }

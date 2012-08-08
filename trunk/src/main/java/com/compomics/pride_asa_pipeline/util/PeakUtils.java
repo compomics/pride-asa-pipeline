@@ -12,10 +12,28 @@ import java.util.List;
  * @author niels
  */
 public class PeakUtils {
-    
+
+    /**
+     * Gets the spectrum mz ratios as double array
+     *
+     * @param peaks the spectrum peaks
+     * @return the spectrum mz ratios double array
+     */
+    public static double[] getMzRatiosAsArray(List<Peak> peaks) {
+        if (peaks == null) {
+            return null;
+        }
+        double[] intensities = new double[peaks.size()];
+        for (int i = 0; i < peaks.size(); i++) {
+            intensities[i] = peaks.get(i).getMzRatio();
+
+        }
+        return intensities;
+    }
+
     /**
      * Gets the spectrum intensities as double array
-     * 
+     *
      * @param peaks the spectrum peaks
      * @return the spectrum intensities double array
      */
@@ -30,7 +48,7 @@ public class PeakUtils {
         }
         return intensities;
     }
-    
+
     /**
      * Determines if the provided m/z of the fragment ion matches the proviced
      * m/z of the spectra spectrum m/z. Note: This will take a fragment mass
@@ -50,5 +68,4 @@ public class PeakUtils {
         //that is defined by the fragment mass error.
         return (fragmentMz > spectraMz - fragmentMassError) && (fragmentMz < spectraMz + fragmentMassError);
     }
-        
 }

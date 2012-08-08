@@ -2,9 +2,10 @@ package com.compomics.pride_asa_pipeline.spectrum.match.impl;
 
 import com.compomics.pride_asa_pipeline.model.AnnotationData;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
+import com.compomics.pride_asa_pipeline.model.ModifiedPeptidesMatchResult;
 import com.compomics.pride_asa_pipeline.model.Peak;
+import com.compomics.pride_asa_pipeline.model.PeakFilterResult;
 import com.compomics.pride_asa_pipeline.model.Peptide;
-import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import com.compomics.pride_asa_pipeline.spectrum.filter.NoiseFilter;
 import com.compomics.pride_asa_pipeline.spectrum.filter.NoiseThresholdFinder;
 import com.compomics.pride_asa_pipeline.spectrum.match.SpectrumMatcher;
@@ -21,14 +22,13 @@ import org.apache.log4j.Logger;
 public class SpectrumMatcherImpl implements SpectrumMatcher {
 
     private static final Logger LOGGER = Logger.getLogger(SpectrumMatcherImpl.class);
-    
     /**
      * The identiciation scorer; scores the peptide spectrum match
      */
     private IdentificationScorer identificationScorer;
     private NoiseThresholdFinder noiseThresholdFinder;
     private NoiseFilter noiseFilter;
-            
+
     @Override
     public IdentificationScorer getIdentificationScorer() {
         return identificationScorer;
@@ -57,15 +57,22 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
     @Override
     public AnnotationData matchUnmodifiedPeptide(Peptide unmodifiedPeptide, List<Peak> peaks) {
         //filter spectrum
-        List<Peak> signalPeaks = filterPeaks(peaks, unmodifiedPeptide.calculateExperimentalMass());
+        PeakFilterResult peakFilterResult = filterPeaks(peaks, unmodifiedPeptide.calculateExperimentalMass());
 
-        return matchPeptide(unmodifiedPeptide, signalPeaks);
+        //match the peptide
+        AnnotationData annotationData = matchPeptide(unmodifiedPeptide, peakFilterResult.getFilteredPeaks());
+        //set noise threshold
+        annotationData.setNoiseThreshold(peakFilterResult.getNoiseThreshold());
+
+        return annotationData;
     }
 
     @Override
-    public ModifiedPeptide findBestModifiedPeptideMatch(Peptide peptide, Set<ModifiedPeptide> modifiedPeptides, List<Peak> peaks) {
+    public ModifiedPeptidesMatchResult findBestModifiedPeptideMatch(Peptide peptide, Set<ModifiedPeptide> modifiedPeptides, List<Peak> peaks) {
+        ModifiedPeptidesMatchResult modifiedPeptidesMatchResult = null;
+
         //filter spectrum
-        List<Peak> filteredPeaks = filterPeaks(peaks, peptide.calculateExperimentalMass());
+        PeakFilterResult peakFilterResult = filterPeaks(peaks, peptide.calculateExperimentalMass());
 
         //now match each ModifiedPeptide and record its score
         ModifiedPeptide bestMatch = null;
@@ -76,8 +83,8 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
                 LOGGER.info("null as modified peptide in variations collection for precursor!");
             }
             //score the modified peptide against the spectrum peaks
-            annotationData = this.matchPeptide(modifiedPeptide, filteredPeaks);
-            //take the average fragment ion score
+            annotationData = this.matchPeptide(modifiedPeptide, peakFilterResult.getFilteredPeaks());
+            //for the moment, consider the average fragment ion score
             double averageFragmentIonScore = annotationData.getIdentificationScore().getAverageFragmentIonScore();
             if (averageFragmentIonScore > bestScore) {
                 bestMatch = modifiedPeptide;
@@ -85,30 +92,39 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
             }
         }
 
-        //return the best scoring ModifiedPeptide as the best match
+        //return the best scoring ModifiedPeptide as the best match        
         if (bestMatch != null) {
             LOGGER.info("Best matching peptide: " + bestMatch.getSequence() + " with score: " + bestScore);
+            //set annotation data noise threshold
+            annotationData.setNoiseThreshold(peakFilterResult.getNoiseThreshold());
+            modifiedPeptidesMatchResult = new ModifiedPeptidesMatchResult(bestMatch, annotationData);
         } else {
             LOGGER.info("best match: null");
         }
 
-        return bestMatch;
+        return modifiedPeptidesMatchResult;
     }
 
-    private List<Peak> filterPeaks(List<Peak> peaks, double experimentalPrecursorMass) {
-        //first get the signal peaks we have to use for the matching
-        //these are either the unfiltered or filtered spectra peaks
-        List<Peak> filteredPeaks = peaks;
-        if (noiseFilter != null && noiseThresholdFinder != null) {
-            //don't filter if there are no peaks
-            if (!peaks.isEmpty()) {
-                double[] intensities = PeakUtils.getIntensitiesAsArray(peaks);
-                double threshold = noiseThresholdFinder.findNoiseThreshold(intensities);
-                filteredPeaks = noiseFilter.filterNoise(peaks, threshold, experimentalPrecursorMass);
-            }
+    /**
+     * Filters the peaks.
+     *
+     * @param peaks the peaks
+     * @param experimentalPrecursorMass the experimental precursor mass
+     * @return the peak filter result (filtered peaks + noise filter threshold)
+     */
+    private PeakFilterResult filterPeaks(List<Peak> peaks, double experimentalPrecursorMass) {
+        PeakFilterResult peakFilterResult = null;
+        //don't filter if there are no peaks
+        if (!peaks.isEmpty()) {
+            double[] intensities = PeakUtils.getIntensitiesAsArray(peaks);
+            double threshold = noiseThresholdFinder.findNoiseThreshold(intensities);
+            List<Peak> filteredPeaks = noiseFilter.filterNoise(peaks, threshold, experimentalPrecursorMass);
+            peakFilterResult = new PeakFilterResult(filteredPeaks, threshold);
+        } else {
+            peakFilterResult = new PeakFilterResult(peaks);
         }
 
-        return filteredPeaks;
+        return peakFilterResult;
     }
 
     /**

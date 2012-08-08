@@ -5,23 +5,23 @@
 package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.gui.view.PipelineResultPanel;
+import com.compomics.pride_asa_pipeline.gui.wrapper.IdentificationGuiWrapper;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
-import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.ModificationFacade;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peptide;
+import com.compomics.pride_asa_pipeline.service.SpectrumPanelService;
+import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.google.common.base.Joiner;
-import java.awt.Component;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
 import org.apache.log4j.Logger;
 import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.BindingGroup;
@@ -42,11 +42,13 @@ public class PipelineResultController {
     private static final Integer NUMBER_OF_DECIMALS = 4;
     //model
     private BindingGroup bindingGroup;
-    private ObservableList<Identification> identificationsBindingList;
+    private ObservableList<IdentificationGuiWrapper> identificationGuiWrappersBindingList;
     //view
     private PipelineResultPanel pipelineResultPanel;
     //parent controller
     private MainController mainController;
+    //services
+    private SpectrumPanelService spectrumPanelService;
 
     public MainController getMainController() {
         return mainController;
@@ -60,9 +62,17 @@ public class PipelineResultController {
         return pipelineResultPanel;
     }
 
+    public SpectrumPanelService getSpectrumPanelService() {
+        return spectrumPanelService;
+    }
+
+    public void setSpectrumPanelService(SpectrumPanelService spectrumPanelService) {
+        this.spectrumPanelService = spectrumPanelService;
+    }
+
     public void updateIdentifications() {
-        identificationsBindingList.clear();
-        identificationsBindingList.addAll(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getAllIdentifications());
+        identificationGuiWrappersBindingList.clear();
+        identificationGuiWrappersBindingList.addAll(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getIdentificationGuiWrappers());
     }
 
     public void init() {
@@ -70,46 +80,83 @@ public class PipelineResultController {
 
         //init bindings
         bindingGroup = new BindingGroup();
-        identificationsBindingList = ObservableCollections.observableList(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getAllIdentifications());
+        identificationGuiWrappersBindingList = ObservableCollections.observableList(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getIdentificationGuiWrappers());
 
         //table binding        
-        JTableBinding identificationsTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ, identificationsBindingList, pipelineResultPanel.getIdentificationsTable());
+        JTableBinding identificationGuiWrappersTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ, identificationGuiWrappersBindingList, pipelineResultPanel.getIdentificationsTable());
 
         //Add column bindings
-        ColumnBinding columnBinding = identificationsTableBinding.addColumnBinding(ELProperty.create("${peptide.sequence}"));
+        ColumnBinding columnBinding = identificationGuiWrappersTableBinding.addColumnBinding(ELProperty.create("${explanationType}"));
+        columnBinding.setColumnName("Pipeline explanation");
+        columnBinding.setEditable(Boolean.FALSE);
+        columnBinding.setColumnClass(IdentificationGuiWrapper.ExplanationType.class);
+        columnBinding.setRenderer(new ExplanationCellRenderer());
+
+        columnBinding = identificationGuiWrappersTableBinding.addColumnBinding(ELProperty.create("${identification.peptide.sequence}"));
         columnBinding.setColumnName("Peptide");
         columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(AminoAcidSequence.class);
 
-        columnBinding = identificationsTableBinding.addColumnBinding(ELProperty.create("${peptide.charge}"));
+        columnBinding = identificationGuiWrappersTableBinding.addColumnBinding(ELProperty.create("${identification.peptide.charge}"));
         columnBinding.setColumnName("Charge");
         columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(Integer.class);
 
-        columnBinding = identificationsTableBinding.addColumnBinding(ELProperty.create("${peptide}"));
+        columnBinding = identificationGuiWrappersTableBinding.addColumnBinding(ELProperty.create("${identification.peptide}"));
         columnBinding.setColumnName("Delta m/z");
         columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(Peptide.class);
         columnBinding.setRenderer(new DeltaMzTableCellRenderer());
 
-        columnBinding = identificationsTableBinding.addColumnBinding(ELProperty.create("${peptide.mzRatio}"));
+        columnBinding = identificationGuiWrappersTableBinding.addColumnBinding(ELProperty.create("${identification.peptide.mzRatio}"));
         columnBinding.setColumnName("Precursor m/z");
         columnBinding.setEditable(Boolean.FALSE);
-        columnBinding.setColumnClass(Double.class);
+        columnBinding.setColumnClass(Double.class);        
 
-        columnBinding = identificationsTableBinding.addColumnBinding(ELProperty.create("${spectrumId}"));
+        columnBinding = identificationGuiWrappersTableBinding.addColumnBinding(ELProperty.create("${identification.spectrumId}"));
         columnBinding.setColumnName("Pride spectrum ID");
         columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(String.class);
 
-        columnBinding = identificationsTableBinding.addColumnBinding(ELProperty.create("${peptide}"));
+        columnBinding = identificationGuiWrappersTableBinding.addColumnBinding(ELProperty.create("${identification.peptide}"));
         columnBinding.setColumnName("Modifications");
         columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(Peptide.class);
-        columnBinding.setRenderer(new ModificationsTableCellRenderer());
+        columnBinding.setRenderer(new ModificationsCellRenderer());
 
-        bindingGroup.addBinding(identificationsTableBinding);
+        bindingGroup.addBinding(identificationGuiWrappersTableBinding);
         bindingGroup.bind();
+
+        //add listeners
+        pipelineResultPanel.getIdentificationsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent lse) {
+                if (!lse.getValueIsAdjusting()) {
+                    if (pipelineResultPanel.getIdentificationsTable().getSelectedRow() != -1) {
+                        IdentificationGuiWrapper identificationGuiWrapper = identificationGuiWrappersBindingList.get(pipelineResultPanel.getIdentificationsTable().getSelectedRow());
+                        
+                        System.out.println("spectrum ref: " + identificationGuiWrapper.getIdentification().getSpectrumRef() + ", spectrum id: " + identificationGuiWrapper.getIdentification().getSpectrumId());
+
+                        SpectrumPanel spectrumPanel = spectrumPanelService.getSpectrumPanel(identificationGuiWrapper.getIdentification());
+
+                        //remove spectrum panel if already present
+                        if (pipelineResultPanel.getIdentificationDetailPanel().getComponentCount() != 0) {
+                            pipelineResultPanel.getIdentificationDetailPanel().remove(0);
+                        }
+
+                        //add the spectrum panel to the identifications detail panel
+                        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+                        gridBagConstraints.fill = GridBagConstraints.BOTH;
+                        gridBagConstraints.weightx = 1.0;
+                        gridBagConstraints.weighty = 1.0;
+
+                        pipelineResultPanel.getIdentificationDetailPanel().add(spectrumPanel, gridBagConstraints);
+                        pipelineResultPanel.getIdentificationDetailPanel().validate();
+                        pipelineResultPanel.getIdentificationDetailPanel().repaint();
+                    }
+                }
+            }
+        });
     }
 
     private class DeltaMzTableCellRenderer extends DefaultTableCellRenderer {
@@ -119,7 +166,7 @@ public class PipelineResultController {
             Peptide peptide = (Peptide) value;
             double deltaMz = 0.0;
             try {
-                BigDecimal bigDecimal = new BigDecimal(Double.toString(peptide.calculateMassDelta()));
+                BigDecimal bigDecimal = new BigDecimal(Double.toString(peptide.calculateMassDelta() / peptide.getCharge()));
                 bigDecimal = bigDecimal.setScale(NUMBER_OF_DECIMALS, BigDecimal.ROUND_HALF_UP);
                 deltaMz = bigDecimal.doubleValue();
             } catch (AASequenceMassUnknownException ex) {
@@ -127,9 +174,9 @@ public class PipelineResultController {
             }
             super.setValue(deltaMz);
         }
-    }
+    }        
 
-    private class ModificationsTableCellRenderer extends DefaultTableCellRenderer {
+    private class ModificationsCellRenderer extends DefaultTableCellRenderer {
 
         @Override
         protected void setValue(Object value) {
@@ -157,7 +204,26 @@ public class PipelineResultController {
                 Joiner joiner = Joiner.on(", ");
                 modificationsInfoString = modifications.size() + "(" + joiner.join(modifications) + ")";
             }
+
             super.setValue(modificationsInfoString);
+        }
+    }
+
+    private class ExplanationCellRenderer extends DefaultTableCellRenderer {
+
+        @Override
+        protected void setValue(Object value) {
+            IdentificationGuiWrapper.ExplanationType explanationType = (IdentificationGuiWrapper.ExplanationType) value;
+
+            if (explanationType.equals(IdentificationGuiWrapper.ExplanationType.UNMODIFIED)) {
+                setBackground(Color.GREEN);
+            } else if (explanationType.equals(IdentificationGuiWrapper.ExplanationType.MODIFIED)) {
+                setBackground(Color.ORANGE);
+            } else {
+                setBackground(Color.RED);
+            }
+
+            super.setValue(explanationType.name());
         }
     }
 }
