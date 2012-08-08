@@ -47,11 +47,13 @@ public class Playground {
 
 //        SpectrumService spectrumService = (SpectrumService) applicationContext.getBean("spectrumService");
 
-        File file = experimentService.getSpectraAsMgfFile("2811");
+        experimentService.buildSpectrumCacheForExperiment("2");
+        File file = experimentService.getSpectrumCacheAsMgfFile("2", true);
+
         System.out.println(file.getAbsolutePath());
 
 //
-//        File file = experimentService.getSpectraAsMgfFile("7662");
+//        File file = experimentService.getSpectrumCacheAsMgfFile("7662");
 //
 //        Set<String> lAccessions = experimentService.getProteinAccessions("7662");
 //        System.out.println(String.format("%d unique protein accessions", lAccessions.size()));

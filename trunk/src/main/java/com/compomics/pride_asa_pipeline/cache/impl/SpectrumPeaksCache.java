@@ -7,6 +7,7 @@ package com.compomics.pride_asa_pipeline.cache.impl;
 import com.compomics.pride_asa_pipeline.cache.Cache;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.Peak;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,4 +62,5 @@ public class SpectrumPeaksCache extends LinkedHashMap<Long, List<Peak>> implemen
         MAXIMUM_CACHE_SIZE = PropertiesConfigurationHolder.getInstance().getInt("spectrum_peaks_cache.maximum_cache_size");
         this.clear();
     }
+
 }

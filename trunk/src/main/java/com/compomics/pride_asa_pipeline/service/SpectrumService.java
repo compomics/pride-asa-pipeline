@@ -43,5 +43,4 @@ public interface SpectrumService {
      */
     void clearCache();
 
-
 }
