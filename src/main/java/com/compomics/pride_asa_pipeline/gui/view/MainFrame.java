@@ -48,6 +48,10 @@ public class MainFrame extends javax.swing.JFrame {
         return identificationsParentPanel;
     }
 
+    public JPanel getPipelineParamsParentPanel() {
+        return pipelineParamsParentPanel;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -61,7 +65,7 @@ public class MainFrame extends javax.swing.JFrame {
         pipelinePanel = new javax.swing.JPanel();
         experimentSelectionParentPanel = new javax.swing.JPanel();
         pipelineResultTabbedPane = new javax.swing.JTabbedPane();
-        sumaryParentPanel = new javax.swing.JPanel();
+        summaryParentPanel = new javax.swing.JPanel();
         identificationsParentPanel = new javax.swing.JPanel();
         modificationsParentPanel = new javax.swing.JPanel();
         pipelineParamsParentPanel = new javax.swing.JPanel();
@@ -94,8 +98,8 @@ public class MainFrame extends javax.swing.JFrame {
         pipelineResultTabbedPane.setMinimumSize(new java.awt.Dimension(20, 20));
         pipelineResultTabbedPane.setPreferredSize(new java.awt.Dimension(20, 20));
 
-        sumaryParentPanel.setLayout(new java.awt.GridBagLayout());
-        pipelineResultTabbedPane.addTab("Summary", sumaryParentPanel);
+        summaryParentPanel.setLayout(new java.awt.GridBagLayout());
+        pipelineResultTabbedPane.addTab("Summary", summaryParentPanel);
 
         identificationsParentPanel.setRequestFocusEnabled(false);
         identificationsParentPanel.setLayout(new java.awt.GridBagLayout());
@@ -117,6 +121,7 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().add(modificationsParentPanel, "modificationsParentPanel");
 
         pipelineParamsParentPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        pipelineParamsParentPanel.setLayout(new java.awt.GridBagLayout());
         getContentPane().add(pipelineParamsParentPanel, "pipelineParamsParentPanel");
 
         viewMenu.setText("View");
@@ -151,7 +156,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem pipelineParamsViewMenuItem;
     private javax.swing.JTabbedPane pipelineResultTabbedPane;
     private javax.swing.JMenuItem pipelineViewMenuItem;
-    private javax.swing.JPanel sumaryParentPanel;
+    private javax.swing.JPanel summaryParentPanel;
     private javax.swing.JMenu viewMenu;
     // End of variables declaration//GEN-END:variables
 }

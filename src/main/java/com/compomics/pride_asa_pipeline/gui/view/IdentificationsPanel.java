@@ -11,12 +11,12 @@ import javax.swing.JTable;
  *
  * @author niels
  */
-public class PipelineResultPanel extends javax.swing.JPanel {
+public class IdentificationsPanel extends javax.swing.JPanel {
 
     /**
      * Creates new form ExperimentDetailPanel
      */
-    public PipelineResultPanel() {
+    public IdentificationsPanel() {
         initComponents();
     }
 
