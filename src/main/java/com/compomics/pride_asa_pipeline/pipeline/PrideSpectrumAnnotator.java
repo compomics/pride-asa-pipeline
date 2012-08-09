@@ -10,11 +10,10 @@ import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import com.compomics.pride_asa_pipeline.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.util.FileUtils;
-import org.apache.log4j.Logger;
-import org.jdom2.JDOMException;
-
 import java.io.File;
 import java.util.*;
+import org.apache.log4j.Logger;
+import org.jdom2.JDOMException;
 
 /**
  * Created by IntelliJ IDEA. User: niels Date: 9/11/11 Time: 13:22 To change
@@ -243,7 +242,7 @@ public class PrideSpectrumAnnotator {
 
     public void annotate(String experimentAccession) {
 
-        LOGGER.info("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
+        LOGGER.debug("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
         spectrumAnnotatorResult = new SpectrumAnnotatorResult();
 
         LOGGER.info("Loading identifications for experiment " + experimentAccession);
@@ -296,10 +295,13 @@ public class PrideSpectrumAnnotator {
                 significantMassDeltaExplanationsMap.put(identification, massDeltaExplanationsMap.get(identification));
             } else {
                 unmodifiedPrecursors.add(identification);
-
-                //score the unmodified identification
-                AnnotationData annotationData = spectrumMatcher.matchUnmodifiedPeptide(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()));
-                identification.setAnnotationData(annotationData);
+                
+                //annotate the unmodified identifications if necessary
+                if(!PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.annotate_modified_identifications_only")){
+                    //score the unmodified identification
+                    AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()));
+                    identification.setAnnotationData(annotationData);
+                }
             }
         }
         spectrumAnnotatorResult.setUnmodifiedPrecursors(unmodifiedPrecursors);
@@ -353,6 +355,13 @@ public class PrideSpectrumAnnotator {
         List<Identification> unexplainedIdentifications = new ArrayList<Identification>();
         for (Identification identification : identifications) {
             if (!explainableIdentifications.contains(identification)) {
+                //annotate the unmodified identifications if necessary
+                if(!PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.annotate_modified_identifications_only")){
+                    //score the unmodified identification
+                    AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()));
+                    identification.setAnnotationData(annotationData);
+                }
+                                
                 unexplainedIdentifications.add(identification);
             }
         }
