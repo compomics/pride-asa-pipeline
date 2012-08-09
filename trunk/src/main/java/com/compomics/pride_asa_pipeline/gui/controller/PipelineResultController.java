@@ -4,7 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
-import com.compomics.pride_asa_pipeline.gui.view.PipelineResultPanel;
+import com.compomics.pride_asa_pipeline.gui.view.IdentificationsPanel;
 import com.compomics.pride_asa_pipeline.gui.wrapper.IdentificationGuiWrapper;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
@@ -44,7 +44,7 @@ public class PipelineResultController {
     private BindingGroup bindingGroup;
     private ObservableList<IdentificationGuiWrapper> identificationGuiWrappersBindingList;
     //view
-    private PipelineResultPanel pipelineResultPanel;
+    private IdentificationsPanel identificationsPanel;
     //parent controller
     private MainController mainController;
     //services
@@ -58,8 +58,8 @@ public class PipelineResultController {
         this.mainController = mainController;
     }
 
-    public PipelineResultPanel getPipelineResultPanel() {
-        return pipelineResultPanel;
+    public IdentificationsPanel getPipelineResultPanel() {
+        return identificationsPanel;
     }
 
     public SpectrumPanelService getSpectrumPanelService() {
@@ -76,14 +76,14 @@ public class PipelineResultController {
     }
 
     public void init() {
-        pipelineResultPanel = new PipelineResultPanel();
+        identificationsPanel = new IdentificationsPanel();
 
         //init bindings
         bindingGroup = new BindingGroup();
         identificationGuiWrappersBindingList = ObservableCollections.observableList(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getIdentificationGuiWrappers());
 
         //table binding        
-        JTableBinding identificationGuiWrappersTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ, identificationGuiWrappersBindingList, pipelineResultPanel.getIdentificationsTable());
+        JTableBinding identificationGuiWrappersTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ, identificationGuiWrappersBindingList, identificationsPanel.getIdentificationsTable());
 
         //Add column bindings
         ColumnBinding columnBinding = identificationGuiWrappersTableBinding.addColumnBinding(ELProperty.create("${explanationType}"));
@@ -128,20 +128,20 @@ public class PipelineResultController {
         bindingGroup.bind();
 
         //add listeners
-        pipelineResultPanel.getIdentificationsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        identificationsPanel.getIdentificationsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent lse) {
                 if (!lse.getValueIsAdjusting()) {
-                    if (pipelineResultPanel.getIdentificationsTable().getSelectedRow() != -1) {
-                        IdentificationGuiWrapper identificationGuiWrapper = identificationGuiWrappersBindingList.get(pipelineResultPanel.getIdentificationsTable().getSelectedRow());
+                    if (identificationsPanel.getIdentificationsTable().getSelectedRow() != -1) {
+                        IdentificationGuiWrapper identificationGuiWrapper = identificationGuiWrappersBindingList.get(identificationsPanel.getIdentificationsTable().getSelectedRow());
                         
                         System.out.println("spectrum ref: " + identificationGuiWrapper.getIdentification().getSpectrumRef() + ", spectrum id: " + identificationGuiWrapper.getIdentification().getSpectrumId());
 
                         SpectrumPanel spectrumPanel = spectrumPanelService.getSpectrumPanel(identificationGuiWrapper.getIdentification());
 
                         //remove spectrum panel if already present
-                        if (pipelineResultPanel.getIdentificationDetailPanel().getComponentCount() != 0) {
-                            pipelineResultPanel.getIdentificationDetailPanel().remove(0);
+                        if (identificationsPanel.getIdentificationDetailPanel().getComponentCount() != 0) {
+                            identificationsPanel.getIdentificationDetailPanel().remove(0);
                         }
 
                         //add the spectrum panel to the identifications detail panel
@@ -150,9 +150,9 @@ public class PipelineResultController {
                         gridBagConstraints.weightx = 1.0;
                         gridBagConstraints.weighty = 1.0;
 
-                        pipelineResultPanel.getIdentificationDetailPanel().add(spectrumPanel, gridBagConstraints);
-                        pipelineResultPanel.getIdentificationDetailPanel().validate();
-                        pipelineResultPanel.getIdentificationDetailPanel().repaint();
+                        identificationsPanel.getIdentificationDetailPanel().add(spectrumPanel, gridBagConstraints);
+                        identificationsPanel.getIdentificationDetailPanel().validate();
+                        identificationsPanel.getIdentificationDetailPanel().repaint();
                     }
                 }
             }
