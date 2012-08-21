@@ -1,6 +1,7 @@
-package com.compomics.pride_asa_pipeline.spectrum.filter;
+package com.compomics.pride_asa_pipeline.logic.spectrum.filter;
 
-import com.compomics.pride_asa_pipeline.spectrum.filter.impl.WinsorNoiseThresholdFinder;
+import com.compomics.pride_asa_pipeline.logic.spectrum.filter.NoiseThresholdFinder;
+import com.compomics.pride_asa_pipeline.logic.spectrum.filter.impl.WinsorNoiseThresholdFinder;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

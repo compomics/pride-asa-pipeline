@@ -1,5 +1,6 @@
-package com.compomics.pride_asa_pipeline.spectrum.filter;
+package com.compomics.pride_asa_pipeline.logic.spectrum.filter;
 
+import com.compomics.pride_asa_pipeline.logic.spectrum.filter.NoiseFilter;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import java.io.BufferedReader;
 import java.io.File;

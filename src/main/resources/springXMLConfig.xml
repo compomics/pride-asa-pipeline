@@ -10,6 +10,11 @@
     </bean>
     
     <!-- pipeline beans -->
+    <bean id="commandLineRunner"
+          class="com.compomics.pride_asa_pipeline.pipeline.CommandLineRunner">
+        <property name="prideSpectrumAnnotator" ref="prideSpectrumAnnotator"/>
+    </bean>
+    
     <bean id="prideSpectrumAnnotator"
           class="com.compomics.pride_asa_pipeline.pipeline.PrideSpectrumAnnotator">        
         <property name="experimentService" ref="experimentService"/>
@@ -51,6 +56,11 @@
         <property name="omssaModiciationMarshaller" ref="omssaModificationMarshaller"/>
     </bean> 
     
+    <bean id="resultService"
+          class="com.compomics.pride_asa_pipeline.service.impl.ResultServiceImpl">
+        <property name="resultWriter" ref="resultWriter"/>
+    </bean>  
+    
     <bean id="spectrumPanelService"
           class="com.compomics.pride_asa_pipeline.service.impl.SpectrumPanelServiceImpl">
         <property name="spectrumService" ref="spectrumService"/>
@@ -72,6 +82,10 @@
         <property name="dataSource" ref="prideDataSource"/>
     </bean>
     
+    <bean id="resultWriter"
+          class="com.compomics.pride_asa_pipeline.repository.impl.ResultWriterImpl">        
+    </bean> 
+    
     <!-- encode/decode beans -->
     <bean id="base64DecoderMapper"
           class="com.compomics.pride_asa_pipeline.data.mapper.Base64DecoderMapper">
@@ -79,7 +93,7 @@
     </bean>
     
     <bean id="base64DataDecoder"
-          class="com.compomics.pride_asa_pipeline.spectrum.decode.impl.Base64DataDecoderImpl">        
+          class="com.compomics.pride_asa_pipeline.logic.spectrum.decode.impl.Base64DataDecoderImpl">        
     </bean>
                                
     <!-- modification beans -->
@@ -95,7 +109,7 @@
     </bean>
     
     <bean id="modificationMarshaller"
-          class="com.compomics.pride_asa_pipeline.modification.impl.ModificationMarshallerImpl">        
+          class="com.compomics.pride_asa_pipeline.logic.modification.impl.ModificationMarshallerImpl">        
     </bean>
     
     <bean id="peptideVariationsGenerator"
@@ -111,37 +125,37 @@
     </bean>
     
     <bean id="omssaModificationMarshaller"
-          class="com.compomics.pride_asa_pipeline.modification.impl.OmssaModificationMarshallerImpl">        
+          class="com.compomics.pride_asa_pipeline.logic.modification.impl.OmssaModificationMarshallerImpl">        
     </bean>
                     
     <!-- spectrum beans -->  
     <bean id="spectrumMatcher"
-          class="com.compomics.pride_asa_pipeline.spectrum.match.impl.SpectrumMatcherImpl">
+          class="com.compomics.pride_asa_pipeline.logic.spectrum.match.impl.SpectrumMatcherImpl">
         <property name="identificationScorer" ref="identificationScorer"/>
         <property name="noiseFilter" ref="noiseFilter"/>
         <property name="noiseThresholdFinder" ref="noiseThresholdFinder"/>
     </bean>
     
     <bean id="identificationScorer"
-          class="com.compomics.pride_asa_pipeline.spectrum.score.impl.IdentificationScorerImpl">        
+          class="com.compomics.pride_asa_pipeline.logic.spectrum.score.impl.IdentificationScorerImpl">        
     </bean>
     
     <bean id="noiseFilter"
-          class="com.compomics.pride_asa_pipeline.spectrum.filter.impl.PeakNoiseFilter">        
+          class="com.compomics.pride_asa_pipeline.logic.spectrum.filter.impl.PeakNoiseFilter">        
     </bean>
     
     <bean id="noiseThresholdFinder"
-          class="com.compomics.pride_asa_pipeline.spectrum.filter.impl.WinsorNoiseThresholdFinder">        
+          class="com.compomics.pride_asa_pipeline.logic.spectrum.filter.impl.WinsorNoiseThresholdFinder">        
     </bean>
     
     <!-- recalibration beans -->
     <bean id="massRecalibrator"
-          class="com.compomics.pride_asa_pipeline.recalibration.impl.MassRecalibratorImpl">
+          class="com.compomics.pride_asa_pipeline.logic.recalibration.impl.MassRecalibratorImpl">
         <property name="massWindowFinder" ref="massWindowFinder"/>
     </bean>
     
     <bean id="massWindowFinder"
-          class="com.compomics.pride_asa_pipeline.recalibration.impl.SimpleMassWindowFinder">        
+          class="com.compomics.pride_asa_pipeline.logic.recalibration.impl.SimpleMassWindowFinder">        
     </bean>
     
     <!-- controller beans -->
@@ -151,17 +165,25 @@
         <property name="experimentSelectionController" ref="experimentSelectionController"/>
         <property name="modificationsController" ref="modificationsController"/>
         <property name="pipelineResultController" ref="pipelineResultController"/>
+        <property name="pipelineParamsController" ref="pipelineParamsController"/>
+        <property name="resultService" ref="resultService"/>
     </bean>
     
     <bean id="experimentSelectionController"
           class="com.compomics.pride_asa_pipeline.gui.controller.ExperimentSelectionController">
         <property name="mainController" ref="mainController"/>
         <property name="pipelineProgressController" ref="pipelineProgressController"/>
+        <property name="pipelineProceedController" ref="pipelineProceedController"/>
         <property name="experimentService" ref="experimentService"/>
     </bean>
     
     <bean id="pipelineProgressController"
           class="com.compomics.pride_asa_pipeline.gui.controller.PipelineProgressController">
+        <property name="experimentSelectionController" ref="experimentSelectionController"/>    
+    </bean>
+    
+    <bean id="pipelineProceedController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.PipelineProceedController">
         <property name="experimentSelectionController" ref="experimentSelectionController"/>    
     </bean>
     
@@ -174,7 +196,12 @@
     <bean id="pipelineResultController"
           class="com.compomics.pride_asa_pipeline.gui.controller.PipelineResultController"> 
         <property name="mainController" ref="mainController"/>
-        <property name="spectrumPanelService" ref="spectrumPanelService"/>
+        <property name="spectrumPanelService" ref="spectrumPanelService"/>        
+    </bean>
+    
+    <bean id="pipelineParamsController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.PipelineParamsController"> 
+        <property name="mainController" ref="mainController"/>
     </bean>
     
     <!-- other beans -->
