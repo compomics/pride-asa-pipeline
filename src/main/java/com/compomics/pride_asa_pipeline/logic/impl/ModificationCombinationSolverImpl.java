@@ -91,8 +91,8 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
         //(massToExplain) of a given peptide, where the massToExplain usually corresponds to
         //the (experimental mass - theoretical mass). The zen archer will scan in a given window
         //which is defined by: mass delta +/- (deviation * charge).
-        zenArcher.setMinimalSum(massToExplain - peptide.getCharge() * deviation);
-        zenArcher.setMaximalSum(massToExplain + peptide.getCharge() * deviation);
+        zenArcher.setMinimalSum(massToExplain - (peptide.getCharge() * deviation));
+        zenArcher.setMaximalSum(massToExplain + (peptide.getCharge() * deviation));
 
         //loop over all possible modification combinations for the given peptide
         for (ModificationCombination candidateModificationCombination : peptideModificationHolder.getCandidateModificationCombinations()) {

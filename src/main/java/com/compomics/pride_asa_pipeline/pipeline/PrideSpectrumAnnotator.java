@@ -3,12 +3,12 @@ package com.compomics.pride_asa_pipeline.pipeline;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.logic.MassDeltaExplainer;
 import com.compomics.pride_asa_pipeline.logic.PeptideVariationsGenerator;
+import com.compomics.pride_asa_pipeline.logic.recalibration.MassRecalibrator;
+import com.compomics.pride_asa_pipeline.logic.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.model.*;
-import com.compomics.pride_asa_pipeline.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
-import com.compomics.pride_asa_pipeline.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.util.FileUtils;
 import java.io.File;
 import java.util.*;
@@ -53,8 +53,6 @@ public class PrideSpectrumAnnotator {
      * No-arg constructor
      */
     public PrideSpectrumAnnotator() {
-        spectrumAnnotatorResult = new SpectrumAnnotatorResult();
-        init();
     }
 
     /**
@@ -143,107 +141,18 @@ public class PrideSpectrumAnnotator {
     /**
      * Public methods.
      */
-    public void loadExperimentIdentifications(String experimentAccession) {
-        //load the identifications for the given experiment
-        identifications = experimentService.loadExperimentIdentifications(experimentAccession);
-        //update the considered charge states (if necessary)
-        experimentService.updateChargeStates(experimentAccession, consideredChargeStates);
-    }
-
-    public MassRecalibrationResult findSystematicMassError(Set<Integer> consideredChargeStates, List<Peptide> completePeptides) {
-        //set considered charge states
-        massRecalibrator.setConsideredChargeStates(consideredChargeStates);
-
-        MassRecalibrationResult massRecalibrationResult = null;
-        try {
-            massRecalibrationResult = massRecalibrator.recalibrate(completePeptides);
-        } catch (AASequenceMassUnknownException e) {
-            //this should not happen here, since we only handle 'complete precursors' where
-            //all the amino acids have a known mass
-            LOGGER.error("ERROR! Could not calculate masses for all (complete) precursors!");
-            throw new IllegalStateException("Could not calculate masses for all (complete) precursors!");
-        }
-        return massRecalibrationResult;
-    }
-
-    public Map<Identification, Set<ModificationCombination>> findModificationCombinations(MassRecalibrationResult massRecalibrationResult, Identifications identifications) {
-        //For the solver we need a ModificationHolder (contains all considered modifications)
-        ModificationHolder modificationHolder = new ModificationHolder();
-
-        //add the pipeline modifications
-        File modificationsFile = FileUtils.getFileByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
-        try {
-            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsFile));
-        } catch (JDOMException ex) {
-            LOGGER.error(ex.getMessage(), ex);
-        }
-
-        //add the modifications found in pride for the given experiment
-        if (PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_modifications")) {
-            modificationHolder.addModifications(modificationService.loadExperimentModifications(identifications.getCompletePeptides()));
-        }
-
-        //set MassDeltaExplainer ModificationHolder, MassRecalibrationResult and AnalyzerData
-        massDeltaExplainer.getModificationCombinationSolver().setModificationHolder(modificationHolder);
-        if (massRecalibrationResult != null) {
-            massDeltaExplainer.setMassRecalibrationResult(massRecalibrationResult);
-        }
-        if (analyzerData != null) {
-            massDeltaExplainer.setAnalyzerData(analyzerData);
-        }
-        //finally calculate the possible explanations
-        Map<Identification, Set<ModificationCombination>> possibleExplanations =
-                massDeltaExplainer.explainCompleteIndentifications(identifications.getCompleteIdentifications());
-
-        return possibleExplanations;
-    }
-
-    public Map<Identification, Set<ModifiedPeptide>> findPrecursorVariations(Map<Identification, Set<ModificationCombination>> possibleExplanations) {
-        //From the theoretical information we already have (e.g. the precursor sequence
-        //and all possible modifications) we therefore first create all possible
-        //'modified precursors' or 'precursor variations' (e.g. the same peptide sequence,
-        //but with different modifications on different locations).
-        Map<Identification, Set<ModifiedPeptide>> precursorVariations = new HashMap<Identification, Set<ModifiedPeptide>>();
-        for (Identification identificationSet : possibleExplanations.keySet()) {
-            Set<ModificationCombination> modifications = possibleExplanations.get(identificationSet);
-            Set<ModifiedPeptide> precursorVariationsSet = peptideVariationsGenerator.generateVariations(identificationSet.getPeptide(), modifications);
-            precursorVariations.put(identificationSet, precursorVariationsSet);
-        }
-        LOGGER.debug("Peptide variations found for " + precursorVariations.size() + " peptides.");
-
-        return precursorVariations;
-    }
-
-    public List<Identification> findBestMatches(String experimentAccession, Map<Identification, Set<ModifiedPeptide>> precursorVariations) {
-        //After we now have all the theoretical ions for all possible 'precursor variations',
-        //we can try and find them in the real spectrum. This will give an indication as to
-        //which 'variation' of the precursor is the most likely one.
-
-        //for each precursor: try all ModifiedPeptide variations
-        //for all these variations: map against the spectra and assign a score       
-        List<Identification> bestMatches = new ArrayList<Identification>();
-        for (Identification identification : precursorVariations.keySet()) {
-            //load spectrum
-            List<Peak> peaks = spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
-            ModifiedPeptidesMatchResult modifiedPeptidesMatchResult = spectrumMatcher.findBestModifiedPeptideMatch(identification.getPeptide(), precursorVariations.get(identification), peaks);
-            if (modifiedPeptidesMatchResult != null) {
-                identification.setPeptide(modifiedPeptidesMatchResult.getModifiedPeptide());
-                identification.setAnnotationData(modifiedPeptidesMatchResult.getAnnotationData());
-                bestMatches.add(identification);
-            } else {
-                LOGGER.info("No best match found for precursor: " + identification.getPeptide());
-                //add to unexplained identifications
-                spectrumAnnotatorResult.getUnexplainedIdentifications().add(identification);
-            }
-        }
-
-        return bestMatches;
-    }
-
-    public void annotate(String experimentAccession) {
-
+    /**
+     * Loads the experiment identifications and calculates the systematic mass
+     * errors per charge state.
+     *
+     * @param experimentAccession the experiment accession number
+     */
+    public void initAnnotation(String experimentAccession) {
         LOGGER.debug("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
-        spectrumAnnotatorResult = new SpectrumAnnotatorResult();
+        spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
+
+        LOGGER.debug("Loading charge states for experiment " + experimentAccession);
+        initChargeStates();
 
         LOGGER.info("Loading identifications for experiment " + experimentAccession);
         loadExperimentIdentifications(experimentAccession);
@@ -255,7 +164,14 @@ public class PrideSpectrumAnnotator {
         MassRecalibrationResult massRecalibrationResult = findSystematicMassError(consideredChargeStates, identifications.getCompletePeptides());
         LOGGER.debug("Finished finding systematic mass errors:" + "\n" + massRecalibrationResult.toString());
         spectrumAnnotatorResult.setMassRecalibrationResult(massRecalibrationResult);
+    }
 
+    /**
+     * Annotates the experiment identifications
+     *
+     * @param experimentAccession the experiment accession number
+     */
+    public void annotate(String experimentAccession) {
         ///////////////////////////////////////////////////////////////////////
         //SECOND STEP: find all the modification combinations that could
         //              explain a given mass delta (if there is one) -> Zen Archer
@@ -264,7 +180,7 @@ public class PrideSpectrumAnnotator {
         LOGGER.info("Finding modification combinations");
         //set fragment mass error for the identification scorer
         spectrumMatcher.getIdentificationScorer().setFragmentMassError(analyzerData.getFragmentMassError());
-        Map<Identification, Set<ModificationCombination>> massDeltaExplanationsMap = findModificationCombinations(massRecalibrationResult, identifications);
+        Map<Identification, Set<ModificationCombination>> massDeltaExplanationsMap = findModificationCombinations(spectrumAnnotatorResult.getMassRecalibrationResult(), identifications);
         LOGGER.debug("Finished finding modification combinations");
 
         //the returned possibleExplanations map will contain all precursors for which a
@@ -295,9 +211,9 @@ public class PrideSpectrumAnnotator {
                 significantMassDeltaExplanationsMap.put(identification, massDeltaExplanationsMap.get(identification));
             } else {
                 unmodifiedPrecursors.add(identification);
-                
+
                 //annotate the unmodified identifications if necessary
-                if(!PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.annotate_modified_identifications_only")){
+                if (!PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.annotate_modified_identifications_only")) {
                     //score the unmodified identification
                     AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()));
                     identification.setAnnotationData(annotationData);
@@ -333,9 +249,159 @@ public class PrideSpectrumAnnotator {
     }
 
     /**
+     * Clears the pipeline resources
+     */
+    public void clearPipeline(){
+        consideredChargeStates = null;
+        identifications = null;
+        spectrumAnnotatorResult = null;
+        analyzerData = null;
+    }
+    
+    /**
      * Private methods
      */
-    private void init() {
+    /**
+     * Loads the experiment identifications.
+     *
+     * @param experimentAccession the experiment accession number
+     */
+    private void loadExperimentIdentifications(String experimentAccession) {
+        //load the identifications for the given experiment
+        identifications = experimentService.loadExperimentIdentifications(experimentAccession);
+        //update the considered charge states (if necessary)
+        experimentService.updateChargeStates(experimentAccession, consideredChargeStates);
+    }
+
+    /**
+     * finds the systematic mass errors per charge state
+     *
+     * @param consideredChargeStates a set of considered charge states
+     * @param completePeptides list of complete peptides (i.e. all sequence AA
+     * masses known)
+     * @return the mass recalibration result (systemic mass error) per charge
+     * state
+     */
+    private MassRecalibrationResult findSystematicMassError(Set<Integer> consideredChargeStates, List<Peptide> completePeptides) {
+        //set considered charge states
+        massRecalibrator.setConsideredChargeStates(consideredChargeStates);
+
+        MassRecalibrationResult massRecalibrationResult = null;
+        try {
+            massRecalibrationResult = massRecalibrator.recalibrate(completePeptides);
+        } catch (AASequenceMassUnknownException e) {
+            //this should not happen here, since we only handle 'complete precursors' where
+            //all the amino acids have a known mass
+            LOGGER.error("ERROR! Could not calculate masses for all (complete) precursors!");
+            throw new IllegalStateException("Could not calculate masses for all (complete) precursors!");
+        }
+        return massRecalibrationResult;
+    }
+
+    /**
+     * finds all possible modifications that could explain a mass delta -> Zen
+     * Archer
+     *
+     * @param massRecalibrationResult the mass recalibration result (systemic
+     * mass error) per charge state
+     * @param identifications the identifications
+     * @return the possible modifications map (key: the identification data,
+     * value the set of modification combinations)
+     */
+    private Map<Identification, Set<ModificationCombination>> findModificationCombinations(MassRecalibrationResult massRecalibrationResult, Identifications identifications) {
+        //For the solver we need a ModificationHolder (contains all considered modifications)
+        ModificationHolder modificationHolder = new ModificationHolder();
+
+        //add the pipeline modifications
+        File modificationsFile = FileUtils.getFileByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
+        try {
+            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsFile));
+        } catch (JDOMException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        }
+
+        //add the modifications found in pride for the given experiment
+        if (PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_modifications")) {
+            modificationHolder.addModifications(modificationService.loadExperimentModifications(identifications.getCompletePeptides()));
+        }
+
+        //set MassDeltaExplainer ModificationHolder, MassRecalibrationResult and AnalyzerData
+        massDeltaExplainer.getModificationCombinationSolver().setModificationHolder(modificationHolder);
+        if (massRecalibrationResult != null) {
+            massDeltaExplainer.setMassRecalibrationResult(massRecalibrationResult);
+        }
+        if (analyzerData != null) {
+            massDeltaExplainer.setAnalyzerData(analyzerData);
+        }
+        //finally calculate the possible explanations
+        Map<Identification, Set<ModificationCombination>> possibleExplanations =
+                massDeltaExplainer.explainCompleteIndentifications(identifications.getCompleteIdentifications());
+
+        return possibleExplanations;
+    }
+
+    /**
+     * find all possible precursor variations (taking all the possible
+     * modification combinations into account)
+     *
+     * @param massDeltaExplanationsMap the possible modifications map (key: the
+     * identification data, value the set of modification combinations)
+     * @return the precursor variations map (key: the identification data, value
+     * the set of modification combinations)
+     */
+    private Map<Identification, Set<ModifiedPeptide>> findPrecursorVariations(Map<Identification, Set<ModificationCombination>> possibleExplanations) {
+        //From the theoretical information we already have (e.g. the precursor sequence
+        //and all possible modifications) we therefore first create all possible
+        //'modified precursors' or 'precursor variations' (e.g. the same peptide sequence,
+        //but with different modifications on different locations).
+        Map<Identification, Set<ModifiedPeptide>> precursorVariations = new HashMap<Identification, Set<ModifiedPeptide>>();
+        for (Identification identificationSet : possibleExplanations.keySet()) {
+            Set<ModificationCombination> modifications = possibleExplanations.get(identificationSet);
+            Set<ModifiedPeptide> precursorVariationsSet = peptideVariationsGenerator.generateVariations(identificationSet.getPeptide(), modifications);
+            precursorVariations.put(identificationSet, precursorVariationsSet);
+        }
+        LOGGER.debug("Peptide variations found for " + precursorVariations.size() + " peptides.");
+
+        return precursorVariations;
+    }
+
+    /**
+     * creates theoretical fragment ions for all precursors match them onto the
+     * peaks in the spectrum and decide which one is the best 'explanation'
+     *
+     * @param experimentAccession the experiment accession number
+     * @param modifiedPrecursorVariationsMap the modified precursor variations
+     * map (key: the identification data, value the set of modification
+     * combinations)
+     * @return the result list of identifications containing a modified peptide
+     */
+    private List<Identification> findBestMatches(String experimentAccession, Map<Identification, Set<ModifiedPeptide>> precursorVariations) {
+        //After we now have all the theoretical ions for all possible 'precursor variations',
+        //we can try and find them in the real spectrum. This will give an indication as to
+        //which 'variation' of the precursor is the most likely one.
+
+        //for each precursor: try all ModifiedPeptide variations
+        //for all these variations: map against the spectra and assign a score       
+        List<Identification> bestMatches = new ArrayList<Identification>();
+        for (Identification identification : precursorVariations.keySet()) {
+            //load spectrum
+            List<Peak> peaks = spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
+            ModifiedPeptidesMatchResult modifiedPeptidesMatchResult = spectrumMatcher.findBestModifiedPeptideMatch(identification.getPeptide(), precursorVariations.get(identification), peaks);
+            if (modifiedPeptidesMatchResult != null) {
+                identification.setPeptide(modifiedPeptidesMatchResult.getModifiedPeptide());
+                identification.setAnnotationData(modifiedPeptidesMatchResult.getAnnotationData());
+                bestMatches.add(identification);
+            } else {
+                LOGGER.info("No best match found for precursor: " + identification.getPeptide());
+                //add to unexplained identifications
+                spectrumAnnotatorResult.getUnexplainedIdentifications().add(identification);
+            }
+        }
+
+        return bestMatches;
+    }
+
+    private void initChargeStates() {
         //load default values for considered charge states
         consideredChargeStates = new HashSet<Integer>();
         for (Object chargeState : PropertiesConfigurationHolder.getInstance().getList("pipeline.considered_charge_states")) {
@@ -356,12 +422,12 @@ public class PrideSpectrumAnnotator {
         for (Identification identification : identifications) {
             if (!explainableIdentifications.contains(identification)) {
                 //annotate the unmodified identifications if necessary
-                if(!PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.annotate_modified_identifications_only")){
+                if (!PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.annotate_modified_identifications_only")) {
                     //score the unmodified identification
                     AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()));
                     identification.setAnnotationData(annotationData);
                 }
-                                
+
                 unexplainedIdentifications.add(identification);
             }
         }

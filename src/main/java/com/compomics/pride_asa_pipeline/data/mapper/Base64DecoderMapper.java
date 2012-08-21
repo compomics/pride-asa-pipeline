@@ -4,8 +4,8 @@
  */
 package com.compomics.pride_asa_pipeline.data.mapper;
 
-import com.compomics.pride_asa_pipeline.spectrum.decode.Base64DataDecoder;
-import com.compomics.pride_asa_pipeline.spectrum.decode.impl.Base64DataDecoderImpl;
+import com.compomics.pride_asa_pipeline.logic.spectrum.decode.Base64DataDecoder;
+import com.compomics.pride_asa_pipeline.logic.spectrum.decode.impl.Base64DataDecoderImpl;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;

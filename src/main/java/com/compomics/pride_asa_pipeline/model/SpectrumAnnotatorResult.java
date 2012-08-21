@@ -4,8 +4,10 @@
  */
 package com.compomics.pride_asa_pipeline.model;
 
+import com.compomics.pride_asa_pipeline.model.comparator.IdentificationComparator;
 import com.compomics.pride_asa_pipeline.gui.wrapper.IdentificationGuiWrapper;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,6 +17,10 @@ import java.util.List;
  */
 public class SpectrumAnnotatorResult {
 
+    /**
+     * The experiment accession
+     */
+    String experimentAccession;
     /**
      * The mass recalibration result
      */
@@ -36,6 +42,11 @@ public class SpectrumAnnotatorResult {
         unexplainedIdentifications = new ArrayList<Identification>();
         unmodifiedPrecursors = new ArrayList<Identification>();
         modifiedPrecursors = new ArrayList<Identification>();
+    }
+
+    public SpectrumAnnotatorResult(String experimentAccession) {
+        this();
+        this.experimentAccession = experimentAccession;
     }
 
     public MassRecalibrationResult getMassRecalibrationResult() {
@@ -70,8 +81,13 @@ public class SpectrumAnnotatorResult {
         this.unmodifiedPrecursors = unmodifiedPrecursors;
     }
 
+    public String getExperimentAccession() {
+        return experimentAccession;
+    }        
+
     /**
-     * Returns all the experiment identications.
+     * Returns all the experiment identications as a list, sorted by spectrum
+     * ID.
      *
      * @return the list of experiment identifications
      */
@@ -81,28 +97,9 @@ public class SpectrumAnnotatorResult {
         identifications.addAll(modifiedPrecursors);
         identifications.addAll(unexplainedIdentifications);
 
+        Collections.sort(identifications, new IdentificationComparator());
+        
         return identifications;
-    }
-
-    /**
-     * Returns all the experiment Identications as IdentificationGuiWrappers for
-     * GUI purposes.
-     *
-     * @return the list of experiment identification wrappers
-     */
-    public List<IdentificationGuiWrapper> getIdentificationGuiWrappers() {
-        List<IdentificationGuiWrapper> identificationGuiWrappers = new ArrayList<IdentificationGuiWrapper>();
-        for (Identification identification : unexplainedIdentifications) {
-            identificationGuiWrappers.add(new IdentificationGuiWrapper(identification, IdentificationGuiWrapper.ExplanationType.UNEXPLAINED));
-        }
-        for (Identification identification : unmodifiedPrecursors) {
-            identificationGuiWrappers.add(new IdentificationGuiWrapper(identification, IdentificationGuiWrapper.ExplanationType.UNMODIFIED));
-        }
-        for (Identification identification : modifiedPrecursors) {
-            identificationGuiWrappers.add(new IdentificationGuiWrapper(identification, IdentificationGuiWrapper.ExplanationType.MODIFIED));
-        }
-
-        return identificationGuiWrappers;
     }
     
 }

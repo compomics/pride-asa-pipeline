@@ -198,8 +198,14 @@ public class ModificationsPanel extends javax.swing.JPanel {
         jScrollPane2.setViewportView(affectedAminoAcidsList);
 
         addAminoAcidButton.setText(">>>");
+        addAminoAcidButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        addAminoAcidButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        addAminoAcidButton.setPreferredSize(new java.awt.Dimension(80, 25));
 
         removeAminoAcidButton.setText("<<<");
+        removeAminoAcidButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        removeAminoAcidButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        removeAminoAcidButton.setPreferredSize(new java.awt.Dimension(80, 25));
 
         modAccessionValueLabel.setText("accession value");
 
@@ -280,14 +286,14 @@ public class ModificationsPanel extends javax.swing.JPanel {
                 .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(editModificationPanelLayout.createSequentialGroup()
                         .addGap(61, 61, 61)
-                        .addComponent(addAminoAcidButton)
+                        .addComponent(addAminoAcidButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(37, 37, 37)
-                        .addComponent(removeAminoAcidButton))
+                        .addComponent(removeAminoAcidButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(affectedAminoAcidsLabel)
                     .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(0, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -318,7 +324,7 @@ public class ModificationsPanel extends javax.swing.JPanel {
         importButton.setPreferredSize(new java.awt.Dimension(80, 25));
 
         saveButton.setText("save");
-        saveButton.setToolTipText("Click to save the modifications to the the modifications file.");
+        saveButton.setToolTipText("Click to save the modifications to the modifications file.");
         saveButton.setMaximumSize(new java.awt.Dimension(80, 25));
         saveButton.setMinimumSize(new java.awt.Dimension(80, 25));
         saveButton.setPreferredSize(new java.awt.Dimension(80, 25));

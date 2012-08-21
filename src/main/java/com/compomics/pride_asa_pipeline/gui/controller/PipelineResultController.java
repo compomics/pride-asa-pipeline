@@ -4,20 +4,26 @@
  */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
+import com.compomics.pride_asa_pipeline.model.comparator.IdentificationGuiWrapperComparator;
 import com.compomics.pride_asa_pipeline.gui.view.IdentificationsPanel;
+import com.compomics.pride_asa_pipeline.gui.view.SummaryPanel;
 import com.compomics.pride_asa_pipeline.gui.wrapper.IdentificationGuiWrapper;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
+import com.compomics.pride_asa_pipeline.model.Identification;
+import com.compomics.pride_asa_pipeline.model.IdentificationScore;
 import com.compomics.pride_asa_pipeline.model.ModificationFacade;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.service.SpectrumPanelService;
+import com.compomics.pride_asa_pipeline.util.GuiUtils;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.google.common.base.Joiner;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -31,6 +37,11 @@ import org.jdesktop.observablecollections.ObservableList;
 import org.jdesktop.swingbinding.JTableBinding;
 import org.jdesktop.swingbinding.JTableBinding.ColumnBinding;
 import org.jdesktop.swingbinding.SwingBindings;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.data.general.DefaultPieDataset;
 
 /**
  *
@@ -39,12 +50,14 @@ import org.jdesktop.swingbinding.SwingBindings;
 public class PipelineResultController {
 
     private static final Logger LOGGER = Logger.getLogger(PipelineResultController.class);
-    private static final Integer NUMBER_OF_DECIMALS = 4;
     //model
     private BindingGroup bindingGroup;
     private ObservableList<IdentificationGuiWrapper> identificationGuiWrappersBindingList;
-    //view
+    private DefaultPieDataset pieDataset;
+    //views
     private IdentificationsPanel identificationsPanel;
+    private SummaryPanel summaryPanel;
+    private ChartPanel pieChartPanel;
     //parent controller
     private MainController mainController;
     //services
@@ -58,8 +71,12 @@ public class PipelineResultController {
         this.mainController = mainController;
     }
 
-    public IdentificationsPanel getPipelineResultPanel() {
+    public IdentificationsPanel getIdentificationsPanel() {
         return identificationsPanel;
+    }
+
+    public SummaryPanel getSummaryPanel() {
+        return summaryPanel;
     }
 
     public SpectrumPanelService getSpectrumPanelService() {
@@ -72,15 +89,57 @@ public class PipelineResultController {
 
     public void updateIdentifications() {
         identificationGuiWrappersBindingList.clear();
-        identificationGuiWrappersBindingList.addAll(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getIdentificationGuiWrappers());
+        identificationGuiWrappersBindingList.addAll(getIdentificationGuiWrappers());
+    }
+
+    public void updateSummary() {
+        //create new pie data set
+        pieDataset = new DefaultPieDataset();
+        pieDataset.setValue(IdentificationGuiWrapper.ExplanationType.UNMODIFIED, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getUnmodifiedPrecursors().size());
+        pieDataset.setValue(IdentificationGuiWrapper.ExplanationType.MODIFIED, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getModifiedPrecursors().size());
+        pieDataset.setValue(IdentificationGuiWrapper.ExplanationType.UNEXPLAINED, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getUnexplainedIdentifications().size());
+
+        JFreeChart pieChart = ChartFactory.createPieChart(
+                "Identifications", // chart title
+                pieDataset, // data
+                true, // include legend
+                true,
+                false);
+
+        PiePlot plot = (PiePlot) pieChart.getPlot();
+        plot.setLabelFont(new Font("SansSerif", Font.PLAIN, 12));
+        plot.setNoDataMessage("No data available");
+        //plot.setCircular(false);
+        plot.setLabelGap(0.02);
+
+        //add chart to panels
+        pieChartPanel.setChart(pieChart);
     }
 
     public void init() {
+        initIdentificationsPanel();
+
+        initSummaryPanel();
+    }
+
+    /**
+     * Clear the pipeline result section
+     */
+    public void clear() {
+        //clear identifications panel
+        identificationGuiWrappersBindingList.clear();
+        addSpectrumPanel(null);
+
+        //clear summary panel
+        pieChartPanel.setChart(null);
+    }
+
+    private void initIdentificationsPanel() {
         identificationsPanel = new IdentificationsPanel();
 
         //init bindings
         bindingGroup = new BindingGroup();
-        identificationGuiWrappersBindingList = ObservableCollections.observableList(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getIdentificationGuiWrappers());
+        identificationGuiWrappersBindingList = ObservableCollections.observableList(new ArrayList<IdentificationGuiWrapper>());
 
         //table binding        
         JTableBinding identificationGuiWrappersTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ, identificationGuiWrappersBindingList, identificationsPanel.getIdentificationsTable());
@@ -111,12 +170,19 @@ public class PipelineResultController {
         columnBinding = identificationGuiWrappersTableBinding.addColumnBinding(ELProperty.create("${identification.peptide.mzRatio}"));
         columnBinding.setColumnName("Precursor m/z");
         columnBinding.setEditable(Boolean.FALSE);
-        columnBinding.setColumnClass(Double.class);        
+        columnBinding.setColumnClass(Double.class);
+        columnBinding.setRenderer(new PrecursorMzRatioCellRenderer());
 
         columnBinding = identificationGuiWrappersTableBinding.addColumnBinding(ELProperty.create("${identification.spectrumId}"));
         columnBinding.setColumnName("Pride spectrum ID");
         columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(String.class);
+
+        columnBinding = identificationGuiWrappersTableBinding.addColumnBinding(ELProperty.create("${identification.annotationData.identificationScore}"));
+        columnBinding.setColumnName("Average fragment ion score");
+        columnBinding.setEditable(Boolean.FALSE);
+        columnBinding.setColumnClass(IdentificationScore.class);
+        columnBinding.setRenderer(new IdentificationScoreCellRenderer());
 
         columnBinding = identificationGuiWrappersTableBinding.addColumnBinding(ELProperty.create("${identification.peptide}"));
         columnBinding.setColumnName("Modifications");
@@ -134,31 +200,73 @@ public class PipelineResultController {
                 if (!lse.getValueIsAdjusting()) {
                     if (identificationsPanel.getIdentificationsTable().getSelectedRow() != -1) {
                         IdentificationGuiWrapper identificationGuiWrapper = identificationGuiWrappersBindingList.get(identificationsPanel.getIdentificationsTable().getSelectedRow());
-                        
-                        System.out.println("spectrum ref: " + identificationGuiWrapper.getIdentification().getSpectrumRef() + ", spectrum id: " + identificationGuiWrapper.getIdentification().getSpectrumId());
 
                         SpectrumPanel spectrumPanel = spectrumPanelService.getSpectrumPanel(identificationGuiWrapper.getIdentification());
 
-                        //remove spectrum panel if already present
-                        if (identificationsPanel.getIdentificationDetailPanel().getComponentCount() != 0) {
-                            identificationsPanel.getIdentificationDetailPanel().remove(0);
-                        }
-
-                        //add the spectrum panel to the identifications detail panel
-                        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-                        gridBagConstraints.fill = GridBagConstraints.BOTH;
-                        gridBagConstraints.weightx = 1.0;
-                        gridBagConstraints.weighty = 1.0;
-
-                        identificationsPanel.getIdentificationDetailPanel().add(spectrumPanel, gridBagConstraints);
-                        identificationsPanel.getIdentificationDetailPanel().validate();
-                        identificationsPanel.getIdentificationDetailPanel().repaint();
+                        addSpectrumPanel(spectrumPanel);
                     }
                 }
             }
         });
     }
 
+    private void initSummaryPanel() {
+        summaryPanel = new SummaryPanel();
+        pieChartPanel = new ChartPanel(null);
+
+        //add chartPanel                  
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+
+        summaryPanel.getPieChartParentPanel().add(pieChartPanel, gridBagConstraints);
+    }
+
+    /**
+     * Returns all the experiment Identications as IdentificationGuiWrappers for
+     * GUI purposes.
+     *
+     * @return the list of experiment identification wrappers
+     */
+    private List<IdentificationGuiWrapper> getIdentificationGuiWrappers() {
+        List<IdentificationGuiWrapper> identificationGuiWrappers = new ArrayList<IdentificationGuiWrapper>();
+        for (Identification identification : mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getUnexplainedIdentifications()) {
+            identificationGuiWrappers.add(new IdentificationGuiWrapper(identification, IdentificationGuiWrapper.ExplanationType.UNEXPLAINED));
+        }
+        for (Identification identification : mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getUnmodifiedPrecursors()) {
+            identificationGuiWrappers.add(new IdentificationGuiWrapper(identification, IdentificationGuiWrapper.ExplanationType.UNMODIFIED));
+        }
+        for (Identification identification : mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getModifiedPrecursors()) {
+            identificationGuiWrappers.add(new IdentificationGuiWrapper(identification, IdentificationGuiWrapper.ExplanationType.MODIFIED));
+        }
+
+        Collections.sort(identificationGuiWrappers, new IdentificationGuiWrapperComparator());
+
+        return identificationGuiWrappers;
+    }
+
+    private void addSpectrumPanel(SpectrumPanel spectrumPanel) {
+        //remove spectrum panel if already present
+        if (identificationsPanel.getIdentificationDetailPanel().getComponentCount() != 0) {
+            identificationsPanel.getIdentificationDetailPanel().remove(0);
+        }
+
+        if (spectrumPanel != null) {
+            //add the spectrum panel to the identifications detail panel
+            GridBagConstraints gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+
+            identificationsPanel.getIdentificationDetailPanel().add(spectrumPanel, gridBagConstraints);
+        }
+
+        identificationsPanel.getIdentificationDetailPanel().validate();
+        identificationsPanel.getIdentificationDetailPanel().repaint();
+    }
+
+    //private classes
     private class DeltaMzTableCellRenderer extends DefaultTableCellRenderer {
 
         @Override
@@ -166,15 +274,13 @@ public class PipelineResultController {
             Peptide peptide = (Peptide) value;
             double deltaMz = 0.0;
             try {
-                BigDecimal bigDecimal = new BigDecimal(Double.toString(peptide.calculateMassDelta() / peptide.getCharge()));
-                bigDecimal = bigDecimal.setScale(NUMBER_OF_DECIMALS, BigDecimal.ROUND_HALF_UP);
-                deltaMz = bigDecimal.doubleValue();
+                deltaMz = GuiUtils.roundDouble(peptide.calculateMassDelta() / peptide.getCharge());
             } catch (AASequenceMassUnknownException ex) {
                 LOGGER.error(ex.getMessage(), ex);
             }
             super.setValue(deltaMz);
         }
-    }        
+    }
 
     private class ModificationsCellRenderer extends DefaultTableCellRenderer {
 
@@ -224,6 +330,26 @@ public class PipelineResultController {
             }
 
             super.setValue(explanationType.name());
+        }
+    }
+
+    private class IdentificationScoreCellRenderer extends DefaultTableCellRenderer {
+
+        @Override
+        protected void setValue(Object value) {
+            IdentificationScore identificationScore = (IdentificationScore) value;
+
+            super.setValue(GuiUtils.roundDouble(identificationScore.getAverageFragmentIonScore()));
+        }
+    }
+
+    private class PrecursorMzRatioCellRenderer extends DefaultTableCellRenderer {
+
+        @Override
+        protected void setValue(Object value) {
+            Double precursorMzRatio = (Double) value;
+
+            super.setValue(GuiUtils.roundDouble(precursorMzRatio));
         }
     }
 }

@@ -38,6 +38,10 @@ public class ExperimentSelectionPanel extends javax.swing.JPanel {
         return taxonomyTextField;
     }       
 
+    public JCheckBox getWriteResultCheckBox() {
+        return writeResultCheckBox;
+    }        
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -53,6 +57,7 @@ public class ExperimentSelectionPanel extends javax.swing.JPanel {
         taxonomyLabel = new javax.swing.JLabel();
         taxonomyTextField = new javax.swing.JTextField();
         experimentProcessButton = new javax.swing.JButton();
+        writeResultCheckBox = new javax.swing.JCheckBox();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Experiment selection"));
 
@@ -67,6 +72,12 @@ public class ExperimentSelectionPanel extends javax.swing.JPanel {
         taxonomyTextField.setPreferredSize(new java.awt.Dimension(69, 20));
 
         experimentProcessButton.setText("process");
+        experimentProcessButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        experimentProcessButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        experimentProcessButton.setPreferredSize(new java.awt.Dimension(80, 25));
+
+        writeResultCheckBox.setText("write result to file");
+        writeResultCheckBox.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -80,9 +91,14 @@ public class ExperimentSelectionPanel extends javax.swing.JPanel {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(experimentSelectionComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(taxonomyFilterCheckBox)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 199, Short.MAX_VALUE)
-                        .addComponent(taxonomyLabel)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(taxonomyFilterCheckBox)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 199, Short.MAX_VALUE)
+                                .addComponent(taxonomyLabel))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(writeResultCheckBox)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(taxonomyTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
@@ -102,9 +118,10 @@ public class ExperimentSelectionPanel extends javax.swing.JPanel {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(taxonomyFilterCheckBox)
                         .addComponent(taxonomyLabel)))
-                .addGap(18, 18, 18)
-                .addComponent(experimentProcessButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 27, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(experimentProcessButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(writeResultCheckBox)))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -114,5 +131,6 @@ public class ExperimentSelectionPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox taxonomyFilterCheckBox;
     private javax.swing.JLabel taxonomyLabel;
     private javax.swing.JTextField taxonomyTextField;
+    private javax.swing.JCheckBox writeResultCheckBox;
     // End of variables declaration//GEN-END:variables
 }

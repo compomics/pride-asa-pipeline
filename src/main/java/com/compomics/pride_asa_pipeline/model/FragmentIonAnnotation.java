@@ -38,7 +38,7 @@ public class FragmentIonAnnotation {
     private String cv_ion_type = null;               // cv_ion_type                  varchar(255)
     private String accession_ion_type = null;               // accession_ion_type           varchar(255)
     private String ion_type_name = null;               // ion_type_name                text
-    private long fragment_ion_number = -1;                 // fragment_ion_number          int(10)
+    private int fragment_ion_number = -1;                 // fragment_ion_number          int(10)
     private String cv_intensity = null;               // cv_intensity                 varchar(255)
     private String accession_intensity = null;               // accession_intensity          varchar(255)
     private double intensity = Double.MIN_VALUE;   // intensity                    decimal(20,10)
@@ -337,17 +337,17 @@ public class FragmentIonAnnotation {
 
     public String getIon_type_name() {
         return ion_type_name;
-    }
+    }   
 
     public void setIon_type_name(String ion_type_name) {
         this.ion_type_name = ion_type_name;
     }
 
-    public long getFragment_ion_number() {
+    public int getFragment_ion_number() {
         return fragment_ion_number;
     }
 
-    public void setFragment_ion_number(long fragment_ion_number) {
+    public void setFragment_ion_number(int fragment_ion_number) {
         this.fragment_ion_number = fragment_ion_number;
     }
 

@@ -66,11 +66,11 @@ public class SpectrumPanelServiceImpl implements SpectrumPanelService {
             DefaultSpectrumAnnotation defaultSpectrumAnnotation = new DefaultSpectrumAnnotation(fragmentIonAnnotation.getMz(), fragmentIonAnnotation.getMass_error(), SpectrumPanel.determineColorOfPeak(label), label);
             peakAnnotations.add(defaultSpectrumAnnotation);
         }
-
+        
         return peakAnnotations;
     }
 
-    private ReferenceArea getReferenceArea(double noiseThreshold) {
+private ReferenceArea getReferenceArea(double noiseThreshold) {
         return new ReferenceArea(
                 "", // reference area unique identifier
                 //"A", // reference area label

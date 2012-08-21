@@ -4,7 +4,9 @@
  */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
+import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.gui.view.ExperimentSelectionPanel;
+import com.compomics.pride_asa_pipeline.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,7 +24,7 @@ import org.apache.log4j.Logger;
 public class ExperimentSelectionController {
 
     private static final Logger LOGGER = Logger.getLogger(ExperimentSelectionController.class);
-    private static final String EXPERIMENT_ACCESSION_SEPARATOR = ":";    
+    private static final String EXPERIMENT_ACCESSION_SEPARATOR = ":";
     //model
     private Integer taxonomyId;
     //view
@@ -31,11 +33,9 @@ public class ExperimentSelectionController {
     private MainController mainController;
     //child controllers
     private PipelineProgressController pipelineProgressController;
+    private PipelineProceedController pipelineProceedController;
     //services
     private ExperimentService experimentService;
-
-    public ExperimentSelectionController() {
-    }
 
     public ExperimentService getExperimentService() {
         return experimentService;
@@ -65,11 +65,20 @@ public class ExperimentSelectionController {
         this.pipelineProgressController = pipelineProgressController;
     }
 
+    public PipelineProceedController getPipelineProceedController() {
+        return pipelineProceedController;
+    }
+
+    public void setPipelineProceedController(PipelineProceedController pipelineProceedController) {
+        this.pipelineProceedController = pipelineProceedController;
+    }
+
     public void init() {
         experimentSelectionPanel = new ExperimentSelectionPanel();
 
         //init child controllers
         pipelineProgressController.init();
+        pipelineProceedController.init();
 
         //fill combo box
         updateComboBox(experimentService.findAllExperimentAccessions());
@@ -79,7 +88,6 @@ public class ExperimentSelectionController {
 
         //add action listeners
         experimentSelectionPanel.getTaxonomyFilterCheckBox().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (experimentSelectionPanel.getTaxonomyFilterCheckBox().isSelected()) {
@@ -97,7 +105,6 @@ public class ExperimentSelectionController {
         });
 
         experimentSelectionPanel.getTaxonomyTextField().addFocusListener(new FocusListener() {
-
             @Override
             public void focusGained(FocusEvent fe) {
             }
@@ -109,17 +116,31 @@ public class ExperimentSelectionController {
         });
 
         experimentSelectionPanel.getExperimentProcessButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                //execute pipeline worker
-                PipelineWorker pipelineWorker = new PipelineWorker();
-                pipelineWorker.execute();
+                //execute worker
+                InitAnnotationWorker initAnnotationWorker = new InitAnnotationWorker();
+                initAnnotationWorker.execute();
 
                 //disable process button
                 experimentSelectionPanel.getExperimentProcessButton().setEnabled(Boolean.FALSE);
             }
         });
+    }
+
+    public void onAnnotationProceed() {
+        //execute worker
+        AnnotationWorker annotationWorker = new AnnotationWorker();
+        annotationWorker.execute();
+    }
+
+    public void onAnnotationCanceled() {
+        //hide progress bar
+        pipelineProgressController.hideProgressDialog();
+        mainController.onAnnotationCanceled();
+
+        //enable process button
+        experimentSelectionPanel.getExperimentProcessButton().setEnabled(Boolean.TRUE);
     }
 
     private void filterExperimentAccessions() {
@@ -156,15 +177,57 @@ public class ExperimentSelectionController {
         return experimentAccession;
     }
 
-    //swing worker
-    private class PipelineWorker extends SwingWorker<Void, Void> {
+    private boolean exceedsMaximumSystematicMassError(MassRecalibrationResult massRecalibrationResult) {
+        boolean exceedsMaxError = Boolean.FALSE;
+        for (int charge : massRecalibrationResult.getCharges()) {
+            if (massRecalibrationResult.getError(charge) > PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error")) {
+                exceedsMaxError = Boolean.TRUE;
+                break;
+            }
+        }
+
+        return exceedsMaxError;
+    }
+
+    //swing workers
+    private class InitAnnotationWorker extends SwingWorker<Void, Void> {
 
         @Override
         protected Void doInBackground() throws Exception {
             //show progress bar
             pipelineProgressController.showProgressBar();
 
+            mainController.getPrideSpectrumAnnotator().initAnnotation(getExperimentAccesion());
+
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            //check if one of the systematic mass errors per charge state exceeds the threshold value. If so, show a confirmation dialog.
+            if (mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult() != null
+                    && exceedsMaximumSystematicMassError(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult())) {
+                pipelineProceedController.showDialog("One or more systematic mass errors exceed the threshold value of "
+                        + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error")
+                        + ", proceed?", mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult());
+            }
+            //else proceed with the annotation
+            else if (mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult() != null){
+                onAnnotationProceed();
+            }
+        }
+    }
+
+    private class AnnotationWorker extends SwingWorker<Void, Void> {
+
+        @Override
+        protected Void doInBackground() throws Exception {
             mainController.getPrideSpectrumAnnotator().annotate(getExperimentAccesion());
+
+            //write result to file if necessary
+            if (experimentSelectionPanel.getWriteResultCheckBox().isSelected()) {
+                mainController.getResultService().writeResultToFile(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
+            }
 
             return null;
         }
@@ -172,12 +235,12 @@ public class ExperimentSelectionController {
         @Override
         protected void done() {
             //enable process button
-            experimentSelectionPanel.getExperimentProcessButton().setEnabled(Boolean.FALSE);
-            
-            mainController.onPipelineFinished();
-            
+            experimentSelectionPanel.getExperimentProcessButton().setEnabled(Boolean.TRUE);
+
+            mainController.onAnnotationFinished();
+
             //hide progress bar
-            pipelineProgressController.hideProgressBar();
+            pipelineProgressController.hideProgressDialog();
         }
     }
 }

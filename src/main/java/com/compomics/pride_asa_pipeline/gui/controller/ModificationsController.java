@@ -232,21 +232,23 @@ public class ModificationsController {
         modificationsPanel.getAddAminoAcidButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                Object[] selectedValues = modificationsPanel.getAminoAcidsList().getSelectedValues();
+                if (modificationsPanel.getModifcationsTable().getSelectedRow() != -1) {
+                    Object[] selectedValues = modificationsPanel.getAminoAcidsList().getSelectedValues();
 
-                Modification selectedModification = modificationsBindingList.get(modificationsPanel.getModifcationsTable().getSelectedRow());
+                    Modification selectedModification = modificationsBindingList.get(modificationsPanel.getModifcationsTable().getSelectedRow());
 
-                for (Object o : selectedValues) {
-                    AminoAcid aminoAcid = (AminoAcid) o;
-                    affectedAminoAcidsBindingList.add(aminoAcid);
-                    Collections.sort(affectedAminoAcidsBindingList);
-                    aminoAcidsBindingList.remove(aminoAcid);
-                    selectedModification.getAffectedAminoAcids().add(aminoAcid);
+                    for (Object o : selectedValues) {
+                        AminoAcid aminoAcid = (AminoAcid) o;
+                        affectedAminoAcidsBindingList.add(aminoAcid);
+                        Collections.sort(affectedAminoAcidsBindingList);
+                        aminoAcidsBindingList.remove(aminoAcid);
+                        selectedModification.getAffectedAminoAcids().add(aminoAcid);
 
-                    //enable remove button if there's more then one affected amino acid
-                    changeRemoveAminoAcidButtonState(selectedModification);
+                        //enable remove button if there's more then one affected amino acid
+                        changeRemoveAminoAcidButtonState(selectedModification);
 
-                    modificationsPanel.getModifcationsTable().updateUI();
+                        modificationsPanel.getModifcationsTable().updateUI();
+                    }
                 }
             }
         });
@@ -254,21 +256,23 @@ public class ModificationsController {
         modificationsPanel.getRemoveAminoAcidButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                Object[] selectedValues = modificationsPanel.getAffectedAminoAcidsList().getSelectedValues();
+                if (modificationsPanel.getModifcationsTable().getSelectedRow() != -1) {
+                    Object[] selectedValues = modificationsPanel.getAffectedAminoAcidsList().getSelectedValues();
 
-                Modification selectedModification = modificationsBindingList.get(modificationsPanel.getModifcationsTable().getSelectedRow());
+                    Modification selectedModification = modificationsBindingList.get(modificationsPanel.getModifcationsTable().getSelectedRow());
 
-                for (Object o : selectedValues) {
-                    AminoAcid aminoAcid = (AminoAcid) o;
-                    aminoAcidsBindingList.add(aminoAcid);
-                    affectedAminoAcidsBindingList.remove(aminoAcid);
-                    Collections.sort(aminoAcidsBindingList);
-                    selectedModification.getAffectedAminoAcids().remove(aminoAcid);
+                    for (Object o : selectedValues) {
+                        AminoAcid aminoAcid = (AminoAcid) o;
+                        aminoAcidsBindingList.add(aminoAcid);
+                        affectedAminoAcidsBindingList.remove(aminoAcid);
+                        Collections.sort(aminoAcidsBindingList);
+                        selectedModification.getAffectedAminoAcids().remove(aminoAcid);
 
-                    //disable remove button if there's only one affected amino acid
-                    changeRemoveAminoAcidButtonState(selectedModification);
+                        //disable remove button if there's only one affected amino acid
+                        changeRemoveAminoAcidButtonState(selectedModification);
 
-                    modificationsPanel.getModifcationsTable().updateUI();
+                        modificationsPanel.getModifcationsTable().updateUI();
+                    }
                 }
             }
         });
