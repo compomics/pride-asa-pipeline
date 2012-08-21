@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.pride_asa_pipeline.recalibration;
+package com.compomics.pride_asa_pipeline.logic.recalibration;
 
+import com.compomics.pride_asa_pipeline.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.model.*;
 import java.util.ArrayList;
 import java.util.Collection;

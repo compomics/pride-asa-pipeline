@@ -1,5 +1,6 @@
-package com.compomics.pride_asa_pipeline.spectrum.score;
+package com.compomics.pride_asa_pipeline.logic.spectrum.score;
 
+import com.compomics.pride_asa_pipeline.logic.spectrum.score.IdentificationScorer;
 import com.compomics.pride_asa_pipeline.model.*;
 import java.util.ArrayList;
 import java.util.List;
