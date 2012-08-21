@@ -6,18 +6,24 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.pipeline.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.service.ResultService;
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
 import javax.swing.JOptionPane;
+import org.apache.log4j.Logger;
+import org.jdesktop.beansbinding.ELProperty;
 
 /**
  *
  * @author niels
  */
 public class MainController implements ActionListener {
-
+    
+    private static final Logger LOGGER = Logger.getLogger(MainController.class);
+    
     private static final String PIPELINE_PANEL_CARD_NAME = "pipelinePanel";
     private static final String MODIFICATIONS_SETTINGS_CARD_NAME = "modificationsParentPanel";
     private static final String PIPELINE_SETTINGS_CARD_NAME = "pipelineParamsParentPanel";
@@ -30,6 +36,7 @@ public class MainController implements ActionListener {
     private PipelineParamsController pipelineParamsController;
     //services
     private PrideSpectrumAnnotator prideSpectrumAnnotator;
+    private ResultService resultService;
 
     public MainController() {
     }
@@ -73,7 +80,15 @@ public class MainController implements ActionListener {
     public void setPipelineParamsController(PipelineParamsController pipelineParamsController) {
         this.pipelineParamsController = pipelineParamsController;
     }
-    
+
+    public ResultService getResultService() {
+        return resultService;
+    }
+
+    public void setResultService(ResultService resultService) {
+        this.resultService = resultService;
+    }        
+
     public MainFrame getMainFrame() {
         return mainFrame;
     }
@@ -97,6 +112,9 @@ public class MainController implements ActionListener {
 
     public void init() {
         mainFrame = new MainFrame();
+        
+        //workaround for betterbeansbinding logging issue
+        org.jdesktop.beansbinding.util.logging.Logger.getLogger(ELProperty.class.getName()).setLevel(Level.SEVERE);
 
         //init child controllers
         experimentSelectionController.init();
@@ -112,7 +130,8 @@ public class MainController implements ActionListener {
 
         mainFrame.getExperimentSelectionParentPanel().add(experimentSelectionController.getExperimentSelectionPanel(), gridBagConstraints);
         mainFrame.getModificationsParentPanel().add(modificationsController.getModificationsPanel(), gridBagConstraints);
-        mainFrame.getIdentificationsParentPanel().add(pipelineResultController.getPipelineResultPanel(), gridBagConstraints);
+        mainFrame.getIdentificationsParentPanel().add(pipelineResultController.getIdentificationsPanel(), gridBagConstraints);
+        mainFrame.getSummaryParentPanel().add(pipelineResultController.getSummaryPanel(), gridBagConstraints);
         mainFrame.getPipelineParamsParentPanel().add(pipelineParamsController.getPipelineParamsPanel(), gridBagConstraints);
 
         //add action listeners        
@@ -133,7 +152,15 @@ public class MainController implements ActionListener {
         JOptionPane.showMessageDialog(mainFrame.getContentPane(), message, title, messageType);
     }
 
-    public void onPipelineFinished() {
+    public void onAnnotationFinished() {
         pipelineResultController.updateIdentifications();
+        pipelineResultController.updateSummary();                
     }
+    
+    public void onAnnotationCanceled(){
+        LOGGER.info("Annotation canceled.");
+        prideSpectrumAnnotator.clearPipeline();
+        pipelineResultController.clear();
+    }
+        
 }

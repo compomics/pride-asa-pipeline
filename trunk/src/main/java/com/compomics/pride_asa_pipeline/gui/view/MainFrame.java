@@ -48,6 +48,10 @@ public class MainFrame extends javax.swing.JFrame {
         return identificationsParentPanel;
     }
 
+    public JPanel getSummaryParentPanel() {
+        return summaryParentPanel;
+    }
+
     public JPanel getPipelineParamsParentPanel() {
         return pipelineParamsParentPanel;
     }
@@ -74,10 +78,9 @@ public class MainFrame extends javax.swing.JFrame {
         pipelineViewMenuItem = new javax.swing.JMenuItem();
         modificationsViewMenuItem = new javax.swing.JMenuItem();
         pipelineParamsViewMenuItem = new javax.swing.JMenuItem();
-        helpMenu = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1000, 800));
+        setPreferredSize(new java.awt.Dimension(1000, 900));
         getContentPane().setLayout(new java.awt.CardLayout());
 
         pipelinePanel.setLayout(new java.awt.GridBagLayout());
@@ -91,7 +94,7 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.3;
+        gridBagConstraints.weighty = 0.25;
         pipelinePanel.add(experimentSelectionParentPanel, gridBagConstraints);
 
         pipelineResultTabbedPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Pipeline result"));
@@ -111,7 +114,7 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.7;
+        gridBagConstraints.weighty = 0.75;
         pipelinePanel.add(pipelineResultTabbedPane, gridBagConstraints);
 
         getContentPane().add(pipelinePanel, "pipelinePanel");
@@ -137,16 +140,12 @@ public class MainFrame extends javax.swing.JFrame {
 
         menuBar.add(viewMenu);
 
-        helpMenu.setText("Help");
-        menuBar.add(helpMenu);
-
         setJMenuBar(menuBar);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel experimentSelectionParentPanel;
-    private javax.swing.JMenu helpMenu;
     private javax.swing.JPanel identificationsParentPanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JPanel modificationsParentPanel;

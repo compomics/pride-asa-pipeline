@@ -4,9 +4,9 @@
  */
 package com.compomics.pride_asa_pipeline.gui.view;
 
+import java.awt.Frame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
-import javax.swing.JTextField;
 
 /**
  *
@@ -14,13 +14,12 @@ import javax.swing.JTextField;
  */
 public class PipelineProgressDialog extends javax.swing.JDialog {
 
-    public PipelineProgressDialog(java.awt.Frame parent) {
+    public PipelineProgressDialog(Frame parent) {
         super(parent);
-        setLocationRelativeTo(parent);
-        initComponents();
+        initComponents();       
     }
 
-    public JProgressBar getProgressBar() {        
+    public JProgressBar getProgressBar() {
         return progressBar;
     }
 
@@ -46,6 +45,8 @@ public class PipelineProgressDialog extends javax.swing.JDialog {
         progressInfoLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Pipeline progress");
+        setResizable(false);
 
         progressHeaderLabel.setText("progress header");
 
@@ -66,13 +67,13 @@ public class PipelineProgressDialog extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(18, 18, 18)
+                .addGap(6, 6, 6)
                 .addComponent(progressHeaderLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(progressInfoLabel)
-                .addContainerGap(47, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
