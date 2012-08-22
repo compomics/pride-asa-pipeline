@@ -6,13 +6,14 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.gui.view.ExperimentSelectionPanel;
-import com.compomics.pride_asa_pipeline.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import org.apache.log4j.Logger;
@@ -27,6 +28,8 @@ public class ExperimentSelectionController {
     private static final String EXPERIMENT_ACCESSION_SEPARATOR = ":";
     //model
     private Integer taxonomyId;
+    //hold reference to swingworker for cancelling purposes
+    private SwingWorker<Void, Void> currentSwingWorker;
     //view
     private ExperimentSelectionPanel experimentSelectionPanel;
     //parent controller
@@ -120,6 +123,7 @@ public class ExperimentSelectionController {
             public void actionPerformed(ActionEvent e) {
                 //execute worker
                 InitAnnotationWorker initAnnotationWorker = new InitAnnotationWorker();
+                currentSwingWorker = initAnnotationWorker;
                 initAnnotationWorker.execute();
 
                 //disable process button
@@ -131,6 +135,7 @@ public class ExperimentSelectionController {
     public void onAnnotationProceed() {
         //execute worker
         AnnotationWorker annotationWorker = new AnnotationWorker();
+        currentSwingWorker = annotationWorker;
         annotationWorker.execute();
     }
 
@@ -138,6 +143,9 @@ public class ExperimentSelectionController {
         //hide progress bar
         pipelineProgressController.hideProgressDialog();
         mainController.onAnnotationCanceled();
+
+        //cancel swingworker
+        currentSwingWorker.cancel(Boolean.TRUE);
 
         //enable process button
         experimentSelectionPanel.getExperimentProcessButton().setEnabled(Boolean.TRUE);
@@ -177,18 +185,6 @@ public class ExperimentSelectionController {
         return experimentAccession;
     }
 
-    private boolean exceedsMaximumSystematicMassError(MassRecalibrationResult massRecalibrationResult) {
-        boolean exceedsMaxError = Boolean.FALSE;
-        for (int charge : massRecalibrationResult.getCharges()) {
-            if (massRecalibrationResult.getError(charge) > PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error")) {
-                exceedsMaxError = Boolean.TRUE;
-                break;
-            }
-        }
-
-        return exceedsMaxError;
-    }
-
     //swing workers
     private class InitAnnotationWorker extends SwingWorker<Void, Void> {
 
@@ -204,16 +200,24 @@ public class ExperimentSelectionController {
 
         @Override
         protected void done() {
-            //check if one of the systematic mass errors per charge state exceeds the threshold value. If so, show a confirmation dialog.
-            if (mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult() != null
-                    && exceedsMaximumSystematicMassError(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult())) {
-                pipelineProceedController.showDialog("One or more systematic mass errors exceed the threshold value of "
-                        + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error")
-                        + ", proceed?", mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult());
-            }
-            //else proceed with the annotation
-            else if (mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult() != null){
-                onAnnotationProceed();
+            try {
+                get();
+                //check for possible null values after cancel                
+                //check if one of the systematic mass errors per charge state exceeds the threshold value. If so, show a confirmation dialog.
+                if (mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
+                    pipelineProceedController.showDialog("One or more systematic mass errors exceed the threshold value of "
+                            + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error")
+                            + ", proceed?", mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult());
+                } //else proceed with the annotation
+                else if (mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult() != null) {
+                    onAnnotationProceed();
+                }
+            } catch (InterruptedException ex) {
+                LOGGER.error(ex.getMessage(), ex);
+            } catch (ExecutionException ex) {
+                mainController.showMessageDialog("Unexpected error", "Un expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
+            } catch (CancellationException ex) {
+                LOGGER.debug("annotation canceled.");
             }
         }
     }
@@ -234,13 +238,26 @@ public class ExperimentSelectionController {
 
         @Override
         protected void done() {
-            //enable process button
-            experimentSelectionPanel.getExperimentProcessButton().setEnabled(Boolean.TRUE);
+            try {
+                get();
 
-            mainController.onAnnotationFinished();
+                //enable process button
+                experimentSelectionPanel.getExperimentProcessButton().setEnabled(Boolean.TRUE);
 
-            //hide progress bar
-            pipelineProgressController.hideProgressDialog();
+                mainController.onAnnotationFinished();
+
+                //hide progress bar
+                pipelineProgressController.hideProgressDialog();
+
+            } catch (InterruptedException ex) {
+                LOGGER.error(ex.getMessage(), ex);
+                mainController.showUnexpectedErrorDialog(ex.getMessage());
+            } catch (ExecutionException ex) {
+                LOGGER.error(ex.getMessage(), ex);
+                mainController.showUnexpectedErrorDialog(ex.getMessage());
+            } catch (CancellationException ex) {
+                LOGGER.info("annotation for experiment " + getExperimentAccesion() + " canceled.");
+            }
         }
     }
 }

@@ -69,7 +69,7 @@ public class MassRecalibratorTest {
         MassRecalibrationResult massRecalibrationResult = massRecalibrator.recalibrate(peptides);
 
         double errorWindowChargeState1 = massRecalibrationResult.getErrorWindow(1);
-        assertEquals(9.1, errorWindowChargeState1, 0.1);
+        assertEquals(9.1, errorWindowChargeState1, 0.01);
 
         double errorWindowChargeState2 = massRecalibrationResult.getErrorWindow(2);
         assertEquals(0.2, errorWindowChargeState2, 0.01);

@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.pipeline;
+package com.compomics.pride_asa_pipeline.logic;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.logic.MassDeltaExplainer;
@@ -251,13 +251,13 @@ public class PrideSpectrumAnnotator {
     /**
      * Clears the pipeline resources
      */
-    public void clearPipeline(){
+    public void clearPipeline() {
         consideredChargeStates = null;
         identifications = null;
         spectrumAnnotatorResult = null;
         analyzerData = null;
     }
-    
+
     /**
      * Private methods
      */

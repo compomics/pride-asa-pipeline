@@ -75,7 +75,7 @@ public class ModificationsController {
         this.modificationService = modificationService;
     }
 
-    public void init() {
+    public void init() {                        
         modificationsPanel = new ModificationsPanel();
 
         //fill location combobox
@@ -349,7 +349,7 @@ public class ModificationsController {
                             + "\n" + "The modifications will however be used in the pipeline.", JOptionPane.WARNING_MESSAGE);
                 }
             }
-        });
+        });                
     }
 
     /**

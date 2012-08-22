@@ -105,7 +105,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                 //else use default or reported value for analyzer                
 
                 //get default deviation
-                Double deviation = PropertiesConfigurationHolder.getInstance().getDouble("massdeltaexplainer.default_deviation");
+                Double deviation = PropertiesConfigurationHolder.getInstance().getDouble("massdeltaexplainer.default_deviation") / peptide.getCharge();
                 if (massRecalibrationResult == null) {
                     //if mass recalibration result is null, use precursor mass error from analyzer data
                     if (analyzerData != null) {

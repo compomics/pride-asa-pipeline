@@ -118,7 +118,7 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
     protected List<Peptide> findUsablePeptides(List<Peptide> peptidesByCharge) {
         List<Peptide> peptides = new ArrayList<Peptide>();
         //get threshold value from configuration file
-        double threshold = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.usable_peptides_threshold");
+        double threshold = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.mass_delta_threshold");
         for (Peptide peptide : peptidesByCharge) {
             try {
                 double massDelta = peptide.calculateMassDelta();
