@@ -2,8 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.pride_asa_pipeline.pipeline;
+package com.compomics.pride_asa_pipeline;
 
+import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,8 +40,16 @@ public class CommandLineRunner {
     public void runPipeline(String experimentAccession) {
         //init the annotiation
         prideSpectrumAnnotator.initAnnotation(experimentAccession);
-        //continue with the annotiation
-        prideSpectrumAnnotator.annotate(experimentAccession);
+
+        //check if the maximum systematic mass error is exceeded
+        if (prideSpectrumAnnotator.getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
+            //continue with the annotiation
+            prideSpectrumAnnotator.annotate(experimentAccession);
+        } else {
+            LOGGER.warn("One or more systematic mass error exceed the maximum value of " + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error") + ", experiment " + experimentAccession + " will be skipped.");
+            prideSpectrumAnnotator.clearPipeline();
+        }
+
     }
 
     /**
@@ -52,10 +62,7 @@ public class CommandLineRunner {
         Set<String> experimentAccessions = readExperimentAccessions(experimentAccessionsFile);
 
         for (String experimentAccession : experimentAccessions) {
-            //init the annotiation
-            prideSpectrumAnnotator.initAnnotation(experimentAccession);
-            //continue with the annotiation
-            prideSpectrumAnnotator.annotate(experimentAccession);
+            runPipeline(experimentAccession);
         }
     }
 

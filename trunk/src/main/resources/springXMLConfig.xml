@@ -11,12 +11,12 @@
     
     <!-- pipeline beans -->
     <bean id="commandLineRunner"
-          class="com.compomics.pride_asa_pipeline.pipeline.CommandLineRunner">
+          class="com.compomics.pride_asa_pipeline.CommandLineRunner">
         <property name="prideSpectrumAnnotator" ref="prideSpectrumAnnotator"/>
     </bean>
     
     <bean id="prideSpectrumAnnotator"
-          class="com.compomics.pride_asa_pipeline.pipeline.PrideSpectrumAnnotator">        
+          class="com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator">        
         <property name="experimentService" ref="experimentService"/>
         <property name="spectrumService" ref="spectrumService"/>
         <property name="modificationService" ref="modificationService"/>
