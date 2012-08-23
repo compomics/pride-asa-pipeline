@@ -97,7 +97,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                     //work with adjusted masses
                     Double errorAdjustment = massRecalibrationResult.getError(peptide.getCharge());
                     if (errorAdjustment != null) {
-                        precursorMassDelta += errorAdjustment;
+                        precursorMassDelta -= errorAdjustment;
                     }
                 }
 

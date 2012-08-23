@@ -4,7 +4,6 @@
  */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
-import com.compomics.pride_asa_pipeline.model.comparator.IdentificationGuiWrapperComparator;
 import com.compomics.pride_asa_pipeline.gui.view.IdentificationsPanel;
 import com.compomics.pride_asa_pipeline.gui.view.SummaryPanel;
 import com.compomics.pride_asa_pipeline.gui.wrapper.IdentificationGuiWrapper;
@@ -12,9 +11,12 @@ import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.IdentificationScore;
+import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ModificationFacade;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peptide;
+import com.compomics.pride_asa_pipeline.model.comparator.IdentificationGuiWrapperComparator;
+import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumPanelService;
 import com.compomics.pride_asa_pipeline.util.GuiUtils;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
@@ -25,6 +27,7 @@ import java.awt.GridBagConstraints;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -40,7 +43,12 @@ import org.jdesktop.swingbinding.SwingBindings;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 
 /**
@@ -53,15 +61,18 @@ public class PipelineResultController {
     //model
     private BindingGroup bindingGroup;
     private ObservableList<IdentificationGuiWrapper> identificationGuiWrappersBindingList;
-    private DefaultPieDataset pieDataset;
+    private DefaultPieDataset identificationsDataset;
+    private DefaultCategoryDataset modificationsDataset;
     //views
     private IdentificationsPanel identificationsPanel;
     private SummaryPanel summaryPanel;
-    private ChartPanel pieChartPanel;
+    private ChartPanel identificationsChartPanel;
+    private ChartPanel modificationsChartPanel;
     //parent controller
     private MainController mainController;
     //services
     private SpectrumPanelService spectrumPanelService;
+    private ModificationService modificationService;
 
     public MainController getMainController() {
         return mainController;
@@ -87,39 +98,65 @@ public class PipelineResultController {
         this.spectrumPanelService = spectrumPanelService;
     }
 
+    public ModificationService getModificationService() {
+        return modificationService;
+    }
+
+    public void setModificationService(ModificationService modificationService) {
+        this.modificationService = modificationService;
+    }
+
+    public void init() {
+        initIdentificationsPanel();
+        initSummaryPanel();
+    }
+
     public void updateIdentifications() {
         identificationGuiWrappersBindingList.clear();
         identificationGuiWrappersBindingList.addAll(getIdentificationGuiWrappers());
     }
 
     public void updateSummary() {
-        //create new pie data set
-        pieDataset = new DefaultPieDataset();
-        pieDataset.setValue(IdentificationGuiWrapper.ExplanationType.UNMODIFIED, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getUnmodifiedPrecursors().size());
-        pieDataset.setValue(IdentificationGuiWrapper.ExplanationType.MODIFIED, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getModifiedPrecursors().size());
-        pieDataset.setValue(IdentificationGuiWrapper.ExplanationType.UNEXPLAINED, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getUnexplainedIdentifications().size());
+        //create new identificiations data set
+        identificationsDataset = new DefaultPieDataset();
+        identificationsDataset.setValue(IdentificationGuiWrapper.ExplanationType.UNMODIFIED, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getUnmodifiedPrecursors().size());
+        identificationsDataset.setValue(IdentificationGuiWrapper.ExplanationType.MODIFIED, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getModifiedPrecursors().size());
+        identificationsDataset.setValue(IdentificationGuiWrapper.ExplanationType.UNEXPLAINED, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getUnexplainedIdentifications().size());
 
-        JFreeChart pieChart = ChartFactory.createPieChart(
+        JFreeChart identificationsChart = ChartFactory.createPieChart(
                 "Identifications", // chart title
-                pieDataset, // data
-                true, // include legend
-                true,
-                false);
+                identificationsDataset, // data
+                Boolean.TRUE, // include legend
+                Boolean.TRUE,
+                Boolean.FALSE);
 
-        PiePlot plot = (PiePlot) pieChart.getPlot();
+        PiePlot plot = (PiePlot) identificationsChart.getPlot();
         plot.setLabelFont(new Font("SansSerif", Font.PLAIN, 12));
         plot.setNoDataMessage("No data available");
         //plot.setCircular(false);
         plot.setLabelGap(0.02);
 
+        //create new modifications data set
+        modificationsDataset = new DefaultCategoryDataset();
+        Map<Modification, Integer> modifications = modificationService.getUsedModifications(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
+        for (Modification modification : modifications.keySet()) {
+            double relativeCount = (double) (modifications.get(modification)) / (double) (mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getNumberOfIdentifications());
+            modificationsDataset.addValue(relativeCount, "relative count", modification.getName());
+        }
+
+        JFreeChart modificationsChart = ChartFactory.createBarChart(
+                "Modifications",
+                "modification",
+                "relative count",
+                modificationsDataset,
+                PlotOrientation.VERTICAL, true, true, false);
+        CategoryPlot modificationsPlot = (CategoryPlot) modificationsChart.getPlot();
+        //CategoryAxis xAxis = (CategoryAxis) modificationsPlot.getDomainAxis();
+        //xAxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
+
         //add chart to panels
-        pieChartPanel.setChart(pieChart);
-    }
-
-    public void init() {
-        initIdentificationsPanel();
-
-        initSummaryPanel();
+        identificationsChartPanel.setChart(identificationsChart);
+        modificationsChartPanel.setChart(modificationsChart);
     }
 
     /**
@@ -131,7 +168,8 @@ public class PipelineResultController {
         addSpectrumPanel(null);
 
         //clear summary panel
-        pieChartPanel.setChart(null);
+        identificationsChartPanel.setChart(null);
+        modificationsChartPanel.setChart(null);
     }
 
     private void initIdentificationsPanel() {
@@ -212,7 +250,8 @@ public class PipelineResultController {
 
     private void initSummaryPanel() {
         summaryPanel = new SummaryPanel();
-        pieChartPanel = new ChartPanel(null);
+        identificationsChartPanel = new ChartPanel(null);
+        modificationsChartPanel = new ChartPanel(null);
 
         //add chartPanel                  
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -220,7 +259,8 @@ public class PipelineResultController {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
 
-        summaryPanel.getPieChartParentPanel().add(pieChartPanel, gridBagConstraints);
+        summaryPanel.getIdentificationsChartParentPanel().add(identificationsChartPanel, gridBagConstraints);
+        summaryPanel.getModificationsChartParentPanel().add(modificationsChartPanel, gridBagConstraints);
     }
 
     /**

@@ -12,7 +12,7 @@ import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.logic.modification.ModificationMarshaller;
-import com.compomics.pride_asa_pipeline.logic.modification.OmssaModiciationMarshaller;
+import com.compomics.pride_asa_pipeline.logic.modification.OmssaModificationMarshaller;
 import com.compomics.pride_asa_pipeline.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.google.common.base.Joiner;
@@ -31,7 +31,7 @@ public class ModificationServiceImpl implements ModificationService {
     private static final Logger LOGGER = Logger.getLogger(ModificationServiceImpl.class);
     private ModificationMarshaller modificationMarshaller;
     private ModificationRepository modificationRepository;
-    private OmssaModiciationMarshaller omssaModiciationMarshaller;
+    private OmssaModificationMarshaller omssaModificationMarshaller;
     private Set<Modification> pipelineModifications;
 
     public ModificationMarshaller getModificationMarshaller() {
@@ -50,13 +50,13 @@ public class ModificationServiceImpl implements ModificationService {
         this.modificationRepository = modificationRepository;
     }
 
-    public OmssaModiciationMarshaller getOmssaModiciationMarshaller() {
-        return omssaModiciationMarshaller;
+    public OmssaModificationMarshaller getOmssaModificationMarshaller() {
+        return omssaModificationMarshaller;
     }
 
-    public void setOmssaModiciationMarshaller(OmssaModiciationMarshaller omssaModiciationMarshaller) {
-        this.omssaModiciationMarshaller = omssaModiciationMarshaller;
-    }
+    public void setOmssaModificationMarshaller(OmssaModificationMarshaller omssaModificationMarshaller) {
+        this.omssaModificationMarshaller = omssaModificationMarshaller;
+    }    
 
     @Override
     public Set<Modification> loadPipelineModifications(File modificationsFile) throws JDOMException {
@@ -118,7 +118,7 @@ public class ModificationServiceImpl implements ModificationService {
                     + "_"
                     + Joiner.on("").join(lModification.getAffectedAminoAcids())
                     + "_" + lModification.getMassShift());
-            if(lAdd){
+            if (lAdd) {
                 // Unique Unimod + location + mass combination
                 modificationSet.add(lModification);
             }
@@ -128,23 +128,24 @@ public class ModificationServiceImpl implements ModificationService {
     }
 
     @Override
-    public Set<Modification> getUsedModifications(SpectrumAnnotatorResult spectrumAnnotatorResult) {
-        Set<Modification> modifications = new HashSet<Modification>();
+    public Map<Modification, Integer> getUsedModifications(SpectrumAnnotatorResult spectrumAnnotatorResult) {
+        Map<Modification, Integer> modifications = new HashMap<Modification, Integer>();
+
         for (Identification identification : spectrumAnnotatorResult.getModifiedPrecursors()) {
             ModifiedPeptide modifiedPeptide = (ModifiedPeptide) identification.getPeptide();
             if (modifiedPeptide.getNTermMod() != null) {
-                modifications.add((Modification) modifiedPeptide.getNTermMod());
+                addModificationToMap(modifications, (Modification) modifiedPeptide.getNTermMod());
             }
             if (modifiedPeptide.getNTModifications() != null) {
                 for (int i = 0; i < modifiedPeptide.getNTModifications().length; i++) {
                     Modification modification = (Modification) modifiedPeptide.getNTModifications()[i];
                     if (modification != null) {
-                        modifications.add(modification);
+                        addModificationToMap(modifications, modification);
                     }
                 }
             }
             if (modifiedPeptide.getCTermMod() != null) {
-                modifications.add((Modification) modifiedPeptide.getNTermMod());
+                addModificationToMap(modifications, (Modification) modifiedPeptide.getCTermMod());
             }
         }
 
@@ -153,8 +154,8 @@ public class ModificationServiceImpl implements ModificationService {
 
     @Override
     public UserModCollection getModificationsAsUserModCollection(SpectrumAnnotatorResult spectrumAnnotatorResult) {
-        Set<Modification> modifications = getUsedModifications(spectrumAnnotatorResult);
-        return omssaModiciationMarshaller.marshallModifications(modifications);
+        Set<Modification> modifications = getUsedModifications(spectrumAnnotatorResult).keySet();
+        return omssaModificationMarshaller.marshallModifications(modifications);
     }
 
     /**
@@ -176,6 +177,22 @@ public class ModificationServiceImpl implements ModificationService {
             }
         } else {
             modifications.put(modification.getName(), modification);
+        }
+    }
+
+    /**
+     * Adds a modification to the modifications map. If already present, the
+     * occurence count is incremented.
+     *
+     * @param modifications the modifications map (key: modification, value:
+     * modification occurence count)
+     * @param modification the modification
+     */
+    private void addModificationToMap(Map<Modification, Integer> modifications, Modification modification) {
+        if (modifications.containsKey(modification)) {
+            modifications.put(modification, modifications.get(modification) + 1);
+        } else {
+            modifications.put(modification, 1);
         }
     }
 

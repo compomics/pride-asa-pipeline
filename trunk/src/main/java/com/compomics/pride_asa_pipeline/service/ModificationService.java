@@ -11,6 +11,7 @@ import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.jdom2.JDOMException;
 
@@ -70,14 +71,14 @@ public interface ModificationService {
     Set<Modification> loadExperimentModifications(long experimentId);
 
     /**
-     * Gets the modifications that were actually used in the pipeline; i.e.
+     * Gets the modifications as a map (key: modification, value: occurence count) that were actually used in the pipeline; i.e.
      * modifications that could be combined the explain a certain mass delta for
      * a precursor.
      *
      * @param spectrumAnnotatorResult the spectrum annotator result
      * @return the used modifications
      */
-    Set<Modification> getUsedModifications(SpectrumAnnotatorResult spectrumAnnotatorResult);
+    Map<Modification, Integer> getUsedModifications(SpectrumAnnotatorResult spectrumAnnotatorResult);        
 
     /**
      * Gets the modifications that were actually used in the pipeline; i.e.

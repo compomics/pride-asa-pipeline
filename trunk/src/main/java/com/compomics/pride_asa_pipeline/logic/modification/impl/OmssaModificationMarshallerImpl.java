@@ -3,7 +3,7 @@ package com.compomics.pride_asa_pipeline.logic.modification.impl;
 import com.compomics.omssa.xsd.LocationTypeEnum;
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.omssa.xsd.UserModCollection;
-import com.compomics.pride_asa_pipeline.logic.modification.OmssaModiciationMarshaller;
+import com.compomics.pride_asa_pipeline.logic.modification.OmssaModificationMarshaller;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.Set;
@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
  * Created by IntelliJ IDEA. User: niels Date: 17/11/11 Time: 9:54 To change
  * this template use File | Settings | File Templates.
  */
-public class OmssaModificationMarshallerImpl implements OmssaModiciationMarshaller {
+public class OmssaModificationMarshallerImpl implements OmssaModificationMarshaller {
 
     private static final Logger LOGGER = Logger.getLogger(OmssaModificationMarshallerImpl.class);
 

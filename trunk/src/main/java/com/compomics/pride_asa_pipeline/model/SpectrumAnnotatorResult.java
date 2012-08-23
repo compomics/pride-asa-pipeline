@@ -102,4 +102,13 @@ public class SpectrumAnnotatorResult {
         return identifications;
     }
     
+    /**
+     * Gets the total number of identifications (unexplained, unmodified and modified).
+     * 
+     * @return the total number of identifications
+     */
+    public int getNumberOfIdentifications(){
+        return unexplainedIdentifications.size() + unmodifiedPrecursors.size() + modifiedPrecursors.size();
+    }
+    
 }
