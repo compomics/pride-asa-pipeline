@@ -19,10 +19,14 @@ public class SummaryPanel extends javax.swing.JPanel {
         initComponents();
     }
 
-    public JPanel getPieChartParentPanel() {
-        return pieChartParentPanel;
+    public JPanel getIdentificationsChartParentPanel() {
+        return identificationsChartParentPanel;
     }
 
+    public JPanel getModificationsChartParentPanel() {
+        return modificationsChartParentPanel;
+    }    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -31,53 +35,61 @@ public class SummaryPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        pieChartParentPanelgg = new javax.swing.JPanel();
-        pieChartParentPanel1 = new javax.swing.JPanel();
-        pieChartParentPanel2 = new javax.swing.JPanel();
-        pieChartParentPanel = new javax.swing.JPanel();
+        identificationsChartParentPanel = new javax.swing.JPanel();
+        modificationsChartParentPanel = new javax.swing.JPanel();
+        generalSummaryPanel = new javax.swing.JPanel();
 
-        pieChartParentPanelgg.setBorder(javax.swing.BorderFactory.createTitledBorder("Identifications summary"));
-        pieChartParentPanelgg.setLayout(new java.awt.GridBagLayout());
+        setPreferredSize(new java.awt.Dimension(400, 200));
+        setLayout(new java.awt.GridBagLayout());
 
-        pieChartParentPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Identifications summary"));
-        pieChartParentPanel1.setLayout(new java.awt.GridBagLayout());
+        identificationsChartParentPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Identifications"));
+        identificationsChartParentPanel.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 0.5;
+        add(identificationsChartParentPanel, gridBagConstraints);
 
-        pieChartParentPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Identifications summary"));
-        pieChartParentPanel2.setLayout(new java.awt.GridBagLayout());
+        modificationsChartParentPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Modifications"));
+        modificationsChartParentPanel.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 0.5;
+        add(modificationsChartParentPanel, gridBagConstraints);
 
-        pieChartParentPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Identifications summary"));
-        pieChartParentPanel.setLayout(new java.awt.GridBagLayout());
+        generalSummaryPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("General"));
+        generalSummaryPanel.setPreferredSize(new java.awt.Dimension(12, 23));
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(pieChartParentPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(pieChartParentPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(pieChartParentPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(pieChartParentPanelgg, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        org.jdesktop.layout.GroupLayout generalSummaryPanelLayout = new org.jdesktop.layout.GroupLayout(generalSummaryPanel);
+        generalSummaryPanel.setLayout(generalSummaryPanelLayout);
+        generalSummaryPanelLayout.setHorizontalGroup(
+            generalSummaryPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 388, Short.MAX_VALUE)
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(pieChartParentPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(pieChartParentPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(pieChartParentPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(pieChartParentPanelgg, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        generalSummaryPanelLayout.setVerticalGroup(
+            generalSummaryPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 77, Short.MAX_VALUE)
         );
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.5;
+        add(generalSummaryPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel pieChartParentPanel;
-    private javax.swing.JPanel pieChartParentPanel1;
-    private javax.swing.JPanel pieChartParentPanel2;
-    private javax.swing.JPanel pieChartParentPanelgg;
+    private javax.swing.JPanel generalSummaryPanel;
+    private javax.swing.JPanel identificationsChartParentPanel;
+    private javax.swing.JPanel modificationsChartParentPanel;
     // End of variables declaration//GEN-END:variables
 }

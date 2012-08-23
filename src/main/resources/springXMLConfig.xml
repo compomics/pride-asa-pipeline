@@ -53,7 +53,7 @@
           class="com.compomics.pride_asa_pipeline.service.impl.ModificationServiceImpl">
         <property name="modificationMarshaller" ref="modificationMarshaller"/>
         <property name="modificationRepository" ref="modificationRepository"/>
-        <property name="omssaModiciationMarshaller" ref="omssaModificationMarshaller"/>
+        <property name="omssaModificationMarshaller" ref="omssaModificationMarshaller"/>
     </bean> 
     
     <bean id="resultService"
@@ -197,6 +197,7 @@
           class="com.compomics.pride_asa_pipeline.gui.controller.PipelineResultController"> 
         <property name="mainController" ref="mainController"/>
         <property name="spectrumPanelService" ref="spectrumPanelService"/>        
+        <property name="modificationService" ref="modificationService"/>        
     </bean>
     
     <bean id="pipelineParamsController"

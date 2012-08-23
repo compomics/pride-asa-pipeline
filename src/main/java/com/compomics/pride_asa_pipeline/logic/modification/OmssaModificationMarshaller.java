@@ -12,7 +12,7 @@ import java.util.Set;
  *
  * @author Niels Hulstaert
  */
-public interface OmssaModiciationMarshaller {
+public interface OmssaModificationMarshaller {
 
     /**
      * Marshalls the modifications used in the pipeline to the OMSSA format
