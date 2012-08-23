@@ -7,6 +7,7 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.gui.view.ExperimentSelectionPanel;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
+import com.compomics.pride_asa_pipeline.service.ResultHandler;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -39,6 +40,7 @@ public class ExperimentSelectionController {
     private PipelineProceedController pipelineProceedController;
     //services
     private ExperimentService experimentService;
+    private ResultHandler resultHandler;
 
     public ExperimentService getExperimentService() {
         return experimentService;
@@ -47,6 +49,14 @@ public class ExperimentSelectionController {
     public void setExperimentService(ExperimentService experimentService) {
         this.experimentService = experimentService;
     }
+
+    public ResultHandler getResultHandler() {
+        return resultHandler;
+    }
+
+    public void setResultHandler(ResultHandler resultHandler) {
+        this.resultHandler = resultHandler;
+    }        
 
     public MainController getMainController() {
         return mainController;
@@ -230,7 +240,7 @@ public class ExperimentSelectionController {
 
             //write result to file if necessary
             if (experimentSelectionPanel.getWriteResultCheckBox().isSelected()) {
-                mainController.getResultService().writeResultToFile(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
+                resultHandler.writeResultToFile(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
             }
 
             return null;

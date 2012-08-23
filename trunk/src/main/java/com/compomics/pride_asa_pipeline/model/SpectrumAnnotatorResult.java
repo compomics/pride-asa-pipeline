@@ -5,7 +5,6 @@
 package com.compomics.pride_asa_pipeline.model;
 
 import com.compomics.pride_asa_pipeline.model.comparator.IdentificationComparator;
-import com.compomics.pride_asa_pipeline.gui.wrapper.IdentificationGuiWrapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

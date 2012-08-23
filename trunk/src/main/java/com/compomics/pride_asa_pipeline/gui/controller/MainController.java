@@ -6,7 +6,7 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.service.ResultService;
+import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
@@ -35,7 +35,6 @@ public class MainController implements ActionListener {
     private PipelineParamsController pipelineParamsController;
     //services
     private PrideSpectrumAnnotator prideSpectrumAnnotator;
-    private ResultService resultService;
     
     public MainController() {
     }
@@ -79,15 +78,7 @@ public class MainController implements ActionListener {
     public void setPipelineParamsController(PipelineParamsController pipelineParamsController) {
         this.pipelineParamsController = pipelineParamsController;
     }
-    
-    public ResultService getResultService() {
-        return resultService;
-    }
-    
-    public void setResultService(ResultService resultService) {
-        this.resultService = resultService;
-    }
-    
+               
     public MainFrame getMainFrame() {
         return mainFrame;
     }

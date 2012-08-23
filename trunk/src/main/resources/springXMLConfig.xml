@@ -41,6 +41,7 @@
           class="com.compomics.pride_asa_pipeline.service.impl.ExperimentServiceImpl">
         <property name="experimentRepository" ref="experimentRepository"/>
         <property name="spectrumService" ref="spectrumService"/>
+        <property name="resultHandler" ref="resultHandler"/>
     </bean> 
     
     <bean id="spectrumService"
@@ -56,9 +57,9 @@
         <property name="omssaModificationMarshaller" ref="omssaModificationMarshaller"/>
     </bean> 
     
-    <bean id="resultService"
-          class="com.compomics.pride_asa_pipeline.service.impl.ResultServiceImpl">
-        <property name="resultWriter" ref="resultWriter"/>
+    <bean id="resultHandler"
+          class="com.compomics.pride_asa_pipeline.service.impl.ResultHandlerImpl">
+        <property name="fileResultHandler" ref="fileResultHandler"/>
     </bean>  
     
     <bean id="spectrumPanelService"
@@ -82,8 +83,8 @@
         <property name="dataSource" ref="prideDataSource"/>
     </bean>
     
-    <bean id="resultWriter"
-          class="com.compomics.pride_asa_pipeline.repository.impl.ResultWriterImpl">        
+    <bean id="fileResultHandler"
+          class="com.compomics.pride_asa_pipeline.repository.impl.FileResultHandlerImpl">        
     </bean> 
     
     <!-- encode/decode beans -->
@@ -166,7 +167,6 @@
         <property name="modificationsController" ref="modificationsController"/>
         <property name="pipelineResultController" ref="pipelineResultController"/>
         <property name="pipelineParamsController" ref="pipelineParamsController"/>
-        <property name="resultService" ref="resultService"/>
     </bean>
     
     <bean id="experimentSelectionController"

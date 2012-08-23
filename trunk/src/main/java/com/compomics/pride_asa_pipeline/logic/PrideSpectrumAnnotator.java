@@ -1,19 +1,17 @@
 package com.compomics.pride_asa_pipeline.logic;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.logic.MassDeltaExplainer;
-import com.compomics.pride_asa_pipeline.logic.PeptideVariationsGenerator;
 import com.compomics.pride_asa_pipeline.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.logic.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.model.*;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
-import com.compomics.pride_asa_pipeline.util.FileUtils;
-import java.io.File;
+import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
+import org.springframework.core.io.Resource;
 
 /**
  * Created by IntelliJ IDEA. User: niels Date: 9/11/11 Time: 13:22 To change
@@ -313,9 +311,9 @@ public class PrideSpectrumAnnotator {
         ModificationHolder modificationHolder = new ModificationHolder();
 
         //add the pipeline modifications
-        File modificationsFile = FileUtils.getFileByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
+        Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
         try {
-            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsFile));
+            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource));
         } catch (JDOMException ex) {
             LOGGER.error(ex.getMessage(), ex);
         }

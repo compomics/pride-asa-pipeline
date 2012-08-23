@@ -6,7 +6,7 @@ package com.compomics.pride_asa_pipeline.service;
 
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identifications;
-
+import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
@@ -95,5 +95,5 @@ public interface ExperimentService {
      * @param experimentAccession
      */
     void buildSpectrumCacheForExperiment(String experimentAccession);
-
+        
 }

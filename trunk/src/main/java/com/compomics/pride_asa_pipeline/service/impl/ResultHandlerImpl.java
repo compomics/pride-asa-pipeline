@@ -6,34 +6,30 @@ package com.compomics.pride_asa_pipeline.service.impl;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
-import com.compomics.pride_asa_pipeline.repository.ResultWriter;
-import com.compomics.pride_asa_pipeline.service.ResultService;
+import com.compomics.pride_asa_pipeline.repository.FileResultHandler;
+import com.compomics.pride_asa_pipeline.service.ResultHandler;
 import java.io.File;
-import org.apache.log4j.Logger;
 
 /**
  *
  * @author niels
  */
-public class ResultServiceImpl implements ResultService {
+public class ResultHandlerImpl implements ResultHandler {
     
-    private static final Logger LOGGER = Logger.getLogger(ResultServiceImpl.class);
-    
-    private ResultWriter resultWriter;
+    private FileResultHandler fileResultHandler;
 
-    public ResultWriter getResultWriter() {
-        return resultWriter;
+    public FileResultHandler getFileResultHandler() {
+        return fileResultHandler;
     }
 
-    public void setResultWriter(ResultWriter resultWriter) {
-        this.resultWriter = resultWriter;
+    public void setFileResultHandler(FileResultHandler fileResultHandler) {
+        this.fileResultHandler = fileResultHandler;
     }        
-    
+
     @Override
     public void writeResultToFile(SpectrumAnnotatorResult spectrumAnnotatorResult) {
         File resultFile = new File(PropertiesConfigurationHolder.getInstance().getString("results_path"), spectrumAnnotatorResult.getExperimentAccession() + ".txt");
-        
-        resultWriter.writeResult(resultFile, spectrumAnnotatorResult.getIdentifications());
+
+        fileResultHandler.writeResult(resultFile, spectrumAnnotatorResult.getIdentifications());
     }
-            
 }

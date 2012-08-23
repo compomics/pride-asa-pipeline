@@ -10,7 +10,7 @@ import com.compomics.pride_asa_pipeline.gui.view.ModificationsPanel;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
-import com.compomics.pride_asa_pipeline.util.FileUtils;
+import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -30,6 +30,8 @@ import org.jdesktop.swingbinding.JTableBinding.ColumnBinding;
 import org.jdesktop.swingbinding.SwingBindings;
 import org.jdom2.JDOMException;
 import org.jdom2.input.JDOMParseException;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 /**
  *
@@ -39,7 +41,7 @@ public class ModificationsController {
 
     private static final Logger LOGGER = Logger.getLogger(ModificationsController.class);
     //model
-    private File modificationsFile;
+    private Resource modificationsResource;
     private BindingGroup bindingGroup;
     private ObservableList<Modification> modificationsBindingList;
     private ObservableList<AminoAcid> aminoAcidsBindingList;
@@ -52,7 +54,7 @@ public class ModificationsController {
     private ModificationService modificationService;
 
     public ModificationsController() {
-        modificationsFile = FileUtils.getFileByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
+        modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
     }
 
     public MainController getMainController() {
@@ -122,7 +124,7 @@ public class ModificationsController {
         //table binding
         try {
             modificationsBindingList = ObservableCollections.observableList(getModificationsAsList(
-                    modificationService.loadPipelineModifications(modificationsFile)));
+                    modificationService.loadPipelineModifications(modificationsResource)));
         } catch (JDOMParseException ex) {
             LOGGER.error(ex.getMessage(), ex);
             mainController.showMessageDialog("Import unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
@@ -309,12 +311,12 @@ public class ModificationsController {
                 //in response to the button click, show open dialog 
                 int returnVal = modificationsPanel.getFileChooser().showOpenDialog(modificationsPanel);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File modificationsImportFile = modificationsPanel.getFileChooser().getSelectedFile();
+                    Resource modificationsImportResource = new FileSystemResource(modificationsPanel.getFileChooser().getSelectedFile());
 
                     //import modifications and refill the binding list
                     Set<Modification> importedModifications = null;
                     try {
-                        importedModifications = modificationService.importPipelineModifications(modificationsImportFile);
+                        importedModifications = modificationService.importPipelineModifications(modificationsImportResource);
 
                         modificationsBindingList.clear();
                         modificationsBindingList.addAll(importedModifications);
@@ -341,8 +343,8 @@ public class ModificationsController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //check if modifications file in resources folder can be found
-                if (FileUtils.isExistingFile(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"))) {
-                    modificationService.savePipelineModifications(modificationsFile, modificationsBindingList);
+                if (ResourceUtils.isExistingFile(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"))) {
+                    modificationService.savePipelineModifications(modificationsResource, modificationsBindingList);
                 } else {
                     mainController.showMessageDialog("Save unsuccessful", "The modifications could not be saved to file. "
                             + "\n" + "Please check if a \"modifications.xml\" file exists in the \"resources\" folder. "

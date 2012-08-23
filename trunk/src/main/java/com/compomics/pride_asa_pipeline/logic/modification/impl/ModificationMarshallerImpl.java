@@ -48,12 +48,12 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
     }
 
     @Override
-    public Set<Modification> unmarshall(File modificationsFile) throws JDOMException {
+    public Set<Modification> unmarshall(Resource modificationsResource) throws JDOMException {
         XMLReaderJDOMFactory schemaFactory = new XMLReaderXSDFactory(modificationsSchemaURL);
         SAXBuilder builder = new SAXBuilder(schemaFactory);
 
         try {
-            document = builder.build(modificationsFile);
+            document = builder.build(modificationsResource.getInputStream());
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -103,7 +103,7 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
     }
 
     @Override
-    public void marshall(File modificationsFile, Collection<Modification> modifications) {
+    public void marshall(Resource modificationsResource, Collection<Modification> modifications) {
         try {
             //add root element
             Document doc = new Document();
@@ -158,8 +158,8 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
 
             XMLOutputter xmlOutputter = new XMLOutputter();
             xmlOutputter.setFormat(Format.getPrettyFormat());
-            FileOutputStream fileOutputStream = new FileOutputStream(modificationsFile);
-            xmlOutputter.output(doc, fileOutputStream);
+            OutputStream outputStream = new FileOutputStream(modificationsResource.getFile());
+            xmlOutputter.output(doc, outputStream);
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage(), ex);
         }

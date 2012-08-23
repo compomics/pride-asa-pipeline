@@ -10,7 +10,7 @@ import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
  *
  * @author niels
  */
-public interface ResultService {
+public interface ResultHandler {
     
     /**
      * Writes the result of the annotation pipeline to file. 
