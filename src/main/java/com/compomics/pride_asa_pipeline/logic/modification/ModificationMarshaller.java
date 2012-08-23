@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Set;
 import org.jdom2.JDOMException;
+import org.springframework.core.io.Resource;
 
 /**
  *
@@ -17,21 +18,21 @@ import org.jdom2.JDOMException;
 public interface ModificationMarshaller {
 
     /**
-     * Unmarchalls the given modifications XML file and returns a set of
+     * Unmarchalls the given modifications XML resource and returns a set of
      * modifications
      *
-     * @param modificationsFile the modifications XML file to be parsed
+     * @param modificationsResource the modifications XML resource to be parsed
      * @return the set of modifications
      * @exception JDOMException
      */
-    Set<Modification> unmarshall(File modificationsFile) throws JDOMException;
+    Set<Modification> unmarshall(Resource modificationsResource) throws JDOMException;
 
     /**
      * Marshalls the collection of modifications to the modifications.xml file.
      *
-     * @param modificationsFile the modifications file
+     * @param modificationsResource the modifications resource
      * @param modifications the modifications collection
      * @return the modifications output stream
      */
-    void marshall(File modificationsFile, Collection<Modification> modifications);
+    void marshall(Resource modificationsResource, Collection<Modification> modifications);
 }

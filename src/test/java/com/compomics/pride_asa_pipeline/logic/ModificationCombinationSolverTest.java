@@ -7,8 +7,7 @@ package com.compomics.pride_asa_pipeline.logic;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.*;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
-import com.compomics.pride_asa_pipeline.util.FileUtils;
-import java.io.File;
+import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.io.IOException;
 import java.util.Set;
 import static junit.framework.Assert.assertEquals;
@@ -18,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -43,8 +43,8 @@ public class ModificationCombinationSolverTest {
         if (modificationCombinationSolver.getModificationHolder() == null) {
             //add the pipeline modifications
             ModificationHolder modificationHolder = new ModificationHolder();
-            File modificationsFile = FileUtils.getFileByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
-            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsFile));
+            Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
+            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource));
 
             //set the modification combination holder
             modificationCombinationSolver.setModificationHolder(modificationHolder);

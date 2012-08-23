@@ -7,6 +7,7 @@ package com.compomics.pride_asa_pipeline.logic;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.*;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
+import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -39,9 +40,8 @@ public class PeptideVariartionsGeneratorTest {
     @Before
     public void loadModifications() throws IOException, JDOMException {
         if (modifications == null) {
-            Resource resource = new ClassPathResource(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
-            File modificationsFile = resource.getFile();
-            modifications = modificationService.loadPipelineModifications(modificationsFile);
+            Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));            
+            modifications = modificationService.loadPipelineModifications(modificationsResource);
         }
     }
 

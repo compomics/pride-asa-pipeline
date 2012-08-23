@@ -75,8 +75,7 @@ public class CommandLineRunner {
 
             String line = null;
             while ((line = br.readLine()) != null) {
-                String experimentAccession = line;
-                experimentAccessions.add(experimentAccession);
+                experimentAccessions.add(line);
             }
             br.close();
         } catch (FileNotFoundException e) {

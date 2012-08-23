@@ -12,14 +12,20 @@ import java.util.List;
  *
  * @author niels
  */
-public interface ResultWriter {
-        
+public interface FileResultHandler {
+
     /**
      * Writes the identifications to file
-     * 
-     * @param resultFile
-     * @param identifications
+     *
+     * @param resultFile the spectrum annotation pipeline result
+     * @param identifications the experiment identifications
      */
     void writeResult(File resultFile, List<Identification> identifications);
     
+    /**
+     * Reads the result file
+     * 
+     * @param resultFile the spectrum annotation pipeline result     
+     */
+    void readResult(File resultFile);
 }

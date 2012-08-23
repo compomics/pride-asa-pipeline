@@ -11,16 +11,16 @@ import com.compomics.pride_asa_pipeline.model.Identifications;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
+import com.compomics.pride_asa_pipeline.service.ResultHandler;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
-import org.apache.log4j.Logger;
-
-import javax.annotation.Nullable;
 import java.io.*;
 import java.util.*;
+import javax.annotation.Nullable;
+import org.apache.log4j.Logger;
 
 /**
  * @author niels
@@ -29,9 +29,11 @@ public class ExperimentServiceImpl implements ExperimentService {
 
     private static final Logger LOGGER = Logger.getLogger(ExperimentServiceImpl.class);
     private static final String MALDI_SOURCE_ACCESSION = "PSI:1000075";
+    
     private ExperimentRepository experimentRepository;
     private SpectrumService spectrumService;
-    protected boolean iFirstMfgFile;
+    private ResultHandler resultHandler;
+    private boolean iFirstMfgFile;
 
     public ExperimentRepository getExperimentRepository() {
         return experimentRepository;
@@ -48,6 +50,14 @@ public class ExperimentServiceImpl implements ExperimentService {
     public void setSpectrumService(SpectrumService spectrumService) {
         this.spectrumService = spectrumService;
     }
+
+    public ResultHandler getResultHandler() {
+        return resultHandler;
+    }
+
+    public void setResultHandler(ResultHandler resultHandler) {
+        this.resultHandler = resultHandler;
+    }     
 
     @Override
     public Map<String, String> findAllExperimentAccessions() {
@@ -181,7 +191,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         }
 
     }
-
+        
     private void writeCachedSpectra(BufferedOutputStream aOutputStream, String experimentAccession) throws IOException {
         MascotGenericFile mascotGenericFile = null;
         PeakToMapFunction peakToMap = new PeakToMapFunction();

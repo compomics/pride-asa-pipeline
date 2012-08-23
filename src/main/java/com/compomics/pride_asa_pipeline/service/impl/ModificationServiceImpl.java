@@ -5,14 +5,14 @@
 package com.compomics.pride_asa_pipeline.service.impl;
 
 import com.compomics.omssa.xsd.UserModCollection;
+import com.compomics.pride_asa_pipeline.logic.modification.ModificationMarshaller;
+import com.compomics.pride_asa_pipeline.logic.modification.OmssaModificationMarshaller;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Modification.Location;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
-import com.compomics.pride_asa_pipeline.logic.modification.ModificationMarshaller;
-import com.compomics.pride_asa_pipeline.logic.modification.OmssaModificationMarshaller;
 import com.compomics.pride_asa_pipeline.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.google.common.base.Joiner;
@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
+import org.springframework.core.io.Resource;
 
 /**
  *
@@ -59,18 +60,18 @@ public class ModificationServiceImpl implements ModificationService {
     }    
 
     @Override
-    public Set<Modification> loadPipelineModifications(File modificationsFile) throws JDOMException {
+    public Set<Modification> loadPipelineModifications(Resource modificationsResource) throws JDOMException {
         //return the modifications or first unmarshall them from the specified
         //configuration file if not done so before
         if (pipelineModifications == null) {
-            loadPipelineModificationsFromFile(modificationsFile);
+            loadPipelineModificationsFromResource(modificationsResource);
         }
         return pipelineModifications;
     }
 
     @Override
-    public void savePipelineModifications(File modificationsFile, Collection<Modification> newPipelineModifications) {
-        modificationMarshaller.marshall(modificationsFile, newPipelineModifications);
+    public void savePipelineModifications(Resource modificationsResource, Collection<Modification> newPipelineModifications) {
+        modificationMarshaller.marshall(modificationsResource, newPipelineModifications);
         //replace the current pipeline modifications
         pipelineModifications.clear();
         for (Modification modification : newPipelineModifications) {
@@ -79,8 +80,8 @@ public class ModificationServiceImpl implements ModificationService {
     }
 
     @Override
-    public Set<Modification> importPipelineModifications(File modificationsFile) throws JDOMException {
-        Set<Modification> modifications = modificationMarshaller.unmarshall(modificationsFile);
+    public Set<Modification> importPipelineModifications(Resource modificationsResource) throws JDOMException {
+        Set<Modification> modifications = modificationMarshaller.unmarshall(modificationsResource);
 
         return modifications;
     }
@@ -201,8 +202,8 @@ public class ModificationServiceImpl implements ModificationService {
      *
      * @param modificationFileName the modifications file name
      */
-    private void loadPipelineModificationsFromFile(File modificationsFile) throws JDOMException {
+    private void loadPipelineModificationsFromResource(Resource modificationsResource) throws JDOMException {
         pipelineModifications = new HashSet<Modification>();
-        pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationsFile));
+        pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationsResource));
     }
 }
