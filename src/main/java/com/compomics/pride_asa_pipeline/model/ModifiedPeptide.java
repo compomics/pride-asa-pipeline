@@ -117,6 +117,28 @@ public class ModifiedPeptide extends Peptide {
     }
 
     /**
+     * Calculates the total modifications mass
+     *
+     * @return the total modifications mass
+     */
+    public double calculateModificationsMass() {
+        double modificationsMass = 0.0;
+        if (nTermMod != null) {
+            modificationsMass += nTermMod.getMassShift();
+        }
+        for (ModificationFacade modificationFacade : modifications) {
+            if (modificationFacade != null) {
+                modificationsMass += modificationFacade.getMassShift();
+            }
+        }
+        if (cTermMod != null) {
+            modificationsMass += cTermMod.getMassShift();
+        }
+
+        return modificationsMass;
+    }
+
+    /**
      * Note: this is the mass of the peptide WITHOUT C/N termini adjustment! (to
      * complete a peptide, a H has to added to the N-terminus and a OH to the
      * C-terminus)

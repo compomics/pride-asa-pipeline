@@ -4,8 +4,6 @@
  */
 package com.compomics.pride_asa_pipeline.util;
 
-import java.io.File;
-import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;

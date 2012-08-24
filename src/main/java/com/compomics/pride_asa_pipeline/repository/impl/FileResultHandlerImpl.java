@@ -32,9 +32,17 @@ import org.apache.log4j.Logger;
 public class FileResultHandlerImpl implements FileResultHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FileResultHandlerImpl.class);
-    private static final String DELIMITER = "\t";
+    private static final String COLUMN_DELIMITER = "\t";
+    private static final String FRAGMENT_IONS_OPEN = "ions[";
+    private static final String FRAGMENT_IONS_CLOSE = "]";
     private static final String FRAGMENT_ION_TYPE_DELIMITER = ";";
+    private static final String FRAGMENT_ION_TYPE_CHARGE_DELIMITER = "_";
     private static final String FRAGMENT_ION_NUMBER_DELIMITER = "|";
+    private static final String FRAGMENT_ION_NUMBER_VALUES_OPEN = "{";
+    private static final String FRAGMENT_ION_NUMBER_VALUES_CLOSE = "}";
+    private static final String FRAGMENT_ION_NUMBER_VALUES_DELIMITER = ":";
+    private static final String FRAGMENT_ION_NUMBERS_OPEN = "(";
+    private static final String FRAGMENT_ION_NUMBERS_CLOSE = ")";
     private static final String MODIFICATIONS_DELIMITER = ";";
 
     @Override
@@ -43,31 +51,30 @@ public class FileResultHandlerImpl implements FileResultHandler {
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(resultFile)));
 
             //print identification header
-            pw.println("spectrum_id" + DELIMITER + "peptide_sequence" + DELIMITER + "annotation_score" + DELIMITER + "fragment_ions" + DELIMITER + "modifications");
+            pw.println("spectrum_id" + COLUMN_DELIMITER + "peptide_sequence" + COLUMN_DELIMITER + "annotation_score" + COLUMN_DELIMITER + "fragment_ions" + COLUMN_DELIMITER + "modifications");
 
-            String fragmentIonsString = null;
-            String modificationsString = null;
-            String annotationScore = null;
             //print identification
             for (Identification identification : identifications) {
+                String fragmentIonsString = "N/A";
+                String modificationsString = "N/A";
+                String annotationScore = "N/A";
                 //check if there are fragment ion annotations
-                if (identification.getAnnotationData() != null && identification.getAnnotationData().getFragmentIonAnnotations() != null) {
-                    fragmentIonsString = constructFragmentIonsString(identification.getAnnotationData().getFragmentIonAnnotations());
-                    annotationScore = Double.toString(identification.getAnnotationData().getIdentificationScore().getAverageFragmentIonScore());
-                } else {
-                    fragmentIonsString = "N/A";
-                    annotationScore = "N/A";
+                if (identification.getAnnotationData() != null) {
+                    if (identification.getAnnotationData().getFragmentIonAnnotations() != null) {
+                        fragmentIonsString = constructFragmentIonsString(identification.getAnnotationData().getFragmentIonAnnotations());
+                        if (identification.getAnnotationData().getIdentificationScore() != null) {
+                            annotationScore = Double.toString(identification.getAnnotationData().getIdentificationScore().getAverageFragmentIonScore());
+                        }
+                    }
                 }
 
                 //check if there are modifications
                 if (identification.getPeptide() instanceof ModifiedPeptide) {
                     modificationsString = constructModificationsString((ModifiedPeptide) identification.getPeptide());
-                } else {
-                    modificationsString = "N/A";
                 }
 
-                pw.print(identification.getSpectrumId() + DELIMITER + identification.getPeptide().getSequenceString() + DELIMITER + annotationScore + DELIMITER + fragmentIonsString
-                        + DELIMITER + modificationsString);
+                pw.print(identification.getSpectrumId() + COLUMN_DELIMITER + identification.getPeptide().getSequenceString() + COLUMN_DELIMITER + annotationScore + COLUMN_DELIMITER + fragmentIonsString
+                        + COLUMN_DELIMITER + modificationsString);
 
                 pw.println();
             }
@@ -89,8 +96,8 @@ public class FileResultHandlerImpl implements FileResultHandler {
             String line = null;
             while ((line = br.readLine()) != null) {
                 if (!line.startsWith("spectrum_id")) {
-                    String[] splitArray = line.split(DELIMITER);
-                    
+                    String[] splits = line.split(COLUMN_DELIMITER);
+
                 }
             }
             br.close();
@@ -104,9 +111,9 @@ public class FileResultHandlerImpl implements FileResultHandler {
 
     /**
      * Constructs the modifications string for a modified peptide before
-     * 
+     *
      * @param modifiedPeptide the modified peptide
-     * @return 
+     * @return
      */
     private String constructModificationsString(ModifiedPeptide modifiedPeptide) {
         Joiner modificationsJoiner = Joiner.on(MODIFICATIONS_DELIMITER);
@@ -123,7 +130,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
             }
         }
         if (modifiedPeptide.getCTermMod() != null) {
-            modifications.add("CT_" + "_" + modifiedPeptide.getCTermMod().getName());
+            modifications.add("CT_" + modifiedPeptide.getCTermMod().getName());
         }
 
         return "mods[" + modificationsJoiner.join(modifications) + "]";
@@ -146,7 +153,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
                 fragmentIonNumbersByIonType.add(String.valueOf(fragmentIonAnnotations.get(i).getFragment_ion_number()));
             } else {
                 //join fragment ion numbers by ion type
-                fragmentIonsByIonType.add(currentIonType + "(" + fragmentIonNumberJoiner.join(fragmentIonNumbersByIonType) + ")");
+                fragmentIonsByIonType.add(currentIonType + FRAGMENT_ION_NUMBERS_OPEN + fragmentIonNumberJoiner.join(fragmentIonNumbersByIonType) + FRAGMENT_ION_NUMBERS_CLOSE);
                 //clear fragment ion number list and add first element
                 fragmentIonNumbersByIonType.clear();
                 fragmentIonNumbersByIonType.add(String.valueOf(fragmentIonAnnotations.get(i).getFragment_ion_number()));
@@ -155,20 +162,40 @@ public class FileResultHandlerImpl implements FileResultHandler {
             }
         }
         //add the last fragment ion type        
-        fragmentIonsByIonType.add(currentIonType + "(" + fragmentIonNumberJoiner.join(fragmentIonNumbersByIonType) + ")");
+        fragmentIonsByIonType.add(currentIonType + FRAGMENT_ION_NUMBERS_OPEN + fragmentIonNumberJoiner.join(fragmentIonNumbersByIonType) + FRAGMENT_ION_NUMBERS_CLOSE);
 
-        return "ions[" + fragmentIonTypeJoiner.join(fragmentIonsByIonType) + "]";
+        return FRAGMENT_IONS_OPEN + fragmentIonTypeJoiner.join(fragmentIonsByIonType) + FRAGMENT_IONS_CLOSE;
+    }
+    
+    private String constructFragmentIonNumberValue(FragmentIonAnnotation fragmentIonAnnotation){
+        String fragmentIonNumberValue = "" + fragmentIonAnnotation.getFragment_ion_number() + FRAGMENT_ION_NUMBER_VALUES_OPEN 
+                + fragmentIonAnnotation.getMz() + FRAGMENT_ION_NUMBER_VALUES_DELIMITER 
+                + fragmentIonAnnotation.getIntensity();
+        
+        return fragmentIonNumberValue;
     }
 
     private String constructIonTypeString(FragmentIonAnnotation fragmentIonAnnotation) {
         return fragmentIonAnnotation.getIon_type_name() + "_" + fragmentIonAnnotation.getIon_charge() + "+";
     }
-    
-    private List<FragmentIonAnnotation> parseFragmentIonAnnotation(String fragmentIonAnnotationString){
+
+    private List<FragmentIonAnnotation> parseFragmentIonAnnotation(String fragmentIonAnnotationString) {
         List<FragmentIonAnnotation> fragmentIonAnnotations = new ArrayList<FragmentIonAnnotation>();
-        
-        
-        
+
+        String fragmentIons = fragmentIonAnnotationString.substring(fragmentIonAnnotationString.indexOf(FRAGMENT_IONS_OPEN) + FRAGMENT_IONS_OPEN.length(), fragmentIonAnnotationString.indexOf(FRAGMENT_IONS_CLOSE));
+        //split the fragments by ion types
+        String[] fragmentsByIonTypes = fragmentIons.split(FRAGMENT_ION_TYPE_DELIMITER);
+        for (String fragmentByIonType : fragmentsByIonTypes) {
+            String ionType = fragmentByIonType.substring(0, fragmentByIonType.indexOf(FRAGMENT_ION_TYPE_CHARGE_DELIMITER));
+            int charge = Integer.parseInt(fragmentByIonType.substring(fragmentByIonType.indexOf(FRAGMENT_ION_TYPE_CHARGE_DELIMITER) + 1, fragmentByIonType.indexOf(FRAGMENT_ION_NUMBERS_OPEN) - 1));
+            //FragmentIonAnnotation fragmentIonAnnotation = new FragmentIonAnnotation
+        }
+
         return fragmentIonAnnotations;
+    }
+
+    public static void main(String[] args) {
+        FileResultHandlerImpl fileResultHandlerImpl = new FileResultHandlerImpl();
+        fileResultHandlerImpl.parseFragmentIonAnnotation("ions[b ion_1+(6);y ion_1+(1|2|3|4|5|6|7);y ion_2+(3|5)]");
     }
 }

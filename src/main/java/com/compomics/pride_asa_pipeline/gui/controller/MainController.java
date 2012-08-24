@@ -6,7 +6,6 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
@@ -24,8 +23,8 @@ public class MainController implements ActionListener {
     
     private static final Logger LOGGER = Logger.getLogger(MainController.class);
     private static final String PIPELINE_PANEL_CARD_NAME = "pipelinePanel";
-    private static final String MODIFICATIONS_SETTINGS_CARD_NAME = "modificationsParentPanel";
-    private static final String PIPELINE_SETTINGS_CARD_NAME = "pipelineParamsParentPanel";
+    private static final String MODIFICATIONS_CARD_NAME = "modificationsParentPanel";
+    private static final String PIPELINE_PARAMS_CARD_NAME = "pipelineParamsParentPanel";
     //view
     private MainFrame mainFrame;
     //child controllers
@@ -86,18 +85,10 @@ public class MainController implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String menuItemLabel = actionEvent.getActionCommand();
-        String cardName = "";
+        String cardName = actionEvent.getActionCommand();       
         
-        if (menuItemLabel.equals(mainFrame.getModificationsViewMenuItem().getText())) {
-            cardName = MODIFICATIONS_SETTINGS_CARD_NAME;
-        } else if (menuItemLabel.equals(mainFrame.getPipelineParamsViewMenuItem().getText())) {
-            cardName = PIPELINE_SETTINGS_CARD_NAME;
-        } else if (menuItemLabel.equals(mainFrame.getPipelineViewMenuItem().getText())) {
-            cardName = PIPELINE_PANEL_CARD_NAME;
-        }
-        
-        CardLayout cardLayout = (CardLayout) mainFrame.getContentPane().getLayout();
-        cardLayout.show(mainFrame.getContentPane(), cardName);
+        CardLayout cardLayout = (CardLayout) mainFrame.getMainPanel().getLayout();
+        cardLayout.show(mainFrame.getMainPanel(), cardName);
     }
     
     public void init() {
@@ -132,14 +123,18 @@ public class MainController implements ActionListener {
         mainFrame.getSummaryParentPanel().add(pipelineResultController.getSummaryPanel(), gridBagConstraints);
         mainFrame.getPipelineParamsParentPanel().add(pipelineParamsController.getPipelineParamsPanel(), gridBagConstraints);
 
-        //add action listeners        
-        mainFrame.getPipelineViewMenuItem().addActionListener(this);
-        mainFrame.getModificationsViewMenuItem().addActionListener(this);
-        mainFrame.getPipelineParamsViewMenuItem().addActionListener(this);
+        //add action listeners and action commands       
+        mainFrame.getPipelineButton().setActionCommand(PIPELINE_PANEL_CARD_NAME);
+        mainFrame.getPipelineButton().addActionListener(this);
+        mainFrame.getPipelineParamsButton().setActionCommand(PIPELINE_PARAMS_CARD_NAME);
+        mainFrame.getPipelineParamsButton().addActionListener(this);
+        mainFrame.getModificationsButton().setActionCommand(MODIFICATIONS_CARD_NAME);
+        mainFrame.getModificationsButton().addActionListener(this);
+        
 
         //set pipeline panel visible in card layout
-        CardLayout cardLayout = (CardLayout) mainFrame.getContentPane().getLayout();
-        cardLayout.show(mainFrame.getContentPane(), PIPELINE_PANEL_CARD_NAME);
+        CardLayout cardLayout = (CardLayout) mainFrame.getMainPanel().getLayout();
+        cardLayout.show(mainFrame.getMainPanel(), PIPELINE_PANEL_CARD_NAME);
 
         //set main frame visible
         mainFrame.setLocationRelativeTo(null);
@@ -153,7 +148,7 @@ public class MainController implements ActionListener {
     public void showUnexpectedErrorDialog(String message) {
         showMessageDialog("Unexpected error", "Un expected error occured: "
                 + "\n" + message
-                + "\n" + ", please try to rerun the application.", JOptionPane.ERROR_MESSAGE);
+                + "\n" + "please try to rerun the application.", JOptionPane.ERROR_MESSAGE);
     }
     
     public void onAnnotationFinished() {

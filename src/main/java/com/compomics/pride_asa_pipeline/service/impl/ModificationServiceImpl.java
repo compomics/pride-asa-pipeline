@@ -17,7 +17,6 @@ import com.compomics.pride_asa_pipeline.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
-import java.io.File;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;

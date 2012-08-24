@@ -7,7 +7,6 @@ package com.compomics.pride_asa_pipeline.model;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
