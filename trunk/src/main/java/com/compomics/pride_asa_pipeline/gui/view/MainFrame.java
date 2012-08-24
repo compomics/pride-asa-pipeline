@@ -4,7 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.gui.view;
 
-import javax.swing.JMenuItem;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 
 /**
@@ -32,16 +32,16 @@ public class MainFrame extends javax.swing.JFrame {
         return modificationsParentPanel;
     }
 
-    public JMenuItem getModificationsViewMenuItem() {
-        return modificationsViewMenuItem;
+    public JButton getModificationsButton() {
+        return modificationsButton;
     }
 
-    public JMenuItem getPipelineParamsViewMenuItem() {
-        return pipelineParamsViewMenuItem;
+    public JButton getPipelineButton() {
+        return pipelineButton;
     }
 
-    public JMenuItem getPipelineViewMenuItem() {
-        return pipelineViewMenuItem;
+    public JButton getPipelineParamsButton() {
+        return pipelineParamsButton;
     }
 
     public JPanel getIdentificationsParentPanel() {
@@ -56,6 +56,10 @@ public class MainFrame extends javax.swing.JFrame {
         return pipelineParamsParentPanel;
     }
 
+    public JPanel getMainPanel() {
+        return mainPanel;
+    }       
+        
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -66,6 +70,11 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        toolBar = new javax.swing.JToolBar();
+        pipelineButton = new javax.swing.JButton();
+        pipelineParamsButton = new javax.swing.JButton();
+        modificationsButton = new javax.swing.JButton();
+        mainPanel = new javax.swing.JPanel();
         pipelinePanel = new javax.swing.JPanel();
         experimentSelectionParentPanel = new javax.swing.JPanel();
         pipelineResultTabbedPane = new javax.swing.JTabbedPane();
@@ -73,15 +82,33 @@ public class MainFrame extends javax.swing.JFrame {
         identificationsParentPanel = new javax.swing.JPanel();
         modificationsParentPanel = new javax.swing.JPanel();
         pipelineParamsParentPanel = new javax.swing.JPanel();
-        menuBar = new javax.swing.JMenuBar();
-        viewMenu = new javax.swing.JMenu();
-        pipelineViewMenuItem = new javax.swing.JMenuItem();
-        modificationsViewMenuItem = new javax.swing.JMenuItem();
-        pipelineParamsViewMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(1000, 900));
-        getContentPane().setLayout(new java.awt.CardLayout());
+
+        toolBar.setBorder(null);
+        toolBar.setFloatable(false);
+        toolBar.setRollover(true);
+
+        pipelineButton.setText("Pipeline");
+        pipelineButton.setFocusable(false);
+        pipelineButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        pipelineButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(pipelineButton);
+
+        pipelineParamsButton.setText("Pipeline configuration");
+        pipelineParamsButton.setFocusable(false);
+        pipelineParamsButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        pipelineParamsButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(pipelineParamsButton);
+
+        modificationsButton.setText("Modifications configuration");
+        modificationsButton.setFocusable(false);
+        modificationsButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        modificationsButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(modificationsButton);
+
+        mainPanel.setLayout(new java.awt.CardLayout());
 
         pipelinePanel.setLayout(new java.awt.GridBagLayout());
 
@@ -117,45 +144,43 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints.weighty = 0.75;
         pipelinePanel.add(pipelineResultTabbedPane, gridBagConstraints);
 
-        getContentPane().add(pipelinePanel, "pipelinePanel");
+        mainPanel.add(pipelinePanel, "pipelinePanel");
 
-        modificationsParentPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         modificationsParentPanel.setLayout(new java.awt.GridBagLayout());
-        getContentPane().add(modificationsParentPanel, "modificationsParentPanel");
+        mainPanel.add(modificationsParentPanel, "modificationsParentPanel");
 
-        pipelineParamsParentPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         pipelineParamsParentPanel.setLayout(new java.awt.GridBagLayout());
-        getContentPane().add(pipelineParamsParentPanel, "pipelineParamsParentPanel");
+        mainPanel.add(pipelineParamsParentPanel, "pipelineParamsParentPanel");
 
-        viewMenu.setText("View");
-
-        pipelineViewMenuItem.setText("pipeline");
-        viewMenu.add(pipelineViewMenuItem);
-
-        modificationsViewMenuItem.setText("modifications");
-        viewMenu.add(modificationsViewMenuItem);
-
-        pipelineParamsViewMenuItem.setText("pipeline params");
-        viewMenu.add(pipelineParamsViewMenuItem);
-
-        menuBar.add(viewMenu);
-
-        setJMenuBar(menuBar);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(toolBar, javax.swing.GroupLayout.DEFAULT_SIZE, 840, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE))
+        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel experimentSelectionParentPanel;
     private javax.swing.JPanel identificationsParentPanel;
-    private javax.swing.JMenuBar menuBar;
+    private javax.swing.JPanel mainPanel;
+    private javax.swing.JButton modificationsButton;
     private javax.swing.JPanel modificationsParentPanel;
-    private javax.swing.JMenuItem modificationsViewMenuItem;
+    private javax.swing.JButton pipelineButton;
     private javax.swing.JPanel pipelinePanel;
+    private javax.swing.JButton pipelineParamsButton;
     private javax.swing.JPanel pipelineParamsParentPanel;
-    private javax.swing.JMenuItem pipelineParamsViewMenuItem;
     private javax.swing.JTabbedPane pipelineResultTabbedPane;
-    private javax.swing.JMenuItem pipelineViewMenuItem;
     private javax.swing.JPanel summaryParentPanel;
-    private javax.swing.JMenu viewMenu;
+    private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
 }

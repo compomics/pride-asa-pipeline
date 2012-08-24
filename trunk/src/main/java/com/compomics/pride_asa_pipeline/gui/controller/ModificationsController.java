@@ -362,9 +362,7 @@ public class ModificationsController {
      */
     private List<Modification> getModificationsAsList(Set<Modification> modificationSet) {
         List<Modification> modifications = new ArrayList<Modification>();
-        for (Modification modification : modificationSet) {
-            modifications.add(modification);
-        }
+        modifications.addAll(modificationSet);        
 
         return modifications;
     }
@@ -377,9 +375,7 @@ public class ModificationsController {
      */
     private List<AminoAcid> getAminoAcidsAsList() {
         List<AminoAcid> aminoAcids = new ArrayList<AminoAcid>();
-        for (AminoAcid aminoAcid : AminoAcid.values()) {
-            aminoAcids.add(aminoAcid);
-        }
+        aminoAcids.addAll(Arrays.asList(AminoAcid.values()));
 
         return aminoAcids;
     }

@@ -56,7 +56,7 @@ public class ExperimentSelectionController {
 
     public void setResultHandler(ResultHandler resultHandler) {
         this.resultHandler = resultHandler;
-    }        
+    }
 
     public MainController getMainController() {
         return mainController;
@@ -219,7 +219,7 @@ public class ExperimentSelectionController {
                             + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error")
                             + ", proceed?", mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult());
                 } //else proceed with the annotation
-                else if (mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult() != null) {
+                else {
                     onAnnotationProceed();
                 }
             } catch (InterruptedException ex) {
