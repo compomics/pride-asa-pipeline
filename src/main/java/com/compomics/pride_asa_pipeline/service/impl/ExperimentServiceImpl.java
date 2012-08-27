@@ -5,6 +5,7 @@
 package com.compomics.pride_asa_pipeline.service.impl;
 
 import com.compomics.mslims.util.fileio.MascotGenericFile;
+import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Identifications;
@@ -16,11 +17,11 @@ import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.io.Files;
+import org.apache.log4j.Logger;
+
+import javax.annotation.Nullable;
 import java.io.*;
 import java.util.*;
-import javax.annotation.Nullable;
-import org.apache.log4j.Logger;
 
 /**
  * @author niels
@@ -128,7 +129,12 @@ public class ExperimentServiceImpl implements ExperimentService {
     @Override
     public File getSpectrumCacheAsMgfFile(String experimentAccession, boolean rebuildCache) {
 
-        File tempDir = Files.createTempDir();
+        String lPath_tmp = PropertiesConfigurationHolder.getInstance().getString("results_path_tmp");
+        File tempDir = new File(lPath_tmp);
+        if(!tempDir.exists()){
+            tempDir.mkdir();
+        }
+
         File file = new File(tempDir, experimentAccession + ".mgf");
         LOGGER.debug(String.format("writing spectra from experiment %s to %s", experimentAccession, file.getAbsolutePath()));
 
