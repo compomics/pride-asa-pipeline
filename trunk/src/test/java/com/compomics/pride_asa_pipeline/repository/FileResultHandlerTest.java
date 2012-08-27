@@ -4,29 +4,26 @@
  */
 package com.compomics.pride_asa_pipeline.repository;
 
-import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
-<<<<<<< .mine
-=======
-import com.compomics.pride_asa_pipeline.model.AminoAcid;
-import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
-import com.compomics.pride_asa_pipeline.model.AnnotationData;
-import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
-import com.compomics.pride_asa_pipeline.model.Identification;
-import com.compomics.pride_asa_pipeline.model.IdentificationScore;
-import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
-import com.compomics.pride_asa_pipeline.model.Peptide;
->>>>>>> .r42
-import com.compomics.pride_asa_pipeline.model.UnknownAAException;
+import com.compomics.pride_asa_pipeline.model.*;
 import org.jdom2.JDOMException;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static junit.framework.Assert.assertEquals;
 
 /**
  *
@@ -37,9 +34,9 @@ import java.io.IOException;
 public class FileResultHandlerTest {
 
     @Autowired
-//    private FileResultHandler fileResultHandler;
+    private FileResultHandler fileResultHandler;
     @Rule
-//    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
     public void testWriteResult() throws IOException, UnknownAAException, JDOMException, AASequenceMassUnknownException {
