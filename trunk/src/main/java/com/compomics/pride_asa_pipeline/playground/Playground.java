@@ -4,11 +4,10 @@
  */
 package com.compomics.pride_asa_pipeline.playground;
 
+import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import org.springframework.context.ApplicationContext;
-
-import java.io.File;
 
 /**
  * @author niels
@@ -47,10 +46,15 @@ public class Playground {
 
 //        SpectrumService spectrumService = (SpectrumService) applicationContext.getBean("spectrumService");
 
-        experimentService.buildSpectrumCacheForExperiment("2");
-        File file = experimentService.getSpectrumCacheAsMgfFile("2", true);
+        PrideSpectrumAnnotator lSpectrumAnnotator;
+        lSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
+        lSpectrumAnnotator.clearTmpResources();
 
-        System.out.println(file.getAbsolutePath());
+//        experimentService.buildSpectrumCacheForExperiment("2");
+//        File file = experimentService.getSpectrumCacheAsMgfFile("2", true);
+
+//        System.out.println(file.getAbsolutePath());
+
 
 //
 //        File file = experimentService.getSpectrumCacheAsMgfFile("7662");
