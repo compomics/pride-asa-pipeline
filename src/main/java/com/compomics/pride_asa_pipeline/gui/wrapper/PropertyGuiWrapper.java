@@ -8,7 +8,7 @@ import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class PropertyGuiWrapper {
 

@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public interface ModificationRepository {
      

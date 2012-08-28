@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class ModificationMapper implements RowMapper<Modification> {
 

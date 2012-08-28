@@ -84,7 +84,8 @@
     </bean>
     
     <bean id="fileResultHandler"
-          class="com.compomics.pride_asa_pipeline.repository.impl.FileResultHandlerImpl">        
+          class="com.compomics.pride_asa_pipeline.repository.impl.FileResultHandlerImpl">  
+        <property name="modificationService" ref="modificationService"/>      
     </bean> 
     
     <!-- encode/decode beans -->
@@ -175,6 +176,7 @@
         <property name="pipelineProgressController" ref="pipelineProgressController"/>
         <property name="pipelineProceedController" ref="pipelineProceedController"/>
         <property name="experimentService" ref="experimentService"/>
+        <property name="resultHandler" ref="resultHandler"/>
     </bean>
     
     <bean id="pipelineProgressController"

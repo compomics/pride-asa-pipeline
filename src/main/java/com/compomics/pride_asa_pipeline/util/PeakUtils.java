@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class PeakUtils {
 

@@ -26,7 +26,7 @@ import org.springframework.core.io.ClassPathResource;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class PipelineParamsController {
 

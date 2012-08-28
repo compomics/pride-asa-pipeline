@@ -5,19 +5,15 @@
 package com.compomics.pride_asa_pipeline.util;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Point;
-import java.math.BigDecimal;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class GuiUtils {
-
-    private static final Integer NUMBER_OF_DECIMALS = 4;
 
     /**
      * Centers the dialog on the parent frame.
@@ -47,12 +43,5 @@ public class GuiUtils {
         }
 
         dialog.setLocation(x, y);
-    }
-
-    public static double roundDouble(double d) {
-        BigDecimal bigDecimal = new BigDecimal(Double.toString(d));
-        bigDecimal = bigDecimal.setScale(NUMBER_OF_DECIMALS, BigDecimal.ROUND_HALF_UP);
-
-        return bigDecimal.doubleValue();
     }
 }

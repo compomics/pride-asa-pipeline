@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.util;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +13,8 @@ import java.util.List;
  * @since $version
  */
 public class MathUtils {
+    
+    private static final Integer NUMBER_OF_DECIMALS = 4;
 
     /**
      * Utility method to calculate the median of a given list of values.
@@ -225,6 +228,12 @@ public class MathUtils {
     public static boolean equalValues(double a, double b, double allowedError) {
         // the difference between the tow values a and b has to be smaller than the allowed error.
         return Math.abs(a - b) < allowedError;
+    }
+
+    public static double roundDouble(double d) {
+        BigDecimal bigDecimal = new BigDecimal(Double.toString(d));
+        bigDecimal = bigDecimal.setScale(NUMBER_OF_DECIMALS, BigDecimal.ROUND_HALF_UP);
+        return bigDecimal.doubleValue();
     }
 
 }

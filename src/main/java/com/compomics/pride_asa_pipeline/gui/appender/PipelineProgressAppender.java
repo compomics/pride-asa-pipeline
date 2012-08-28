@@ -12,7 +12,7 @@ import org.apache.log4j.spi.LoggingEvent;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public class PipelineProgressAppender extends WriterAppender {
 

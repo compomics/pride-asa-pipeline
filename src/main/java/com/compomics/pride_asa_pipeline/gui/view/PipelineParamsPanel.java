@@ -9,7 +9,7 @@ import javax.swing.JTable;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class PipelineParamsPanel extends javax.swing.JPanel {
 
@@ -47,6 +47,9 @@ public class PipelineParamsPanel extends javax.swing.JPanel {
         saveButton = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Pipeline params"));
+        setOpaque(false);
+
+        jScrollPane1.setOpaque(false);
 
         pipelineParamsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -59,6 +62,7 @@ public class PipelineParamsPanel extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        pipelineParamsTable.setOpaque(false);
         jScrollPane1.setViewportView(pipelineParamsTable);
 
         resetButton.setText("reset");

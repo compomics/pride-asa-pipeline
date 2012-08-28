@@ -19,7 +19,7 @@ import java.util.Vector;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class SpectrumPanelServiceImpl implements SpectrumPanelService {
 

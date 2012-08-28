@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class SpectrumPeaksCache extends LinkedHashMap<Long, List<Peak>> implements Cache<Long, List<Peak>> {
 

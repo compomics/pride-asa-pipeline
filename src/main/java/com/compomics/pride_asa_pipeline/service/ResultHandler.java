@@ -8,7 +8,7 @@ import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public interface ResultHandler {
     

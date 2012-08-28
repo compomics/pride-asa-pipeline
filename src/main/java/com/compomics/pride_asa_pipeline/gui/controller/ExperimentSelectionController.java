@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public class ExperimentSelectionController {
 

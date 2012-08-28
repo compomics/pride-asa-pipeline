@@ -9,7 +9,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class ApplicationContextProvider {
 

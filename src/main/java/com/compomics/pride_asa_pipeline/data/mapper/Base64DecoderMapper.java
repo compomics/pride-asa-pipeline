@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class Base64DecoderMapper implements RowMapper<double[]> {
     

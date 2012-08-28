@@ -14,7 +14,7 @@ import java.sql.SQLException;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class AnalyzerDataMapper implements RowMapper<AnalyzerData> {
 

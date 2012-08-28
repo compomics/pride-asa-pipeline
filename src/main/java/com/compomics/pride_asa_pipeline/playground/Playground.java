@@ -10,7 +10,7 @@ import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import org.springframework.context.ApplicationContext;
 
 /**
- * @author niels
+ * @author Niels Hulstaert
  */
 public class Playground {
 

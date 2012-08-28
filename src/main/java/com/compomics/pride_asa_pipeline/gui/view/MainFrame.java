@@ -4,12 +4,13 @@
  */
 package com.compomics.pride_asa_pipeline.gui.view;
 
+import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public class MainFrame extends javax.swing.JFrame {
 
@@ -18,6 +19,7 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
+        this.getContentPane().setBackground(Color.WHITE);
     }
 
     public JPanel getExperimentSelectionParentPanel() {
@@ -84,35 +86,43 @@ public class MainFrame extends javax.swing.JFrame {
         pipelineParamsParentPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(1000, 900));
 
         toolBar.setBorder(null);
         toolBar.setFloatable(false);
         toolBar.setRollover(true);
 
+        pipelineButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         pipelineButton.setText("Pipeline");
         pipelineButton.setFocusable(false);
         pipelineButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         pipelineButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         toolBar.add(pipelineButton);
 
+        pipelineParamsButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         pipelineParamsButton.setText("Pipeline configuration");
         pipelineParamsButton.setFocusable(false);
         pipelineParamsButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         pipelineParamsButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         toolBar.add(pipelineParamsButton);
 
+        modificationsButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         modificationsButton.setText("Modifications configuration");
         modificationsButton.setFocusable(false);
         modificationsButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         modificationsButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         toolBar.add(modificationsButton);
 
+        mainPanel.setOpaque(false);
         mainPanel.setLayout(new java.awt.CardLayout());
 
+        pipelinePanel.setOpaque(false);
         pipelinePanel.setLayout(new java.awt.GridBagLayout());
 
+        experimentSelectionParentPanel.setBackground(new java.awt.Color(255, 255, 255));
         experimentSelectionParentPanel.setMinimumSize(new java.awt.Dimension(20, 20));
+        experimentSelectionParentPanel.setOpaque(false);
         experimentSelectionParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
         experimentSelectionParentPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -124,13 +134,18 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints.weighty = 0.25;
         pipelinePanel.add(experimentSelectionParentPanel, gridBagConstraints);
 
+        pipelineResultTabbedPane.setBackground(new java.awt.Color(255, 255, 255));
         pipelineResultTabbedPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Pipeline result"));
         pipelineResultTabbedPane.setMinimumSize(new java.awt.Dimension(20, 20));
         pipelineResultTabbedPane.setPreferredSize(new java.awt.Dimension(20, 20));
 
+        summaryParentPanel.setBackground(new java.awt.Color(255, 255, 255));
+        summaryParentPanel.setOpaque(false);
         summaryParentPanel.setLayout(new java.awt.GridBagLayout());
         pipelineResultTabbedPane.addTab("Summary", summaryParentPanel);
 
+        identificationsParentPanel.setBackground(new java.awt.Color(255, 255, 255));
+        identificationsParentPanel.setOpaque(false);
         identificationsParentPanel.setRequestFocusEnabled(false);
         identificationsParentPanel.setLayout(new java.awt.GridBagLayout());
         pipelineResultTabbedPane.addTab("Identifications", identificationsParentPanel);
@@ -146,9 +161,11 @@ public class MainFrame extends javax.swing.JFrame {
 
         mainPanel.add(pipelinePanel, "pipelinePanel");
 
+        modificationsParentPanel.setOpaque(false);
         modificationsParentPanel.setLayout(new java.awt.GridBagLayout());
         mainPanel.add(modificationsParentPanel, "modificationsParentPanel");
 
+        pipelineParamsParentPanel.setOpaque(false);
         pipelineParamsParentPanel.setLayout(new java.awt.GridBagLayout());
         mainPanel.add(pipelineParamsParentPanel, "pipelineParamsParentPanel");
 

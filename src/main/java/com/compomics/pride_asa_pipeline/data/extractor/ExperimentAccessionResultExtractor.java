@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public class ExperimentAccessionResultExtractor implements ResultSetExtractor<Map<String, String>> {
 

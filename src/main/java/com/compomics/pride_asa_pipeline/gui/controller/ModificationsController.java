@@ -35,7 +35,7 @@ import org.springframework.core.io.Resource;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public class ModificationsController {
 

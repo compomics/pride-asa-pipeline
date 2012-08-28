@@ -14,7 +14,7 @@ import org.junit.Test;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public class MathUtilsTest {
 

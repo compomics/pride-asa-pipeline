@@ -10,7 +10,7 @@ import java.util.Set;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class PeptideModificationHolder {
 

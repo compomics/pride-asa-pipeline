@@ -4,13 +4,24 @@
  */
 package com.compomics.pride_asa_pipeline.repository.impl;
 
+import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
+import com.compomics.pride_asa_pipeline.model.AnnotationData;
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
 import com.compomics.pride_asa_pipeline.model.Identification;
+import com.compomics.pride_asa_pipeline.model.IdentificationScore;
+import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ModificationFacade;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
+import com.compomics.pride_asa_pipeline.model.Peptide;
+import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import com.compomics.pride_asa_pipeline.model.comparator.FragmentIonAnnotationComparator;
 import com.compomics.pride_asa_pipeline.repository.FileResultHandler;
+import com.compomics.pride_asa_pipeline.service.ModificationService;
+import com.compomics.pride_asa_pipeline.util.MathUtils;
+import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import com.google.common.base.Joiner;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,28 +33,50 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
+import org.jdom2.JDOMException;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class FileResultHandlerImpl implements FileResultHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FileResultHandlerImpl.class);
     private static final String COLUMN_DELIMITER = "\t";
+    private static final String SCORE_OPEN = "(";
+    private static final String SCORE_CLOSE = ")";
+    private static final String SCORE_DELIMITER = ";";
     private static final String FRAGMENT_IONS_OPEN = "ions[";
     private static final String FRAGMENT_IONS_CLOSE = "]";
     private static final String FRAGMENT_ION_TYPE_DELIMITER = ";";
     private static final String FRAGMENT_ION_TYPE_CHARGE_DELIMITER = "_";
     private static final String FRAGMENT_ION_NUMBER_DELIMITER = "|";
-    private static final String FRAGMENT_ION_NUMBER_VALUES_OPEN = "{";
-    private static final String FRAGMENT_ION_NUMBER_VALUES_CLOSE = "}";
-    private static final String FRAGMENT_ION_NUMBER_VALUES_DELIMITER = ":";
+    private static final String FRAGMENT_ION_PEAK_VALUES_OPEN = "{";
+    private static final String FRAGMENT_ION_PEAK_VALUES_CLOSE = "}";
+    private static final String FRAGMENT_ION_PEAK_VALUES_DELIMITER = ":";
     private static final String FRAGMENT_ION_NUMBERS_OPEN = "(";
     private static final String FRAGMENT_ION_NUMBERS_CLOSE = ")";
     private static final String MODIFICATIONS_DELIMITER = ";";
+    private static final String MODIFICATIONS_OPEN = "mods[";
+    private static final String MODIFICATIONS_CLOSE = "]";
+    private static final String MODIFICATIONS_N_TERMINAL = "NT";
+    private static final String MODIFICATIONS_C_TERMINAL = "CT";
+    private static final String MODIFICATIONS_LOCATION_DELIMITER = "_";
+    private static final String NOT_AVAILABLE = "N/A";
+    private ModificationService modificationService;
+    private Map<String, Modification> modifications;
+
+    public ModificationService getModificationService() {
+        return modificationService;
+    }
+
+    public void setModificationService(ModificationService modificationService) {
+        this.modificationService = modificationService;
+    }
 
     @Override
     public void writeResult(File resultFile, List<Identification> identifications) {
@@ -51,29 +84,44 @@ public class FileResultHandlerImpl implements FileResultHandler {
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(resultFile)));
 
             //print identification header
-            pw.println("spectrum_id" + COLUMN_DELIMITER + "peptide_sequence" + COLUMN_DELIMITER + "annotation_score" + COLUMN_DELIMITER + "fragment_ions" + COLUMN_DELIMITER + "modifications");
+            pw.println("spectrum_id" + COLUMN_DELIMITER
+                    + "mz_accession" + COLUMN_DELIMITER
+                    + "peptide_sequence" + COLUMN_DELIMITER
+                    + "precursor_mzratio" + COLUMN_DELIMITER
+                    + "precursor_charge" + COLUMN_DELIMITER
+                    + "explanation" + COLUMN_DELIMITER
+                    + "annotation_score" + COLUMN_DELIMITER
+                    + "fragment_ions" + COLUMN_DELIMITER
+                    + "modifications");
 
             //print identification
             for (Identification identification : identifications) {
-                String fragmentIonsString = "N/A";
-                String modificationsString = "N/A";
-                String annotationScore = "N/A";
+                String fragmentIonsString = NOT_AVAILABLE;
+                String modificationsString = NOT_AVAILABLE;
+                String annotationScore = NOT_AVAILABLE;
                 //check if there are fragment ion annotations
                 if (identification.getAnnotationData() != null) {
                     if (identification.getAnnotationData().getFragmentIonAnnotations() != null) {
-                        fragmentIonsString = constructFragmentIonsString(identification.getAnnotationData().getFragmentIonAnnotations());
+                        fragmentIonsString = constructFragmentIons(identification.getAnnotationData().getFragmentIonAnnotations());
                         if (identification.getAnnotationData().getIdentificationScore() != null) {
-                            annotationScore = Double.toString(identification.getAnnotationData().getIdentificationScore().getAverageFragmentIonScore());
+                            annotationScore = constructScore(identification.getAnnotationData().getIdentificationScore());
                         }
                     }
                 }
 
                 //check if there are modifications
                 if (identification.getPeptide() instanceof ModifiedPeptide) {
-                    modificationsString = constructModificationsString((ModifiedPeptide) identification.getPeptide());
+                    modificationsString = constructModifications((ModifiedPeptide) identification.getPeptide());
                 }
 
-                pw.print(identification.getSpectrumId() + COLUMN_DELIMITER + identification.getPeptide().getSequenceString() + COLUMN_DELIMITER + annotationScore + COLUMN_DELIMITER + fragmentIonsString
+                pw.print(identification.getSpectrumId()
+                        + COLUMN_DELIMITER + identification.getMzAccession()
+                        + COLUMN_DELIMITER + identification.getPeptide().getSequenceString()
+                        + COLUMN_DELIMITER + identification.getPeptide().getMzRatio()
+                        + COLUMN_DELIMITER + identification.getPeptide().getCharge()
+                        + COLUMN_DELIMITER + identification.getPipelineExplanationType().toString()
+                        + COLUMN_DELIMITER + annotationScore
+                        + COLUMN_DELIMITER + fragmentIonsString
                         + COLUMN_DELIMITER + modificationsString);
 
                 pw.println();
@@ -86,27 +134,70 @@ public class FileResultHandlerImpl implements FileResultHandler {
     }
 
     @Override
-    public void readResult(File resultFile) {
+    public SpectrumAnnotatorResult readResult(File resultFile) {
+        SpectrumAnnotatorResult spectrumAnnotatorResult = null;
         try {
             BufferedReader br = new BufferedReader(new FileReader(resultFile));
 
             String experimentAccession = resultFile.getName().substring(0, resultFile.getName().lastIndexOf(".txt"));
-            SpectrumAnnotatorResult spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
+            spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
+            //load modifications if necessary
+            if (modifications == null) {
+                loadModifications();
+            }
 
             String line = null;
             while ((line = br.readLine()) != null) {
                 if (!line.startsWith("spectrum_id")) {
                     String[] splits = line.split(COLUMN_DELIMITER);
 
+                    long spectrumId = Long.parseLong(splits[0]);
+                    String mzAccession = splits[1];
+                    String sequence = splits[2];
+                    double precursorMass = Double.parseDouble(splits[3]);
+                    int precursorCharge = Integer.parseInt(splits[4]);
+                    PipelineExplanationType pipelineExplanationType = PipelineExplanationType.valueOf(splits[5]);
+
+                    Peptide peptide = null;
+                    //check for modifications
+                    if (splits[8].equals(NOT_AVAILABLE)) {
+                        peptide = new Peptide(precursorCharge, precursorMass, new AminoAcidSequence(sequence));
+                    } else {
+                        peptide = new ModifiedPeptide(precursorCharge, precursorMass, new AminoAcidSequence(sequence), 0L);
+                        parseModifications((ModifiedPeptide) peptide, splits[8]);
+                    }
+
+                    Identification identification = new Identification(peptide, mzAccession, spectrumId, 0L);
+                    identification.setPipelineExplanationType(pipelineExplanationType);
+
+                    //check for score
+                    if (!splits[6].equals(NOT_AVAILABLE)) {
+                        AnnotationData annotationData = new AnnotationData();
+                        annotationData.setIdentificationScore(parseScore(splits[6], peptide.length()));
+
+                        //check for annotations
+                        if (!splits[7].equals(NOT_AVAILABLE)) {
+                            List<FragmentIonAnnotation> fragmentIonAnnotations = parseFragmentIonAnnotations(splits[7]);
+                            annotationData.setFragmentIonAnnotations(fragmentIonAnnotations);
+                        }
+
+                        identification.setAnnotationData(annotationData);
+                    }
+
+                    //add identification to SpectrumAnnotatorResult
+                    spectrumAnnotatorResult.addIdentification(identification);
                 }
             }
             br.close();
+        } catch (UnknownAAException e) {
+            LOGGER.error(e.getMessage(), e);
         } catch (FileNotFoundException e) {
             LOGGER.error(e.getMessage(), e);
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
 
+        return spectrumAnnotatorResult;
     }
 
     /**
@@ -115,7 +206,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
      * @param modifiedPeptide the modified peptide
      * @return
      */
-    private String constructModificationsString(ModifiedPeptide modifiedPeptide) {
+    private String constructModifications(ModifiedPeptide modifiedPeptide) {
         Joiner modificationsJoiner = Joiner.on(MODIFICATIONS_DELIMITER);
         List<String> modifications = new ArrayList<String>();
         if (modifiedPeptide.getNTermMod() != null) {
@@ -136,7 +227,18 @@ public class FileResultHandlerImpl implements FileResultHandler {
         return "mods[" + modificationsJoiner.join(modifications) + "]";
     }
 
-    private String constructFragmentIonsString(List<FragmentIonAnnotation> fragmentIonAnnotations) {
+    private String constructScore(IdentificationScore identificationScore) {
+        String score = "" + MathUtils.roundDouble(identificationScore.getAverageFragmentIonScore()) + SCORE_OPEN
+                + identificationScore.getMatchingPeaks() + SCORE_DELIMITER
+                + identificationScore.getTotalPeaks() + SCORE_DELIMITER
+                + identificationScore.getMatchingIntensity() + SCORE_DELIMITER
+                + identificationScore.getTotalIntensity() + SCORE_CLOSE;
+
+
+        return score;
+    }
+
+    private String constructFragmentIons(List<FragmentIonAnnotation> fragmentIonAnnotations) {
         //first sort the fragment ion annotations before iterating over them
         Collections.sort(fragmentIonAnnotations, new FragmentIonAnnotationComparator());
 
@@ -144,21 +246,21 @@ public class FileResultHandlerImpl implements FileResultHandler {
         List<String> fragmentIonNumbersByIonType = new ArrayList<String>();
         Joiner fragmentIonTypeJoiner = Joiner.on(FRAGMENT_ION_TYPE_DELIMITER);
         Joiner fragmentIonNumberJoiner = Joiner.on(FRAGMENT_ION_NUMBER_DELIMITER);
-        String currentIonType = constructIonTypeString(fragmentIonAnnotations.get(0));
+        String currentIonType = constructIonType(fragmentIonAnnotations.get(0));
 
         for (int i = 0; i < fragmentIonAnnotations.size(); i++) {
             //check if the ion type is still the same
-            if (currentIonType.equals(constructIonTypeString(fragmentIonAnnotations.get(i)))) {
+            if (currentIonType.equals(constructIonType(fragmentIonAnnotations.get(i)))) {
                 //add fragment ion number to the correct ion type
-                fragmentIonNumbersByIonType.add(String.valueOf(fragmentIonAnnotations.get(i).getFragment_ion_number()));
+                fragmentIonNumbersByIonType.add(String.valueOf(fragmentIonAnnotations.get(i).getFragment_ion_number()) + constructFragmentIonPeakValues(fragmentIonAnnotations.get(i)));
             } else {
                 //join fragment ion numbers by ion type
                 fragmentIonsByIonType.add(currentIonType + FRAGMENT_ION_NUMBERS_OPEN + fragmentIonNumberJoiner.join(fragmentIonNumbersByIonType) + FRAGMENT_ION_NUMBERS_CLOSE);
                 //clear fragment ion number list and add first element
                 fragmentIonNumbersByIonType.clear();
-                fragmentIonNumbersByIonType.add(String.valueOf(fragmentIonAnnotations.get(i).getFragment_ion_number()));
+                fragmentIonNumbersByIonType.add(String.valueOf(fragmentIonAnnotations.get(i).getFragment_ion_number()) + constructFragmentIonPeakValues(fragmentIonAnnotations.get(i)));
                 //change current ion type
-                currentIonType = constructIonTypeString(fragmentIonAnnotations.get(i));
+                currentIonType = constructIonType(fragmentIonAnnotations.get(i));
             }
         }
         //add the last fragment ion type        
@@ -166,36 +268,110 @@ public class FileResultHandlerImpl implements FileResultHandler {
 
         return FRAGMENT_IONS_OPEN + fragmentIonTypeJoiner.join(fragmentIonsByIonType) + FRAGMENT_IONS_CLOSE;
     }
-    
-    private String constructFragmentIonNumberValue(FragmentIonAnnotation fragmentIonAnnotation){
-        String fragmentIonNumberValue = "" + fragmentIonAnnotation.getFragment_ion_number() + FRAGMENT_ION_NUMBER_VALUES_OPEN 
-                + fragmentIonAnnotation.getMz() + FRAGMENT_ION_NUMBER_VALUES_DELIMITER 
-                + fragmentIonAnnotation.getIntensity();
-        
+
+    private String constructFragmentIonPeakValues(FragmentIonAnnotation fragmentIonAnnotation) {
+        String fragmentIonNumberValue = "" + fragmentIonAnnotation.getFragment_ion_number() + FRAGMENT_ION_PEAK_VALUES_OPEN
+                + fragmentIonAnnotation.getMz() + FRAGMENT_ION_PEAK_VALUES_DELIMITER
+                + fragmentIonAnnotation.getIntensity()
+                + FRAGMENT_ION_PEAK_VALUES_CLOSE;
+
         return fragmentIonNumberValue;
     }
 
-    private String constructIonTypeString(FragmentIonAnnotation fragmentIonAnnotation) {
+    private String constructIonType(FragmentIonAnnotation fragmentIonAnnotation) {
         return fragmentIonAnnotation.getIon_type_name() + "_" + fragmentIonAnnotation.getIon_charge() + "+";
     }
 
-    private List<FragmentIonAnnotation> parseFragmentIonAnnotation(String fragmentIonAnnotationString) {
+    private IdentificationScore parseScore(String score, int peptideLength) {
+        String scoreValues = score.substring(score.indexOf(SCORE_OPEN) + 1, score.indexOf(SCORE_CLOSE));
+        //split into score values: 
+        //1. matching peaks
+        //2. total peaks
+        //3. matching intensity
+        //4. total intensity        
+        String[] splits = scoreValues.split(SCORE_DELIMITER);
+
+        return new IdentificationScore(Integer.parseInt(splits[0]), Integer.parseInt(splits[1]), Long.parseLong(splits[2]), Long.parseLong(splits[3]), peptideLength);
+    }
+
+    private List<FragmentIonAnnotation> parseFragmentIonAnnotations(String fragmentIonAnnotationString) {
         List<FragmentIonAnnotation> fragmentIonAnnotations = new ArrayList<FragmentIonAnnotation>();
 
         String fragmentIons = fragmentIonAnnotationString.substring(fragmentIonAnnotationString.indexOf(FRAGMENT_IONS_OPEN) + FRAGMENT_IONS_OPEN.length(), fragmentIonAnnotationString.indexOf(FRAGMENT_IONS_CLOSE));
         //split the fragments by ion types
-        String[] fragmentsByIonTypes = fragmentIons.split(FRAGMENT_ION_TYPE_DELIMITER);
-        for (String fragmentByIonType : fragmentsByIonTypes) {
+        String[] fragmentsByIonType = fragmentIons.split(FRAGMENT_ION_TYPE_DELIMITER);
+        for (String fragmentByIonType : fragmentsByIonType) {
             String ionType = fragmentByIonType.substring(0, fragmentByIonType.indexOf(FRAGMENT_ION_TYPE_CHARGE_DELIMITER));
             int charge = Integer.parseInt(fragmentByIonType.substring(fragmentByIonType.indexOf(FRAGMENT_ION_TYPE_CHARGE_DELIMITER) + 1, fragmentByIonType.indexOf(FRAGMENT_ION_NUMBERS_OPEN) - 1));
-            //FragmentIonAnnotation fragmentIonAnnotation = new FragmentIonAnnotation
+
+            String fragmentIonNumbers = fragmentByIonType.substring(fragmentByIonType.indexOf(FRAGMENT_ION_NUMBERS_OPEN) + 1, fragmentByIonType.indexOf(FRAGMENT_ION_NUMBERS_CLOSE));
+            //split by ion number
+            String[] fragments = fragmentIonNumbers.split("\\" + FRAGMENT_ION_NUMBER_DELIMITER);
+            for (String fragment : fragments) {
+                double[] peakValues = parseFragmentIonPeakValues(fragment);
+                int ionNumber = Integer.parseInt(fragment.substring(0, fragment.indexOf(FRAGMENT_ION_PEAK_VALUES_OPEN)));
+                FragmentIonAnnotation fragmentIonAnnotation = new FragmentIonAnnotation(0L, FragmentIonAnnotation.resolveIonType(ionType), ionNumber, peakValues[0], peakValues[1], 0.0, charge);
+                fragmentIonAnnotations.add(fragmentIonAnnotation);
+            }
         }
 
         return fragmentIonAnnotations;
     }
 
-    public static void main(String[] args) {
-        FileResultHandlerImpl fileResultHandlerImpl = new FileResultHandlerImpl();
-        fileResultHandlerImpl.parseFragmentIonAnnotation("ions[b ion_1+(6);y ion_1+(1|2|3|4|5|6|7);y ion_2+(3|5)]");
+    private double[] parseFragmentIonPeakValues(String fragment) {
+        double[] peakValues = new double[2];
+        peakValues[0] = Double.parseDouble(fragment.substring(fragment.indexOf(FRAGMENT_ION_PEAK_VALUES_OPEN) + 1, fragment.indexOf(FRAGMENT_ION_PEAK_VALUES_DELIMITER)));
+        peakValues[1] = Double.parseDouble(fragment.substring(fragment.indexOf(FRAGMENT_ION_PEAK_VALUES_DELIMITER) + 1, fragment.indexOf(FRAGMENT_ION_PEAK_VALUES_CLOSE)));
+
+        return peakValues;
+    }
+
+    private void parseModifications(ModifiedPeptide modifiedPeptide, String modificationsString) {
+        String mods = modificationsString.substring(modificationsString.indexOf(MODIFICATIONS_OPEN) + MODIFICATIONS_OPEN.length(), modificationsString.indexOf(MODIFICATIONS_CLOSE));
+        //split modifications
+        String[] splits = mods.split(MODIFICATIONS_DELIMITER);
+        for (String mod : splits) {
+            String modificationName = mod.substring(mod.indexOf(MODIFICATIONS_LOCATION_DELIMITER) + 1, mod.length());
+            //try to find modification by name
+            Modification modification = findModificationByName(modificationName);
+            if (mod.contains(MODIFICATIONS_N_TERMINAL)) {
+                modifiedPeptide.setNTermMod(modification);
+            } else if (mod.contains(MODIFICATIONS_C_TERMINAL)) {
+                modifiedPeptide.setCTermMod(modification);
+            } else {
+                int location = Integer.parseInt(mod.substring(0, mod.indexOf(MODIFICATIONS_LOCATION_DELIMITER)));
+                modifiedPeptide.setNTModification(location, modification);
+            }
+        }
+    }
+
+    /**
+     * loads pipeline modifications in order to map the modification names in
+     * the result file to the right modification
+     */
+    private void loadModifications() {
+        modifications = new HashMap<String, Modification>();
+        try {
+            for (Modification modification : modificationService.loadPipelineModifications(ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file")))) {
+                modifications.put(modification.getName(), modification);
+            }
+        } catch (JDOMException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Finds the modification by name in the pipeline modifications. Returns an
+     * "unknown" modification if nothing was found.
+     *
+     * @param modificationName
+     * @return
+     */
+    private Modification findModificationByName(String modificationName) {
+        if (modifications.containsKey(modificationName)) {
+            return modifications.get(modificationName);
+        } else {
+            return new Modification(0.0, Modification.Location.NON_TERMINAL, "unknown", "unknown");
+        }
     }
 }

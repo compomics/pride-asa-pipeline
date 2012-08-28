@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class PeptideModificationHolderCache extends LinkedHashMap<String, PeptideModificationHolder> implements Cache<String, PeptideModificationHolder> {
 

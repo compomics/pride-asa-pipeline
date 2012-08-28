@@ -16,6 +16,7 @@ import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumPanelService;
 import com.compomics.pride_asa_pipeline.util.GuiUtils;
+import com.compomics.pride_asa_pipeline.util.MathUtils;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.google.common.base.Joiner;
 import java.awt.Color;
@@ -47,7 +48,7 @@ import org.jfree.data.general.DefaultPieDataset;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class PipelineResultController {
 
@@ -123,7 +124,7 @@ public class PipelineResultController {
         identificationsDataset.setValue(UNEXPLAINED_LABEL, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getUnexplainedIdentifications().size());
 
         JFreeChart identificationsChart = ChartFactory.createPieChart(
-                "Identifications", // chart title
+                "Identifications(" + mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getNumberOfIdentifications() + ")", // chart title
                 identificationsDataset, // data
                 Boolean.TRUE, // include legend
                 Boolean.TRUE,
@@ -168,7 +169,9 @@ public class PipelineResultController {
 
         //clear summary panel
         identificationsChartPanel.setChart(null);
+        identificationsChartPanel.setOpaque(Boolean.FALSE);
         modificationsChartPanel.setChart(null);
+        modificationsChartPanel.setOpaque(Boolean.FALSE);
     }
 
     private void initIdentificationsPanel() {
@@ -245,7 +248,9 @@ public class PipelineResultController {
     private void initSummaryPanel() {
         summaryPanel = new SummaryPanel();
         identificationsChartPanel = new ChartPanel(null);
+        identificationsChartPanel.setOpaque(Boolean.FALSE);
         modificationsChartPanel = new ChartPanel(null);
+        modificationsChartPanel.setOpaque(Boolean.FALSE);
 
         //add chartPanel                  
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -363,7 +368,7 @@ public class PipelineResultController {
         protected void setValue(Object value) {
             IdentificationScore identificationScore = (IdentificationScore) value;
 
-            super.setValue(GuiUtils.roundDouble(identificationScore.getAverageFragmentIonScore()));
+            super.setValue(MathUtils.roundDouble(identificationScore.getAverageFragmentIonScore()));
         }
     }
 
@@ -373,7 +378,7 @@ public class PipelineResultController {
         protected void setValue(Object value) {
             Double precursorMzRatio = (Double) value;
 
-            super.setValue(GuiUtils.roundDouble(precursorMzRatio));
+            super.setValue(MathUtils.roundDouble(precursorMzRatio));
         }
     }
 }

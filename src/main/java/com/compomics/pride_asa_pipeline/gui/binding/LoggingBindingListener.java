@@ -10,7 +10,7 @@ import org.jdesktop.beansbinding.Binding;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public class LoggingBindingListener extends AbstractBindingListener {
 

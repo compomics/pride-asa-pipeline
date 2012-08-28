@@ -6,11 +6,13 @@ package com.compomics.pride_asa_pipeline;
 
 import com.compomics.pride_asa_pipeline.gui.controller.MainController;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import javax.swing.UIManager;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -24,7 +26,7 @@ import org.springframework.context.ApplicationContext;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public class PrideAsaPipelineStarter {
 
@@ -61,7 +63,7 @@ public class PrideAsaPipelineStarter {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    UIManager.setLookAndFeel(info.getClassName());                    
                     break;
                 }
             }

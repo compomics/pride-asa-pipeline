@@ -5,12 +5,13 @@
 package com.compomics.pride_asa_pipeline.repository;
 
 import com.compomics.pride_asa_pipeline.model.Identification;
+import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import java.io.File;
 import java.util.List;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public interface FileResultHandler {
 
@@ -21,11 +22,12 @@ public interface FileResultHandler {
      * @param identifications the experiment identifications
      */
     void writeResult(File resultFile, List<Identification> identifications);
-    
+
     /**
-     * Reads the result file
-     * 
-     * @param resultFile the spectrum annotation pipeline result     
+     * Parses the result file and returns the SpectrumAnnotatorResult
+     *
+     * @param resultFile the spectrum annotation pipeline result
+     * @return the spectrum annotator result
      */
-    void readResult(File resultFile);
+    SpectrumAnnotatorResult readResult(File resultFile);
 }

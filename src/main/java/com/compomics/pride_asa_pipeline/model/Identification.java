@@ -29,6 +29,10 @@ public class Identification {
      * The annotation data
      */
     private AnnotationData annotationData;
+    /**
+     * the pipeline explanation for this identification
+     */
+    private PipelineExplanationType pipelineExplanationType;
 
     public Identification(){}
     
@@ -67,6 +71,14 @@ public class Identification {
         this.peptide = peptide;
     }
 
+    public PipelineExplanationType getPipelineExplanationType() {
+        return pipelineExplanationType;
+    }
+
+    public void setPipelineExplanationType(PipelineExplanationType pipelineExplanationType) {
+        this.pipelineExplanationType = pipelineExplanationType;
+    }
+        
     public String toShortString() {
         return new StringBuilder().append("IdentificationData{").append("mzAccession='").append(mzAccession).append('\'').append(", spectrumId=").append(spectrumId).append(", spectrumRef=").append(spectrumRef).append('}').toString();
     }

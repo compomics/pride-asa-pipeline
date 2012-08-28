@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public interface ZenArcher {
 

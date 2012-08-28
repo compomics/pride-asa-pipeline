@@ -8,7 +8,7 @@ import javax.swing.*;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public class ModificationsPanel extends javax.swing.JPanel {
     
@@ -129,9 +129,11 @@ public class ModificationsPanel extends javax.swing.JPanel {
         importButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
 
+        setOpaque(false);
         setLayout(new java.awt.GridBagLayout());
 
         jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Modifications table"));
+        jScrollPane1.setOpaque(false);
         jScrollPane1.setPreferredSize(new java.awt.Dimension(25, 25));
 
         modifcationsTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -143,6 +145,7 @@ public class ModificationsPanel extends javax.swing.JPanel {
             }
         ));
         modifcationsTable.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        modifcationsTable.setOpaque(false);
         jScrollPane1.setViewportView(modifcationsTable);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -156,6 +159,7 @@ public class ModificationsPanel extends javax.swing.JPanel {
 
         editModificationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Modification details"));
         editModificationPanel.setMinimumSize(new java.awt.Dimension(100, 100));
+        editModificationPanel.setOpaque(false);
         editModificationPanel.setPreferredSize(new java.awt.Dimension(300, 300));
 
         modNameLabel.setText("name");
@@ -304,6 +308,8 @@ public class ModificationsPanel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.6;
         add(editModificationPanel, gridBagConstraints);
+
+        jPanel3.setOpaque(false);
 
         addModificationButton.setText("add");
         addModificationButton.setToolTipText("Click to add a modification.");

@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author niels
+ * @author Niels Hulstaert
  */
 public interface ExperimentService {
 

@@ -15,7 +15,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class IdentificationDataMapper implements RowMapper<Identification> {
 

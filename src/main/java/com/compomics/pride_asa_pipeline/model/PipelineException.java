@@ -6,7 +6,7 @@ package com.compomics.pride_asa_pipeline.model;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class PipelineException extends Exception {
 
