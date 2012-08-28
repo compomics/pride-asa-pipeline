@@ -17,7 +17,7 @@ import org.springframework.core.io.Resource;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public interface ModificationService {
 

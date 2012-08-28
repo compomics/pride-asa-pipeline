@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class JdbcExperimentRepository extends JdbcDaoSupport implements ExperimentRepository {
 

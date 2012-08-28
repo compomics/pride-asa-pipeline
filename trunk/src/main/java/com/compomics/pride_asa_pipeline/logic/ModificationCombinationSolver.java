@@ -11,7 +11,7 @@ import java.util.Set;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public interface ModificationCombinationSolver {
 

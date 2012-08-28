@@ -23,7 +23,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:springXMLConfig.xml")

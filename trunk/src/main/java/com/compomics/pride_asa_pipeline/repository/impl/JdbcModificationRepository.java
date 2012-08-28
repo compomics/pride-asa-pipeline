@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import java.util.List;
 
 /**
- * @author niels
+ * @author Niels Hulstaert
  */
 public class JdbcModificationRepository extends JdbcDaoSupport implements ModificationRepository {
 

@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class SummaryPanel extends javax.swing.JPanel {
 
@@ -41,10 +41,14 @@ public class SummaryPanel extends javax.swing.JPanel {
         modificationsChartParentPanel = new javax.swing.JPanel();
         generalSummaryPanel = new javax.swing.JPanel();
 
+        setBackground(new java.awt.Color(255, 255, 255));
+        setOpaque(false);
         setPreferredSize(new java.awt.Dimension(400, 200));
         setLayout(new java.awt.GridBagLayout());
 
+        identificationsChartParentPanel.setBackground(new java.awt.Color(255, 255, 255));
         identificationsChartParentPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Identifications"));
+        identificationsChartParentPanel.setOpaque(false);
         identificationsChartParentPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -54,7 +58,9 @@ public class SummaryPanel extends javax.swing.JPanel {
         gridBagConstraints.weighty = 0.5;
         add(identificationsChartParentPanel, gridBagConstraints);
 
+        modificationsChartParentPanel.setBackground(new java.awt.Color(255, 255, 255));
         modificationsChartParentPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Modifications"));
+        modificationsChartParentPanel.setOpaque(false);
         modificationsChartParentPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -65,6 +71,7 @@ public class SummaryPanel extends javax.swing.JPanel {
         add(modificationsChartParentPanel, gridBagConstraints);
 
         generalSummaryPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("General"));
+        generalSummaryPanel.setOpaque(false);
         generalSummaryPanel.setPreferredSize(new java.awt.Dimension(12, 23));
 
         org.jdesktop.layout.GroupLayout generalSummaryPanelLayout = new org.jdesktop.layout.GroupLayout(generalSummaryPanel);
@@ -75,7 +82,7 @@ public class SummaryPanel extends javax.swing.JPanel {
         );
         generalSummaryPanelLayout.setVerticalGroup(
             generalSummaryPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 77, Short.MAX_VALUE)
+            .add(0, 127, Short.MAX_VALUE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();

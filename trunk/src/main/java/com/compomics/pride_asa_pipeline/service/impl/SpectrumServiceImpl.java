@@ -14,7 +14,7 @@ import java.util.*;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class SpectrumServiceImpl implements SpectrumService {
     private static final Logger LOGGER = Logger.getLogger(SpectrumServiceImpl.class);

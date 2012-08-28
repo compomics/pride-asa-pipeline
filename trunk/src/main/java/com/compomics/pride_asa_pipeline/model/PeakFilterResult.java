@@ -10,7 +10,7 @@ import java.util.List;
  * Helper class for storing the peak filtering result: the filtered peaks + the
  * used noise filter threshold.
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class PeakFilterResult {
 

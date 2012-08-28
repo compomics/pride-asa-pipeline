@@ -6,7 +6,7 @@ package com.compomics.pride_asa_pipeline.cache;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public interface Cache<K, V> {
 

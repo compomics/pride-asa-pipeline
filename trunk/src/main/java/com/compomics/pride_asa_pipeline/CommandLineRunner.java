@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class CommandLineRunner {
 

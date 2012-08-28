@@ -230,6 +230,7 @@ public class PrideSpectrumAnnotator {
             if (massDeltaExplanationsMap.get(identification) != null) {
                 significantMassDeltaExplanationsMap.put(identification, massDeltaExplanationsMap.get(identification));
             } else {
+                identification.setPipelineExplanationType(PipelineExplanationType.UNMODIFIED);
                 unmodifiedPrecursors.add(identification);
 
                 //annotate the unmodified identifications if necessary
@@ -425,10 +426,12 @@ public class PrideSpectrumAnnotator {
             if (modifiedPeptidesMatchResult != null) {
                 identification.setPeptide(modifiedPeptidesMatchResult.getModifiedPeptide());
                 identification.setAnnotationData(modifiedPeptidesMatchResult.getAnnotationData());
+                identification.setPipelineExplanationType(PipelineExplanationType.MODIFIED);
                 bestMatches.add(identification);
             } else {
                 LOGGER.info("No best match found for precursor: " + identification.getPeptide());
                 //add to unexplained identifications
+                identification.setPipelineExplanationType(PipelineExplanationType.UNEXPLAINED);
                 spectrumAnnotatorResult.getUnexplainedIdentifications().add(identification);
             }
         }
@@ -462,7 +465,7 @@ public class PrideSpectrumAnnotator {
                     AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()));
                     identification.setAnnotationData(annotationData);
                 }
-
+                identification.setPipelineExplanationType(PipelineExplanationType.UNEXPLAINED);
                 unexplainedIdentifications.add(identification);
             }
         }

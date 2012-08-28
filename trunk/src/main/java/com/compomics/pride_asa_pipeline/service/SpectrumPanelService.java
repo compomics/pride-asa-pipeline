@@ -9,7 +9,7 @@ import com.compomics.util.gui.spectrum.SpectrumPanel;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public interface SpectrumPanelService {
 

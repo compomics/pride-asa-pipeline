@@ -17,7 +17,7 @@ import org.jdesktop.beansbinding.ELProperty;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class MainController implements ActionListener {
     

@@ -12,7 +12,7 @@ import java.awt.event.WindowEvent;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public class PipelineProgressController extends WindowAdapter {
 

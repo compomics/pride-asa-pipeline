@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class Base64DecoderListMapper implements RowMapper<Base64DecoderListMapper.PartialSpectrumContent> {
 

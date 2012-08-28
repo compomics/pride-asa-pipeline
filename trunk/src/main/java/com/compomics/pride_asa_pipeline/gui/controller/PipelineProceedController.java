@@ -7,6 +7,7 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 import com.compomics.pride_asa_pipeline.gui.view.PipelineProceedDialog;
 import com.compomics.pride_asa_pipeline.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.util.GuiUtils;
+import com.compomics.pride_asa_pipeline.util.MathUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -15,7 +16,7 @@ import javax.swing.table.AbstractTableModel;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class PipelineProceedController extends WindowAdapter {
 
@@ -77,8 +78,8 @@ public class PipelineProceedController extends WindowAdapter {
             data = new Object[massRecalibrationResult.getCharges().size()][3];
             for (Integer i : massRecalibrationResult.getCharges()) {
                 data[i - 1][0] = i;
-                data[i - 1][1] = GuiUtils.roundDouble(massRecalibrationResult.getError(i));
-                data[i - 1][2] = GuiUtils.roundDouble(massRecalibrationResult.getErrorWindow(i));
+                data[i - 1][1] = MathUtils.roundDouble(massRecalibrationResult.getError(i));
+                data[i - 1][2] = MathUtils.roundDouble(massRecalibrationResult.getErrorWindow(i));
             }
         }
 

@@ -10,7 +10,7 @@ import javax.swing.JProgressBar;
 
 /**
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public class PipelineProgressDialog extends javax.swing.JDialog {
 

@@ -9,7 +9,7 @@ import javax.swing.JTable;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class IdentificationsPanel extends javax.swing.JPanel {
 
@@ -43,13 +43,19 @@ public class IdentificationsPanel extends javax.swing.JPanel {
         identificationsTable = new javax.swing.JTable();
         identificationDetailPanel = new javax.swing.JPanel();
 
+        setBackground(new java.awt.Color(255, 255, 255));
         setMinimumSize(new java.awt.Dimension(520, 520));
+        setOpaque(false);
         setPreferredSize(new java.awt.Dimension(520, 520));
         setLayout(new java.awt.GridBagLayout());
 
+        identificationsTablePanel.setBackground(new java.awt.Color(255, 255, 255));
         identificationsTablePanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Identifications"));
         identificationsTablePanel.setMinimumSize(new java.awt.Dimension(20, 20));
+        identificationsTablePanel.setOpaque(false);
         identificationsTablePanel.setPreferredSize(new java.awt.Dimension(20, 20));
+
+        jScrollPane1.setOpaque(false);
 
         identificationsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -85,6 +91,7 @@ public class IdentificationsPanel extends javax.swing.JPanel {
 
         identificationDetailPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Identification detail"));
         identificationDetailPanel.setMinimumSize(new java.awt.Dimension(20, 20));
+        identificationDetailPanel.setOpaque(false);
         identificationDetailPanel.setPreferredSize(new java.awt.Dimension(20, 20));
         identificationDetailPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();

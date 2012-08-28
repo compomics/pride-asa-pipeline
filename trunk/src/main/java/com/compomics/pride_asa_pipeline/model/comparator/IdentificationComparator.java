@@ -9,7 +9,7 @@ import java.util.Comparator;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class IdentificationComparator implements Comparator<Identification> {
 

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author niels
+ * @author Niels Hulstaert
  */
 public class JdbcSpectrumRepository extends JdbcDaoSupport implements SpectrumRepository {
 

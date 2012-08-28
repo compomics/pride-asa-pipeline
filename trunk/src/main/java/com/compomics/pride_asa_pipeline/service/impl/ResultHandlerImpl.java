@@ -12,7 +12,7 @@ import java.io.File;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class ResultHandlerImpl implements ResultHandler {
     

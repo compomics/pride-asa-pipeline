@@ -7,12 +7,14 @@ package com.compomics.pride_asa_pipeline.model;
 import com.compomics.pride_asa_pipeline.model.comparator.IdentificationComparator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Convenience class for holding the pipeline results
  *
- * @author Niels Hulstaert
+ * @author Niels Hulstaert Hulstaert
  */
 public class SpectrumAnnotatorResult {
 
@@ -24,23 +26,13 @@ public class SpectrumAnnotatorResult {
      * The mass recalibration result
      */
     private MassRecalibrationResult massRecalibrationResult;
-    /**
-     * The unexplained identifications
-     */
-    private List<Identification> unexplainedIdentifications;
-    /**
-     * The unmodified identifications
-     */
-    private List<Identification> unmodifiedPrecursors;
-    /**
-     * The modified identifications
-     */
-    private List<Identification> modifiedPrecursors;
+    private Map<PipelineExplanationType, List<Identification>> identifications;
 
     public SpectrumAnnotatorResult() {
-        unexplainedIdentifications = new ArrayList<Identification>();
-        unmodifiedPrecursors = new ArrayList<Identification>();
-        modifiedPrecursors = new ArrayList<Identification>();
+        identifications = new EnumMap<PipelineExplanationType, List<Identification>>(PipelineExplanationType.class);
+        identifications.put(PipelineExplanationType.UNEXPLAINED, new ArrayList<Identification>());
+        identifications.put(PipelineExplanationType.UNMODIFIED, new ArrayList<Identification>());
+        identifications.put(PipelineExplanationType.MODIFIED, new ArrayList<Identification>());
     }
 
     public SpectrumAnnotatorResult(String experimentAccession) {
@@ -57,32 +49,32 @@ public class SpectrumAnnotatorResult {
     }
 
     public List<Identification> getModifiedPrecursors() {
-        return modifiedPrecursors;
+        return identifications.get(PipelineExplanationType.MODIFIED);
     }
 
     public void setModifiedPrecursors(List<Identification> modifiedPrecursors) {
-        this.modifiedPrecursors = modifiedPrecursors;
+        identifications.put(PipelineExplanationType.MODIFIED, modifiedPrecursors);
     }
 
     public List<Identification> getUnexplainedIdentifications() {
-        return unexplainedIdentifications;
+        return identifications.get(PipelineExplanationType.UNEXPLAINED);
     }
 
     public void setUnexplainedIdentifications(List<Identification> unexplainedIdentifications) {
-        this.unexplainedIdentifications = unexplainedIdentifications;
+        identifications.put(PipelineExplanationType.UNEXPLAINED, unexplainedIdentifications);
     }
 
     public List<Identification> getUnmodifiedPrecursors() {
-        return unmodifiedPrecursors;
+        return identifications.get(PipelineExplanationType.UNMODIFIED);
     }
 
     public void setUnmodifiedPrecursors(List<Identification> unmodifiedPrecursors) {
-        this.unmodifiedPrecursors = unmodifiedPrecursors;
+        identifications.put(PipelineExplanationType.UNMODIFIED, unmodifiedPrecursors);
     }
 
     public String getExperimentAccession() {
         return experimentAccession;
-    }        
+    }
 
     /**
      * Returns all the experiment identications as a list, sorted by spectrum
@@ -91,23 +83,38 @@ public class SpectrumAnnotatorResult {
      * @return the list of experiment identifications
      */
     public List<Identification> getIdentifications() {
-        List<Identification> identifications = new ArrayList<Identification>();
-        identifications.addAll(unmodifiedPrecursors);
-        identifications.addAll(modifiedPrecursors);
-        identifications.addAll(unexplainedIdentifications);
+        List<Identification> allIdentifications = new ArrayList<Identification>();
+        allIdentifications.addAll(getUnexplainedIdentifications());
+        allIdentifications.addAll(getUnmodifiedPrecursors());
+        allIdentifications.addAll(getModifiedPrecursors());
 
-        Collections.sort(identifications, new IdentificationComparator());
-        
-        return identifications;
+        Collections.sort(allIdentifications, new IdentificationComparator());
+
+        return allIdentifications;
     }
-    
+
     /**
-     * Gets the total number of identifications (unexplained, unmodified and modified).
-     * 
+     * Gets the total number of identifications (unexplained, unmodified and
+     * modified).
+     *
      * @return the total number of identifications
      */
-    public int getNumberOfIdentifications(){
-        return unexplainedIdentifications.size() + unmodifiedPrecursors.size() + modifiedPrecursors.size();
+    public int getNumberOfIdentifications() {
+        return getUnexplainedIdentifications().size() + getUnmodifiedPrecursors().size() + getModifiedPrecursors().size();
     }
-    
+
+    /**
+     * Adds an identification to identifcations
+     *
+     * @param identification the identification
+     */
+    public void addIdentification(Identification identification) {
+        if (identification.getPipelineExplanationType().equals(PipelineExplanationType.UNEXPLAINED)) {
+            identifications.get(PipelineExplanationType.UNEXPLAINED).add(identification);
+        } else if (identification.getPipelineExplanationType().equals(PipelineExplanationType.UNMODIFIED)) {
+            identifications.get(PipelineExplanationType.UNMODIFIED).add(identification);
+        } else {
+            identifications.get(PipelineExplanationType.MODIFIED).add(identification);
+        }
+    }
 }

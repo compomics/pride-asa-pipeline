@@ -8,7 +8,7 @@ package com.compomics.pride_asa_pipeline.model;
  * Helper class for storing the modified peptides matching result: the best
  * modified peptide (if found) + the annotation data
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class ModifiedPeptidesMatchResult {
 

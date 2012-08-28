@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public class ExperimentSelectionPanel extends javax.swing.JPanel {
 
@@ -60,6 +60,7 @@ public class ExperimentSelectionPanel extends javax.swing.JPanel {
         writeResultCheckBox = new javax.swing.JCheckBox();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Experiment selection"));
+        setOpaque(false);
 
         experimentSelectionLabel.setText("select an experiment");
 

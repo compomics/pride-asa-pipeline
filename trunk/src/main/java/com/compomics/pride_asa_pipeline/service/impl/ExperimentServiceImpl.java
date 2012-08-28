@@ -24,7 +24,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * @author niels
+ * @author Niels Hulstaert
  */
 public class ExperimentServiceImpl implements ExperimentService {
 
