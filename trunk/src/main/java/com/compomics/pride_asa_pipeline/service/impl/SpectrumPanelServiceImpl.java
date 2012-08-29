@@ -44,7 +44,9 @@ public class SpectrumPanelServiceImpl implements SpectrumPanelService {
         spectrumPanel = new SpectrumPanel(PeakUtils.getMzRatiosAsArray(peaks), PeakUtils.getIntensitiesAsArray(peaks), identification.getPeptide().getMzRatio(), Integer.toString(identification.getPeptide().getCharge()), "test");
 
         //add peak annotations
-        spectrumPanel.setAnnotations(getPeakAnnotations(identification));
+        if (identification.getAnnotationData().getFragmentIonAnnotations() != null) {
+            spectrumPanel.setAnnotations(getPeakAnnotations(identification));
+        }
 
         //add noise threshold area
         spectrumPanel.addReferenceAreaYAxis(getReferenceArea(identification.getAnnotationData().getNoiseThreshold()));
@@ -66,18 +68,18 @@ public class SpectrumPanelServiceImpl implements SpectrumPanelService {
             DefaultSpectrumAnnotation defaultSpectrumAnnotation = new DefaultSpectrumAnnotation(fragmentIonAnnotation.getMz(), fragmentIonAnnotation.getMass_error(), SpectrumPanel.determineColorOfPeak(label), label);
             peakAnnotations.add(defaultSpectrumAnnotation);
         }
-        
+
         return peakAnnotations;
     }
 
-private ReferenceArea getReferenceArea(double noiseThreshold) {
+    private ReferenceArea getReferenceArea(double noiseThreshold) {
         return new ReferenceArea(
                 "", // reference area unique identifier
                 //"A", // reference area label
                 0.0, // start of area
                 noiseThreshold, // end of area
                 Color.blue, // color of area
-                0.3f, // transparency level
+                0.1f, // transparency level
                 Boolean.TRUE, // drawn on top of or behind the data
                 Boolean.TRUE);
     }

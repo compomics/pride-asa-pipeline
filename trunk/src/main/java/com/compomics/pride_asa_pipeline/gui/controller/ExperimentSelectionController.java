@@ -5,19 +5,26 @@
 package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.gui.view.ExperimentSelectionPanel;
+import com.compomics.pride_asa_pipeline.gui.view.FileSelectionPanel;
+import com.compomics.pride_asa_pipeline.gui.view.PrideSelectionPanel;
+import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.service.ResultHandler;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.File;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 /**
  *
@@ -32,7 +39,8 @@ public class ExperimentSelectionController {
     //hold reference to swingworker for cancelling purposes
     private SwingWorker<Void, Void> currentSwingWorker;
     //view
-    private ExperimentSelectionPanel experimentSelectionPanel;
+    private PrideSelectionPanel prideSelectionPanel;
+    private FileSelectionPanel fileSelectionPanel;
     //parent controller
     private MainController mainController;
     //child controllers
@@ -66,8 +74,12 @@ public class ExperimentSelectionController {
         this.mainController = mainController;
     }
 
-    public ExperimentSelectionPanel getExperimentSelectionPanel() {
-        return experimentSelectionPanel;
+    public PrideSelectionPanel getPrideSelectionPanel() {
+        return prideSelectionPanel;
+    }
+
+    public FileSelectionPanel getFileSelectionPanel() {
+        return fileSelectionPanel;
     }
 
     public PipelineProgressController getPipelineProgressController() {
@@ -87,59 +99,12 @@ public class ExperimentSelectionController {
     }
 
     public void init() {
-        experimentSelectionPanel = new ExperimentSelectionPanel();
+        initPrideSelectionPanel();
+        initFileSelectionPanel();
 
         //init child controllers
         pipelineProgressController.init();
         pipelineProceedController.init();
-
-        //fill combo box
-        updateComboBox(experimentService.findAllExperimentAccessions());
-
-        //disable taxonomy text field
-        experimentSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.FALSE);
-
-        //add action listeners
-        experimentSelectionPanel.getTaxonomyFilterCheckBox().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                if (experimentSelectionPanel.getTaxonomyFilterCheckBox().isSelected()) {
-                    //enable taxonomy text field
-                    experimentSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.TRUE);
-                    filterExperimentAccessions();
-                } else {
-                    //disable taxonomy text field
-                    experimentSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.FALSE);
-                    //reset combo box                    
-                    updateComboBox(experimentService.findAllExperimentAccessions());
-                    taxonomyId = null;
-                }
-            }
-        });
-
-        experimentSelectionPanel.getTaxonomyTextField().addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent fe) {
-            }
-
-            @Override
-            public void focusLost(FocusEvent fe) {
-                filterExperimentAccessions();
-            }
-        });
-
-        experimentSelectionPanel.getExperimentProcessButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //execute worker
-                InitAnnotationWorker initAnnotationWorker = new InitAnnotationWorker();
-                currentSwingWorker = initAnnotationWorker;
-                initAnnotationWorker.execute();
-
-                //disable process button
-                experimentSelectionPanel.getExperimentProcessButton().setEnabled(Boolean.FALSE);
-            }
-        });
     }
 
     public void onAnnotationProceed() {
@@ -158,37 +123,158 @@ public class ExperimentSelectionController {
         currentSwingWorker.cancel(Boolean.TRUE);
 
         //enable process button
-        experimentSelectionPanel.getExperimentProcessButton().setEnabled(Boolean.TRUE);
+        prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
+        fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
+    }
+
+    private void initPrideSelectionPanel() {
+        prideSelectionPanel = new PrideSelectionPanel();
+
+        //fill combo box
+        updateComboBox(experimentService.findAllExperimentAccessions());
+
+        //disable taxonomy text field
+        prideSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.FALSE);
+
+        //add action listeners
+        prideSelectionPanel.getTaxonomyFilterCheckBox().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                if (prideSelectionPanel.getTaxonomyFilterCheckBox().isSelected()) {
+                    //enable taxonomy text field
+                    prideSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.TRUE);
+                    filterExperimentAccessions();
+                } else {
+                    //disable taxonomy text field
+                    prideSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.FALSE);
+                    //reset combo box                    
+                    updateComboBox(experimentService.findAllExperimentAccessions());
+                    taxonomyId = null;
+                }
+            }
+        });
+
+        prideSelectionPanel.getTaxonomyTextField().addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent fe) {
+            }
+
+            @Override
+            public void focusLost(FocusEvent fe) {
+                filterExperimentAccessions();
+            }
+        });
+
+        prideSelectionPanel.getProcessButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //execute worker
+                InitAnnotationWorker initAnnotationWorker = new InitAnnotationWorker();
+                currentSwingWorker = initAnnotationWorker;
+                initAnnotationWorker.execute();
+
+                //disable process button
+                prideSelectionPanel.getProcessButton().setEnabled(Boolean.FALSE);
+            }
+        });
+    }
+
+    private void initFileSelectionPanel() {
+        fileSelectionPanel = new FileSelectionPanel();
+
+        //init filechooser
+        //get file chooser
+        JFileChooser fileChooser = fileSelectionPanel.getFileChooser();
+        //select only files
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        //select multiple file
+        fileChooser.setMultiSelectionEnabled(Boolean.FALSE);
+        //set MGF file filter
+        fileChooser.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                if (f.isDirectory()) {
+                    return true;
+                }
+
+                int index = f.getName().lastIndexOf(".");
+                String extension = f.getName().substring(index + 1);
+                if (extension != null) {
+                    if (extension.equals("txt")) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
+                return false;
+            }
+
+            @Override
+            public String getDescription() {
+                return ("text files only");
+            }
+        });
+
+        //add listeners
+        fileSelectionPanel.getSelectFileButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //in response to the button click, show open dialog 
+                int returnVal = fileSelectionPanel.getFileChooser().showOpenDialog(fileSelectionPanel);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    Resource resultFileResource = new FileSystemResource(fileSelectionPanel.getFileChooser().getSelectedFile());
+
+                    //show file name in label
+                    fileSelectionPanel.getFileNameLabel().setText(resultFileResource.getFilename());
+                }
+            }
+        });
+
+        fileSelectionPanel.getProcessButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (fileSelectionPanel.getFileChooser().getSelectedFile() != null) {
+                    ImportPipelineResultWorker importPipelineResultWorker = new ImportPipelineResultWorker();
+                    importPipelineResultWorker.execute();
+
+                    //disable process button
+                    fileSelectionPanel.getProcessButton().setEnabled(Boolean.FALSE);
+                } else {
+                    mainController.showMessageDialog("Pipeline result import", "Please select an pipeline result file", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
     }
 
     private void filterExperimentAccessions() {
-        if (!experimentSelectionPanel.getTaxonomyTextField().getText().isEmpty()) {
+        if (!prideSelectionPanel.getTaxonomyTextField().getText().isEmpty()) {
             try {
-                Integer newTaxonomyId = Integer.parseInt(experimentSelectionPanel.getTaxonomyTextField().getText());
+                Integer newTaxonomyId = Integer.parseInt(prideSelectionPanel.getTaxonomyTextField().getText());
                 if (taxonomyId != newTaxonomyId) {
                     taxonomyId = newTaxonomyId;
                     updateComboBox(experimentService.findExperimentAccessionsByTaxonomy(taxonomyId));
                 }
             } catch (NumberFormatException e) {
                 mainController.showMessageDialog("Format error", "Please insert a correct taxonomy ID (e.g. Homo Sapiens ID: 9606)", JOptionPane.ERROR_MESSAGE);
-                experimentSelectionPanel.getTaxonomyTextField().setText("");
+                prideSelectionPanel.getTaxonomyTextField().setText("");
             }
         }
     }
 
     private void updateComboBox(Map<String, String> experimentAccessions) {
         //empty combo box
-        experimentSelectionPanel.getExperimentSelectionComboBox().removeAllItems();
+        prideSelectionPanel.getExperimentSelectionComboBox().removeAllItems();
         //load experiment accessions and fill combo box        
         for (String experimentAccession : experimentAccessions.keySet()) {
-            experimentSelectionPanel.getExperimentSelectionComboBox().addItem(experimentAccession + EXPERIMENT_ACCESSION_SEPARATOR + " " + experimentAccessions.get(experimentAccession));
+            prideSelectionPanel.getExperimentSelectionComboBox().addItem(experimentAccession + EXPERIMENT_ACCESSION_SEPARATOR + " " + experimentAccessions.get(experimentAccession));
         }
     }
 
     private String getExperimentAccesion() {
         String experimentAccession = null;
-        if (experimentSelectionPanel.getExperimentSelectionComboBox().getSelectedItem() != null) {
-            String comboBoxString = experimentSelectionPanel.getExperimentSelectionComboBox().getSelectedItem().toString();
+        if (prideSelectionPanel.getExperimentSelectionComboBox().getSelectedItem() != null) {
+            String comboBoxString = prideSelectionPanel.getExperimentSelectionComboBox().getSelectedItem().toString();
             experimentAccession = comboBoxString.substring(0, comboBoxString.indexOf(EXPERIMENT_ACCESSION_SEPARATOR));
         }
 
@@ -223,8 +309,12 @@ public class ExperimentSelectionController {
                     onAnnotationProceed();
                 }
             } catch (InterruptedException ex) {
+                //hide progress bar
+                pipelineProgressController.hideProgressDialog();
                 LOGGER.error(ex.getMessage(), ex);
             } catch (ExecutionException ex) {
+                //hide progress bar
+                pipelineProgressController.hideProgressDialog();
                 mainController.showMessageDialog("Unexpected error", "Un expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
             } catch (CancellationException ex) {
                 LOGGER.debug("annotation canceled.");
@@ -239,7 +329,7 @@ public class ExperimentSelectionController {
             mainController.getPrideSpectrumAnnotator().annotate(getExperimentAccesion());
 
             //write result to file if necessary
-            if (experimentSelectionPanel.getWriteResultCheckBox().isSelected()) {
+            if (prideSelectionPanel.getWriteResultCheckBox().isSelected()) {
                 resultHandler.writeResultToFile(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
             }
 
@@ -252,13 +342,9 @@ public class ExperimentSelectionController {
                 get();
 
                 //enable process button
-                experimentSelectionPanel.getExperimentProcessButton().setEnabled(Boolean.TRUE);
+                prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
 
-                mainController.onAnnotationFinished();
-
-                //hide progress bar
-                pipelineProgressController.hideProgressDialog();
-
+                mainController.onAnnotationFinished(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
             } catch (InterruptedException ex) {
                 LOGGER.error(ex.getMessage(), ex);
                 mainController.showUnexpectedErrorDialog(ex.getMessage());
@@ -267,6 +353,47 @@ public class ExperimentSelectionController {
                 mainController.showUnexpectedErrorDialog(ex.getMessage());
             } catch (CancellationException ex) {
                 LOGGER.info("annotation for experiment " + getExperimentAccesion() + " canceled.");
+            } finally {
+                //hide progress bar
+                pipelineProgressController.hideProgressDialog();
+            }
+        }
+    }
+
+    private class ImportPipelineResultWorker extends SwingWorker<SpectrumAnnotatorResult, Void> {
+
+        @Override
+        protected SpectrumAnnotatorResult doInBackground() throws Exception {
+            SpectrumAnnotatorResult spectrumAnnotatorResult = null;
+
+            //show progress bar
+            pipelineProgressController.showProgressBar();
+
+            LOGGER.info("Importing pipeline result file " + fileSelectionPanel.getFileChooser().getSelectedFile().getName());
+            spectrumAnnotatorResult = resultHandler.readResultFromFile(fileSelectionPanel.getFileChooser().getSelectedFile());
+            LOGGER.info("Finished importing pipeline result file " + fileSelectionPanel.getFileChooser().getSelectedFile().getName());
+
+            return spectrumAnnotatorResult;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                mainController.onAnnotationFinished(get());
+
+                //enable process button
+                fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
+            } catch (InterruptedException ex) {
+                LOGGER.error(ex.getMessage(), ex);
+                mainController.showUnexpectedErrorDialog(ex.getMessage());
+            } catch (ExecutionException ex) {
+                LOGGER.error(ex.getMessage(), ex);
+                mainController.showUnexpectedErrorDialog(ex.getMessage());
+            } catch (CancellationException ex) {
+                LOGGER.info("annotation for experiment " + getExperimentAccesion() + " canceled.");
+            } finally {
+                //hide progress bar
+                pipelineProgressController.hideProgressDialog();
             }
         }
     }

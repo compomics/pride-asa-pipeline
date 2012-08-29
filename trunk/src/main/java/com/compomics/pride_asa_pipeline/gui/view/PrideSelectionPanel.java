@@ -13,16 +13,16 @@ import javax.swing.JTextField;
  *
  * @author Niels Hulstaert
  */
-public class ExperimentSelectionPanel extends javax.swing.JPanel {
+public class PrideSelectionPanel extends javax.swing.JPanel {
 
     /**
      * Creates new form ExperimentSelectionPanel
      */
-    public ExperimentSelectionPanel() {
+    public PrideSelectionPanel() {
         initComponents();
     }
 
-    public JButton getExperimentProcessButton() {
+    public JButton getProcessButton() {
         return experimentProcessButton;
     }
 
@@ -59,10 +59,10 @@ public class ExperimentSelectionPanel extends javax.swing.JPanel {
         experimentProcessButton = new javax.swing.JButton();
         writeResultCheckBox = new javax.swing.JCheckBox();
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder("Experiment selection"));
         setOpaque(false);
+        setPreferredSize(new java.awt.Dimension(50, 20));
 
-        experimentSelectionLabel.setText("select an experiment");
+        experimentSelectionLabel.setText("select a pride experiment");
 
         taxonomyFilterCheckBox.setText("filter on taxonomy");
         taxonomyFilterCheckBox.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
@@ -95,7 +95,7 @@ public class ExperimentSelectionPanel extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(taxonomyFilterCheckBox)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 199, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(taxonomyLabel))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
@@ -119,7 +119,7 @@ public class ExperimentSelectionPanel extends javax.swing.JPanel {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(taxonomyFilterCheckBox)
                         .addComponent(taxonomyLabel)))
-                .addGap(18, 27, Short.MAX_VALUE)
+                .addGap(18, 18, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(experimentProcessButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(writeResultCheckBox)))

@@ -19,13 +19,16 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
-        this.getContentPane().setBackground(Color.WHITE);
     }
 
-    public JPanel getExperimentSelectionParentPanel() {
-        return experimentSelectionParentPanel;
+    public JPanel getPrideSelectionParentPanel() {
+        return prideSelectionParentPanel;
     }
 
+    public JPanel getFileSelectionParentPanel() {
+        return fileSelectionParentPanel;
+    }
+        
     public JPanel getPipelinePanel() {
         return pipelinePanel;
     }
@@ -78,7 +81,9 @@ public class MainFrame extends javax.swing.JFrame {
         modificationsButton = new javax.swing.JButton();
         mainPanel = new javax.swing.JPanel();
         pipelinePanel = new javax.swing.JPanel();
-        experimentSelectionParentPanel = new javax.swing.JPanel();
+        experimentSelectionTabbedPane = new javax.swing.JTabbedPane();
+        prideSelectionParentPanel = new javax.swing.JPanel();
+        fileSelectionParentPanel = new javax.swing.JPanel();
         pipelineResultTabbedPane = new javax.swing.JTabbedPane();
         summaryParentPanel = new javax.swing.JPanel();
         identificationsParentPanel = new javax.swing.JPanel();
@@ -87,7 +92,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
-        setPreferredSize(new java.awt.Dimension(1000, 900));
 
         toolBar.setBorder(null);
         toolBar.setFloatable(false);
@@ -114,25 +118,32 @@ public class MainFrame extends javax.swing.JFrame {
         modificationsButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         toolBar.add(modificationsButton);
 
-        mainPanel.setOpaque(false);
+        mainPanel.setBackground(new java.awt.Color(255, 255, 255));
         mainPanel.setLayout(new java.awt.CardLayout());
 
         pipelinePanel.setOpaque(false);
         pipelinePanel.setLayout(new java.awt.GridBagLayout());
 
-        experimentSelectionParentPanel.setBackground(new java.awt.Color(255, 255, 255));
-        experimentSelectionParentPanel.setMinimumSize(new java.awt.Dimension(20, 20));
-        experimentSelectionParentPanel.setOpaque(false);
-        experimentSelectionParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
-        experimentSelectionParentPanel.setLayout(new java.awt.GridBagLayout());
+        experimentSelectionTabbedPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Experiment selection"));
+        experimentSelectionTabbedPane.setMinimumSize(new java.awt.Dimension(20, 20));
+        experimentSelectionTabbedPane.setPreferredSize(new java.awt.Dimension(20, 20));
+
+        prideSelectionParentPanel.setMinimumSize(new java.awt.Dimension(20, 20));
+        prideSelectionParentPanel.setOpaque(false);
+        prideSelectionParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
+        prideSelectionParentPanel.setLayout(new java.awt.GridBagLayout());
+        experimentSelectionTabbedPane.addTab("Pride", prideSelectionParentPanel);
+
+        fileSelectionParentPanel.setOpaque(false);
+        fileSelectionParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
+        fileSelectionParentPanel.setLayout(new java.awt.GridBagLayout());
+        experimentSelectionTabbedPane.addTab("Pipeline result file", fileSelectionParentPanel);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.25;
-        pipelinePanel.add(experimentSelectionParentPanel, gridBagConstraints);
+        pipelinePanel.add(experimentSelectionTabbedPane, gridBagConstraints);
 
         pipelineResultTabbedPane.setBackground(new java.awt.Color(255, 255, 255));
         pipelineResultTabbedPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Pipeline result"));
@@ -154,7 +165,6 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.75;
         pipelinePanel.add(pipelineResultTabbedPane, gridBagConstraints);
@@ -174,20 +184,21 @@ public class MainFrame extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(toolBar, javax.swing.GroupLayout.DEFAULT_SIZE, 840, Short.MAX_VALUE)
+            .addComponent(toolBar, javax.swing.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE))
+                .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 863, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel experimentSelectionParentPanel;
+    private javax.swing.JTabbedPane experimentSelectionTabbedPane;
+    private javax.swing.JPanel fileSelectionParentPanel;
     private javax.swing.JPanel identificationsParentPanel;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JButton modificationsButton;
@@ -197,6 +208,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton pipelineParamsButton;
     private javax.swing.JPanel pipelineParamsParentPanel;
     private javax.swing.JTabbedPane pipelineResultTabbedPane;
+    private javax.swing.JPanel prideSelectionParentPanel;
     private javax.swing.JPanel summaryParentPanel;
     private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
