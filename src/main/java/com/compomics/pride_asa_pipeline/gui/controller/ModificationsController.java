@@ -77,7 +77,7 @@ public class ModificationsController {
         this.modificationService = modificationService;
     }
 
-    public void init() {                        
+    public void init() {
         modificationsPanel = new ModificationsPanel();
 
         //fill location combobox
@@ -115,7 +115,7 @@ public class ModificationsController {
 
             @Override
             public String getDescription() {
-                return ("only xml.");
+                return ("XML files only");
             }
         });
 
@@ -351,7 +351,7 @@ public class ModificationsController {
                             + "\n" + "The modifications will however be used in the pipeline.", JOptionPane.WARNING_MESSAGE);
                 }
             }
-        });                
+        });
     }
 
     /**
@@ -362,7 +362,7 @@ public class ModificationsController {
      */
     private List<Modification> getModificationsAsList(Set<Modification> modificationSet) {
         List<Modification> modifications = new ArrayList<Modification>();
-        modifications.addAll(modificationSet);        
+        modifications.addAll(modificationSet);
 
         return modifications;
     }

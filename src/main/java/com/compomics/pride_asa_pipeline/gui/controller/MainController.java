@@ -6,6 +6,7 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
@@ -96,6 +97,7 @@ public class MainController implements ActionListener {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
+                LOGGER.error(e.getMessage(), e);
                 showUnexpectedErrorDialog(e.getMessage());
             }
         });
@@ -117,7 +119,8 @@ public class MainController implements ActionListener {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         
-        mainFrame.getExperimentSelectionParentPanel().add(experimentSelectionController.getExperimentSelectionPanel(), gridBagConstraints);
+        mainFrame.getPrideSelectionParentPanel().add(experimentSelectionController.getPrideSelectionPanel(), gridBagConstraints);
+        mainFrame.getFileSelectionParentPanel().add(experimentSelectionController.getFileSelectionPanel(), gridBagConstraints);
         mainFrame.getModificationsParentPanel().add(modificationsController.getModificationsPanel(), gridBagConstraints);
         mainFrame.getIdentificationsParentPanel().add(pipelineResultController.getIdentificationsPanel(), gridBagConstraints);
         mainFrame.getSummaryParentPanel().add(pipelineResultController.getSummaryPanel(), gridBagConstraints);
@@ -145,15 +148,14 @@ public class MainController implements ActionListener {
         JOptionPane.showMessageDialog(mainFrame.getContentPane(), message, title, messageType);
     }
     
-    public void showUnexpectedErrorDialog(String message) {
+    public void showUnexpectedErrorDialog(String message) {        
         showMessageDialog("Unexpected error", "Un expected error occured: "
                 + "\n" + message
                 + "\n" + "please try to rerun the application.", JOptionPane.ERROR_MESSAGE);
     }
     
-    public void onAnnotationFinished() {
-        pipelineResultController.updateIdentifications();
-        pipelineResultController.updateSummary();
+    public void onAnnotationFinished(SpectrumAnnotatorResult spectrumAnnotatorResult) {
+        pipelineResultController.update(spectrumAnnotatorResult);        
     }
     
     public void onAnnotationCanceled() {

@@ -4,9 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.model;
 
-import com.compomics.pride_asa_pipeline.model.comparator.IdentificationComparator;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -77,8 +75,7 @@ public class SpectrumAnnotatorResult {
     }
 
     /**
-     * Returns all the experiment identications as a list, sorted by spectrum
-     * ID.
+     * Returns all the experiment identications as a list.
      *
      * @return the list of experiment identifications
      */
@@ -87,8 +84,6 @@ public class SpectrumAnnotatorResult {
         allIdentifications.addAll(getUnexplainedIdentifications());
         allIdentifications.addAll(getUnmodifiedPrecursors());
         allIdentifications.addAll(getModifiedPrecursors());
-
-        Collections.sort(allIdentifications, new IdentificationComparator());
 
         return allIdentifications;
     }

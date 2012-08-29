@@ -11,11 +11,11 @@ import java.util.Comparator;
  *
  * @author Niels Hulstaert
  */
-public class IdentificationComparator implements Comparator<Identification> {
+public class IdentificationSequenceComparator implements Comparator<Identification> {
 
     @Override
     public int compare(Identification identification1, Identification identification2) {
-        return Double.compare(identification1.getSpectrumId(), identification2.getSpectrumId());
+        return identification1.getPeptide().getSequenceString().compareTo(identification2.getPeptide().getSequenceString());
     }
         
 }

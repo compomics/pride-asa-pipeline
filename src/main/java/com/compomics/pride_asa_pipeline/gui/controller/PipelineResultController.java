@@ -4,22 +4,28 @@
  */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.gui.TableFormat;
+import ca.odell.glazedlists.swing.EventSelectionModel;
+import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.TableComparatorChooser;
 import com.compomics.pride_asa_pipeline.gui.view.IdentificationsPanel;
 import com.compomics.pride_asa_pipeline.gui.view.SummaryPanel;
-import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
+import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.Identification;
-import com.compomics.pride_asa_pipeline.model.IdentificationScore;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ModificationFacade;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peptide;
+import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.model.comparator.IdentificationSequenceComparator;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumPanelService;
-import com.compomics.pride_asa_pipeline.util.GuiUtils;
 import com.compomics.pride_asa_pipeline.util.MathUtils;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.google.common.base.Joiner;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
@@ -27,20 +33,10 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.log4j.Logger;
-import org.jdesktop.beansbinding.AutoBinding;
-import org.jdesktop.beansbinding.BindingGroup;
-import org.jdesktop.beansbinding.ELProperty;
-import org.jdesktop.observablecollections.ObservableCollections;
-import org.jdesktop.observablecollections.ObservableList;
-import org.jdesktop.swingbinding.JTableBinding;
-import org.jdesktop.swingbinding.JTableBinding.ColumnBinding;
-import org.jdesktop.swingbinding.SwingBindings;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -53,14 +49,17 @@ import org.jfree.data.general.DefaultPieDataset;
 public class PipelineResultController {
 
     private static final Logger LOGGER = Logger.getLogger(PipelineResultController.class);
-    
+    private static final String UNMOD_MASS_DELTA_OPEN = "[";
+    private static final String UNMOD_MASS_DELTA_CLOSE = "]";
     private static final String MODIFIED_LABEL = "modified";
     private static final String UNMODIFIED_LABEL = "unmodified";
     private static final String UNEXPLAINED_LABEL = "unexplained";
-    
     //model
-    private BindingGroup bindingGroup;
-    private ObservableList<Identification> identificationsBindingList;
+    private SpectrumAnnotatorResult spectrumAnnotatorResult;
+    private EventList<Identification> identificationsEventList;
+    private SortedList<Identification> sortedIdentificationsList;
+    private EventSelectionModel identificationsSelectionModel;
+    private EventTableModel identificationsTableModel;
     private DefaultPieDataset identificationsDataset;
     private DefaultCategoryDataset modificationsDataset;
     //views
@@ -111,52 +110,10 @@ public class PipelineResultController {
         initSummaryPanel();
     }
 
-    public void updateIdentifications() {
-        identificationsBindingList.clear();
-        identificationsBindingList.addAll(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getIdentifications());
-    }
-
-    public void updateSummary() {
-        //create new identificiations data set
-        identificationsDataset = new DefaultPieDataset();
-        identificationsDataset.setValue(UNMODIFIED_LABEL, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getUnmodifiedPrecursors().size());
-        identificationsDataset.setValue(MODIFIED_LABEL, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getModifiedPrecursors().size());
-        identificationsDataset.setValue(UNEXPLAINED_LABEL, mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getUnexplainedIdentifications().size());
-
-        JFreeChart identificationsChart = ChartFactory.createPieChart(
-                "Identifications(" + mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getNumberOfIdentifications() + ")", // chart title
-                identificationsDataset, // data
-                Boolean.TRUE, // include legend
-                Boolean.TRUE,
-                Boolean.FALSE);
-
-        PiePlot plot = (PiePlot) identificationsChart.getPlot();
-        plot.setLabelFont(new Font("SansSerif", Font.PLAIN, 12));
-        plot.setNoDataMessage("No data available");
-        //plot.setCircular(false);
-        plot.setLabelGap(0.02);
-
-        //create new modifications data set
-        modificationsDataset = new DefaultCategoryDataset();
-        Map<Modification, Integer> modifications = modificationService.getUsedModifications(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
-        for (Modification modification : modifications.keySet()) {
-            double relativeCount = (double) (modifications.get(modification)) / (double) (mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getNumberOfIdentifications());
-            modificationsDataset.addValue(relativeCount, "relative count", modification.getName());
-        }
-
-        JFreeChart modificationsChart = ChartFactory.createBarChart(
-                "Modifications",
-                "modification",
-                "relative count",
-                modificationsDataset,
-                PlotOrientation.VERTICAL, true, true, false);
-        CategoryPlot modificationsPlot = (CategoryPlot) modificationsChart.getPlot();
-        //CategoryAxis xAxis = (CategoryAxis) modificationsPlot.getDomainAxis();
-        //xAxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
-
-        //add chart to panels
-        identificationsChartPanel.setChart(identificationsChart);
-        modificationsChartPanel.setChart(modificationsChart);
+    public void update(SpectrumAnnotatorResult spectrumAnnotatorResult) {
+        this.spectrumAnnotatorResult = spectrumAnnotatorResult;
+        updateIdentifications();
+        updateSummary();
     }
 
     /**
@@ -164,7 +121,7 @@ public class PipelineResultController {
      */
     public void clear() {
         //clear identifications panel
-        identificationsBindingList.clear();
+        identificationsEventList.clear();
         addSpectrumPanel(null);
 
         //clear summary panel
@@ -177,56 +134,16 @@ public class PipelineResultController {
     private void initIdentificationsPanel() {
         identificationsPanel = new IdentificationsPanel();
 
-        //init bindings
-        bindingGroup = new BindingGroup();
-        identificationsBindingList = ObservableCollections.observableList(new ArrayList<Identification>());
+        identificationsEventList = new BasicEventList<Identification>();
+        sortedIdentificationsList = new SortedList<Identification>(identificationsEventList, new IdentificationSequenceComparator());
+        identificationsSelectionModel = new EventSelectionModel(sortedIdentificationsList);
+        identificationsTableModel = new EventTableModel(sortedIdentificationsList, new IdentificationsTableFormat());
+        identificationsPanel.getIdentificationsTable().setModel(identificationsTableModel);
+        identificationsPanel.getIdentificationsTable().setSelectionModel(identificationsSelectionModel);
 
-        //table binding        
-        JTableBinding identificationTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ, identificationsBindingList, identificationsPanel.getIdentificationsTable());
-
-        //Add column bindings        
-        ColumnBinding columnBinding = identificationTableBinding.addColumnBinding(ELProperty.create("${peptide.sequence}"));
-        columnBinding.setColumnName("Peptide");
-        columnBinding.setEditable(Boolean.FALSE);
-        columnBinding.setColumnClass(AminoAcidSequence.class);
-
-        columnBinding = identificationTableBinding.addColumnBinding(ELProperty.create("${peptide.charge}"));
-        columnBinding.setColumnName("Charge");
-        columnBinding.setEditable(Boolean.FALSE);
-        columnBinding.setColumnClass(Integer.class);
-        
-        columnBinding = identificationTableBinding.addColumnBinding(ELProperty.create("${peptide}"));
-        columnBinding.setColumnName("Delta m");
-        columnBinding.setEditable(Boolean.FALSE);
-        columnBinding.setColumnClass(Peptide.class);
-        columnBinding.setRenderer(new DeltaMTableCellRenderer());
-        
-        columnBinding = identificationTableBinding.addColumnBinding(ELProperty.create("${peptide}"));
-        columnBinding.setColumnName("Delta m/z");
-        columnBinding.setEditable(Boolean.FALSE);
-        columnBinding.setColumnClass(Peptide.class);
-        columnBinding.setRenderer(new DeltaMTableCellRenderer());
-
-        columnBinding = identificationTableBinding.addColumnBinding(ELProperty.create("${peptide.mzRatio}"));
-        columnBinding.setColumnName("Precursor m/z");
-        columnBinding.setEditable(Boolean.FALSE);
-        columnBinding.setColumnClass(Double.class);
-        columnBinding.setRenderer(new PrecursorMzRatioCellRenderer());
-        
-        columnBinding = identificationTableBinding.addColumnBinding(ELProperty.create("${annotationData.identificationScore}"));
-        columnBinding.setColumnName("Average fragment ion score");
-        columnBinding.setEditable(Boolean.FALSE);
-        columnBinding.setColumnClass(IdentificationScore.class);
-        columnBinding.setRenderer(new IdentificationScoreCellRenderer());
-
-        columnBinding = identificationTableBinding.addColumnBinding(ELProperty.create("${peptide}"));
-        columnBinding.setColumnName("Modifications");
-        columnBinding.setEditable(Boolean.FALSE);
-        columnBinding.setColumnClass(Peptide.class);
-        columnBinding.setRenderer(new ModificationsCellRenderer());
-
-        bindingGroup.addBinding(identificationTableBinding);
-        bindingGroup.bind();
+        //use MULTIPLE_COLUMN_MOUSE to allow sorting by multiple columns
+        TableComparatorChooser tableSorter = TableComparatorChooser.install(
+                identificationsPanel.getIdentificationsTable(), sortedIdentificationsList, TableComparatorChooser.MULTIPLE_COLUMN_MOUSE);
 
         //add listeners
         identificationsPanel.getIdentificationsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -234,7 +151,7 @@ public class PipelineResultController {
             public void valueChanged(ListSelectionEvent lse) {
                 if (!lse.getValueIsAdjusting()) {
                     if (identificationsPanel.getIdentificationsTable().getSelectedRow() != -1) {
-                        Identification identification = identificationsBindingList.get(identificationsPanel.getIdentificationsTable().getSelectedRow());
+                        Identification identification = sortedIdentificationsList.get(identificationsPanel.getIdentificationsTable().getSelectedRow());
 
                         SpectrumPanel spectrumPanel = spectrumPanelService.getSpectrumPanel(identification);
 
@@ -243,6 +160,52 @@ public class PipelineResultController {
                 }
             }
         });
+    }
+
+    private void updateIdentifications() {
+        identificationsEventList.clear();
+        identificationsEventList.addAll(spectrumAnnotatorResult.getIdentifications());
+        addSpectrumPanel(null);
+    }
+
+    private void updateSummary() {
+        //create new identificiations data set
+        identificationsDataset = new DefaultPieDataset();
+        identificationsDataset.setValue(UNMODIFIED_LABEL, spectrumAnnotatorResult.getUnmodifiedPrecursors().size());
+        identificationsDataset.setValue(MODIFIED_LABEL, spectrumAnnotatorResult.getModifiedPrecursors().size());
+        identificationsDataset.setValue(UNEXPLAINED_LABEL, spectrumAnnotatorResult.getUnexplainedIdentifications().size());
+
+        JFreeChart identificationsChart = ChartFactory.createPieChart(
+                "Identifications(" + spectrumAnnotatorResult.getNumberOfIdentifications() + ")", // chart title
+                identificationsDataset, // data
+                Boolean.TRUE, // include legend
+                Boolean.TRUE,
+                Boolean.FALSE);
+
+        PiePlot plot = (PiePlot) identificationsChart.getPlot();
+        plot.setLabelFont(new Font("SansSerif", Font.PLAIN, 12));
+        plot.setNoDataMessage("No data available");
+        plot.setCircular(Boolean.TRUE);
+        plot.setLabelGap(0.02);
+
+        //create new modifications data set
+        modificationsDataset = new DefaultCategoryDataset();
+        Map<Modification, Integer> modifications = modificationService.getUsedModifications(spectrumAnnotatorResult);
+        for (Modification modification : modifications.keySet()) {
+            double relativeCount = (double) (modifications.get(modification)) / (double) (spectrumAnnotatorResult.getNumberOfIdentifications());
+            modificationsDataset.addValue(relativeCount, "relative count", modification.getName());
+        }
+
+        JFreeChart modificationsChart = ChartFactory.createBarChart(
+                "Modifications",
+                "modification",
+                "relative count",
+                modificationsDataset,
+                PlotOrientation.VERTICAL, true, true, false);
+
+        //add chart to panels
+        identificationsChartPanel.setChart(identificationsChart);
+        modificationsChartPanel.setChart(modificationsChart);
     }
 
     private void initSummaryPanel() {
@@ -260,7 +223,7 @@ public class PipelineResultController {
 
         summaryPanel.getIdentificationsChartParentPanel().add(identificationsChartPanel, gridBagConstraints);
         summaryPanel.getModificationsChartParentPanel().add(modificationsChartPanel, gridBagConstraints);
-    }    
+    }
 
     private void addSpectrumPanel(SpectrumPanel spectrumPanel) {
         //remove spectrum panel if already present
@@ -282,43 +245,57 @@ public class PipelineResultController {
         identificationsPanel.getIdentificationDetailPanel().repaint();
     }
 
-    //private classes
-    private class DeltaMTableCellRenderer extends DefaultTableCellRenderer {                
-        
+    //private classes    
+    private class IdentificationsTableFormat implements TableFormat {
+
+        String[] columnNames = {"Peptide", "Charge", "Mass delta", "M/Z delta", "Precursor m/z", "Score", "Modifications"};
+        private static final int PEPTIDE = 0;
+        private static final int CHARGE = 1;
+        private static final int MASS_DELTA = 2;
+        private static final int MZ_DELTA = 3;
+        private static final int PRECURSOR_MZ = 4;
+        private static final int SCORE = 5;
+        private static final int MODIFICATIONS = 6;
+
         @Override
-        protected void setValue(Object value) {
-//            Peptide peptide = (Peptide) value;
-//            String deltaMValue = null;
-//            try {
-//                double deltaM = peptide.calculateMassDelta();
-//                //check if the peptide is a modified peptide,
-//                //if so, show the corrected mass delta as well.
-//                if(peptide instanceof ModifiedPeptide){
-//                    deltaM
-//                }
-//                else{                    
-//                }
-//                deltaMz = GuiUtils.roundDouble(peptide.calculateMassDelta());                
-//                    deltaMz = deltaMz / peptide.getCharge();
-//                
-//            } catch (AASequenceMassUnknownException ex) {
-//                LOGGER.error(ex.getMessage(), ex);
-//            }
-//            super.setValue(deltaMz);
+        public int getColumnCount() {
+            return columnNames.length;
         }
-         
-    }
-
-    private class ModificationsCellRenderer extends DefaultTableCellRenderer {
 
         @Override
-        protected void setValue(Object value) {
-            Peptide peptide = (Peptide) value;
+        public String getColumnName(int column) {
+            return columnNames[column];
+        }
+
+        @Override
+        public Object getColumnValue(Object object, int column) {
+            Identification identification = (Identification) object;
+            switch (column) {
+                case PEPTIDE:
+                    return identification.getPeptide().getSequenceString();
+                case CHARGE:
+                    return identification.getPeptide().getCharge();
+                case MASS_DELTA:
+                    return constructMassDeltaString(identification.getPeptide(), Boolean.FALSE);
+                case MZ_DELTA:
+                    return constructMassDeltaString(identification.getPeptide(), Boolean.TRUE);
+                case PRECURSOR_MZ:
+                    return MathUtils.roundDouble(identification.getPeptide().getMzRatio());
+                case SCORE:
+                    return MathUtils.roundDouble(identification.getAnnotationData().getIdentificationScore().getAverageFragmentIonScore());
+                case MODIFICATIONS:
+                    return constructModificationsString(identification.getPeptide());
+                default:
+                    throw new IllegalArgumentException("Unexpected column number " + column);
+            }
+        }
+
+        private String constructModificationsString(Peptide peptide) {
             String modificationsInfoString = "0";
             if (peptide instanceof ModifiedPeptide) {
                 List<String> modifications = new ArrayList<String>();
 
-                ModifiedPeptide modifiedPeptide = (ModifiedPeptide) peptide;                
+                ModifiedPeptide modifiedPeptide = (ModifiedPeptide) peptide;
                 if (modifiedPeptide.getNTermMod() != null) {
                     modifications.add(modifiedPeptide.getNTermMod().getName());
                 }
@@ -336,49 +313,33 @@ public class PipelineResultController {
 
                 Joiner joiner = Joiner.on(", ");
                 modificationsInfoString = modifications.size() + "(" + joiner.join(modifications) + ")";
-                
-                setBackground(Color.ORANGE);
-            }            
+            }
 
-            super.setValue(modificationsInfoString);
+            return modificationsInfoString;
         }
-    }
 
-//    private class ExplanationCellRenderer extends DefaultTableCellRenderer {
-//
-//        @Override
-//        protected void setValue(Object value) {
-//            IdentificationGuiWrapper.ExplanationType explanationType = (IdentificationGuiWrapper.ExplanationType) value;
-//
-//            if (explanationType.equals(IdentificationGuiWrapper.ExplanationType.UNMODIFIED)) {
-//                setBackground(Color.GREEN);
-//            } else if (explanationType.equals(IdentificationGuiWrapper.ExplanationType.MODIFIED)) {
-//                setBackground(Color.ORANGE);
-//            } else {
-//                setBackground(Color.RED);
-//            }
-//
-//            super.setValue(explanationType.name());
-//        }
-//    }
+        private String constructMassDeltaString(Peptide peptide, boolean doChargeAdjustment) {
+            String massDelta = "N/A";
+            try {
+                double massDeltaValue = peptide.calculateMassDelta();
+                if (doChargeAdjustment) {
+                    massDeltaValue = massDeltaValue / peptide.getCharge();
+                }
+                massDelta = Double.toString(MathUtils.roundDouble(massDeltaValue));
+                //check if the peptide is a modified peptide,
+                //if so, show the corrected mass delta as well.
+                if (peptide instanceof ModifiedPeptide) {
+                    double massDeltaValueWithMods = peptide.calculateMassDelta() - ((ModifiedPeptide) peptide).calculateModificationsMass();
+                    if (doChargeAdjustment) {
+                        massDeltaValueWithMods = massDeltaValueWithMods / peptide.getCharge();
+                    }
+                    massDelta = Double.toString(MathUtils.roundDouble(massDeltaValueWithMods)) + " " + UNMOD_MASS_DELTA_OPEN + massDelta + UNMOD_MASS_DELTA_CLOSE;
+                }
+            } catch (AASequenceMassUnknownException ex) {
+                LOGGER.error(ex.getMessage(), ex);
+            }
 
-    private class IdentificationScoreCellRenderer extends DefaultTableCellRenderer {
-
-        @Override
-        protected void setValue(Object value) {
-            IdentificationScore identificationScore = (IdentificationScore) value;
-
-            super.setValue(MathUtils.roundDouble(identificationScore.getAverageFragmentIonScore()));
-        }
-    }
-
-    private class PrecursorMzRatioCellRenderer extends DefaultTableCellRenderer {
-
-        @Override
-        protected void setValue(Object value) {
-            Double precursorMzRatio = (Double) value;
-
-            super.setValue(MathUtils.roundDouble(precursorMzRatio));
+            return massDelta;
         }
     }
 }

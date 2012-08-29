@@ -12,7 +12,7 @@ import javax.swing.*;
  */
 public class ModificationsPanel extends javax.swing.JPanel {
     
-    JFileChooser fileChooser;
+    private JFileChooser fileChooser;
     
     /**
      * Creates new form ModificationsPanel

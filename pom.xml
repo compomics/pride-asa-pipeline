@@ -388,17 +388,18 @@
             <artifactId>jfreechart</artifactId>
             <version>1.0.14</version>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>unknown.binary</groupId>-->
-        <!--<artifactId>AbsoluteLayout</artifactId>-->
-        <!--<version>SNAPSHOT</version>-->
-        <!--</dependency>-->
         
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
             <version>1.2</version>
         </dependency>
-            
+        
+        <dependency>
+            <groupId>net.java.dev.glazedlists</groupId>
+            <artifactId>glazedlists_java15</artifactId>
+            <version>1.8.0</version>
+        </dependency>
+                        
     </dependencies>
 </project>
