@@ -22,7 +22,7 @@ public class AnnotationData {
     /**
      * The filter noise threshold
      */
-    private double noiseThreshold;
+    private double noiseThreshold = 0.0;
        
     public List<FragmentIonAnnotation> getFragmentIonAnnotations() {
         return fragmentIonAnnotations;
