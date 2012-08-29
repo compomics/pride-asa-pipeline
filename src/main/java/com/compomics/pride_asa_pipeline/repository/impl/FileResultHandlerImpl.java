@@ -90,6 +90,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
                     + "precursor_mzratio" + COLUMN_DELIMITER
                     + "precursor_charge" + COLUMN_DELIMITER
                     + "explanation" + COLUMN_DELIMITER
+                    + "noise_threshold" + COLUMN_DELIMITER
                     + "annotation_score" + COLUMN_DELIMITER
                     + "fragment_ions" + COLUMN_DELIMITER
                     + "modifications");
@@ -98,15 +99,17 @@ public class FileResultHandlerImpl implements FileResultHandler {
             for (Identification identification : identifications) {
                 String fragmentIonsString = NOT_AVAILABLE;
                 String modificationsString = NOT_AVAILABLE;
-                String annotationScore = NOT_AVAILABLE;
+                String annotationScoreString = NOT_AVAILABLE;
+                String noiseThresholdString = NOT_AVAILABLE;
                 //check if there are fragment ion annotations
                 if (identification.getAnnotationData() != null) {
-                    if (identification.getAnnotationData().getFragmentIonAnnotations() != null) {
-                        fragmentIonsString = constructFragmentIons(identification.getAnnotationData().getFragmentIonAnnotations());
-                        if (identification.getAnnotationData().getIdentificationScore() != null) {
-                            annotationScore = constructScore(identification.getAnnotationData().getIdentificationScore());
+                    if (identification.getAnnotationData().getIdentificationScore() != null) {
+                        annotationScoreString = constructScore(identification.getAnnotationData().getIdentificationScore());
+                        noiseThresholdString = Double.toString(MathUtils.roundDouble(identification.getAnnotationData().getNoiseThreshold()));
+                        if (identification.getAnnotationData().getFragmentIonAnnotations() != null) {
+                            fragmentIonsString = constructFragmentIons(identification.getAnnotationData().getFragmentIonAnnotations());
                         }
-                    }
+                    }                   
                 }
 
                 //check if there are modifications
@@ -117,10 +120,11 @@ public class FileResultHandlerImpl implements FileResultHandler {
                 pw.print(identification.getSpectrumId()
                         + COLUMN_DELIMITER + identification.getMzAccession()
                         + COLUMN_DELIMITER + identification.getPeptide().getSequenceString()
-                        + COLUMN_DELIMITER + identification.getPeptide().getMzRatio()
+                        + COLUMN_DELIMITER + MathUtils.roundDouble(identification.getPeptide().getMzRatio())
                         + COLUMN_DELIMITER + identification.getPeptide().getCharge()
                         + COLUMN_DELIMITER + identification.getPipelineExplanationType().toString()
-                        + COLUMN_DELIMITER + annotationScore
+                        + COLUMN_DELIMITER + noiseThresholdString
+                        + COLUMN_DELIMITER + annotationScoreString
                         + COLUMN_DELIMITER + fragmentIonsString
                         + COLUMN_DELIMITER + modificationsString);
 
@@ -160,24 +164,25 @@ public class FileResultHandlerImpl implements FileResultHandler {
 
                     Peptide peptide = null;
                     //check for modifications
-                    if (splits[8].equals(NOT_AVAILABLE)) {
+                    if (splits[9].equals(NOT_AVAILABLE)) {
                         peptide = new Peptide(precursorCharge, precursorMass, new AminoAcidSequence(sequence));
                     } else {
                         peptide = new ModifiedPeptide(precursorCharge, precursorMass, new AminoAcidSequence(sequence), 0L);
-                        parseModifications((ModifiedPeptide) peptide, splits[8]);
+                        parseModifications((ModifiedPeptide) peptide, splits[9]);
                     }
 
                     Identification identification = new Identification(peptide, mzAccession, spectrumId, 0L);
                     identification.setPipelineExplanationType(pipelineExplanationType);
 
-                    //check for score
-                    if (!splits[6].equals(NOT_AVAILABLE)) {
+                    //check for noise threshold and score
+                    if (!splits[7].equals(NOT_AVAILABLE)) {
                         AnnotationData annotationData = new AnnotationData();
-                        annotationData.setIdentificationScore(parseScore(splits[6], peptide.length()));
+                        annotationData.setNoiseThreshold(Double.parseDouble(splits[6]));
+                        annotationData.setIdentificationScore(parseScore(splits[7], peptide.length()));
 
                         //check for annotations
-                        if (!splits[7].equals(NOT_AVAILABLE)) {
-                            List<FragmentIonAnnotation> fragmentIonAnnotations = parseFragmentIonAnnotations(splits[7]);
+                        if (!splits[8].equals(NOT_AVAILABLE)) {
+                            List<FragmentIonAnnotation> fragmentIonAnnotations = parseFragmentIonAnnotations(splits[8]);
                             annotationData.setFragmentIonAnnotations(fragmentIonAnnotations);
                         }
 

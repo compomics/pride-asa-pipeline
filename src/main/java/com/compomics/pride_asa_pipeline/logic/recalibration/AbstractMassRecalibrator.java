@@ -144,8 +144,7 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
     protected List<Double> getMassErrors(List<Peptide> peptides) throws AASequenceMassUnknownException {
         List<Double> errors = new ArrayList<Double>();
         for (Peptide peptide : peptides) {
-            errors.add(peptide.calculateMassDelta());
-            System.out.println("mass delta: " + peptide.calculateMassDelta());
+            errors.add(peptide.calculateMassDelta());            
         }
         return errors;
     }

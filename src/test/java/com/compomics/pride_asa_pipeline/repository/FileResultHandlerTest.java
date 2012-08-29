@@ -115,14 +115,15 @@ public class FileResultHandlerTest {
                 assertEquals(peptide.getMzRatio(), Double.parseDouble(splitArray[3]), 0.01);
                 assertEquals(peptide.getCharge(), Integer.parseInt(splitArray[4]));
                 assertEquals(identification_1.getPipelineExplanationType(), PipelineExplanationType.valueOf(splitArray[5]));
+                assertEquals(identification_1.getAnnotationData().getNoiseThreshold(), Double.parseDouble(splitArray[6]), 0.01);
                 String identificationScoreString_1 = "" + MathUtils.roundDouble(identification_1.getAnnotationData().getIdentificationScore().getAverageFragmentIonScore()) + "("
                         + identification_1.getAnnotationData().getIdentificationScore().getMatchingPeaks() + ";"
                         + identification_1.getAnnotationData().getIdentificationScore().getTotalPeaks() + ";"
                         + identification_1.getAnnotationData().getIdentificationScore().getMatchingIntensity() + ";"
                         + identification_1.getAnnotationData().getIdentificationScore().getTotalIntensity() + ")";
-                assertEquals(identificationScoreString_1, splitArray[6]);
-                assertEquals("ions[b ion_1+(22{400.8:80.0}|44{500.0:300.0});y ion_1+(22{100.5:100.0});y ion_2+(55{200.3:50.0})]", splitArray[7]);
-                assertEquals("N/A", splitArray[8]);
+                assertEquals(identificationScoreString_1, splitArray[7]);
+                assertEquals("ions[b ion_1+(22{400.8:80.0}|44{500.0:300.0});y ion_1+(22{100.5:100.0});y ion_2+(55{200.3:50.0})]", splitArray[8]);
+                assertEquals("N/A", splitArray[9]);
             } else if (line.startsWith("2")) {
                 assertEquals(Long.toString(identification_2.getSpectrumId()), splitArray[0]);
                 assertEquals(identification_1.getMzAccession(), splitArray[1]);
@@ -132,7 +133,8 @@ public class FileResultHandlerTest {
                 assertEquals(identification_2.getPipelineExplanationType(), PipelineExplanationType.valueOf(splitArray[5]));
                 assertEquals("N/A", splitArray[6]);
                 assertEquals("N/A", splitArray[7]);
-                assertEquals("mods[NT_testModification_4;0_testModification_3;3_testModification_1;6_testModification_2]", splitArray[8]);
+                assertEquals("N/A", splitArray[8]);
+                assertEquals("mods[NT_testModification_4;0_testModification_3;3_testModification_1;6_testModification_2]", splitArray[9]);
             }
         }
     }
@@ -152,7 +154,10 @@ public class FileResultHandlerTest {
         assertEquals(2, spectrumAnnotatorResult.getUnexplainedIdentifications().size());
 
         for (Identification identification : spectrumAnnotatorResult.getIdentifications()) {
-            assertNotNull(identification.getPeptide());            
+            assertNotNull(identification.getPeptide()); 
+            if(identification.getAnnotationData() != null){
+                assertNotNull(identification.getAnnotationData().getIdentificationScore());                
+            }            
         }
     }
 }
