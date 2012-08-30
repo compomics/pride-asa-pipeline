@@ -67,6 +67,16 @@ public class FileResultHandlerImpl implements FileResultHandler {
     private static final String MODIFICATIONS_C_TERMINAL = "CT";
     private static final String MODIFICATIONS_LOCATION_DELIMITER = "_";
     private static final String NOT_AVAILABLE = "N/A";
+    private static final int SPECTRUM_ID = 0;
+    private static final int MZ_ACCESSION = 1;
+    private static final int PEPTIDE_SEQUENCE = 2;
+    private static final int PRECURSOR_MZ = 3;
+    private static final int PRECURSOR_CHARGE = 4;
+    private static final int EXPLANATION = 5;
+    private static final int NOISE_THRESHOLD = 6;
+    private static final int SCORE = 7;
+    private static final int FRAGMENT_IONS = 8;
+    private static final int MODIFICATIONS = 9;
     private ModificationService modificationService;
     private Map<String, Modification> modifications;
 
@@ -87,7 +97,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
             pw.println("spectrum_id" + COLUMN_DELIMITER
                     + "mz_accession" + COLUMN_DELIMITER
                     + "peptide_sequence" + COLUMN_DELIMITER
-                    + "precursor_mzratio" + COLUMN_DELIMITER
+                    + "precursor_mz" + COLUMN_DELIMITER
                     + "precursor_charge" + COLUMN_DELIMITER
                     + "explanation" + COLUMN_DELIMITER
                     + "noise_threshold" + COLUMN_DELIMITER
@@ -109,7 +119,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
                         if (identification.getAnnotationData().getFragmentIonAnnotations() != null) {
                             fragmentIonsString = constructFragmentIons(identification.getAnnotationData().getFragmentIonAnnotations());
                         }
-                    }                   
+                    }
                 }
 
                 //check if there are modifications
@@ -144,6 +154,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
             BufferedReader br = new BufferedReader(new FileReader(resultFile));
 
             String experimentAccession = resultFile.getName().substring(0, resultFile.getName().lastIndexOf(".txt"));
+            LOGGER.info("Start reading pipeline result file for experiment " + experimentAccession);
             spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
             //load modifications if necessary
             if (modifications == null) {
@@ -155,44 +166,45 @@ public class FileResultHandlerImpl implements FileResultHandler {
                 if (!line.startsWith("spectrum_id")) {
                     String[] splits = line.split(COLUMN_DELIMITER);
 
-                    long spectrumId = Long.parseLong(splits[0]);
-                    String mzAccession = splits[1];
-                    String sequence = splits[2];
-                    double precursorMass = Double.parseDouble(splits[3]);
-                    int precursorCharge = Integer.parseInt(splits[4]);
-                    PipelineExplanationType pipelineExplanationType = PipelineExplanationType.valueOf(splits[5]);
+                    long spectrumId = Long.parseLong(splits[SPECTRUM_ID]);
+                    String mzAccession = splits[MZ_ACCESSION];
+                    String sequence = splits[PEPTIDE_SEQUENCE];
+                    double precursorMass = Double.parseDouble(splits[PRECURSOR_MZ]);
+                    int precursorCharge = Integer.parseInt(splits[PRECURSOR_CHARGE]);
+                    PipelineExplanationType pipelineExplanationType = PipelineExplanationType.valueOf(splits[EXPLANATION]);
 
                     Peptide peptide = null;
                     //check for modifications
-                    if (splits[9].equals(NOT_AVAILABLE)) {
+                    if (splits[MODIFICATIONS].equals(NOT_AVAILABLE)) {
                         peptide = new Peptide(precursorCharge, precursorMass, new AminoAcidSequence(sequence));
                     } else {
                         peptide = new ModifiedPeptide(precursorCharge, precursorMass, new AminoAcidSequence(sequence), 0L);
-                        parseModifications((ModifiedPeptide) peptide, splits[9]);
+                        //add the modifications to the modified peptide                        
+                        parseModifications((ModifiedPeptide) peptide, splits[MODIFICATIONS]);
                     }
 
                     Identification identification = new Identification(peptide, mzAccession, spectrumId, 0L);
                     identification.setPipelineExplanationType(pipelineExplanationType);
 
                     //check for noise threshold and score
-                    if (!splits[7].equals(NOT_AVAILABLE)) {
+                    if (!splits[SCORE].equals(NOT_AVAILABLE)) {
                         AnnotationData annotationData = new AnnotationData();
-                        annotationData.setNoiseThreshold(Double.parseDouble(splits[6]));
-                        annotationData.setIdentificationScore(parseScore(splits[7], peptide.length()));
+                        annotationData.setNoiseThreshold(Double.parseDouble(splits[NOISE_THRESHOLD]));
+                        annotationData.setIdentificationScore(parseScore(splits[SCORE], peptide.length()));
 
                         //check for annotations
-                        if (!splits[8].equals(NOT_AVAILABLE)) {
-                            List<FragmentIonAnnotation> fragmentIonAnnotations = parseFragmentIonAnnotations(splits[8]);
+                        if (!splits[FRAGMENT_IONS].equals(NOT_AVAILABLE)) {
+                            List<FragmentIonAnnotation> fragmentIonAnnotations = parseFragmentIonAnnotations(splits[FRAGMENT_IONS]);
                             annotationData.setFragmentIonAnnotations(fragmentIonAnnotations);
                         }
 
                         identification.setAnnotationData(annotationData);
                     }
-
                     //add identification to SpectrumAnnotatorResult
                     spectrumAnnotatorResult.addIdentification(identification);
-                }
+                }                
             }
+            LOGGER.info("Finished reading " + spectrumAnnotatorResult.getNumberOfIdentifications() + " identifications for experiment " + experimentAccession);            
             br.close();
         } catch (UnknownAAException e) {
             LOGGER.error(e.getMessage(), e);
@@ -257,13 +269,13 @@ public class FileResultHandlerImpl implements FileResultHandler {
             //check if the ion type is still the same
             if (currentIonType.equals(constructIonType(fragmentIonAnnotations.get(i)))) {
                 //add fragment ion number to the correct ion type
-                fragmentIonNumbersByIonType.add(String.valueOf(fragmentIonAnnotations.get(i).getFragment_ion_number()) + constructFragmentIonPeakValues(fragmentIonAnnotations.get(i)));
+                fragmentIonNumbersByIonType.add(constructFragmentIonPeakValues(fragmentIonAnnotations.get(i)));
             } else {
                 //join fragment ion numbers by ion type
                 fragmentIonsByIonType.add(currentIonType + FRAGMENT_ION_NUMBERS_OPEN + fragmentIonNumberJoiner.join(fragmentIonNumbersByIonType) + FRAGMENT_ION_NUMBERS_CLOSE);
                 //clear fragment ion number list and add first element
                 fragmentIonNumbersByIonType.clear();
-                fragmentIonNumbersByIonType.add(String.valueOf(fragmentIonAnnotations.get(i).getFragment_ion_number()) + constructFragmentIonPeakValues(fragmentIonAnnotations.get(i)));
+                fragmentIonNumbersByIonType.add(constructFragmentIonPeakValues(fragmentIonAnnotations.get(i)));
                 //change current ion type
                 currentIonType = constructIonType(fragmentIonAnnotations.get(i));
             }
@@ -331,6 +343,14 @@ public class FileResultHandlerImpl implements FileResultHandler {
         return peakValues;
     }
 
+    /**
+     * Parses the modifications in the result file and adds them to the modified
+     * peptide. If the modifications is not found by name in the
+     * modifications.xml file, a default modifications is added.
+     *
+     * @param modifiedPeptide the modified peptide
+     * @param modificationsString
+     */
     private void parseModifications(ModifiedPeptide modifiedPeptide, String modificationsString) {
         String mods = modificationsString.substring(modificationsString.indexOf(MODIFICATIONS_OPEN) + MODIFICATIONS_OPEN.length(), modificationsString.indexOf(MODIFICATIONS_CLOSE));
         //split modifications
@@ -376,7 +396,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
         if (modifications.containsKey(modificationName)) {
             return modifications.get(modificationName);
         } else {
-            return new Modification(0.0, Modification.Location.NON_TERMINAL, "unknown", "unknown");
+            return new Modification(0.0, Modification.Location.NON_TERMINAL, NOT_AVAILABLE, modificationName);
         }
     }
 }

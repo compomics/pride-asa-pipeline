@@ -21,7 +21,7 @@ import org.jdesktop.beansbinding.ELProperty;
  * @author Niels Hulstaert
  */
 public class MainController implements ActionListener {
-    
+
     private static final Logger LOGGER = Logger.getLogger(MainController.class);
     private static final String PIPELINE_PANEL_CARD_NAME = "pipelinePanel";
     private static final String MODIFICATIONS_CARD_NAME = "modificationsParentPanel";
@@ -35,63 +35,62 @@ public class MainController implements ActionListener {
     private PipelineParamsController pipelineParamsController;
     //services
     private PrideSpectrumAnnotator prideSpectrumAnnotator;
-    
+
     public MainController() {
     }
-    
+
     public ExperimentSelectionController getExperimentSelectionController() {
         return experimentSelectionController;
     }
-    
+
     public void setExperimentSelectionController(ExperimentSelectionController experimentSelectionController) {
         this.experimentSelectionController = experimentSelectionController;
     }
-    
+
     public ModificationsController getModificationsController() {
         return modificationsController;
     }
-    
+
     public void setModificationsController(ModificationsController modificationsController) {
         this.modificationsController = modificationsController;
     }
-    
+
     public PrideSpectrumAnnotator getPrideSpectrumAnnotator() {
         return prideSpectrumAnnotator;
     }
-    
+
     public void setPrideSpectrumAnnotator(PrideSpectrumAnnotator prideSpectrumAnnotator) {
         this.prideSpectrumAnnotator = prideSpectrumAnnotator;
     }
-    
+
     public PipelineResultController getPipelineResultController() {
         return pipelineResultController;
     }
-    
+
     public void setPipelineResultController(PipelineResultController pipelineResultController) {
         this.pipelineResultController = pipelineResultController;
     }
-    
+
     public PipelineParamsController getPipelineParamsController() {
         return pipelineParamsController;
     }
-    
+
     public void setPipelineParamsController(PipelineParamsController pipelineParamsController) {
         this.pipelineParamsController = pipelineParamsController;
     }
-               
+
     public MainFrame getMainFrame() {
         return mainFrame;
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        String menuItemLabel = actionEvent.getActionCommand();
-        String cardName = actionEvent.getActionCommand();       
-        
+        String cardName = actionEvent.getActionCommand();
+
         CardLayout cardLayout = (CardLayout) mainFrame.getMainPanel().getLayout();
         cardLayout.show(mainFrame.getMainPanel(), cardName);
     }
-    
+
     public void init() {
         //set uncaught exception handler
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -101,7 +100,7 @@ public class MainController implements ActionListener {
                 showUnexpectedErrorDialog(e.getMessage());
             }
         });
-        
+
         mainFrame = new MainFrame();
 
         //workaround for betterbeansbinding logging issue
@@ -118,7 +117,7 @@ public class MainController implements ActionListener {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        
+
         mainFrame.getPrideSelectionParentPanel().add(experimentSelectionController.getPrideSelectionPanel(), gridBagConstraints);
         mainFrame.getFileSelectionParentPanel().add(experimentSelectionController.getFileSelectionPanel(), gridBagConstraints);
         mainFrame.getModificationsParentPanel().add(modificationsController.getModificationsPanel(), gridBagConstraints);
@@ -133,7 +132,7 @@ public class MainController implements ActionListener {
         mainFrame.getPipelineParamsButton().addActionListener(this);
         mainFrame.getModificationsButton().setActionCommand(MODIFICATIONS_CARD_NAME);
         mainFrame.getModificationsButton().addActionListener(this);
-        
+
 
         //set pipeline panel visible in card layout
         CardLayout cardLayout = (CardLayout) mainFrame.getMainPanel().getLayout();
@@ -143,21 +142,21 @@ public class MainController implements ActionListener {
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(Boolean.TRUE);
     }
-    
+
     public void showMessageDialog(String title, String message, int messageType) {
         JOptionPane.showMessageDialog(mainFrame.getContentPane(), message, title, messageType);
     }
-    
-    public void showUnexpectedErrorDialog(String message) {        
+
+    public void showUnexpectedErrorDialog(String message) {
         showMessageDialog("Unexpected error", "Un expected error occured: "
                 + "\n" + message
                 + "\n" + "please try to rerun the application.", JOptionPane.ERROR_MESSAGE);
     }
-    
+
     public void onAnnotationFinished(SpectrumAnnotatorResult spectrumAnnotatorResult) {
-        pipelineResultController.update(spectrumAnnotatorResult);        
+        pipelineResultController.update(spectrumAnnotatorResult);
     }
-    
+
     public void onAnnotationCanceled() {
         LOGGER.info("Annotation canceled.");
         prideSpectrumAnnotator.clearPipeline();

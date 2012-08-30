@@ -25,8 +25,24 @@ public class SummaryPanel extends javax.swing.JPanel {
 
     public JPanel getModificationsChartParentPanel() {
         return modificationsChartParentPanel;
-    }    
-    
+    }
+
+    public JPanel getScoresChartParentPanel() {
+        return scoresChartParentPanel;
+    }
+
+    public JPanel getPrecursorMassDeltaChartParentPanel() {
+        return precursorMassDeltaChartParentPanel;
+    }
+
+    public JPanel getIonCoverageChartParentPanel() {
+        return ionCoverageChartParentPanel;
+    }
+
+    public JPanel getFragmentIonMassDeltaChartParentPanel() {
+        return fragmentIonMassDeltaChartParentPanel;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -40,6 +56,10 @@ public class SummaryPanel extends javax.swing.JPanel {
         identificationsChartParentPanel = new javax.swing.JPanel();
         modificationsChartParentPanel = new javax.swing.JPanel();
         generalSummaryPanel = new javax.swing.JPanel();
+        precursorMassDeltaChartParentPanel = new javax.swing.JPanel();
+        scoresChartParentPanel = new javax.swing.JPanel();
+        fragmentIonMassDeltaChartParentPanel = new javax.swing.JPanel();
+        ionCoverageChartParentPanel = new javax.swing.JPanel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setOpaque(false);
@@ -52,9 +72,9 @@ public class SummaryPanel extends javax.swing.JPanel {
         identificationsChartParentPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weightx = 0.33;
         gridBagConstraints.weighty = 0.5;
         add(identificationsChartParentPanel, gridBagConstraints);
 
@@ -63,40 +83,78 @@ public class SummaryPanel extends javax.swing.JPanel {
         modificationsChartParentPanel.setOpaque(false);
         modificationsChartParentPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weightx = 0.33;
         gridBagConstraints.weighty = 0.5;
         add(modificationsChartParentPanel, gridBagConstraints);
 
         generalSummaryPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("General"));
         generalSummaryPanel.setOpaque(false);
         generalSummaryPanel.setPreferredSize(new java.awt.Dimension(12, 23));
+        generalSummaryPanel.setLayout(new java.awt.GridBagLayout());
 
-        org.jdesktop.layout.GroupLayout generalSummaryPanelLayout = new org.jdesktop.layout.GroupLayout(generalSummaryPanel);
-        generalSummaryPanel.setLayout(generalSummaryPanelLayout);
-        generalSummaryPanelLayout.setHorizontalGroup(
-            generalSummaryPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 388, Short.MAX_VALUE)
-        );
-        generalSummaryPanelLayout.setVerticalGroup(
-            generalSummaryPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 127, Short.MAX_VALUE)
-        );
-
+        precursorMassDeltaChartParentPanel.setOpaque(false);
+        precursorMassDeltaChartParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
+        precursorMassDeltaChartParentPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
+        generalSummaryPanel.add(precursorMassDeltaChartParentPanel, gridBagConstraints);
+
+        scoresChartParentPanel.setOpaque(false);
+        scoresChartParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
+        scoresChartParentPanel.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 0.5;
+        generalSummaryPanel.add(scoresChartParentPanel, gridBagConstraints);
+
+        fragmentIonMassDeltaChartParentPanel.setOpaque(false);
+        fragmentIonMassDeltaChartParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
+        fragmentIonMassDeltaChartParentPanel.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 0.5;
+        generalSummaryPanel.add(fragmentIonMassDeltaChartParentPanel, gridBagConstraints);
+
+        ionCoverageChartParentPanel.setOpaque(false);
+        ionCoverageChartParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
+        ionCoverageChartParentPanel.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 0.5;
+        generalSummaryPanel.add(ionCoverageChartParentPanel, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.66;
+        gridBagConstraints.weighty = 1.0;
         add(generalSummaryPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel fragmentIonMassDeltaChartParentPanel;
     private javax.swing.JPanel generalSummaryPanel;
     private javax.swing.JPanel identificationsChartParentPanel;
+    private javax.swing.JPanel ionCoverageChartParentPanel;
     private javax.swing.JPanel modificationsChartParentPanel;
+    private javax.swing.JPanel precursorMassDeltaChartParentPanel;
+    private javax.swing.JPanel scoresChartParentPanel;
     // End of variables declaration//GEN-END:variables
 }

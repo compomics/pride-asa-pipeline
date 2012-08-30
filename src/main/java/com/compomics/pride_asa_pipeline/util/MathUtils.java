@@ -8,18 +8,17 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @author Florian Reisinger
- *         Date: 10-Aug-2009
+ * @author Florian Reisinger Date: 10-Aug-2009
  * @since $version
  */
 public class MathUtils {
-    
+
     private static final Integer NUMBER_OF_DECIMALS = 4;
 
     /**
-     * Utility method to calculate the median of a given list of values.
-     * Note: this will throw an IllegalStateException if the provided
-     *       argument is null or empty.
+     * Utility method to calculate the median of a given list of values. Note:
+     * this will throw an IllegalStateException if the provided argument is null
+     * or empty.
      *
      * @param values the double values for which to calculate the median.
      * @return the median of the provided values
@@ -64,7 +63,6 @@ public class MathUtils {
         return result;
     }
 
-
     public static double calculateMean(Collection<Double> values) {
         if (values == null || values.isEmpty()) {
             throw new IllegalArgumentException("Can not calculate mean of null or empty collection!");
@@ -82,7 +80,6 @@ public class MathUtils {
         return (calcSum(values) / values.length);
 
     }
-
 
     public static double calcVariance(double[] population) {
         long n = 0;
@@ -103,7 +100,6 @@ public class MathUtils {
     public static double calcStdDeviation(double[] population) {
         return Math.sqrt(calcVariance(population));
     }
-
 
     public static double calcSum(Collection<Double> values) {
         if (values == null) {
@@ -127,15 +123,13 @@ public class MathUtils {
         return sum;
     }
 
-
     public static double calcVariance(double[] values, double mean) {
         double squares = 0D;
         for (double value : values) {
-            squares += Math.pow( (value - mean), 2 );
+            squares += Math.pow((value - mean), 2);
         }
         return squares / (double) values.length;
     }
-
 
     public static double[] toArray(Collection<Double> values) {
         if (values == null) {
@@ -160,11 +154,10 @@ public class MathUtils {
         return result;
     }
 
-
     /**
-     * Utility method for computing the factorial n! of a number n.
-     * NOTE: the resulting factorial is only valid in the scope of
-     * the primitive type 'long', so the largest factorial is 20!. 
+     * Utility method for computing the factorial n! of a number n. NOTE: the
+     * resulting factorial is only valid in the scope of the primitive type
+     * 'long', so the largest factorial is 20!.
      *
      * @param n The integer number of which to compute the factorial.
      * @return The factorial number n!.
@@ -172,8 +165,8 @@ public class MathUtils {
     public static long factorial(int n) {
         // check that we have a number we can actually calculate the factorial for.
         if (n < 0 || n > 20) {
-            throw new IllegalArgumentException("The factorial can only " +
-                    "be calculated for numbers n with 0 <= n <= 20 .");
+            throw new IllegalArgumentException("The factorial can only "
+                    + "be calculated for numbers n with 0 <= n <= 20 .");
         }
         // handle the trivial cases
         if (n == 0 || n == 1) {
@@ -188,11 +181,10 @@ public class MathUtils {
     }
 
     /**
-     * Utility method for computing the factorial n! of a number n.
-     * NOTE: this method uses BigInteger, so is in principle abel to
-     * calculate arbitrary precision numbers. However, to compute the
-     * factorial of large numbers may take up considerable resources
-     * and time.
+     * Utility method for computing the factorial n! of a number n. NOTE: this
+     * method uses BigInteger, so is in principle abel to calculate arbitrary
+     * precision numbers. However, to compute the factorial of large numbers may
+     * take up considerable resources and time.
      *
      * @param n The integer number of which to compute the factorial.
      * @return The factorial number n! as BigInteger.
@@ -200,8 +192,8 @@ public class MathUtils {
     public static BigInteger bigFactorial(int n) {
         // check that we have a number we can actually calculate the factorial for.
         if (n < 0) {
-            throw new IllegalArgumentException("The factorial can only " +
-                    "be calculated positive numbers.");
+            throw new IllegalArgumentException("The factorial can only "
+                    + "be calculated positive numbers.");
         }
         // handle the trivial cases
         if (n == 0 || n == 1) {
@@ -216,13 +208,14 @@ public class MathUtils {
     }
 
     /**
-     * This method allows to check two double values if they are equal within
-     * a certain error margin. E.g. it will check if the difference between the
+     * This method allows to check two double values if they are equal within a
+     * certain error margin. E.g. it will check if the difference between the
      * two values is smaller than the specified allowedError.
      *
      * @param a the first double to compare.
      * @param b the second double to compare.
-     * @param allowedError the allowed error (or difference) between the two values.
+     * @param allowedError the allowed error (or difference) between the two
+     * values.
      * @return true if the two given values are equal within the allowed error.
      */
     public static boolean equalValues(double a, double b, double allowedError) {
@@ -231,9 +224,12 @@ public class MathUtils {
     }
 
     public static double roundDouble(double d) {
-        BigDecimal bigDecimal = new BigDecimal(Double.toString(d));
-        bigDecimal = bigDecimal.setScale(NUMBER_OF_DECIMALS, BigDecimal.ROUND_HALF_UP);
-        return bigDecimal.doubleValue();
+        return roundDouble(d, NUMBER_OF_DECIMALS);
     }
 
+    public static double roundDouble(double d, int numberOfDecimals) {
+        BigDecimal bigDecimal = new BigDecimal(Double.toString(d));
+        bigDecimal = bigDecimal.setScale(numberOfDecimals, BigDecimal.ROUND_HALF_UP);
+        return bigDecimal.doubleValue();
+    }
 }

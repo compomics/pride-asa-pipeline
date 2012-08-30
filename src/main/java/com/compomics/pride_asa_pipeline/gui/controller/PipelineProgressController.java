@@ -15,9 +15,7 @@ import java.awt.event.WindowEvent;
  * @author Niels Hulstaert Hulstaert
  */
 public class PipelineProgressController extends WindowAdapter {
-
-    private static final int NUMBER_OF_PROGRESS_STEPS = 5;
-    private static final String PROGRESS_HEADER_TEXT = "Processing...";
+        
     //model
     private int progress;
     //view
@@ -36,15 +34,14 @@ public class PipelineProgressController extends WindowAdapter {
     public void init() {
         pipelineProgressDialog = new PipelineProgressDialog(experimentSelectionController.getMainController().getMainFrame());
         pipelineProgressDialog.addWindowListener(this);
-
-        pipelineProgressDialog.getProgressBar().setMaximum(NUMBER_OF_PROGRESS_STEPS);
-
+        
         //set this controller in PipelineProgressAppender
         PipelineProgressAppender.setPipelineProgressController(this);
     }
 
-    public void showProgressBar() {
-        pipelineProgressDialog.getProgressHeaderLabel().setText(PROGRESS_HEADER_TEXT);
+    public void showProgressBar(int numberOfProgressSteps, String progressHeaderText) {
+        pipelineProgressDialog.getProgressBar().setMaximum(numberOfProgressSteps);
+        pipelineProgressDialog.getProgressHeaderLabel().setText(progressHeaderText);
         progress = 1;
         GuiUtils.centerDialogOnFrame(experimentSelectionController.getMainController().getMainFrame(), pipelineProgressDialog);
         pipelineProgressDialog.setVisible(Boolean.TRUE);
@@ -70,5 +67,4 @@ public class PipelineProgressController extends WindowAdapter {
         super.windowClosed(e);
         experimentSelectionController.onAnnotationCanceled();
     }
-       
 }
