@@ -27,16 +27,19 @@ import com.compomics.pride_asa_pipeline.service.SpectrumPanelService;
 import com.compomics.pride_asa_pipeline.util.MathUtils;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.google.common.base.Joiner;
+import com.google.common.primitives.Doubles;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -64,7 +67,7 @@ public class PipelineResultController {
     private static final String UNMODIFIED_LABEL = "unmodified";
     private static final String UNEXPLAINED_LABEL = "unexplained";
     private static final int NUMBER_OF_PRECURSOR_MASS_DELTA_BINS = 100;
-    private static final int NUMBER_OF_ION_FRAGMENT_MASS_DELTA_BINS = 100;
+    private static final int NUMBER_OF_ION_FRAGMENT_MASS_DELTA_BINS = 50;
     private static final int NUMBER_OF_ION_COVERAGE_BINS = 100;    
     private static final int NUMBER_OF_SCORE_BINS = 100;
     private static final Color[] PIE_COLORS = new Color[]{Color.GREEN, Color.ORANGE, Color.RED};
@@ -213,11 +216,11 @@ public class PipelineResultController {
                 "Precursor mass delta", "mass delta (d.)", "frequency", precMassDeltasDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
 
-        //create new precursor mass delta dataset
+        //create new fragment ion mass delta dataset
         HistogramDataset fragMassDeltasDataset = new HistogramDataset();
         fragMassDeltasDataset.setType(HistogramType.FREQUENCY);
         
-        fragMassDeltasDataset.addSeries("precursorMassDeltaSeries", precursorMassDeltaValues, NUMBER_OF_PRECURSOR_MASS_DELTA_BINS, -5.0, 25.0);
+        fragMassDeltasDataset.addSeries("precursorMassDeltaSeries", Doubles.toArray(fragmentMassDeltaValues), NUMBER_OF_ION_FRAGMENT_MASS_DELTA_BINS, -5.0, 5.0);
         JFreeChart fragMassDeltasDeltasChart = ChartFactory.createHistogram(
                 "Fragment ion mass delta", "mass delta (d.)", "frequency", fragMassDeltasDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
