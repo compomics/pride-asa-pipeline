@@ -122,7 +122,7 @@ public class FileResultHandlerTest {
                         + identification_1.getAnnotationData().getIdentificationScore().getMatchingIntensity() + ";"
                         + identification_1.getAnnotationData().getIdentificationScore().getTotalIntensity() + ")";
                 assertEquals(identificationScoreString_1, splitArray[7]);
-                assertEquals("ions[b ion_1+(22{400.8:80.0}|44{500.0:300.0});y ion_1+(22{100.5:100.0});y ion_2+(55{200.3:50.0})]", splitArray[8]);
+                assertEquals("ions[b ion_1+(2{400.8:80.0}|4{500.0:300.0});y ion_1+(2{100.5:100.0});y ion_2+(5{200.3:50.0})]", splitArray[8]);
                 assertEquals("N/A", splitArray[9]);
             } else if (line.startsWith("2")) {
                 assertEquals(Long.toString(identification_2.getSpectrumId()), splitArray[0]);
@@ -157,7 +157,11 @@ public class FileResultHandlerTest {
             assertNotNull(identification.getPeptide()); 
             if(identification.getAnnotationData() != null){
                 assertNotNull(identification.getAnnotationData().getIdentificationScore());                
-            }            
+            }    
+            if(identification.getPeptide() instanceof ModifiedPeptide){
+                ModifiedPeptide modifiedPeptide = (ModifiedPeptide)identification.getPeptide();
+                assertTrue(modifiedPeptide.getNTModifications() != null || modifiedPeptide.getNumberNTModifications() != 0 || modifiedPeptide.getCTermMod() != null);
+            }
         }
     }
 }

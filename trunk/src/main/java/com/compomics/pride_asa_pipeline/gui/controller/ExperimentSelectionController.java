@@ -34,6 +34,8 @@ public class ExperimentSelectionController {
 
     private static final Logger LOGGER = Logger.getLogger(ExperimentSelectionController.class);
     private static final String EXPERIMENT_ACCESSION_SEPARATOR = ":";
+    private static final int NUMBER_OF_PRIDE_PROGRESS_STEPS = 5;
+    private static final int NUMBER_OF_FILE_PROGRESS_STEPS = 2;
     //model
     private Integer taxonomyId;
     //hold reference to swingworker for cancelling purposes
@@ -122,7 +124,7 @@ public class ExperimentSelectionController {
         //cancel swingworker
         currentSwingWorker.cancel(Boolean.TRUE);
 
-        //enable process button
+        //enable process buttons
         prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
         fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
     }
@@ -173,8 +175,9 @@ public class ExperimentSelectionController {
                 currentSwingWorker = initAnnotationWorker;
                 initAnnotationWorker.execute();
 
-                //disable process button
+                //disable process buttons
                 prideSelectionPanel.getProcessButton().setEnabled(Boolean.FALSE);
+                fileSelectionPanel.getProcessButton().setEnabled(Boolean.FALSE);
             }
         });
     }
@@ -238,7 +241,8 @@ public class ExperimentSelectionController {
                     ImportPipelineResultWorker importPipelineResultWorker = new ImportPipelineResultWorker();
                     importPipelineResultWorker.execute();
 
-                    //disable process button
+                    //disable process buttons
+                    prideSelectionPanel.getProcessButton().setEnabled(Boolean.FALSE);
                     fileSelectionPanel.getProcessButton().setEnabled(Boolean.FALSE);
                 } else {
                     mainController.showMessageDialog("Pipeline result import", "Please select an pipeline result file", JOptionPane.WARNING_MESSAGE);
@@ -287,7 +291,7 @@ public class ExperimentSelectionController {
         @Override
         protected Void doInBackground() throws Exception {
             //show progress bar
-            pipelineProgressController.showProgressBar();
+            pipelineProgressController.showProgressBar(NUMBER_OF_PRIDE_PROGRESS_STEPS, "Processing");
 
             mainController.getPrideSpectrumAnnotator().initAnnotation(getExperimentAccesion());
 
@@ -339,11 +343,7 @@ public class ExperimentSelectionController {
         @Override
         protected void done() {
             try {
-                get();
-
-                //enable process button
-                prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
-
+                get();                
                 mainController.onAnnotationFinished(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
             } catch (InterruptedException ex) {
                 LOGGER.error(ex.getMessage(), ex);
@@ -356,6 +356,9 @@ public class ExperimentSelectionController {
             } finally {
                 //hide progress bar
                 pipelineProgressController.hideProgressDialog();
+                //enable process buttons
+                prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
+                fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
             }
         }
     }
@@ -367,7 +370,7 @@ public class ExperimentSelectionController {
             SpectrumAnnotatorResult spectrumAnnotatorResult = null;
 
             //show progress bar
-            pipelineProgressController.showProgressBar();
+            pipelineProgressController.showProgressBar(NUMBER_OF_FILE_PROGRESS_STEPS, "Importing");
 
             LOGGER.info("Importing pipeline result file " + fileSelectionPanel.getFileChooser().getSelectedFile().getName());
             spectrumAnnotatorResult = resultHandler.readResultFromFile(fileSelectionPanel.getFileChooser().getSelectedFile());
@@ -379,10 +382,7 @@ public class ExperimentSelectionController {
         @Override
         protected void done() {
             try {
-                mainController.onAnnotationFinished(get());
-
-                //enable process button
-                fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
+                mainController.onAnnotationFinished(get());                
             } catch (InterruptedException ex) {
                 LOGGER.error(ex.getMessage(), ex);
                 mainController.showUnexpectedErrorDialog(ex.getMessage());
@@ -394,6 +394,9 @@ public class ExperimentSelectionController {
             } finally {
                 //hide progress bar
                 pipelineProgressController.hideProgressDialog();
+                //enable process buttons
+                prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);                
+                fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);                
             }
         }
     }
