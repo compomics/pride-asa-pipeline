@@ -58,7 +58,7 @@ import org.jfree.data.statistics.HistogramType;
  * @author Niels Hulstaert
  */
 public class PipelineResultController {
-    
+
     private static final Logger LOGGER = Logger.getLogger(PipelineResultController.class);
     private static final String UNMOD_MASS_DELTA_OPEN = "[";
     private static final String UNMOD_MASS_DELTA_CLOSE = "]";
@@ -67,7 +67,7 @@ public class PipelineResultController {
     private static final String UNEXPLAINED_LABEL = "unexplained";
     private static final int NUMBER_OF_PRECURSOR_MASS_DELTA_BINS = 100;
     private static final int NUMBER_OF_ION_FRAGMENT_MASS_DELTA_BINS = 50;
-    private static final int NUMBER_OF_ION_COVERAGE_BINS = 100;    
+    private static final int NUMBER_OF_ION_COVERAGE_BINS = 100;
     private static final int NUMBER_OF_SCORE_BINS = 100;
     private static final Color[] PIE_COLORS = new Color[]{Color.GREEN, Color.ORANGE, Color.RED};
     //model
@@ -88,44 +88,44 @@ public class PipelineResultController {
     //services
     private SpectrumPanelService spectrumPanelService;
     private ModificationService modificationService;
-    
+
     public MainController getMainController() {
         return mainController;
     }
-    
+
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
     }
-    
+
     public IdentificationsPanel getIdentificationsPanel() {
         return identificationsPanel;
     }
-    
+
     public SummaryPanel getSummaryPanel() {
         return summaryPanel;
     }
-    
+
     public SpectrumPanelService getSpectrumPanelService() {
         return spectrumPanelService;
     }
-    
+
     public void setSpectrumPanelService(SpectrumPanelService spectrumPanelService) {
         this.spectrumPanelService = spectrumPanelService;
     }
-    
+
     public ModificationService getModificationService() {
         return modificationService;
     }
-    
+
     public void setModificationService(ModificationService modificationService) {
         this.modificationService = modificationService;
     }
-    
+
     public void init() {
         initIdentificationsPanel();
         initSummaryPanel();
     }
-    
+
     public void update(SpectrumAnnotatorResult spectrumAnnotatorResult) {
         this.spectrumAnnotatorResult = spectrumAnnotatorResult;
         updateIdentifications();
@@ -148,10 +148,10 @@ public class PipelineResultController {
         identificationsChartPanel.setChart(null);
         modificationsChartPanel.setChart(null);
     }
-    
+
     private void initIdentificationsPanel() {
         identificationsPanel = new IdentificationsPanel();
-        
+
         identificationsEventList = new BasicEventList<Identification>();
         sortedIdentificationsList = new SortedList<Identification>(identificationsEventList, new IdentificationSequenceComparator());
         identificationsPanel.getIdentificationsTable().setModel(new EventTableModel(sortedIdentificationsList, new IdentificationsTableFormat()));
@@ -168,22 +168,22 @@ public class PipelineResultController {
                 if (!lse.getValueIsAdjusting()) {
                     if (identificationsPanel.getIdentificationsTable().getSelectedRow() != -1) {
                         Identification identification = sortedIdentificationsList.get(identificationsPanel.getIdentificationsTable().getSelectedRow());
-                        
+
                         SpectrumPanel spectrumPanel = spectrumPanelService.getSpectrumPanel(identification);
-                        
+
                         addSpectrumPanel(spectrumPanel);
                     }
                 }
             }
         });
     }
-    
+
     private void updateIdentifications() {
         identificationsEventList.clear();
         identificationsEventList.addAll(spectrumAnnotatorResult.getIdentifications());
         addSpectrumPanel(null);
     }
-    
+
     private void updateSummary() {
         double[] precursorMassDeltaValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
         List<Double> fragmentMassDeltaValues = new ArrayList<Double>();
@@ -209,7 +209,7 @@ public class PipelineResultController {
         //create new precursor mass delta dataset
         HistogramDataset precMassDeltasDataset = new HistogramDataset();
         precMassDeltasDataset.setType(HistogramType.FREQUENCY);
-        
+
         //sort array in order to find min and max values
         Arrays.sort(precursorMassDeltaValues);
         precMassDeltasDataset.addSeries("precursorMassDeltaSeries", precursorMassDeltaValues, NUMBER_OF_PRECURSOR_MASS_DELTA_BINS, precursorMassDeltaValues[0] - 0.5, precursorMassDeltaValues[precursorMassDeltaValues.length - 1] + 0.5);
@@ -220,7 +220,7 @@ public class PipelineResultController {
         //create new fragment ion mass delta dataset
         HistogramDataset fragMassDeltasDataset = new HistogramDataset();
         fragMassDeltasDataset.setType(HistogramType.FREQUENCY);
-        
+
         //sort array in order to find min and max values
         Collections.sort(fragmentMassDeltaValues);
         fragMassDeltasDataset.addSeries("precursorMassDeltaSeries", Doubles.toArray(fragmentMassDeltaValues), NUMBER_OF_ION_FRAGMENT_MASS_DELTA_BINS, fragmentMassDeltaValues.get(0) - 0.5, fragmentMassDeltaValues.get(fragmentMassDeltaValues.size() - 1) + 0.5);
@@ -231,9 +231,9 @@ public class PipelineResultController {
         //create new identification scores dataset
         HistogramDataset ionCoverageDataset = new HistogramDataset();
         ionCoverageDataset.setType(HistogramType.FREQUENCY);
-        
+
         ionCoverageDataset.addSeries("y ions", yIonCoverageValues, NUMBER_OF_ION_COVERAGE_BINS, 0.0, 100.0);
-        ionCoverageDataset.addSeries("b ions", bIonCoverageValues, NUMBER_OF_ION_COVERAGE_BINS, 0.0, 100.0);        
+        ionCoverageDataset.addSeries("b ions", bIonCoverageValues, NUMBER_OF_ION_COVERAGE_BINS, 0.0, 100.0);
         JFreeChart ionCoverageChart = ChartFactory.createHistogram(
                 "B/Y ion coverage", "coverage (%)", "frequency", ionCoverageDataset,
                 PlotOrientation.VERTICAL, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);
@@ -241,7 +241,7 @@ public class PipelineResultController {
         //create new identification scores dataset
         HistogramDataset scoresDataset = new HistogramDataset();
         scoresDataset.setType(HistogramType.FREQUENCY);
-        
+
         scoresDataset.addSeries("scoreSeries", scoresValues, NUMBER_OF_SCORE_BINS, 0.0, 1.0);
         JFreeChart scoresChart = ChartFactory.createHistogram(
                 "Fragment ion score", "score", "frequency", scoresDataset,
@@ -252,14 +252,14 @@ public class PipelineResultController {
         identificationsDataset.setValue(UNMODIFIED_LABEL + "(" + spectrumAnnotatorResult.getUnmodifiedPrecursors().size() + ", " + (MathUtils.roundDouble((double) spectrumAnnotatorResult.getUnmodifiedPrecursors().size() / spectrumAnnotatorResult.getNumberOfIdentifications(), 2)) + "%)", spectrumAnnotatorResult.getUnmodifiedPrecursors().size());
         identificationsDataset.setValue(MODIFIED_LABEL + "(" + spectrumAnnotatorResult.getModifiedPrecursors().size() + ", " + (MathUtils.roundDouble((double) spectrumAnnotatorResult.getModifiedPrecursors().size() / spectrumAnnotatorResult.getNumberOfIdentifications(), 2)) + "%)", spectrumAnnotatorResult.getModifiedPrecursors().size());
         identificationsDataset.setValue(UNEXPLAINED_LABEL + "(" + spectrumAnnotatorResult.getUnexplainedIdentifications().size() + ", " + (MathUtils.roundDouble((double) spectrumAnnotatorResult.getUnexplainedIdentifications().size() / spectrumAnnotatorResult.getNumberOfIdentifications(), 2)) + "%)", spectrumAnnotatorResult.getUnexplainedIdentifications().size());
-        
+
         JFreeChart identificationsChart = ChartFactory.createPieChart(
                 "Identifications(" + spectrumAnnotatorResult.getNumberOfIdentifications() + ")", // chart title
                 identificationsDataset, // data
                 Boolean.TRUE, // include legend
                 Boolean.FALSE,
                 Boolean.FALSE);
-        
+
         PiePlot plot = (PiePlot) identificationsChart.getPlot();
         plot.setLabelFont(new Font("SansSerif", Font.PLAIN, 12));
         plot.setLabelGenerator(null);
@@ -279,7 +279,7 @@ public class PipelineResultController {
             double relativeCount = (double) (modifications.get(modification)) / (double) (spectrumAnnotatorResult.getNumberOfIdentifications());
             modificationsDataset.addValue(relativeCount, "relative occurance", modification.getName());
         }
-        
+
         JFreeChart modificationsChart = ChartFactory.createBarChart(
                 "Modifications",
                 "modification",
@@ -295,7 +295,7 @@ public class PipelineResultController {
         identificationsChartPanel.setChart(identificationsChart);
         modificationsChartPanel.setChart(modificationsChart);
     }
-    
+
     private void initSummaryPanel() {
         summaryPanel = new SummaryPanel();
         precursorMassDeltasChartPanel = new ChartPanel(null);
@@ -316,7 +316,7 @@ public class PipelineResultController {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        
+
         summaryPanel.getPrecursorMassDeltaChartParentPanel().add(precursorMassDeltasChartPanel, gridBagConstraints);
         summaryPanel.getFragmentIonMassDeltaChartParentPanel().add(fragmentIonMassDeltasChartPanel, gridBagConstraints);
         summaryPanel.getIonCoverageChartParentPanel().add(ionCoverageChartPanel, gridBagConstraints);
@@ -324,27 +324,27 @@ public class PipelineResultController {
         summaryPanel.getIdentificationsChartParentPanel().add(identificationsChartPanel, gridBagConstraints);
         summaryPanel.getModificationsChartParentPanel().add(modificationsChartPanel, gridBagConstraints);
     }
-    
+
     private void addSpectrumPanel(SpectrumPanel spectrumPanel) {
         //remove spectrum panel if already present
         if (identificationsPanel.getIdentificationDetailPanel().getComponentCount() != 0) {
             identificationsPanel.getIdentificationDetailPanel().remove(0);
         }
-        
+
         if (spectrumPanel != null) {
             //add the spectrum panel to the identifications detail panel
             GridBagConstraints gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
-            
+
             identificationsPanel.getIdentificationDetailPanel().add(spectrumPanel, gridBagConstraints);
         }
-        
+
         identificationsPanel.getIdentificationDetailPanel().validate();
         identificationsPanel.getIdentificationDetailPanel().repaint();
     }
-    
+
     private Map<FragmentIonAnnotation.IonType, Double> calculateIonCoverages(Identification identification) {
         Map<FragmentIonAnnotation.IonType, Double> ionCoverages = new EnumMap<FragmentIonAnnotation.IonType, Double>(FragmentIonAnnotation.IonType.class);
         if (identification.getAnnotationData() != null && identification.getAnnotationData().getFragmentIonAnnotations() != null) {
@@ -365,40 +365,24 @@ public class PipelineResultController {
         }
         return ionCoverages;
     }
-    
+
     private List<Double> calculateFragmentIonMassDeltas(Identification identification) {
-//        if(identification.getPeptide().getSequenceString().equals("YDDMAAAMK")){
-//            System.out.println("---------------");
-//        }
         List<Double> fragmentIonMassDeltas = new ArrayList<Double>();
-        if (identification.getAnnotationData() != null && identification.getAnnotationData().getFragmentIonAnnotations() != null) {            
+        if (identification.getAnnotationData() != null && identification.getAnnotationData().getFragmentIonAnnotations() != null) {
             for (FragmentIonAnnotation fragmentIonAnnotation : identification.getAnnotationData().getFragmentIonAnnotations()) {
                 if (fragmentIonAnnotation.isBIon()) {
-                    if(fragmentIonAnnotation.getMz() - identification.getPeptide().getBIonLadderMasses(fragmentIonAnnotation.getIon_charge())[fragmentIonAnnotation.getFragment_ion_number() - 1] > 3.0){                        
-                        for(int i = 0 ; i < ((ModifiedPeptide)identification.getPeptide()).getNTModifications().length ; i++){
-                           if(((ModifiedPeptide)identification.getPeptide()).getNTModifications()[i] != null){
-                                System.out.println("---------------loclocloc " + i + ", peptide length: " + identification.getPeptide().length());    
-                            }  
-                        }
-                                               
-                        System.out.println("-----------is modified peptide:" + (identification.getPeptide() instanceof ModifiedPeptide));
-                        System.out.println("peak mz: " + fragmentIonAnnotation.getMz() + ", fragmention ionnumebr: " + fragmentIonAnnotation.getFragment_ion_number() + ", charge: " + fragmentIonAnnotation.getIon_charge());
-                        System.out.println("mod ladder masses" + Arrays.toString(identification.getPeptide().getBIonLadderMasses(fragmentIonAnnotation.getIon_charge())));
-                        System.out.println("unmod ladder masses" + Arrays.toString(((ModifiedPeptide)identification.getPeptide()).getUnmodifiedPeptide().getBIonLadderMasses(fragmentIonAnnotation.getIon_charge())));
-                        System.out.println("------------------identification: " + identification.getPeptide().getSequenceString() + ", score" +identification.getAnnotationData().getIdentificationScore().getAverageFragmentIonScore());                       
-                    }
                     fragmentIonMassDeltas.add(fragmentIonAnnotation.getMz() - identification.getPeptide().getBIonLadderMasses(fragmentIonAnnotation.getIon_charge())[fragmentIonAnnotation.getFragment_ion_number() - 1]);
                 } else if (fragmentIonAnnotation.isYIon()) {
                     fragmentIonMassDeltas.add(fragmentIonAnnotation.getMz() - identification.getPeptide().getYIonLadderMasses(fragmentIonAnnotation.getIon_charge())[fragmentIonAnnotation.getFragment_ion_number() - 1]);
                 }
             }
-        }        
+        }
         return fragmentIonMassDeltas;
     }
 
     //private classes    
     private class IdentificationsTableFormat implements TableFormat {
-        
+
         String[] columnNames = {"Peptide", "Charge", "Mass delta", "M/Z delta", "Precursor m/z", "Noise threshold", "Score", "Modifications"};
         private static final int PEPTIDE = 0;
         private static final int CHARGE = 1;
@@ -408,17 +392,17 @@ public class PipelineResultController {
         private static final int NOISE_THRESHOLD = 5;
         private static final int SCORE = 6;
         private static final int MODIFICATIONS = 7;
-        
+
         @Override
         public int getColumnCount() {
             return columnNames.length;
         }
-        
+
         @Override
         public String getColumnName(int column) {
             return columnNames[column];
         }
-        
+
         @Override
         public Object getColumnValue(Object object, int column) {
             Identification identification = (Identification) object;
@@ -443,12 +427,12 @@ public class PipelineResultController {
                     throw new IllegalArgumentException("Unexpected column number " + column);
             }
         }
-        
+
         private String constructModificationsString(Peptide peptide) {
             String modificationsInfoString = "0";
             if (peptide instanceof ModifiedPeptide) {
                 List<String> modifications = new ArrayList<String>();
-                
+
                 ModifiedPeptide modifiedPeptide = (ModifiedPeptide) peptide;
                 if (modifiedPeptide.getNTermMod() != null) {
                     modifications.add(modifiedPeptide.getNTermMod().getName());
@@ -464,14 +448,14 @@ public class PipelineResultController {
                 if (modifiedPeptide.getCTermMod() != null) {
                     modifications.add(modifiedPeptide.getCTermMod().getName());
                 }
-                
+
                 Joiner joiner = Joiner.on(", ");
                 modificationsInfoString = modifications.size() + "(" + joiner.join(modifications) + ")";
             }
-            
+
             return modificationsInfoString;
         }
-        
+
         private String constructMassDeltaString(Peptide peptide, boolean doChargeAdjustment) {
             String massDelta = "N/A";
             try {
@@ -492,7 +476,7 @@ public class PipelineResultController {
             } catch (AASequenceMassUnknownException ex) {
                 LOGGER.error(ex.getMessage(), ex);
             }
-            
+
             return massDelta;
         }
     }
