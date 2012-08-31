@@ -93,11 +93,11 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
     }
     
     /**
-     * Returns the peptides with a specific charge
+     * Returns the peptides with the spefied charge
      * 
      * @param peptides the peptide collection
      * @param charge the charge value
-     * @return 
+     * @return the list of peptides
      */
     protected List<Peptide> findPrecursorsWithCharge(Collection<Peptide> peptides, int charge) {
         List<Peptide> precs = new ArrayList<Peptide>();

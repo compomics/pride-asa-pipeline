@@ -12,6 +12,7 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Level;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 import org.jdesktop.beansbinding.ELProperty;
@@ -138,6 +139,8 @@ public class MainController implements ActionListener {
         CardLayout cardLayout = (CardLayout) mainFrame.getMainPanel().getLayout();
         cardLayout.show(mainFrame.getMainPanel(), PIPELINE_PANEL_CARD_NAME);
 
+        //fit to screen
+        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //set main frame visible
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(Boolean.TRUE);

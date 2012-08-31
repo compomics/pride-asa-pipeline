@@ -41,11 +41,8 @@ public class ModifiedPeptideTest {
 
         AminoAcidSequence aminoAcidSequence = new AminoAcidSequence("ACDLLYNTTTEY");
 
-        //first get the ion ladders before adding the modification
-        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(charge, aminoAcidSequence.getSequenceMass(), aminoAcidSequence, peptideId);
-
-        double[] unmodifiedBIonLadder = modifiedPeptide.getBIonLadderMasses(charge);
-        double[] unmodifiedYIonLadder = modifiedPeptide.getYIonLadderMasses(charge);
+        //create modified peptide
+        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(charge, aminoAcidSequence.getSequenceMass(), aminoAcidSequence, peptideId);        
 
         //create modification
         Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
@@ -55,6 +52,9 @@ public class ModifiedPeptideTest {
 
         //add modification
         modifiedPeptide.setNTModification(6, modification);
+        
+        double[] unmodifiedBIonLadder = modifiedPeptide.getUnmodifiedPeptide().getBIonLadderMasses(charge);
+        double[] unmodifiedYIonLadder = modifiedPeptide.getUnmodifiedPeptide().getYIonLadderMasses(charge);
 
         double[] modifiedBIonLadder = modifiedPeptide.getBIonLadderMasses(1);
         for (int i = 0; i < modifiedBIonLadder.length; i++) {
@@ -89,11 +89,8 @@ public class ModifiedPeptideTest {
 
         AminoAcidSequence aminoAcidSequence = new AminoAcidSequence("ACDLLYNTTTEY");
 
-        //first get the ion ladders before adding the modification
-        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(charge, aminoAcidSequence.getSequenceMass(), aminoAcidSequence, peptideId);
-
-        double[] unmodifiedBIonLadder = modifiedPeptide.getBIonLadderMasses(charge);
-        double[] unmodifiedYIonLadder = modifiedPeptide.getYIonLadderMasses(charge);
+        //create modified peptide
+        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(charge, aminoAcidSequence.getSequenceMass(), aminoAcidSequence, peptideId);        
 
         //create modification
         Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
@@ -103,6 +100,9 @@ public class ModifiedPeptideTest {
 
         //add modification
         modifiedPeptide.setNTermMod(modification);
+        
+        double[] unmodifiedBIonLadder = modifiedPeptide.getUnmodifiedPeptide().getBIonLadderMasses(charge);
+        double[] unmodifiedYIonLadder = modifiedPeptide.getUnmodifiedPeptide().getYIonLadderMasses(charge);
 
         double[] modifiedBIonLadder = modifiedPeptide.getBIonLadderMasses(1);
         for (int i = 0; i < modifiedBIonLadder.length; i++) {
@@ -133,11 +133,8 @@ public class ModifiedPeptideTest {
 
         AminoAcidSequence aminoAcidSequence = new AminoAcidSequence("ACDLLYNTTTEY");
 
-        //first get the ion ladders before adding the modification
-        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(charge, aminoAcidSequence.getSequenceMass(), aminoAcidSequence, peptideId);
-
-        double[] unmodifiedBIonLadder = modifiedPeptide.getBIonLadderMasses(charge);
-        double[] unmodifiedYIonLadder = modifiedPeptide.getYIonLadderMasses(charge);
+        //create modified peptide
+        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(charge, aminoAcidSequence.getSequenceMass(), aminoAcidSequence, peptideId);        
 
         //create modification
         Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
@@ -147,6 +144,9 @@ public class ModifiedPeptideTest {
 
         //add modification
         modifiedPeptide.setCTermMod(modification);
+        
+        double[] unmodifiedBIonLadder = modifiedPeptide.getUnmodifiedPeptide().getBIonLadderMasses(charge);
+        double[] unmodifiedYIonLadder = modifiedPeptide.getUnmodifiedPeptide().getYIonLadderMasses(charge);
 
         double[] modifiedBIonLadder = modifiedPeptide.getBIonLadderMasses(1);
         for (int i = 0; i < modifiedBIonLadder.length; i++) {
@@ -178,11 +178,8 @@ public class ModifiedPeptideTest {
 
         AminoAcidSequence aminoAcidSequence = new AminoAcidSequence("ACDLLNTTTEY");
 
-        //first get the ion ladders before adding the modification
-        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(charge, aminoAcidSequence.getSequenceMass(), aminoAcidSequence, peptideId);
-
-        double[] unmodifiedBIonLadder = modifiedPeptide.getBIonLadderMasses(charge);
-        double[] unmodifiedYIonLadder = modifiedPeptide.getYIonLadderMasses(charge);
+        //create modified peptide
+        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(charge, aminoAcidSequence.getSequenceMass(), aminoAcidSequence, peptideId);        
 
         //create modification_1
         Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
@@ -197,6 +194,9 @@ public class ModifiedPeptideTest {
         //add modifications
         modifiedPeptide.setNTModification(0, modification_1);
         modifiedPeptide.setNTermMod(modification_2);
+        
+        double[] unmodifiedBIonLadder = modifiedPeptide.getUnmodifiedPeptide().getBIonLadderMasses(charge);
+        double[] unmodifiedYIonLadder = modifiedPeptide.getUnmodifiedPeptide().getYIonLadderMasses(charge);
 
         double[] modifiedBIonLadder = modifiedPeptide.getBIonLadderMasses(1);
         for (int i = 0; i < modifiedBIonLadder.length; i++) {
@@ -228,11 +228,8 @@ public class ModifiedPeptideTest {
 
         AminoAcidSequence aminoAcidSequence = new AminoAcidSequence("ACDLLNTTTEY");
 
-        //first get the ion ladders before adding the modification
-        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(charge, aminoAcidSequence.getSequenceMass(), aminoAcidSequence, peptideId);
-
-        double[] unmodifiedBIonLadder = modifiedPeptide.getBIonLadderMasses(charge);
-        double[] unmodifiedYIonLadder = modifiedPeptide.getYIonLadderMasses(charge);
+        //create modified peptide
+        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(charge, aminoAcidSequence.getSequenceMass(), aminoAcidSequence, peptideId);        
 
         //create modification_1
         Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
@@ -247,6 +244,9 @@ public class ModifiedPeptideTest {
         //add modifications
         modifiedPeptide.setNTModification(modifiedPeptide.length() - 1, modification_1);
         modifiedPeptide.setCTermMod(modification_2);
+        
+        double[] unmodifiedBIonLadder = modifiedPeptide.getUnmodifiedPeptide().getBIonLadderMasses(charge);
+        double[] unmodifiedYIonLadder = modifiedPeptide.getUnmodifiedPeptide().getYIonLadderMasses(charge);
 
         double[] modifiedBIonLadder = modifiedPeptide.getBIonLadderMasses(1);
         for (int i = 0; i < modifiedBIonLadder.length; i++) {

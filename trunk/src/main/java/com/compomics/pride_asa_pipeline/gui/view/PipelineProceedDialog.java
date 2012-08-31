@@ -4,6 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.gui.view;
 
+import java.awt.Color;
 import java.awt.Frame;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -20,6 +21,7 @@ public class PipelineProceedDialog extends javax.swing.JDialog {
      */
     public PipelineProceedDialog(Frame parent) {
         super(parent);
+        this.getContentPane().setBackground(Color.WHITE);
         initComponents();
     }
 
@@ -59,6 +61,7 @@ public class PipelineProceedDialog extends javax.swing.JDialog {
         setResizable(false);
 
         jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder("Systematic mass errors"));
+        jScrollPane2.setOpaque(false);
 
         massRecalibrationResultTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {

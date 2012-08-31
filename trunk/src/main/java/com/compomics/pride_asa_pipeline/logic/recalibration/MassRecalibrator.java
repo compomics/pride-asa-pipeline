@@ -30,7 +30,7 @@ public interface MassRecalibrator {
     /**
      * Gets the mass window finder
      * 
-     * @return 
+     * @return the mass window finder
      */
     MassWindowFinder getMassWindowFinder();
     

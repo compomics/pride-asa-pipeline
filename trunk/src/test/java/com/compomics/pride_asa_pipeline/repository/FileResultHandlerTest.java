@@ -134,7 +134,7 @@ public class FileResultHandlerTest {
                 assertEquals("N/A", splitArray[6]);
                 assertEquals("N/A", splitArray[7]);
                 assertEquals("N/A", splitArray[8]);
-                assertEquals("mods[NT_testModification_4;0_testModification_3;3_testModification_1;6_testModification_2]", splitArray[9]);
+                assertEquals("mods[NT_testModification_4;1_testModification_3;4_testModification_1;7_testModification_2]", splitArray[9]);
             }
         }
     }

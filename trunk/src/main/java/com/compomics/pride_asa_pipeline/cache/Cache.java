@@ -21,7 +21,7 @@ public interface Cache<K, V> {
     /**
      * Gets a value from the cache, returns null if nothing was found
      *
-     * @param 
+     * @param key the key
      * @return the found value
      */
     V getFromCache(K key);

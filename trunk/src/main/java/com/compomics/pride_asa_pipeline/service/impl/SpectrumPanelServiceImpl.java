@@ -49,7 +49,8 @@ public class SpectrumPanelServiceImpl implements SpectrumPanelService {
         }
 
         //add noise threshold area
-        spectrumPanel.addReferenceAreaYAxis(getReferenceArea(identification.getAnnotationData().getNoiseThreshold()));
+        ReferenceArea referenceArea = getReferenceArea(identification.getAnnotationData().getNoiseThreshold());
+        spectrumPanel.addReferenceAreaYAxis(referenceArea);
 
         return spectrumPanel;
     }

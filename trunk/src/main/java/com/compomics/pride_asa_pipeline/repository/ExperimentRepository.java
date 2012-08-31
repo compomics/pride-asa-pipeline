@@ -34,10 +34,10 @@ public interface ExperimentRepository {
     Map<String, String> findExperimentAccessionsByTaxonomy(int taxonomyId);
 
     /**
-     * Gets the experiment identification data
+     * Gets the experiment identifications
      *
      * @param experimentAccession the experiment accession
-     * @return
+     * @return the list of experiment identifications
      */
     List<Identification> loadExperimentIdentifications(String experimentAccession);
 

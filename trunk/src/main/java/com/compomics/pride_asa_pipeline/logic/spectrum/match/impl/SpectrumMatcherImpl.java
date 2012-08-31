@@ -94,7 +94,7 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
 
         //return the best scoring ModifiedPeptide as the best match        
         if (bestMatch != null) {
-            LOGGER.info("Best matching peptide: " + bestMatch.getSequence() + " with score: " + bestScore);
+            //LOGGER.info("Best matching peptide: " + bestMatch.getSequence() + " with score: " + bestScore);
             //set annotation data noise threshold
             annotationData.setNoiseThreshold(peakFilterResult.getNoiseThreshold());
             modifiedPeptidesMatchResult = new ModifiedPeptidesMatchResult(bestMatch, annotationData);

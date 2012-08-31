@@ -32,7 +32,6 @@ public interface ModificationMarshaller {
      *
      * @param modificationsResource the modifications resource
      * @param modifications the modifications collection
-     * @return the modifications output stream
      */
     void marshall(Resource modificationsResource, Collection<Modification> modifications);
 }

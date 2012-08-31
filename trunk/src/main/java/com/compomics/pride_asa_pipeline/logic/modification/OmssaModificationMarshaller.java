@@ -17,7 +17,7 @@ public interface OmssaModificationMarshaller {
     /**
      * Marshalls the modifications used in the pipeline to the OMSSA format
      *
-     * @param modificationSet: the set of found modifications
+     * @param modificationSet the set of found modifications
      * @return the usermod collection
      */
     UserModCollection marshallModifications(Set<Modification> modificationSet);
