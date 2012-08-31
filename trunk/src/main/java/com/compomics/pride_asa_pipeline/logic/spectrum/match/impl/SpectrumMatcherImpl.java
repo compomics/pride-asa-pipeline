@@ -76,6 +76,7 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
 
         //now match each ModifiedPeptide and record its score
         ModifiedPeptide bestMatch = null;
+        AnnotationData bestAnnotationData = null;
         AnnotationData annotationData = null;
         double bestScore = -1;
         for (ModifiedPeptide modifiedPeptide : modifiedPeptides) {
@@ -88,7 +89,8 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
             double averageFragmentIonScore = annotationData.getIdentificationScore().getAverageFragmentIonScore();
             if (averageFragmentIonScore > bestScore) {
                 bestMatch = modifiedPeptide;
-                bestScore = averageFragmentIonScore;
+                bestAnnotationData = annotationData;
+                bestScore = bestAnnotationData.getIdentificationScore().getAverageFragmentIonScore();
             }
         }
 
@@ -97,7 +99,7 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
             //LOGGER.info("Best matching peptide: " + bestMatch.getSequence() + " with score: " + bestScore);
             //set annotation data noise threshold
             annotationData.setNoiseThreshold(peakFilterResult.getNoiseThreshold());
-            modifiedPeptidesMatchResult = new ModifiedPeptidesMatchResult(bestMatch, annotationData);
+            modifiedPeptidesMatchResult = new ModifiedPeptidesMatchResult(bestMatch, bestAnnotationData);
         } else {
             LOGGER.info("best match: null");
         }

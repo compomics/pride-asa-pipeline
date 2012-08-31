@@ -26,7 +26,7 @@ public class IdentificationScorerImpl implements IdentificationScorer {
     }
 
     @Override
-    public AnnotationData score(Peptide peptide, List<Peak> peaks) {                
+    public AnnotationData score(Peptide peptide, List<Peak> peaks) {
         //check the Y- and B-ions
         Map<FragmentIonAnnotation.IonType, double[][]> ionLadderMasses = new EnumMap<FragmentIonAnnotation.IonType, double[][]>(FragmentIonAnnotation.IonType.class);
         //add charge ladders
@@ -58,7 +58,7 @@ public class IdentificationScorerImpl implements IdentificationScorer {
                 for (int j = 0; j < ionLadderMassMatrix[i].length; j++) {
                     double ionLadderMass = ionLadderMassMatrix[i][j];
                     Peak matchingPeak = findMatchingPeak(ionLadderMass, peaks);
-                    if (matchingPeak != null && !matchedPeakSet.contains(matchingPeak)) {                        
+                    if (matchingPeak != null && !matchedPeakSet.contains(matchingPeak)) {
                         //add peak to matchedPeakSet
                         matchedPeakSet.add(matchingPeak);
                         //increment matched peak count
@@ -67,7 +67,7 @@ public class IdentificationScorerImpl implements IdentificationScorer {
                         matchingIntensity += matchingPeak.getIntensity();
                         //add fragment ion annotation to list
                         FragmentIonAnnotation fragmentIonAnnotation = new FragmentIonAnnotation(peptide.getPeptideId(), ionType, j + 1, matchingPeak.getMzRatio(), matchingPeak.getIntensity(), fragmentMassError, i + 1);
-                        fragmentIonAnnotations.add(fragmentIonAnnotation);                        
+                        fragmentIonAnnotations.add(fragmentIonAnnotation);
                     }
                 }
             }
