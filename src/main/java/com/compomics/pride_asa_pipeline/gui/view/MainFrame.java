@@ -4,7 +4,6 @@
  */
 package com.compomics.pride_asa_pipeline.gui.view;
 
-import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
@@ -142,7 +141,7 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.25;
+        gridBagConstraints.weighty = 0.3;
         pipelinePanel.add(experimentSelectionTabbedPane, gridBagConstraints);
 
         pipelineResultTabbedPane.setBackground(new java.awt.Color(255, 255, 255));
@@ -166,7 +165,7 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.75;
+        gridBagConstraints.weighty = 0.7;
         pipelinePanel.add(pipelineResultTabbedPane, gridBagConstraints);
 
         mainPanel.add(pipelinePanel, "pipelinePanel");

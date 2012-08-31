@@ -13,10 +13,10 @@ public class IdentificationScorerImpl implements IdentificationScorer {
 
     private double fragmentMassError;
 
-    public IdentificationScorerImpl() {        
+    public IdentificationScorerImpl() {
     }
-    
-    public double getFragmentMassError(){
+
+    public double getFragmentMassError() {
         return fragmentMassError;
     }
 
@@ -24,9 +24,9 @@ public class IdentificationScorerImpl implements IdentificationScorer {
     public void setFragmentMassError(double fragmentMassError) {
         this.fragmentMassError = fragmentMassError;
     }
-        
+
     @Override
-    public AnnotationData score(Peptide peptide, List<Peak> peaks) {
+    public AnnotationData score(Peptide peptide, List<Peak> peaks) {                
         //check the Y- and B-ions
         Map<FragmentIonAnnotation.IonType, double[][]> ionLadderMasses = new EnumMap<FragmentIonAnnotation.IonType, double[][]>(FragmentIonAnnotation.IonType.class);
         //add charge ladders
@@ -58,7 +58,7 @@ public class IdentificationScorerImpl implements IdentificationScorer {
                 for (int j = 0; j < ionLadderMassMatrix[i].length; j++) {
                     double ionLadderMass = ionLadderMassMatrix[i][j];
                     Peak matchingPeak = findMatchingPeak(ionLadderMass, peaks);
-                    if (matchingPeak != null && !matchedPeakSet.contains(matchingPeak)) {
+                    if (matchingPeak != null && !matchedPeakSet.contains(matchingPeak)) {                        
                         //add peak to matchedPeakSet
                         matchedPeakSet.add(matchingPeak);
                         //increment matched peak count
@@ -67,7 +67,7 @@ public class IdentificationScorerImpl implements IdentificationScorer {
                         matchingIntensity += matchingPeak.getIntensity();
                         //add fragment ion annotation to list
                         FragmentIonAnnotation fragmentIonAnnotation = new FragmentIonAnnotation(peptide.getPeptideId(), ionType, j + 1, matchingPeak.getMzRatio(), matchingPeak.getIntensity(), fragmentMassError, i + 1);
-                        fragmentIonAnnotations.add(fragmentIonAnnotation);
+                        fragmentIonAnnotations.add(fragmentIonAnnotation);                        
                     }
                 }
             }
@@ -79,8 +79,8 @@ public class IdentificationScorerImpl implements IdentificationScorer {
             annotationData.setFragmentIonAnnotations(fragmentIonAnnotations);
         }
         IdentificationScore identificationScore = new IdentificationScore(matchingPeakCount, totalPeakCount, matchingIntensity, totalIntensity, peptide.length());
-        annotationData.setIdentificationScore(identificationScore);                
-        
+        annotationData.setIdentificationScore(identificationScore);
+
         return annotationData;
     }
 

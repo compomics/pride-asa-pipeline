@@ -15,7 +15,7 @@ public interface Base64DataDecoder {
      * @param dataPrecision precision for encoded doubles
      * @param dataEndian data type, big and little endian
      * @param base64DataString the base 64 encoded string 
-     * @return 
+     * @return the data array
      */
     double[] getDataAsArray(String dataPrecision, String dataEndian, String base64DataString);
 

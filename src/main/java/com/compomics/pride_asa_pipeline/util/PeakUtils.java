@@ -61,7 +61,6 @@ public class PeakUtils {
      * @param fragmentMassError the fragment mass error.
      * @return true if the fragment m/z 'hits' (with a given error tolerance)
      * the signal m/z.
-     * @see this #fragmentMassError
      */
     public static boolean isHit(double spectraMz, double fragmentMz, double fragmentMassError) {
         //return true if the fragmentMZ is in the interval (around the spectrum spectrum MZ)

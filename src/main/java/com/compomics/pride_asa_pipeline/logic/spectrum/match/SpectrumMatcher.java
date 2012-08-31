@@ -16,8 +16,8 @@ import java.util.Set;
 public interface SpectrumMatcher {
 
     /**
-     * Matches an peptide against a spectrum. The score result and
-     * fragment ion annotation are returned as annotation data.
+     * Matches an peptide against a spectrum. The score result and fragment ion
+     * annotation are returned as annotation data.
      *
      * @param peptide the peptide
      * @param peaks the spectrum peak list
@@ -29,7 +29,8 @@ public interface SpectrumMatcher {
      * Finds the best matching modified peptide against a spectrum the scores
      * and fragment annotation are added to the peptide.
      *
-     * @see IdentificationScorer#score(uk.ac.ebi.pride.asa.model.Peptide,
+     * @see
+     * IdentificationScorer#score(com.compomics.pride_asa_pipeline.model.Peptide,
      * java.util.List)
      *
      * @param modifiedPeptides the set of modified peptides

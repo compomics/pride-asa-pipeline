@@ -50,7 +50,6 @@ public interface ModificationService {
      * resource.
      *
      * @param modificationsResource the modifications resource to be imported
-     * @param pipelineModifications the collections of pipeline modifications
      * @return the modifications set
      * @exception JDOMException
      */

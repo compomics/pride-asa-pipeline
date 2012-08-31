@@ -32,14 +32,13 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -211,7 +210,9 @@ public class PipelineResultController {
         HistogramDataset precMassDeltasDataset = new HistogramDataset();
         precMassDeltasDataset.setType(HistogramType.FREQUENCY);
         
-        precMassDeltasDataset.addSeries("precursorMassDeltaSeries", precursorMassDeltaValues, NUMBER_OF_PRECURSOR_MASS_DELTA_BINS, -5.0, 25.0);
+        //sort array in order to find min and max values
+        Arrays.sort(precursorMassDeltaValues);
+        precMassDeltasDataset.addSeries("precursorMassDeltaSeries", precursorMassDeltaValues, NUMBER_OF_PRECURSOR_MASS_DELTA_BINS, precursorMassDeltaValues[0] - 0.5, precursorMassDeltaValues[precursorMassDeltaValues.length - 1] + 0.5);
         JFreeChart precursorMassDeltasChart = ChartFactory.createHistogram(
                 "Precursor mass delta", "mass delta (d.)", "frequency", precMassDeltasDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
@@ -220,7 +221,9 @@ public class PipelineResultController {
         HistogramDataset fragMassDeltasDataset = new HistogramDataset();
         fragMassDeltasDataset.setType(HistogramType.FREQUENCY);
         
-        fragMassDeltasDataset.addSeries("precursorMassDeltaSeries", Doubles.toArray(fragmentMassDeltaValues), NUMBER_OF_ION_FRAGMENT_MASS_DELTA_BINS, -5.0, 5.0);
+        //sort array in order to find min and max values
+        Collections.sort(fragmentMassDeltaValues);
+        fragMassDeltasDataset.addSeries("precursorMassDeltaSeries", Doubles.toArray(fragmentMassDeltaValues), NUMBER_OF_ION_FRAGMENT_MASS_DELTA_BINS, fragmentMassDeltaValues.get(0) - 0.5, fragmentMassDeltaValues.get(fragmentMassDeltaValues.size() - 1) + 0.5);
         JFreeChart fragMassDeltasDeltasChart = ChartFactory.createHistogram(
                 "Fragment ion mass delta", "mass delta (d.)", "frequency", fragMassDeltasDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
@@ -283,9 +286,6 @@ public class PipelineResultController {
                 "relative occurance",
                 modificationsDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
-        CategoryPlot modificationsPlot = (CategoryPlot) modificationsChart.getPlot();
-        CategoryAxis xAxis = (CategoryAxis) modificationsPlot.getDomainAxis();
-        xAxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
 
         //add charts to panels
         precursorMassDeltasChartPanel.setChart(precursorMassDeltasChart);
@@ -367,10 +367,26 @@ public class PipelineResultController {
     }
     
     private List<Double> calculateFragmentIonMassDeltas(Identification identification) {
+//        if(identification.getPeptide().getSequenceString().equals("YDDMAAAMK")){
+//            System.out.println("---------------");
+//        }
         List<Double> fragmentIonMassDeltas = new ArrayList<Double>();
         if (identification.getAnnotationData() != null && identification.getAnnotationData().getFragmentIonAnnotations() != null) {            
             for (FragmentIonAnnotation fragmentIonAnnotation : identification.getAnnotationData().getFragmentIonAnnotations()) {
                 if (fragmentIonAnnotation.isBIon()) {
+                    if(fragmentIonAnnotation.getMz() - identification.getPeptide().getBIonLadderMasses(fragmentIonAnnotation.getIon_charge())[fragmentIonAnnotation.getFragment_ion_number() - 1] > 3.0){                        
+                        for(int i = 0 ; i < ((ModifiedPeptide)identification.getPeptide()).getNTModifications().length ; i++){
+                           if(((ModifiedPeptide)identification.getPeptide()).getNTModifications()[i] != null){
+                                System.out.println("---------------loclocloc " + i + ", peptide length: " + identification.getPeptide().length());    
+                            }  
+                        }
+                                               
+                        System.out.println("-----------is modified peptide:" + (identification.getPeptide() instanceof ModifiedPeptide));
+                        System.out.println("peak mz: " + fragmentIonAnnotation.getMz() + ", fragmention ionnumebr: " + fragmentIonAnnotation.getFragment_ion_number() + ", charge: " + fragmentIonAnnotation.getIon_charge());
+                        System.out.println("mod ladder masses" + Arrays.toString(identification.getPeptide().getBIonLadderMasses(fragmentIonAnnotation.getIon_charge())));
+                        System.out.println("unmod ladder masses" + Arrays.toString(((ModifiedPeptide)identification.getPeptide()).getUnmodifiedPeptide().getBIonLadderMasses(fragmentIonAnnotation.getIon_charge())));
+                        System.out.println("------------------identification: " + identification.getPeptide().getSequenceString() + ", score" +identification.getAnnotationData().getIdentificationScore().getAverageFragmentIonScore());                       
+                    }
                     fragmentIonMassDeltas.add(fragmentIonAnnotation.getMz() - identification.getPeptide().getBIonLadderMasses(fragmentIonAnnotation.getIon_charge())[fragmentIonAnnotation.getFragment_ion_number() - 1]);
                 } else if (fragmentIonAnnotation.isYIon()) {
                     fragmentIonMassDeltas.add(fragmentIonAnnotation.getMz() - identification.getPeptide().getYIonLadderMasses(fragmentIonAnnotation.getIon_charge())[fragmentIonAnnotation.getFragment_ion_number() - 1]);

@@ -144,12 +144,12 @@ public class ModifiedPeptide extends Peptide {
      * C-terminus)
      *
      * @param startIndex the start index
-     * @param stopIndex the stop index (included!)
+     * @param stopIndex the stop index
      * @return
      */
     private double cumulativeModMass(int startIndex, int stopIndex) {
         double modMass = 0;
-        for (int i = startIndex; i <= stopIndex; i++) {
+        for (int i = startIndex; i < stopIndex; i++) {
             if (modifications[i] != null) {
                 modMass += modifications[i].getMassShift();
             }
@@ -159,7 +159,7 @@ public class ModifiedPeptide extends Peptide {
             //has a N-terminal modification, so we add its mass
             modMass += getNTermMod().getMassShift();
         }
-        if (stopIndex == (length() - 1) && this.getCTermMod() != null) {
+        if (stopIndex == length() && this.getCTermMod() != null) {
             //the current fragment includes the C-terminus and
             //has a C-terminal modification, so we add its mass
             modMass += getCTermMod().getMassShift();
@@ -184,9 +184,9 @@ public class ModifiedPeptide extends Peptide {
         for (int i = 0; i < numberOfFragmentIons; i++) {
             try {
                 //calculate mass adjusted for the charge state (taking modifications into account)
-                AminoAcidSequence fragSeq = aaSeq.subSequence(0, i);
+                AminoAcidSequence fragSeq = aaSeq.subSequence(0, i + 1);
                 //calculate the cumulative mass of all the modifications within this fragment
-                double cumulativeModMass = cumulativeModMass(0, i);
+                double cumulativeModMass = cumulativeModMass(0, i + 1);
                 double modifiedFragmentMass = fragSeq.getSequenceMass() + cumulativeModMass;
                 //calculate the adjustment of the mass due to the charge state
                 double adjust = (double) charge * Constants.MASS_H;
@@ -215,9 +215,9 @@ public class ModifiedPeptide extends Peptide {
         for (int i = 0; i < numberOfFragmentIons; i++) {
             try {
                 //calculate mass adjusted for the charge state (taking modifications into account)
-                AminoAcidSequence fragSeq = aaSeq.subSequence(numberOfFragmentIons - i, numberOfFragmentIons);
+                AminoAcidSequence fragSeq = aaSeq.subSequence(numberOfFragmentIons - i, numberOfFragmentIons + 1);
                 //calculate the cumulative mass of all the modifications within this fragment
-                double cumulativeModMass = cumulativeModMass(numberOfFragmentIons - i, numberOfFragmentIons);
+                double cumulativeModMass = cumulativeModMass(numberOfFragmentIons - i, numberOfFragmentIons + 1);
                 double modifiedFragmentMass = fragSeq.getSequenceMass() + cumulativeModMass;
                 //calculate the adjustment of the mass due to the charge state
                 double adjust = (double) charge * Constants.MASS_H;

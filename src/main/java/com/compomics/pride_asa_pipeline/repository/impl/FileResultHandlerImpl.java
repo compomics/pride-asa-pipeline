@@ -202,9 +202,9 @@ public class FileResultHandlerImpl implements FileResultHandler {
                     }
                     //add identification to SpectrumAnnotatorResult
                     spectrumAnnotatorResult.addIdentification(identification);
-                }                
+                }
             }
-            LOGGER.info("Finished reading " + spectrumAnnotatorResult.getNumberOfIdentifications() + " identifications for experiment " + experimentAccession);            
+            LOGGER.info("Finished reading " + spectrumAnnotatorResult.getNumberOfIdentifications() + " identifications for experiment " + experimentAccession);
             br.close();
         } catch (UnknownAAException e) {
             LOGGER.error(e.getMessage(), e);
@@ -233,7 +233,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
             for (int i = 0; i < modifiedPeptide.getNTModifications().length; i++) {
                 ModificationFacade modificationFacade = modifiedPeptide.getNTModifications()[i];
                 if (modificationFacade != null) {
-                    modifications.add(i + "_" + modificationFacade.getName());
+                    modifications.add((i + 1) + "_" + modificationFacade.getName());
                 }
             }
         }
@@ -364,7 +364,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
             } else if (mod.contains(MODIFICATIONS_C_TERMINAL)) {
                 modifiedPeptide.setCTermMod(modification);
             } else {
-                int location = Integer.parseInt(mod.substring(0, mod.indexOf(MODIFICATIONS_LOCATION_DELIMITER)));
+                int location = Integer.parseInt(mod.substring(0, mod.indexOf(MODIFICATIONS_LOCATION_DELIMITER))) - 1;
                 modifiedPeptide.setNTModification(location, modification);
             }
         }

@@ -4,6 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.gui.view;
 
+import java.awt.Color;
 import java.awt.Frame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
@@ -16,7 +17,8 @@ public class PipelineProgressDialog extends javax.swing.JDialog {
 
     public PipelineProgressDialog(Frame parent) {
         super(parent);
-        initComponents();       
+        this.getContentPane().setBackground(Color.WHITE);
+        initComponents();    
     }
 
     public JProgressBar getProgressBar() {
