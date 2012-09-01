@@ -6,7 +6,6 @@ package com.compomics.pride_asa_pipeline;
 
 import com.compomics.pride_asa_pipeline.gui.controller.MainController;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
-import java.awt.Color;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
@@ -115,7 +114,7 @@ public class PrideAsaPipelineStarter {
         CommandLine commandLine;
         try {
             commandLine = cmdLineParser.parse(options, commandLineArguments);
-            if (commandLine.hasOption('g')) {
+            if (commandLine.getArgList().isEmpty()) {
                 launchGuiMode();
             }
             if (commandLine.hasOption('h')) {
@@ -159,7 +158,6 @@ public class PrideAsaPipelineStarter {
     private static void constructOptions() {
         options = new Options();
 
-        options.addOption("g", "gui", Boolean.FALSE, "GUI mode");
         options.addOption("h", "help", Boolean.FALSE, "Help");
         options.addOption("u", "usage", Boolean.FALSE, "Usage");
 

@@ -8,15 +8,10 @@ import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
-
+import com.google.common.io.Files;
 import java.io.File;
-
-import com.compomics.pride_asa_pipeline.util.ResourceUtils;
-
 import java.io.IOException;
 import java.util.*;
-
-import com.google.common.io.Files;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.springframework.core.io.Resource;
