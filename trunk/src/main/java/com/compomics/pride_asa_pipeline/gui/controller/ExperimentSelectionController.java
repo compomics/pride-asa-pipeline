@@ -302,9 +302,13 @@ public class ExperimentSelectionController {
         protected void done() {
             try {
                 get();
-                //check for possible null values after cancel                
-                //check if one of the systematic mass errors per charge state exceeds the threshold value. If so, show a confirmation dialog.
-                if (mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
+                //check if the experiment has "useful" identifications
+                if (mainController.getPrideSpectrumAnnotator().getIdentifications().getCompleteIdentifications().isEmpty()) {
+                    mainController.showMessageDialog("Pipeline error", "No useful identifications were found for experiment " + getExperimentAccesion()
+                            + "." + "\n" + "Please try another experiment.", JOptionPane.ERROR_MESSAGE);
+                    onAnnotationCanceled();
+                } //check if one of the systematic mass errors per charge state exceeds the threshold value. If so, show a confirmation dialog.
+                else if (mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
                     pipelineProceedController.showDialog("One or more systematic mass errors exceed the threshold value of "
                             + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error")
                             + ", proceed?", mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult());
@@ -343,7 +347,7 @@ public class ExperimentSelectionController {
         @Override
         protected void done() {
             try {
-                get();                
+                get();
                 mainController.onAnnotationFinished(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
             } catch (InterruptedException ex) {
                 LOGGER.error(ex.getMessage(), ex);
@@ -382,7 +386,7 @@ public class ExperimentSelectionController {
         @Override
         protected void done() {
             try {
-                mainController.onAnnotationFinished(get());                
+                mainController.onAnnotationFinished(get());
             } catch (InterruptedException ex) {
                 LOGGER.error(ex.getMessage(), ex);
                 mainController.showUnexpectedErrorDialog(ex.getMessage());
@@ -395,8 +399,8 @@ public class ExperimentSelectionController {
                 //hide progress bar
                 pipelineProgressController.hideProgressDialog();
                 //enable process buttons
-                prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);                
-                fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);                
+                prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
+                fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
             }
         }
     }

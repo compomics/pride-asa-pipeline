@@ -4,8 +4,8 @@
  */
 package com.compomics.pride_asa_pipeline;
 
-import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,6 +41,11 @@ public class CommandLineRunner {
         //init the annotiation
         prideSpectrumAnnotator.initAnnotation(experimentAccession);
 
+        //check if the experiment has "useful" identifications
+        if (prideSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
+            LOGGER.warn("One or more systematic mass error exceed the maximum value of " + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error") + ", experiment " + experimentAccession + " will be skipped.");
+            prideSpectrumAnnotator.clearPipeline();
+        }
         //check if the maximum systematic mass error is exceeded
         if (prideSpectrumAnnotator.getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
             //continue with the annotiation
