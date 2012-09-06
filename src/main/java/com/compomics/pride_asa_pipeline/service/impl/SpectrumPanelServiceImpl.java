@@ -41,8 +41,14 @@ public class SpectrumPanelServiceImpl implements SpectrumPanelService {
         List<Peak> peaks = spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
 
         //initialize new SpectrumPanel
-        spectrumPanel = new SpectrumPanel(PeakUtils.getMzRatiosAsArray(peaks), PeakUtils.getIntensitiesAsArray(peaks), identification.getPeptide().getMzRatio(), Integer.toString(identification.getPeptide().getCharge()), "test");
-
+        spectrumPanel = new SpectrumPanel(PeakUtils.getMzRatiosAsArray(peaks), 
+                PeakUtils.getIntensitiesAsArray(peaks), 
+                identification.getPeptide().getMzRatio(), 
+                Integer.toString(identification.getPeptide().getCharge()), 
+                "test");
+        
+        spectrumPanel.showAnnotatedPeaksOnly(true);
+        
         //add peak annotations
         if (identification.getAnnotationData().getFragmentIonAnnotations() != null) {
             spectrumPanel.setAnnotations(getPeakAnnotations(identification));
@@ -76,13 +82,13 @@ public class SpectrumPanelServiceImpl implements SpectrumPanelService {
     private ReferenceArea getReferenceArea(double noiseThreshold) {
         return new ReferenceArea(
                 "", // reference area unique identifier
-                //"A", // reference area label
+                "", // reference area label
                 0.0, // start of area
                 noiseThreshold, // end of area
                 Color.blue, // color of area
                 0.1f, // transparency level
                 Boolean.TRUE, // drawn on top of or behind the data
-                Boolean.TRUE);
+                Boolean.FALSE);
     }
 
     private String getIonChargeString(int ionCharge) {

@@ -6,7 +6,6 @@ package com.compomics.pride_asa_pipeline.service;
 
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identifications;
-import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +18,8 @@ public interface ExperimentService {
     /**
      * Finds all experiment accessions
      *
-     * @return the map of experiment accessions (key: experiment accession, value: experiment title)
+     * @return the map of experiment accessions (key: experiment accession,
+     * value: experiment title)
      */
     Map<String, String> findAllExperimentAccessions();
 
@@ -27,7 +27,8 @@ public interface ExperimentService {
      * Finds experiment accessions by taxonomy ID
      *
      * @param taxonomyId the species taxonomy ID
-     * @return the map of experiment accessions (key: experiment accession, value: experiment title)
+     * @return the map of experiment accessions (key: experiment accession,
+     * value: experiment title)
      */
     Map<String, String> findExperimentAccessionsByTaxonomy(int taxonomyId);
 
@@ -45,7 +46,7 @@ public interface ExperimentService {
      * charge 1.
      *
      * @param experimentAccession the experiment accession number
-     * @param chargeStates        the set of charge states
+     * @param chargeStates the set of charge states
      */
     void updateChargeStates(String experimentAccession, Set<Integer> chargeStates);
 
@@ -85,15 +86,16 @@ public interface ExperimentService {
      * Gets the spectra as a file in mgf format
      *
      * @param experimentAccession the experiment accession number
-     * @param rebuildCache          If set to TRUE then the cache will first be rebuilt. Else not.
+     * @param rebuildCache If set to TRUE then the cache will first be rebuilt.
+     * 
      * @return the spectra file
      */
     File getSpectrumCacheAsMgfFile(String experimentAccession, boolean rebuildCache);
 
     /**
      * Build up the spectrum cache for an entire experiment.
+     *
      * @param experimentAccession
      */
     void buildSpectrumCacheForExperiment(String experimentAccession);
-        
 }

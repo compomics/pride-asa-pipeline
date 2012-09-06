@@ -10,16 +10,15 @@ import com.compomics.pride_asa_pipeline.data.mapper.IdentificationDataMapper;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.repository.ExperimentRepository;
-import org.apache.log4j.Logger;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 /**
  *
@@ -39,7 +38,12 @@ public class JdbcExperimentRepository extends JdbcDaoSupport implements Experime
     //PSI:1000075 MALDI
     private static final String SELECT_ANALYZER_SOURCE_FOR_MALDI = new StringBuilder().append("select accession, value ").append("from mzdata_mz_data d, mzdata_analyzer_param p ").append("where p.parent_element_fk = d.mz_data_id ").append("and d.accession_number = ? ").append("and (accession = 'PSI:1000008' or accession = 'PSI:1000075') ").toString();
     private static final String SELECT_ANALYZER_SOURCES = new StringBuilder().append("SELECT ").append(" par.name, ").append(" par.value ").append(" FROM mzdata_mz_data mz").append(" LEFT JOIN mzdata_analyzer ana using (mz_data_id) ").append(" LEFT JOIN mzdata_analyzer_param par ON par.parent_element_fk = ana.analyzer_id and par.accession IN ('PSI:1000010','PSI:1000264','PSI:1000284','PSI:1000291',").append(buildAnalyzerCVlist()).append(") ").append(" WHERE mz.accession_number = ?").toString();
-    private static final String NUMBER_OF_SPECTRA = new StringBuilder().append("select count(exp.accession) ").append("from pride_experiment exp, mzdata_mz_data mzdata, mzdata_spectrum spec ").append("where exp.mz_data_id = mzdata.mz_data_id ").append("and mzdata.mz_data_id = spec.mz_data_id ").append("and exp.accession = ? ").toString();
+    private static final String NUMBER_OF_SPECTRA = new StringBuilder()
+            .append("select count(exp.accession) ")
+            .append("from pride_experiment exp, mzdata_mz_data mzdata, mzdata_spectrum spec ")
+            .append("where exp.mz_data_id = mzdata.mz_data_id ")
+            .append("and mzdata.mz_data_id = spec.mz_data_id ")
+            .append("and exp.accession = ? ").toString();
     private static final String SELECT_PROTEIN_ACCESSIONS = new StringBuilder().append("select ").append("distinct iden.accession_number ").append("from pride_experiment exp, ").append("pride_identification iden ").append("where exp.accession = ? ").append("and exp.experiment_id = iden.experiment_id").toString();
     private static final String NUMBER_OF_PEPTIDES = new StringBuilder().append("select count(exp.accession)").append("from pride_experiment exp, ").append("mzdata_mz_data mzdata, ").append("pride_identification iden, ").append("pride_peptide pep, ").append("mzdata_spectrum spec, ").append("mzdata_precursor prec ").append("where exp.mz_data_id = mzdata.mz_data_id ").append("and exp.experiment_id = iden.experiment_id ").append("and iden.identification_id = pep.identification_id ").append("and pep.spectrum_ref = spec.spectrum_identifier ").append("and mzdata.mz_data_id = spec.mz_data_id ").append("and spec.spectrum_id = prec.spectrum_id ").append("and exp.accession = ? ").toString();
     private static final String SELECT_SPECTRUM_IDS = new StringBuilder().append("select spec.spectrum_id ").append("from pride_experiment exp, mzdata_mz_data mzdata, mzdata_spectrum spec ").append("where exp.mz_data_id = mzdata.mz_data_id ").append("and mzdata.mz_data_id = spec.mz_data_id ").append("and exp.accession = ? ").toString();
