@@ -4,11 +4,10 @@ import java.util.*;
 
 /**
  * A construct to hold all registered modifications ordered by their possible
- * position on the precursor sequence.
- * (e.g. N-terminal or C-terminal or non-terminal modifications)
+ * position on the precursor sequence. (e.g. N-terminal or C-terminal or
+ * non-terminal modifications)
  *
- * @author Florian Reisinger
- *         Date: 19-Aug-2009
+ * @author Florian Reisinger Date: 19-Aug-2009
  * @since 0.1
  */
 public class ModificationHolder {
@@ -16,13 +15,12 @@ public class ModificationHolder {
     private Map<AminoAcid, Set<Modification>> nonTerminalMods;
     private Map<AminoAcid, Set<Modification>> nTerminalMods;
     private Map<AminoAcid, Set<Modification>> cTerminalMods;
-
     private Map<Double, Set<Modification>> massToModification;
 
     public ModificationHolder() {
-        nonTerminalMods = new HashMap<AminoAcid, Set<Modification>>();
-        nTerminalMods = new HashMap<AminoAcid, Set<Modification>>();
-        cTerminalMods = new HashMap<AminoAcid, Set<Modification>>();
+        nonTerminalMods = new EnumMap<AminoAcid, Set<Modification>>(AminoAcid.class);
+        nTerminalMods = new EnumMap<AminoAcid, Set<Modification>>(AminoAcid.class);
+        cTerminalMods = new EnumMap<AminoAcid, Set<Modification>>(AminoAcid.class);
         massToModification = new HashMap<Double, Set<Modification>>();
     }
 
@@ -73,7 +71,7 @@ public class ModificationHolder {
         massToModification.get(mass).add(modification);
 
     }
-    
+
     public boolean containsModForAA(AminoAcid aa) {
         //if there is a modification for either non-terminal, N-terminal or C-terminal position, return true.
         return (nonTerminalMods.containsKey(aa) || nTerminalMods.containsKey(aa) || cTerminalMods.containsKey(aa));
@@ -114,5 +112,4 @@ public class ModificationHolder {
     public Set<Modification> mapMassToMod(double mass) {
         return massToModification.get(mass);
     }
-
 }

@@ -68,7 +68,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
     private static final String MODIFICATIONS_LOCATION_DELIMITER = "_";
     private static final String NOT_AVAILABLE = "N/A";
     private static final int SPECTRUM_ID = 0;
-    private static final int MZ_ACCESSION = 1;
+    private static final int PEPTIDE_ID = 1;
     private static final int PEPTIDE_SEQUENCE = 2;
     private static final int PRECURSOR_MZ = 3;
     private static final int PRECURSOR_CHARGE = 4;
@@ -95,7 +95,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
 
             //print identification header
             pw.println("spectrum_id" + COLUMN_DELIMITER
-                    + "mz_accession" + COLUMN_DELIMITER
+                    + "peptide_id" + COLUMN_DELIMITER
                     + "peptide_sequence" + COLUMN_DELIMITER
                     + "precursor_mz" + COLUMN_DELIMITER
                     + "precursor_charge" + COLUMN_DELIMITER
@@ -128,7 +128,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
                 }
 
                 pw.print(identification.getSpectrumId()
-                        + COLUMN_DELIMITER + identification.getMzAccession()
+                        + COLUMN_DELIMITER + identification.getPeptide().getPeptideId()
                         + COLUMN_DELIMITER + identification.getPeptide().getSequenceString()
                         + COLUMN_DELIMITER + MathUtils.roundDouble(identification.getPeptide().getMzRatio())
                         + COLUMN_DELIMITER + identification.getPeptide().getCharge()
@@ -167,7 +167,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
                     String[] splits = line.split(COLUMN_DELIMITER);
 
                     long spectrumId = Long.parseLong(splits[SPECTRUM_ID]);
-                    String mzAccession = splits[MZ_ACCESSION];
+                    long peptide_id = Long.parseLong(splits[PEPTIDE_ID]);
                     String sequence = splits[PEPTIDE_SEQUENCE];
                     double precursorMass = Double.parseDouble(splits[PRECURSOR_MZ]);
                     int precursorCharge = Integer.parseInt(splits[PRECURSOR_CHARGE]);
@@ -176,14 +176,14 @@ public class FileResultHandlerImpl implements FileResultHandler {
                     Peptide peptide = null;
                     //check for modifications
                     if (splits[MODIFICATIONS].equals(NOT_AVAILABLE)) {
-                        peptide = new Peptide(precursorCharge, precursorMass, new AminoAcidSequence(sequence));
+                        peptide = new Peptide(precursorCharge, precursorMass, new AminoAcidSequence(sequence), peptide_id);
                     } else {
-                        peptide = new ModifiedPeptide(precursorCharge, precursorMass, new AminoAcidSequence(sequence), 0L);
+                        peptide = new ModifiedPeptide(precursorCharge, precursorMass, new AminoAcidSequence(sequence), peptide_id);
                         //add the modifications to the modified peptide                        
                         parseModifications((ModifiedPeptide) peptide, splits[MODIFICATIONS]);
                     }
 
-                    Identification identification = new Identification(peptide, mzAccession, spectrumId, 0L);
+                    Identification identification = new Identification(peptide, "", spectrumId, 0L);
                     identification.setPipelineExplanationType(pipelineExplanationType);
 
                     //check for noise threshold and score

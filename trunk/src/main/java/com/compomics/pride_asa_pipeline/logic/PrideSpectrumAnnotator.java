@@ -40,6 +40,10 @@ public class PrideSpectrumAnnotator {
      */
     private SpectrumAnnotatorResult spectrumAnnotatorResult;
     /**
+     * Keep track of the initialization state of the SpectrumAnnotator.
+     */
+    private boolean hasInitializedAnnotation = Boolean.TRUE;
+    /**
      * Beans
      */
     private ExperimentService experimentService;
@@ -49,11 +53,6 @@ public class PrideSpectrumAnnotator {
     private SpectrumMatcher spectrumMatcher;
     private MassDeltaExplainer massDeltaExplainer;
     private PeptideVariationsGenerator peptideVariationsGenerator;
-
-    /**
-     * Keep track of the initialization state of the SpectrumAnnotator.
-     */
-    private boolean hasInitializedAnnotation = false;
 
     /**
      * No-arg constructor
@@ -172,7 +171,7 @@ public class PrideSpectrumAnnotator {
         spectrumAnnotatorResult.setMassRecalibrationResult(massRecalibrationResult);
 
         // Update the initialization status
-        hasInitializedAnnotation = true;
+        hasInitializedAnnotation = Boolean.TRUE;
     }
 
     /**
@@ -182,8 +181,7 @@ public class PrideSpectrumAnnotator {
      */
     public void annotate(String experimentAccession) {
         if (!hasInitializedAnnotation) {
-            // Check whether first initializationstep has been executed.
-            // If not, do now!
+            //check whether first initializationstep has been executed.
             initAnnotation(experimentAccession);
         }
 
@@ -259,7 +257,7 @@ public class PrideSpectrumAnnotator {
         //               match them onto the peaks in the spectrum and decide
         //               which one is the best 'explanation' 
         LOGGER.info("finding best matches");
-        List<Identification> modifiedPrecursors = findBestMatches(experimentAccession, modifiedPrecursorVariations);
+        List<Identification> modifiedPrecursors = findBestMatches(modifiedPrecursorVariations);
         LOGGER.debug("finished finding best matches");
         spectrumAnnotatorResult.setModifiedPrecursors(modifiedPrecursors);
     }
@@ -308,10 +306,10 @@ public class PrideSpectrumAnnotator {
      * finds the systematic mass errors per charge state
      *
      * @param consideredChargeStates a set of considered charge states
-     * @param completePeptides       list of complete peptides (i.e. all sequence AA
-     *                               masses known)
+     * @param completePeptides list of complete peptides (i.e. all sequence AA
+     * masses known)
      * @return the mass recalibration result (systemic mass error) per charge
-     *         state
+     * state
      */
     private MassRecalibrationResult findSystematicMassError(Set<Integer> consideredChargeStates, List<Peptide> completePeptides) {
         //set considered charge states
@@ -334,10 +332,10 @@ public class PrideSpectrumAnnotator {
      * Archer
      *
      * @param massRecalibrationResult the mass recalibration result (systemic
-     *                                mass error) per charge state
-     * @param identifications         the identifications
+     * mass error) per charge state
+     * @param identifications the identifications
      * @return the possible modifications map (key: the identification data,
-     *         value the set of modification combinations)
+     * value the set of modification combinations)
      */
     private Map<Identification, Set<ModificationCombination>> findModificationCombinations(MassRecalibrationResult massRecalibrationResult, Identifications identifications) {
         //For the solver we need a ModificationHolder (contains all considered modifications)
@@ -376,9 +374,9 @@ public class PrideSpectrumAnnotator {
      * modification combinations into account)
      *
      * @param massDeltaExplanationsMap the possible modifications map (key: the
-     *                                 identification data, value the set of modification combinations)
+     * identification data, value the set of modification combinations)
      * @return the precursor variations map (key: the identification data, value
-     *         the set of modification combinations)
+     * the set of modification combinations)
      */
     private Map<Identification, Set<ModifiedPeptide>> findPrecursorVariations(Map<Identification, Set<ModificationCombination>> possibleExplanations) {
         //From the theoretical information we already have (e.g. the precursor sequence
@@ -400,13 +398,13 @@ public class PrideSpectrumAnnotator {
      * creates theoretical fragment ions for all precursors match them onto the
      * peaks in the spectrum and decide which one is the best 'explanation'
      *
-     * @param experimentAccession            the experiment accession number
+     * @param experimentAccession the experiment accession number
      * @param modifiedPrecursorVariationsMap the modified precursor variations
-     *                                       map (key: the identification data, value the set of modification
-     *                                       combinations)
+     * map (key: the identification data, value the set of modification
+     * combinations)
      * @return the result list of identifications containing a modified peptide
      */
-    private List<Identification> findBestMatches(String experimentAccession, Map<Identification, Set<ModifiedPeptide>> precursorVariations) {
+    private List<Identification> findBestMatches(Map<Identification, Set<ModifiedPeptide>> precursorVariations) {
         //After we now have all the theoretical ions for all possible 'precursor variations',
         //we can try and find them in the real spectrum. This will give an indication as to
         //which 'variation' of the precursor is the most likely one.
@@ -446,7 +444,7 @@ public class PrideSpectrumAnnotator {
      * Gets the identifications that where the mass delta could't be explained
      * by combining modifications
      *
-     * @param identifications            all the experiment identifications
+     * @param identifications all the experiment identifications
      * @param explainableIdentifications the explained identifications
      * @return the unexplained identifications
      */

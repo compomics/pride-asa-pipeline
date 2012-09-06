@@ -59,7 +59,7 @@ public class FileResultHandlerTest {
         List<Identification> identifications = new ArrayList<Identification>();
 
         //create identification with annotation data
-        Peptide peptide = new Peptide(1, 1649.8D, new AminoAcidSequence("AAKENNYLENNART"));
+        Peptide peptide = new Peptide(1, 1649.8D, new AminoAcidSequence("AAKENNYLENNART"), 123L);
         Identification identification_1 = new Identification(peptide, "mzAccession_1", 1L, 1L);
         identification_1.setPipelineExplanationType(PipelineExplanationType.UNMODIFIED);
         identifications.add(identification_1);
@@ -88,7 +88,7 @@ public class FileResultHandlerTest {
 
         //create identification with modified peptide
         Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
-        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(1, new AminoAcidSequence("AAKENNYLENNART").getSequenceMass(), new AminoAcidSequence("AAKENNYLENNART"), 2L);
+        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(1, new AminoAcidSequence("AAKENNYLENNART").getSequenceMass(), new AminoAcidSequence("AAKENNYLENNART"), 456L);
         modifiedPeptide.setNTModification(3, new Modification("testModification_1", 0.0, 0.0, Modification.Location.NON_TERMINAL, modifiedAAs, "mod_1", "mod_1"));
         modifiedPeptide.setNTModification(6, new Modification("testModification_2", 0.0, 0.0, Modification.Location.NON_TERMINAL, modifiedAAs, "mod_2", "mod_2"));
         modifiedPeptide.setNTModification(0, new Modification("testModification_3", 0.0, 0.0, Modification.Location.NON_TERMINAL, modifiedAAs, "mod_3", "mod_3"));
@@ -110,7 +110,7 @@ public class FileResultHandlerTest {
 
             if (line.startsWith("1")) {
                 assertEquals(Long.toString(identification_1.getSpectrumId()), splitArray[0]);
-                assertEquals(identification_1.getMzAccession(), splitArray[1]);
+                assertEquals(identification_1.getPeptide().getPeptideId(), Long.parseLong(splitArray[1]));
                 assertEquals(identification_1.getPeptide().getSequenceString(), splitArray[2]);
                 assertEquals(peptide.getMzRatio(), Double.parseDouble(splitArray[3]), 0.01);
                 assertEquals(peptide.getCharge(), Integer.parseInt(splitArray[4]));
@@ -126,7 +126,7 @@ public class FileResultHandlerTest {
                 assertEquals("N/A", splitArray[9]);
             } else if (line.startsWith("2")) {
                 assertEquals(Long.toString(identification_2.getSpectrumId()), splitArray[0]);
-                assertEquals(identification_1.getMzAccession(), splitArray[1]);
+                assertEquals(identification_2.getPeptide().getPeptideId(), Long.parseLong(splitArray[1]));
                 assertEquals(identification_2.getPeptide().getSequenceString(), splitArray[2]);
                 assertEquals(modifiedPeptide.getMzRatio(), Double.parseDouble(splitArray[3]), 0.01);
                 assertEquals(modifiedPeptide.getCharge(), Integer.parseInt(splitArray[4]));
@@ -154,12 +154,12 @@ public class FileResultHandlerTest {
         assertEquals(2, spectrumAnnotatorResult.getUnexplainedIdentifications().size());
 
         for (Identification identification : spectrumAnnotatorResult.getIdentifications()) {
-            assertNotNull(identification.getPeptide()); 
-            if(identification.getAnnotationData() != null){
-                assertNotNull(identification.getAnnotationData().getIdentificationScore());                
-            }    
-            if(identification.getPeptide() instanceof ModifiedPeptide){
-                ModifiedPeptide modifiedPeptide = (ModifiedPeptide)identification.getPeptide();
+            assertNotNull(identification.getPeptide());
+            if (identification.getAnnotationData() != null) {
+                assertNotNull(identification.getAnnotationData().getIdentificationScore());
+            }
+            if (identification.getPeptide() instanceof ModifiedPeptide) {
+                ModifiedPeptide modifiedPeptide = (ModifiedPeptide) identification.getPeptide();
                 assertTrue(modifiedPeptide.getNTModifications() != null || modifiedPeptide.getNumberNTModifications() != 0 || modifiedPeptide.getCTermMod() != null);
             }
         }

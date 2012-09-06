@@ -23,7 +23,7 @@ public interface ModificationService {
 
     /**
      * This method will read and parse the modification definitions specified in
-     * the modification resource into a List of Modification objects. Note: the
+     * the modification resource into a Set of Modification objects. Note: the
      * modification resource is only parsed once and the so acquired
      * modification objects cached in the list for later retrieval. Changes to
      * the modification resource after the first call of this method will
