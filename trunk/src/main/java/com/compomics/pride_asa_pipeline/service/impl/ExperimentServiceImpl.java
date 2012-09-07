@@ -1,14 +1,14 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *
+
  */
 package com.compomics.pride_asa_pipeline.service.impl;
 
-import com.compomics.mslims.util.fileio.MascotGenericFile;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Identifications;
+import com.compomics.pride_asa_pipeline.model.MascotGenericFile;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
@@ -17,11 +17,10 @@ import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.log4j.Logger;
-
-import javax.annotation.Nullable;
 import java.io.*;
 import java.util.*;
+import javax.annotation.Nullable;
+import org.apache.log4j.Logger;
 
 /**
  * @author Niels Hulstaert
@@ -142,7 +141,7 @@ public class ExperimentServiceImpl implements ExperimentService {
             LOGGER.debug(String.format("rebuilding spectrum cache for experiment %s", experimentAccession));
             buildSpectrumCacheForExperiment(experimentAccession);
         }
-
+                        
         BufferedOutputStream outputStream = null;
         try {
             //create new mgf file from scratch
