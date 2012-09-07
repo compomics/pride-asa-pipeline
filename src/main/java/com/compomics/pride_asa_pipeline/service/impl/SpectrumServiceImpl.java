@@ -1,6 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *
+
  */
 package com.compomics.pride_asa_pipeline.service.impl;
 
@@ -8,17 +8,17 @@ import com.compomics.pride_asa_pipeline.cache.Cache;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.repository.SpectrumRepository;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
-import org.apache.log4j.Logger;
-
 import java.util.*;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Niels Hulstaert
  */
 public class SpectrumServiceImpl implements SpectrumService {
-    private static final Logger LOGGER = Logger.getLogger(SpectrumServiceImpl.class);
 
+    private static final Logger LOGGER = Logger.getLogger(SpectrumServiceImpl.class);
+    
     private SpectrumRepository spectrumRepository;
     private Cache<Long, List<Peak>> spectrumPeaksCache;
 
@@ -58,9 +58,6 @@ public class SpectrumServiceImpl implements SpectrumService {
             //add spectrum peaks in cache
             spectrumPeaksCache.putInCache(spectrumId, peaks);
         }
-        else{
-//            LOGGER.debug("found spectrum with ID: " + spectrumId + " in cache.");
-        }
 
         return peaks;
     }
@@ -81,7 +78,7 @@ public class SpectrumServiceImpl implements SpectrumService {
 
     @Override
     public void cacheSpectra(List<Long> aSpectrumidCacheList) {
-        Map<Long,List<Peak>> lPeakMapsBySpectrumIdList = spectrumRepository.getPeakMapsBySpectrumIdList(aSpectrumidCacheList);
+        Map<Long, List<Peak>> lPeakMapsBySpectrumIdList = spectrumRepository.getPeakMapsBySpectrumIdList(aSpectrumidCacheList);
         Set<Long> lSpectrumids = lPeakMapsBySpectrumIdList.keySet();
         for (Long lSpectrumid : lSpectrumids) {
             spectrumPeaksCache.putInCache(lSpectrumid, lPeakMapsBySpectrumIdList.get(lSpectrumid));
@@ -95,5 +92,4 @@ public class SpectrumServiceImpl implements SpectrumService {
     public void clearCache() {
         spectrumPeaksCache.clearCache();
     }
-
 }
