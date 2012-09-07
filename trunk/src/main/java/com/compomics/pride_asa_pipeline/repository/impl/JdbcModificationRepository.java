@@ -19,7 +19,6 @@ import java.util.List;
 public class JdbcModificationRepository extends JdbcDaoSupport implements ModificationRepository {
 
     private static final Logger LOGGER = Logger.getLogger(JdbcModificationRepository.class);
-
     private static final String SELECT_MODIFICATION_BY_PEPTIDE_ID = new StringBuilder()
             .append("select ")
             .append("modif.accession, modif.location, modif_param.name, pep.sequence, mass_del.mass_delta_value ")
@@ -32,7 +31,6 @@ public class JdbcModificationRepository extends JdbcDaoSupport implements Modifi
             .append("and pep.peptide_id = ? ")
             .append("and modif.modification_id = modif_param.parent_element_fk ")
             .append("and mass_del.modification_id = modif.modification_id; ").toString();
-
     private static final String SELECT_MODIFICATION_BY_EXPERIMENT_ID = new StringBuilder()
             .append("select ")
             .append("modif.accession, modif.location, modif_param.name, mass_del.mass_delta_value, pep.sequence, CONCAT(SUBSTR(pep.sequence, modif.location,1), \"_\", name) as gr ")
@@ -52,7 +50,6 @@ public class JdbcModificationRepository extends JdbcDaoSupport implements Modifi
             .append("and exp.accession = ? ")
             .append("group by gr ").toString();
 
-
     @Override
     public List<Modification> getModificationsByPeptideId(long peptideId) {
         LOGGER.debug("Loading modifications for precursor with peptide id " + peptideId);
@@ -60,7 +57,6 @@ public class JdbcModificationRepository extends JdbcDaoSupport implements Modifi
         LOGGER.debug("Finished loading modifications for precursor with peptide id " + peptideId);
         return modifications;
     }
-
 
     @Override
     public List<Modification> getModificationsByExperimentId(long experimentId) {
