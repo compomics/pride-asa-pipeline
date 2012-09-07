@@ -17,13 +17,13 @@ import org.springframework.jdbc.core.RowMapper;
  *
  * @author Niels Hulstaert
  */
-public class IdentificationDataMapper implements RowMapper<Identification> {
+public class IdentificationMapper implements RowMapper<Identification> {
 
-    private static final Logger LOGGER = Logger.getLogger(IdentificationDataMapper.class);
+    private static final Logger LOGGER = Logger.getLogger(IdentificationMapper.class);
 
     @Override
     public Identification mapRow(ResultSet rs, int i) throws SQLException {
-        Identification identificationData = null;
+        Identification identification = null;
 
         //sequence
         String sequence = rs.getString("sequence");

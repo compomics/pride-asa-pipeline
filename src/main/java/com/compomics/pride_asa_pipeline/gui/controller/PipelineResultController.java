@@ -24,13 +24,16 @@ import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.model.comparator.IdentificationSequenceComparator;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumPanelService;
+import com.compomics.pride_asa_pipeline.util.GuiUtils;
 import com.compomics.pride_asa_pipeline.util.MathUtils;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Doubles;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
+import java.awt.geom.RectangularShape;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,10 +51,14 @@ import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.xy.StandardXYBarPainter;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
+import org.jfree.ui.RectangleEdge;
 
 /**
  *
@@ -216,6 +223,8 @@ public class PipelineResultController {
         JFreeChart precursorMassDeltasChart = ChartFactory.createHistogram(
                 "Precursor mass delta", "mass delta (d.)", "frequency", precMassDeltasDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
+        precursorMassDeltasChart.getPlot().setBackgroundPaint(Color.WHITE);
+        GuiUtils.setShadowVisible(precursorMassDeltasChart, Boolean.FALSE);
 
         //create new fragment ion mass delta dataset
         HistogramDataset fragMassDeltasDataset = new HistogramDataset();
@@ -227,6 +236,8 @@ public class PipelineResultController {
         JFreeChart fragMassDeltasDeltasChart = ChartFactory.createHistogram(
                 "Fragment ion mass delta", "mass delta (d.)", "frequency", fragMassDeltasDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
+        fragMassDeltasDeltasChart.getPlot().setBackgroundPaint(Color.WHITE);
+        GuiUtils.setShadowVisible(fragMassDeltasDeltasChart, Boolean.FALSE);
 
         //create new identification scores dataset
         HistogramDataset ionCoverageDataset = new HistogramDataset();
@@ -237,6 +248,8 @@ public class PipelineResultController {
         JFreeChart ionCoverageChart = ChartFactory.createHistogram(
                 "B/Y ion coverage", "coverage (%)", "frequency", ionCoverageDataset,
                 PlotOrientation.VERTICAL, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);
+        ionCoverageChart.getPlot().setBackgroundPaint(Color.WHITE);
+        GuiUtils.setShadowVisible(ionCoverageChart, Boolean.FALSE);
 
         //create new identification scores dataset
         HistogramDataset scoresDataset = new HistogramDataset();
@@ -246,6 +259,8 @@ public class PipelineResultController {
         JFreeChart scoresChart = ChartFactory.createHistogram(
                 "Fragment ion score", "score", "frequency", scoresDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
+        scoresChart.getPlot().setBackgroundPaint(Color.WHITE);
+        GuiUtils.setShadowVisible(scoresChart, Boolean.FALSE);
 
         //create new identificiations data set
         DefaultPieDataset identificationsDataset = new DefaultPieDataset();
@@ -266,6 +281,7 @@ public class PipelineResultController {
         plot.setNoDataMessage("No data available");
         plot.setCircular(Boolean.TRUE);
         plot.setLabelGap(0.02);
+        plot.setBackgroundPaint(Color.WHITE);
         //change pie colors
         for (int i = 0; i < identificationsDataset.getItemCount(); i++) {
             Comparable key = identificationsDataset.getKey(i);
@@ -286,6 +302,8 @@ public class PipelineResultController {
                 "relative occurance",
                 modificationsDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
+        modificationsChart.getPlot().setBackgroundPaint(Color.WHITE);
+        GuiUtils.setShadowVisible(modificationsChart, Boolean.FALSE);
 
         //add charts to panels
         precursorMassDeltasChartPanel.setChart(precursorMassDeltasChart);

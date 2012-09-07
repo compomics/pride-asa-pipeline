@@ -81,23 +81,4 @@ public class WinsorNoiseThresholdFinder implements NoiseThresholdFinder {
         }
         return correctedIntensities;
     }
-
-    private double[] reduceOutliers2(double[] intensities, double maxIntensityLimit, double minIntensityLimit) {
-        //System.out.println("reduce outliers-------------------------------");
-        double[] correctedIntensities = new double[intensities.length];
-        // sets all the values above the limit (outliers) to the limit
-        // and therefore effectively eliminating outliers
-        for (int i = 0; i < intensities.length; i++) {
-            if (intensities[i] >= minIntensityLimit && intensities[i] <= maxIntensityLimit) {
-                correctedIntensities[i] = intensities[i];
-            } else if (intensities[i] > maxIntensityLimit) {
-                System.out.println("reduce outliers2-------------------------------: " + intensities[i]);
-                correctedIntensities[i] = maxIntensityLimit;
-            } else {
-                System.out.println("reduce outliers3-------------------------------: " + intensities[i]);
-                correctedIntensities[i] = minIntensityLimit;
-            }
-        }
-        return correctedIntensities;
-    }
 }

@@ -24,12 +24,30 @@ import java.util.Map;
 public class JdbcSpectrumRepository extends JdbcDaoSupport implements SpectrumRepository {
 
     private static final Logger LOGGER = Logger.getLogger(JdbcSpectrumRepository.class);
-
-    private static final String SELECT_SPECTRUM_MZVALUES_BY_SPECTRUM_ID = new StringBuilder().append("select binary_array.data_precision as data_precision, binary_array.data_endian as data_endian, base_64.base_64_data as base_64_data from ").append("mzdata_spectrum spec, mzdata_binary_array binary_array, mzdata_base_64_data base_64 ").append("where spec.mz_array_binary_id = binary_array.binary_array_id ").append("and binary_array.binary_array_id = base_64.binary_array_id ").append("and spec.spectrum_id = ?").toString();
-    private static final String SELECT_SPECTRUM_INTENSITIES_BY_SPECTRUM_ID = new StringBuilder().append("select binary_array.data_precision as data_precision, binary_array.data_endian as data_endian, base_64.base_64_data as base_64_data from ").append("mzdata_spectrum spec, mzdata_binary_array binary_array, mzdata_base_64_data base_64 ").append("where spec.inten_array_binary_id = binary_array.binary_array_id ").append("and binary_array.binary_array_id = base_64.binary_array_id ").append("and spec.spectrum_id = ?").toString();
-
-    private static final String SELECT_SPECTRUM_MZVALUES_BY_SPECTRUM_ID_LIST = new StringBuilder().append("select spec.spectrum_id as spectrumid, binary_array.data_precision as data_precision, binary_array.data_endian as data_endian, base_64.base_64_data as base_64_data from ").append("mzdata_spectrum spec, mzdata_binary_array binary_array, mzdata_base_64_data base_64 ").append("where spec.mz_array_binary_id = binary_array.binary_array_id ").append("and binary_array.binary_array_id = base_64.binary_array_id ").append("and spec.spectrum_id IN (%s)").toString();
-    private static final String SELECT_SPECTRUM_INTENSITIES_BY_SPECTRUM_ID_LIST = new StringBuilder().append("select spec.spectrum_id as spectrumid, binary_array.data_precision as data_precision, binary_array.data_endian as data_endian, base_64.base_64_data as base_64_data from ").append("mzdata_spectrum spec, mzdata_binary_array binary_array, mzdata_base_64_data base_64 ").append("where spec.inten_array_binary_id = binary_array.binary_array_id ").append("and binary_array.binary_array_id = base_64.binary_array_id ").append("and spec.spectrum_id IN (%s)").toString();
+    private static final String SELECT_SPECTRUM_MZVALUES_BY_SPECTRUM_ID = new StringBuilder()
+            .append("select binary_array.data_precision as data_precision, binary_array.data_endian as data_endian, base_64.base_64_data as base_64_data from ")
+            .append("mzdata_spectrum spec, mzdata_binary_array binary_array, mzdata_base_64_data base_64 ")
+            .append("where spec.mz_array_binary_id = binary_array.binary_array_id ")
+            .append("and binary_array.binary_array_id = base_64.binary_array_id ")
+            .append("and spec.spectrum_id = ?").toString();
+    private static final String SELECT_SPECTRUM_INTENSITIES_BY_SPECTRUM_ID = new StringBuilder()
+            .append("select binary_array.data_precision as data_precision, binary_array.data_endian as data_endian, base_64.base_64_data as base_64_data from ")
+            .append("mzdata_spectrum spec, mzdata_binary_array binary_array, mzdata_base_64_data base_64 ")
+            .append("where spec.inten_array_binary_id = binary_array.binary_array_id ")
+            .append("and binary_array.binary_array_id = base_64.binary_array_id ")
+            .append("and spec.spectrum_id = ?").toString();
+    private static final String SELECT_SPECTRUM_MZVALUES_BY_SPECTRUM_ID_LIST = new StringBuilder()
+            .append("select spec.spectrum_id as spectrumid, binary_array.data_precision as data_precision, binary_array.data_endian as data_endian, base_64.base_64_data as base_64_data from ")
+            .append("mzdata_spectrum spec, mzdata_binary_array binary_array, mzdata_base_64_data base_64 ")
+            .append("where spec.mz_array_binary_id = binary_array.binary_array_id ")
+            .append("and binary_array.binary_array_id = base_64.binary_array_id ")
+            .append("and spec.spectrum_id IN (%s)").toString();
+    private static final String SELECT_SPECTRUM_INTENSITIES_BY_SPECTRUM_ID_LIST = new StringBuilder()
+            .append("select spec.spectrum_id as spectrumid, binary_array.data_precision as data_precision, binary_array.data_endian as data_endian, base_64.base_64_data as base_64_data from ")
+            .append("mzdata_spectrum spec, mzdata_binary_array binary_array, mzdata_base_64_data base_64 ")
+            .append("where spec.inten_array_binary_id = binary_array.binary_array_id ")
+            .append("and binary_array.binary_array_id = base_64.binary_array_id ")
+            .append("and spec.spectrum_id IN (%s)").toString();
 
     @Override
     public double[] getMzValuesBySpectrumId(long spectrumId) {
@@ -81,5 +99,4 @@ public class JdbcSpectrumRepository extends JdbcDaoSupport implements SpectrumRe
 
         return result;
     }
-
 }

@@ -6,11 +6,10 @@ package com.compomics.pride_asa_pipeline.data.mapper;
 
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData.ANALYZER_FAMILY;
-import org.apache.log4j.Logger;
-import org.springframework.jdbc.core.RowMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.apache.log4j.Logger;
+import org.springframework.jdbc.core.RowMapper;
 
 /**
  *
@@ -24,7 +23,7 @@ public class AnalyzerDataMapper implements RowMapper<AnalyzerData> {
     public AnalyzerData mapRow(ResultSet rs, int i) throws SQLException {
         AnalyzerData analyzerData = null;
         String analyzerType = "";
-
+                       
         //check to see if annotated with PSI:1000010. If so, use value
         if ("AnalyzerType".equals(rs.getString("name")) || "Analyzer Type".equals(rs.getString("name"))) {
             analyzerType = rs.getString("value");
