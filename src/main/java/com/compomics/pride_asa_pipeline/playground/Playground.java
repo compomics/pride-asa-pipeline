@@ -4,10 +4,18 @@
  */
 package com.compomics.pride_asa_pipeline.playground;
 
-import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.service.ExperimentService;
-import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
-import org.springframework.context.ApplicationContext;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Niels Hulstaert
@@ -16,81 +24,51 @@ public class Playground {
 
     public static void main(String[] args) {
         //load application context
-        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-//
-//        ModificationService modificationService = (ModificationService) applicationContext.getBean("modificationService");
-//
-//        Set<Modification> lModificationSet = modificationService.loadExperimentModifications(1748);
-//
-//        System.out.println("printing pride-asap modfications");
-//        for (Modification lNext : lModificationSet) {
-//            if(lNext != null){
-//                System.out.println(String.format("%s - %s - %f", lNext.getName(), lNext.getLocation().toString(), lNext.getMassShift()));
-//            }
-//        }
-//
-//        System.out.println("marshalling into OMSSA xsd modfications");
-//        OmssaModiciationMarshaller marshaller = new OmssaModificationMarshallerImpl();
-//        UserModCollection lUserModCollection = marshaller.marshallModifications(lModificationSet);
-//
-//        System.out.println("printing omssa-xsd modfications");
-//        for (Object lNext : lUserModCollection) {
-//            UserMod lUserMod = (UserMod) lNext;
-//            System.out.println(String.format("%s - %s - %f", lUserMod.getModificationName(), lUserMod.getLocation(), lUserMod.getMass()));
-//        }
-//
+        //ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
 
-//  modificationService.loadExperimentModifications(null);
-
-        ExperimentService experimentService = (ExperimentService) applicationContext.getBean("experimentService");
-
-//        SpectrumService spectrumService = (SpectrumService) applicationContext.getBean("spectrumService");
-
-        PrideSpectrumAnnotator lSpectrumAnnotator;
-        lSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
-        lSpectrumAnnotator.clearTmpResources();
-
-//        experimentService.buildSpectrumCacheForExperiment("2");
-//        File file = experimentService.getSpectrumCacheAsMgfFile("2", true);
-
-//        System.out.println(file.getAbsolutePath());
-
-
-//
-//        File file = experimentService.getSpectrumCacheAsMgfFile("7662");
-//
-//        Set<String> lAccessions = experimentService.getProteinAccessions("7662");
-//        System.out.println(String.format("%d unique protein accessions", lAccessions.size()));
-
-//        ModificationService modificationService = (ModificationService) applicationContext.getBean("modificationService");
-//        PrideSpectrumAnnotator annotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
-////
-//        annotator.annotate("9333");
-//        Set<Modification> lUsedModifications = modificationService.getUsedModifications(annotator.getSpectrumAnnotatorResult());
-//
-//        for(Modification lModification : lUsedModifications){
-//            System.out.println(lModification.getName());
-//        }
-
-
-//        List<Long> spectrumIds = Lists.newArrayList();
-//        spectrumIds.add(4190355l);
-//        spectrumIds.add(4190382l);
-//        spectrumIds.add(4190407l);
-//
-//
-//        spectrumService.cacheSpectra(spectrumIds);
-//        Map lCachedSpectrum = spectrumService.getCachedSpectrum(4190407l);
-//        System.out.println(String.format("spectrum has %d different peaks %s", lCachedSpectrum.keySet().size(), "blabla"));
-
-//        Set<String> proteinAccessions = experimentService.getProteinAccessions("7662");
-//
-//        PrideSpectrumAnnotator prideSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
-//
-//        prideSpectrumAnnotator.annotate("7662");
-//        SpectrumAnnotatorResult spectrumAnnotatorResult = prideSpectrumAnnotator.getSpectrumAnnotatorResult();
-//
-//        UserModCollection userModCollection = modificationService.getModificationsAsUserModCollection(spectrumAnnotatorResult);
+        Playground.filterExperimentAccessions(new File("C:\\Users\\niels\\Desktop\\pride_experiment_accessions.txt"), new File("C:\\Users\\niels\\Documents\\annotation_test\\pride"));
     }
 
+    public static File filterExperimentAccessions(File experimentAccessionsFile, File resultsDirectory) {
+        File filteredExperimentAccessionsFile = null;
+
+        BufferedReader bufferedReader = null;
+        PrintWriter printWriter = null;
+        try {
+            filteredExperimentAccessionsFile = new File("C:\\Users\\niels\\Desktop\\filtered_pride_experiment_accessions.txt");
+
+            //1. read file names in result directory and put them in a set
+            Set<String> processedExperimentAccessions = new HashSet<String>();
+            if (!resultsDirectory.isDirectory()) {
+                return null;
+            }
+            for (File resultFile : resultsDirectory.listFiles()) {
+                processedExperimentAccessions.add(resultFile.getName().substring(0, resultFile.getName().indexOf('.')));
+            }
+
+            //2. read experiment accessions file and write the non processed experiment accessions to the new file
+            bufferedReader = new BufferedReader(new FileReader(experimentAccessionsFile));
+            printWriter = new PrintWriter(new BufferedWriter(new FileWriter(filteredExperimentAccessionsFile)));
+
+            String line = null;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (!processedExperimentAccessions.contains(line)) {
+                    printWriter.println(line);
+                }
+            }
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Playground.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Playground.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                bufferedReader.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Playground.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        return filteredExperimentAccessionsFile;
+    }
 }

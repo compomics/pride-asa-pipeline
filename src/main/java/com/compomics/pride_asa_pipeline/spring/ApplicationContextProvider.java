@@ -18,6 +18,8 @@ public class ApplicationContextProvider {
 
     private ApplicationContextProvider() throws ExceptionInInitializerError {
         try {
+            //load main application context.
+            //Gui beans are not loaded and are located in "guiSpringXMLConfig.xml"
             this.applicationContext = new ClassPathXmlApplicationContext("springXMLConfig.xml");
         } catch (Throwable ex) {
             throw new ExceptionInInitializerError(ex);
@@ -27,11 +29,11 @@ public class ApplicationContextProvider {
     public synchronized static ApplicationContextProvider getInstance() throws ExceptionInInitializerError {
         return provider;
     }
-
+    
     public ApplicationContext getApplicationContext() {
         return applicationContext;
     }
-
+    
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }

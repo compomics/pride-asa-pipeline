@@ -8,14 +8,13 @@ import java.awt.Dimension;
 import java.awt.Point;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.Renderer;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
-import org.jfree.chart.renderer.category.StackedBarRenderer;
 import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.chart.renderer.xy.StandardXYBarPainter;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
@@ -85,7 +84,7 @@ public class GuiUtils {
                     br.setBarPainter(new StandardBarPainter());
                     br.setShadowVisible(state);
                 }
-            }
+            } 
         }
     }
 }

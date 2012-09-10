@@ -6,7 +6,7 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.gui.view.PipelineParamsPanel;
-import com.compomics.pride_asa_pipeline.gui.wrapper.PropertyGuiWrapper;
+import com.compomics.pride_asa_pipeline.gui.PropertyGuiWrapper;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;

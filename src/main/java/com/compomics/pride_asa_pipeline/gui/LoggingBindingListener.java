@@ -2,7 +2,7 @@
  *
 
  */
-package com.compomics.pride_asa_pipeline.gui.binding;
+package com.compomics.pride_asa_pipeline.gui;
 
 import javax.swing.JLabel;
 import org.jdesktop.beansbinding.AbstractBindingListener;

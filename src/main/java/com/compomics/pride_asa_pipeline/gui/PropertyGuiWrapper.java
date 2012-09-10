@@ -2,7 +2,7 @@
  *
 
  */
-package com.compomics.pride_asa_pipeline.gui.wrapper;
+package com.compomics.pride_asa_pipeline.gui;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 

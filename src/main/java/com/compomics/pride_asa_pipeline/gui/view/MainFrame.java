@@ -4,6 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.gui.view;
 
+import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
@@ -16,8 +17,9 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * Creates new form MainFrame
      */
-    public MainFrame() {
+    public MainFrame() {        
         initComponents();
+        this.getContentPane().setBackground(new Color(0,102,204));
     }
 
     public JPanel getPrideSelectionParentPanel() {
@@ -90,8 +92,8 @@ public class MainFrame extends javax.swing.JFrame {
         pipelineParamsParentPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setBackground(new java.awt.Color(255, 255, 255));
 
+        toolBar.setBackground(new java.awt.Color(120, 120, 231));
         toolBar.setBorder(null);
         toolBar.setFloatable(false);
         toolBar.setRollover(true);
