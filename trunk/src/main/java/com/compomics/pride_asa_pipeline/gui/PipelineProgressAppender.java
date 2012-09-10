@@ -2,7 +2,7 @@
  *
 
  */
-package com.compomics.pride_asa_pipeline.gui.appender;
+package com.compomics.pride_asa_pipeline.gui;
 
 import com.compomics.pride_asa_pipeline.gui.controller.PipelineProgressController;
 import java.util.concurrent.ExecutorService;

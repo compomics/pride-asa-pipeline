@@ -4,7 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
-import com.compomics.pride_asa_pipeline.gui.appender.PipelineProgressAppender;
+import com.compomics.pride_asa_pipeline.gui.PipelineProgressAppender;
 import com.compomics.pride_asa_pipeline.gui.view.PipelineProgressDialog;
 import com.compomics.pride_asa_pipeline.util.GuiUtils;
 import java.awt.event.WindowAdapter;

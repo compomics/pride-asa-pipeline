@@ -22,13 +22,14 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  *
  * @author Niels Hulstaert Hulstaert
  */
 public class PrideAsaPipelineStarter {
-
+    
     private static final Logger LOGGER = Logger.getLogger(PrideAsaPipelineStarter.class);
     private static final String HEADER = "[Pride automtic spectrum annotation pipeline]\n";
     private static final String USAGE = "java -jar <jar file name>";
@@ -41,14 +42,14 @@ public class PrideAsaPipelineStarter {
      */
     public static void main(String[] commandLineArguments) {
         constructOptions();
-
+        
         displayBlankLines(1, System.out);
         displayHeader(System.out);
         displayBlankLines(2, System.out);
-
+        
         parse(commandLineArguments);
     }
-
+    
     public static void launchGuiMode() {
         /*
          * Set the Nimbus look and feel
@@ -83,20 +84,22 @@ public class PrideAsaPipelineStarter {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
+                //set GUI application context
+                ApplicationContextProvider.getInstance().setApplicationContext(new ClassPathXmlApplicationContext("guiSpringXMLConfig.xml"));
                 ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
                 MainController mainController = (MainController) applicationContext.getBean("mainController");
                 mainController.init();
             }
         });
     }
-
+    
     public static void launchCommandLineMode(String experimentAccession) {
         LOGGER.debug("launching command line mode with experiment " + experimentAccession);
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
         CommandLineRunner commandLineRunner = (CommandLineRunner) applicationContext.getBean("commandLineRunner");
         commandLineRunner.runPipeline(experimentAccession);
     }
-
+    
     public static void launchCommandLineMode(File experimentAccessionsFile) {
         LOGGER.debug("launching command line mode with experiment accessions file " + experimentAccessionsFile.getAbsolutePath());
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
@@ -114,7 +117,7 @@ public class PrideAsaPipelineStarter {
         CommandLine commandLine;
         try {
             commandLine = cmdLineParser.parse(options, commandLineArguments);
-            if (commandLine.getArgList().isEmpty()) {
+            if (commandLine.getOptions().length == 0) {
                 launchGuiMode();
             }
             if (commandLine.hasOption('h')) {
@@ -157,10 +160,10 @@ public class PrideAsaPipelineStarter {
      */
     private static void constructOptions() {
         options = new Options();
-
+        
         options.addOption("h", "help", Boolean.FALSE, "Help");
         options.addOption("u", "usage", Boolean.FALSE, "Usage");
-
+        
         Option accessionStringOption = new Option("a", "accession", Boolean.TRUE, "Experiment accession");
         accessionStringOption.setArgName("accession");
         Option accessionFileOption = new Option("f", "accessions_file", Boolean.TRUE, "Experiment accessions file path");
@@ -168,7 +171,7 @@ public class PrideAsaPipelineStarter {
         OptionGroup commandLineModeOptionGroup = new OptionGroup();
         commandLineModeOptionGroup.addOption(accessionFileOption);
         commandLineModeOptionGroup.addOption(accessionStringOption);
-
+        
         options.addOptionGroup(commandLineModeOptionGroup);
     }
 

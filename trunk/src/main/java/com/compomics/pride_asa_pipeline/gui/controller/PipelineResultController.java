@@ -11,12 +11,12 @@ import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
+import com.compomics.pride_asa_pipeline.gui.ChartFactory;
 import com.compomics.pride_asa_pipeline.gui.view.IdentificationsPanel;
 import com.compomics.pride_asa_pipeline.gui.view.SummaryPanel;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
 import com.compomics.pride_asa_pipeline.model.Identification;
-import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ModificationFacade;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peptide;
@@ -24,41 +24,18 @@ import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.model.comparator.IdentificationSequenceComparator;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumPanelService;
-import com.compomics.pride_asa_pipeline.util.GuiUtils;
 import com.compomics.pride_asa_pipeline.util.MathUtils;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.google.common.base.Joiner;
-import com.google.common.primitives.Doubles;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
-import java.awt.geom.RectangularShape;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Logger;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.CategoryLabelPositions;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PiePlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.renderer.xy.StandardXYBarPainter;
-import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.data.statistics.HistogramDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.jfree.ui.RectangleEdge;
 
 /**
  *
@@ -69,14 +46,6 @@ public class PipelineResultController {
     private static final Logger LOGGER = Logger.getLogger(PipelineResultController.class);
     private static final String UNMOD_MASS_DELTA_OPEN = "[";
     private static final String UNMOD_MASS_DELTA_CLOSE = "]";
-    private static final String MODIFIED_LABEL = "modified";
-    private static final String UNMODIFIED_LABEL = "unmodified";
-    private static final String UNEXPLAINED_LABEL = "unexplained";
-    private static final int NUMBER_OF_PRECURSOR_MASS_DELTA_BINS = 100;
-    private static final int NUMBER_OF_ION_FRAGMENT_MASS_DELTA_BINS = 50;
-    private static final int NUMBER_OF_ION_COVERAGE_BINS = 100;
-    private static final int NUMBER_OF_SCORE_BINS = 100;
-    private static final Color[] PIE_COLORS = new Color[]{Color.GREEN, Color.ORANGE, Color.RED};
     //model
     private SpectrumAnnotatorResult spectrumAnnotatorResult;
     private EventList<Identification> identificationsEventList;
@@ -213,105 +182,13 @@ public class PipelineResultController {
             }
         }
 
-        //create new precursor mass delta dataset
-        HistogramDataset precMassDeltasDataset = new HistogramDataset();
-        precMassDeltasDataset.setType(HistogramType.FREQUENCY);
-
-        //sort array in order to find min and max values
-        Arrays.sort(precursorMassDeltaValues);
-        precMassDeltasDataset.addSeries("precursorMassDeltaSeries", precursorMassDeltaValues, NUMBER_OF_PRECURSOR_MASS_DELTA_BINS, precursorMassDeltaValues[0] - 0.5, precursorMassDeltaValues[precursorMassDeltaValues.length - 1] + 0.5);
-        JFreeChart precursorMassDeltasChart = ChartFactory.createHistogram(
-                "Precursor mass delta", "mass delta (d.)", "frequency", precMassDeltasDataset,
-                PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
-        precursorMassDeltasChart.getPlot().setBackgroundPaint(Color.WHITE);
-        GuiUtils.setShadowVisible(precursorMassDeltasChart, Boolean.FALSE);
-
-        //create new fragment ion mass delta dataset
-        HistogramDataset fragMassDeltasDataset = new HistogramDataset();
-        fragMassDeltasDataset.setType(HistogramType.FREQUENCY);
-
-        //sort array in order to find min and max values
-        Collections.sort(fragmentMassDeltaValues);
-        fragMassDeltasDataset.addSeries("precursorMassDeltaSeries", Doubles.toArray(fragmentMassDeltaValues), NUMBER_OF_ION_FRAGMENT_MASS_DELTA_BINS, fragmentMassDeltaValues.get(0) - 0.5, fragmentMassDeltaValues.get(fragmentMassDeltaValues.size() - 1) + 0.5);
-        JFreeChart fragMassDeltasDeltasChart = ChartFactory.createHistogram(
-                "Fragment ion mass delta", "mass delta (d.)", "frequency", fragMassDeltasDataset,
-                PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
-        fragMassDeltasDeltasChart.getPlot().setBackgroundPaint(Color.WHITE);
-        GuiUtils.setShadowVisible(fragMassDeltasDeltasChart, Boolean.FALSE);
-
-        //create new identification scores dataset
-        HistogramDataset ionCoverageDataset = new HistogramDataset();
-        ionCoverageDataset.setType(HistogramType.FREQUENCY);
-
-        ionCoverageDataset.addSeries("y ions", yIonCoverageValues, NUMBER_OF_ION_COVERAGE_BINS, 0.0, 100.0);
-        ionCoverageDataset.addSeries("b ions", bIonCoverageValues, NUMBER_OF_ION_COVERAGE_BINS, 0.0, 100.0);
-        JFreeChart ionCoverageChart = ChartFactory.createHistogram(
-                "B/Y ion coverage", "coverage (%)", "frequency", ionCoverageDataset,
-                PlotOrientation.VERTICAL, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);
-        ionCoverageChart.getPlot().setBackgroundPaint(Color.WHITE);
-        GuiUtils.setShadowVisible(ionCoverageChart, Boolean.FALSE);
-
-        //create new identification scores dataset
-        HistogramDataset scoresDataset = new HistogramDataset();
-        scoresDataset.setType(HistogramType.FREQUENCY);
-
-        scoresDataset.addSeries("scoreSeries", scoresValues, NUMBER_OF_SCORE_BINS, 0.0, 1.0);
-        JFreeChart scoresChart = ChartFactory.createHistogram(
-                "Fragment ion score", "score", "frequency", scoresDataset,
-                PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
-        scoresChart.getPlot().setBackgroundPaint(Color.WHITE);
-        GuiUtils.setShadowVisible(scoresChart, Boolean.FALSE);
-
-        //create new identificiations data set
-        DefaultPieDataset identificationsDataset = new DefaultPieDataset();
-        identificationsDataset.setValue(UNMODIFIED_LABEL + "(" + spectrumAnnotatorResult.getUnmodifiedPrecursors().size() + ", " + (MathUtils.roundDouble((double) spectrumAnnotatorResult.getUnmodifiedPrecursors().size() / spectrumAnnotatorResult.getNumberOfIdentifications(), 2)) + "%)", spectrumAnnotatorResult.getUnmodifiedPrecursors().size());
-        identificationsDataset.setValue(MODIFIED_LABEL + "(" + spectrumAnnotatorResult.getModifiedPrecursors().size() + ", " + (MathUtils.roundDouble((double) spectrumAnnotatorResult.getModifiedPrecursors().size() / spectrumAnnotatorResult.getNumberOfIdentifications(), 2)) + "%)", spectrumAnnotatorResult.getModifiedPrecursors().size());
-        identificationsDataset.setValue(UNEXPLAINED_LABEL + "(" + spectrumAnnotatorResult.getUnexplainedIdentifications().size() + ", " + (MathUtils.roundDouble((double) spectrumAnnotatorResult.getUnexplainedIdentifications().size() / spectrumAnnotatorResult.getNumberOfIdentifications(), 2)) + "%)", spectrumAnnotatorResult.getUnexplainedIdentifications().size());
-
-        JFreeChart identificationsChart = ChartFactory.createPieChart(
-                "Identifications(" + spectrumAnnotatorResult.getNumberOfIdentifications() + ")", // chart title
-                identificationsDataset, // data
-                Boolean.TRUE, // include legend
-                Boolean.FALSE,
-                Boolean.FALSE);
-
-        PiePlot plot = (PiePlot) identificationsChart.getPlot();
-        plot.setLabelFont(new Font("SansSerif", Font.PLAIN, 12));
-        plot.setLabelGenerator(null);
-        plot.setNoDataMessage("No data available");
-        plot.setCircular(Boolean.TRUE);
-        plot.setLabelGap(0.02);
-        plot.setBackgroundPaint(Color.WHITE);
-        //change pie colors
-        for (int i = 0; i < identificationsDataset.getItemCount(); i++) {
-            Comparable key = identificationsDataset.getKey(i);
-            plot.setSectionPaint(key, PIE_COLORS[i]);
-        }
-
-        //create new modifications data set
-        DefaultCategoryDataset modificationsDataset = new DefaultCategoryDataset();
-        Map<Modification, Integer> modifications = modificationService.getUsedModifications(spectrumAnnotatorResult);
-        for (Modification modification : modifications.keySet()) {
-            double relativeCount = (double) (modifications.get(modification)) / (double) (spectrumAnnotatorResult.getNumberOfIdentifications());
-            modificationsDataset.addValue(relativeCount, "relative occurance", modification.getName());
-        }
-
-        JFreeChart modificationsChart = ChartFactory.createBarChart(
-                "Modifications",
-                "modification",
-                "relative occurance",
-                modificationsDataset,
-                PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
-        modificationsChart.getPlot().setBackgroundPaint(Color.WHITE);
-        GuiUtils.setShadowVisible(modificationsChart, Boolean.FALSE);
-
-        //add charts to panels
-        precursorMassDeltasChartPanel.setChart(precursorMassDeltasChart);
-        fragmentIonMassDeltasChartPanel.setChart(fragMassDeltasDeltasChart);
-        ionCoverageChartPanel.setChart(ionCoverageChart);
-        scoresChartPanel.setChart(scoresChart);
-        identificationsChartPanel.setChart(identificationsChart);
-        modificationsChartPanel.setChart(modificationsChart);
+        //get charts from factory and add them to the right panels
+        precursorMassDeltasChartPanel.setChart(ChartFactory.getPrecursorMassDeltasChart(precursorMassDeltaValues));
+        fragmentIonMassDeltasChartPanel.setChart(ChartFactory.getFragmentMassDeltasChart(fragmentMassDeltaValues));
+        ionCoverageChartPanel.setChart(ChartFactory.getIonCoverageChart(bIonCoverageValues, yIonCoverageValues));
+        scoresChartPanel.setChart(ChartFactory.getScoresChart(scoresValues));
+        identificationsChartPanel.setChart(ChartFactory.getIdentificationsChart(spectrumAnnotatorResult));
+        modificationsChartPanel.setChart(ChartFactory.getModificationsChart(modificationService.getUsedModifications(spectrumAnnotatorResult), spectrumAnnotatorResult.getNumberOfIdentifications()));
     }
 
     private void initSummaryPanel() {
@@ -369,9 +246,9 @@ public class PipelineResultController {
             int numberOfBIons = 0;
             int numberOfYIons = 0;
             for (FragmentIonAnnotation fragmentIonAnnotation : identification.getAnnotationData().getFragmentIonAnnotations()) {
-                if (fragmentIonAnnotation.isBIon()) {
+                if (fragmentIonAnnotation.isBIon() && fragmentIonAnnotation.getIon_charge() == 1) {
                     numberOfBIons++;
-                } else if (fragmentIonAnnotation.isYIon()) {
+                } else if (fragmentIonAnnotation.isYIon() && fragmentIonAnnotation.getIon_charge() == 1) {
                     numberOfYIons++;
                 }
             }

@@ -5,7 +5,7 @@
 package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.gui.binding.LoggingBindingListener;
+import com.compomics.pride_asa_pipeline.gui.LoggingBindingListener;
 import com.compomics.pride_asa_pipeline.gui.view.ModificationsPanel;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
