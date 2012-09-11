@@ -55,7 +55,8 @@ public class PipelineResultController {
     private SummaryPanel summaryPanel;
     private ChartPanel precursorMassDeltasChartPanel;
     private ChartPanel fragmentIonMassDeltasChartPanel;
-    private ChartPanel ionCoverageChartPanel;
+    private ChartPanel bIonCoverageChartPanel;
+    private ChartPanel yIonCoverageChartPanel;
     private ChartPanel scoresChartPanel;
     private ChartPanel identificationsChartPanel;
     private ChartPanel modificationsChartPanel;
@@ -119,7 +120,8 @@ public class PipelineResultController {
         //clear summary panel
         precursorMassDeltasChartPanel.setChart(null);
         fragmentIonMassDeltasChartPanel.setChart(null);
-        ionCoverageChartPanel.setChart(null);
+        bIonCoverageChartPanel.setChart(null);
+        yIonCoverageChartPanel.setChart(null);
         scoresChartPanel.setChart(null);
         identificationsChartPanel.setChart(null);
         modificationsChartPanel.setChart(null);
@@ -163,8 +165,10 @@ public class PipelineResultController {
     private void updateSummary() {
         double[] precursorMassDeltaValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
         List<Double> fragmentMassDeltaValues = new ArrayList<Double>();
-        double[] bIonCoverageValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
-        double[] yIonCoverageValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
+        double[] b1IonCoverageValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
+        double[] b2IonCoverageValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
+        double[] y1IonCoverageValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
+        double[] y2IonCoverageValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
         double[] scoresValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
 
         //iterate over identifications
@@ -176,8 +180,10 @@ public class PipelineResultController {
                     LOGGER.error(ex.getMessage(), ex);
                 }
                 fragmentMassDeltaValues.addAll(calculateFragmentIonMassDeltas(spectrumAnnotatorResult.getIdentifications().get(i)));
-                bIonCoverageValues[i] = calculateIonCoverages(spectrumAnnotatorResult.getIdentifications().get(i)).get(FragmentIonAnnotation.IonType.B_ION);
-                yIonCoverageValues[i] = calculateIonCoverages(spectrumAnnotatorResult.getIdentifications().get(i)).get(FragmentIonAnnotation.IonType.Y_ION);
+                b1IonCoverageValues[i] = calculateIonCoverages(spectrumAnnotatorResult.getIdentifications().get(i)).get(FragmentIonAnnotation.IonType.B_ION)[0];
+                b2IonCoverageValues[i] = calculateIonCoverages(spectrumAnnotatorResult.getIdentifications().get(i)).get(FragmentIonAnnotation.IonType.B_ION)[1];
+                y1IonCoverageValues[i] = calculateIonCoverages(spectrumAnnotatorResult.getIdentifications().get(i)).get(FragmentIonAnnotation.IonType.Y_ION)[0];
+                y2IonCoverageValues[i] = calculateIonCoverages(spectrumAnnotatorResult.getIdentifications().get(i)).get(FragmentIonAnnotation.IonType.Y_ION)[1];
                 scoresValues[i] = spectrumAnnotatorResult.getIdentifications().get(i).getAnnotationData().getIdentificationScore().getAverageFragmentIonScore();
             }
         }
@@ -185,7 +191,8 @@ public class PipelineResultController {
         //get charts from factory and add them to the right panels
         precursorMassDeltasChartPanel.setChart(ChartFactory.getPrecursorMassDeltasChart(precursorMassDeltaValues));
         fragmentIonMassDeltasChartPanel.setChart(ChartFactory.getFragmentMassDeltasChart(fragmentMassDeltaValues));
-        ionCoverageChartPanel.setChart(ChartFactory.getIonCoverageChart(bIonCoverageValues, yIonCoverageValues));
+        bIonCoverageChartPanel.setChart(ChartFactory.getIonCoverageChart("B fragment ion coverage", b1IonCoverageValues, b2IonCoverageValues));
+        yIonCoverageChartPanel.setChart(ChartFactory.getIonCoverageChart("Y fragment ion coverage", y1IonCoverageValues, y2IonCoverageValues));
         scoresChartPanel.setChart(ChartFactory.getScoresChart(scoresValues));
         identificationsChartPanel.setChart(ChartFactory.getIdentificationsChart(spectrumAnnotatorResult));
         modificationsChartPanel.setChart(ChartFactory.getModificationsChart(modificationService.getUsedModifications(spectrumAnnotatorResult), spectrumAnnotatorResult.getNumberOfIdentifications()));
@@ -197,8 +204,10 @@ public class PipelineResultController {
         precursorMassDeltasChartPanel.setOpaque(Boolean.FALSE);
         fragmentIonMassDeltasChartPanel = new ChartPanel(null);
         fragmentIonMassDeltasChartPanel.setOpaque(Boolean.FALSE);
-        ionCoverageChartPanel = new ChartPanel(null);
-        ionCoverageChartPanel.setOpaque(Boolean.FALSE);
+        bIonCoverageChartPanel = new ChartPanel(null);
+        bIonCoverageChartPanel.setOpaque(Boolean.FALSE);
+        yIonCoverageChartPanel = new ChartPanel(null);
+        yIonCoverageChartPanel.setOpaque(Boolean.FALSE);
         scoresChartPanel = new ChartPanel(null);
         scoresChartPanel.setOpaque(Boolean.FALSE);
         identificationsChartPanel = new ChartPanel(null);
@@ -214,7 +223,8 @@ public class PipelineResultController {
 
         summaryPanel.getPrecursorMassDeltaChartParentPanel().add(precursorMassDeltasChartPanel, gridBagConstraints);
         summaryPanel.getFragmentIonMassDeltaChartParentPanel().add(fragmentIonMassDeltasChartPanel, gridBagConstraints);
-        summaryPanel.getIonCoverageChartParentPanel().add(ionCoverageChartPanel, gridBagConstraints);
+        summaryPanel.getbIonCoverageChartParentPanel().add(bIonCoverageChartPanel, gridBagConstraints);
+        summaryPanel.getyIonCoverageChartParentPanel().add(yIonCoverageChartPanel, gridBagConstraints);
         summaryPanel.getScoresChartParentPanel().add(scoresChartPanel, gridBagConstraints);
         summaryPanel.getIdentificationsChartParentPanel().add(identificationsChartPanel, gridBagConstraints);
         summaryPanel.getModificationsChartParentPanel().add(modificationsChartPanel, gridBagConstraints);
@@ -240,7 +250,42 @@ public class PipelineResultController {
         identificationsPanel.getIdentificationDetailPanel().repaint();
     }
 
-    private Map<FragmentIonAnnotation.IonType, Double> calculateIonCoverages(Identification identification) {
+    private Map<FragmentIonAnnotation.IonType, double[]> calculateIonCoverages(Identification identification) {
+        Map<FragmentIonAnnotation.IonType, double[]> ionCoverages = new EnumMap<FragmentIonAnnotation.IonType, double[]>(FragmentIonAnnotation.IonType.class);
+        if (identification.getAnnotationData() != null && identification.getAnnotationData().getFragmentIonAnnotations() != null) {
+            int numberOfB1Ions = 0;
+            int numberOfB2Ions = 0;
+            int numberOfY1Ions = 0;
+            int numberOfY2Ions = 0;
+            for (FragmentIonAnnotation fragmentIonAnnotation : identification.getAnnotationData().getFragmentIonAnnotations()) {
+                if (fragmentIonAnnotation.isBIon() && fragmentIonAnnotation.getIon_charge() == 1) {
+                    numberOfB1Ions++;
+                } else if (fragmentIonAnnotation.isBIon() && fragmentIonAnnotation.getIon_charge() == 2) {
+                    numberOfB2Ions++;
+                } else if (fragmentIonAnnotation.isYIon() && fragmentIonAnnotation.getIon_charge() == 1) {
+                    numberOfY1Ions++;
+                } else if (fragmentIonAnnotation.isYIon() && fragmentIonAnnotation.getIon_charge() == 2) {
+                    numberOfY2Ions++;
+                }
+            }
+            ionCoverages.put(FragmentIonAnnotation.IonType.B_ION,
+                    new double[]{
+                        (double) numberOfB1Ions / identification.getPeptide().length() * 100,
+                        (double) numberOfB2Ions / identification.getPeptide().length() * 100
+                    });
+            ionCoverages.put(FragmentIonAnnotation.IonType.Y_ION,
+                    new double[]{
+                        (double) numberOfY1Ions / identification.getPeptide().length() * 100,
+                        (double) numberOfY2Ions / identification.getPeptide().length() * 100
+                    });
+        } else {
+            ionCoverages.put(FragmentIonAnnotation.IonType.B_ION, new double[]{0.0, 0.0});
+            ionCoverages.put(FragmentIonAnnotation.IonType.Y_ION, new double[]{0.0, 0.0});
+        }
+        return ionCoverages;
+    }
+
+    private Map<FragmentIonAnnotation.IonType, Double> calculateIonCoverages1(Identification identification) {
         Map<FragmentIonAnnotation.IonType, Double> ionCoverages = new EnumMap<FragmentIonAnnotation.IonType, Double>(FragmentIonAnnotation.IonType.class);
         if (identification.getAnnotationData() != null && identification.getAnnotationData().getFragmentIonAnnotations() != null) {
             int numberOfBIons = 0;
