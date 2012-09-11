@@ -19,7 +19,7 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {        
         initComponents();
-        this.getContentPane().setBackground(new Color(0,102,204));
+        this.getContentPane().setBackground(new Color(255,255,255));
     }
 
     public JPanel getPrideSelectionParentPanel() {
@@ -76,7 +76,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        toolBar = new javax.swing.JToolBar();
+        gradientToolbar = new com.compomics.pride_asa_pipeline.gui.GradientToolbar();
         pipelineButton = new javax.swing.JButton();
         pipelineParamsButton = new javax.swing.JButton();
         modificationsButton = new javax.swing.JButton();
@@ -93,31 +93,29 @@ public class MainFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        toolBar.setBackground(new java.awt.Color(120, 120, 231));
-        toolBar.setBorder(null);
-        toolBar.setFloatable(false);
-        toolBar.setRollover(true);
+        gradientToolbar.setFloatable(false);
+        gradientToolbar.setRollover(true);
 
         pipelineButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         pipelineButton.setText("Pipeline");
         pipelineButton.setFocusable(false);
         pipelineButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         pipelineButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        toolBar.add(pipelineButton);
+        gradientToolbar.add(pipelineButton);
 
         pipelineParamsButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         pipelineParamsButton.setText("Pipeline configuration");
         pipelineParamsButton.setFocusable(false);
         pipelineParamsButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         pipelineParamsButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        toolBar.add(pipelineParamsButton);
+        gradientToolbar.add(pipelineParamsButton);
 
         modificationsButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         modificationsButton.setText("Modifications configuration");
         modificationsButton.setFocusable(false);
         modificationsButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         modificationsButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        toolBar.add(modificationsButton);
+        gradientToolbar.add(modificationsButton);
 
         mainPanel.setBackground(new java.awt.Color(255, 255, 255));
         mainPanel.setLayout(new java.awt.CardLayout());
@@ -184,13 +182,13 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(toolBar, javax.swing.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
+            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
+            .addComponent(gradientToolbar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(gradientToolbar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 863, Short.MAX_VALUE))
         );
@@ -200,6 +198,7 @@ public class MainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane experimentSelectionTabbedPane;
     private javax.swing.JPanel fileSelectionParentPanel;
+    private com.compomics.pride_asa_pipeline.gui.GradientToolbar gradientToolbar;
     private javax.swing.JPanel identificationsParentPanel;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JButton modificationsButton;
@@ -211,6 +210,5 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTabbedPane pipelineResultTabbedPane;
     private javax.swing.JPanel prideSelectionParentPanel;
     private javax.swing.JPanel summaryParentPanel;
-    private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
 }

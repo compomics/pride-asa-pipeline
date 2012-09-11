@@ -33,15 +33,19 @@ public class SummaryPanel extends javax.swing.JPanel {
 
     public JPanel getPrecursorMassDeltaChartParentPanel() {
         return precursorMassDeltaChartParentPanel;
-    }
-
-    public JPanel getIonCoverageChartParentPanel() {
-        return ionCoverageChartParentPanel;
-    }
+    }    
 
     public JPanel getFragmentIonMassDeltaChartParentPanel() {
         return fragmentIonMassDeltaChartParentPanel;
     }
+
+    public JPanel getbIonCoverageChartParentPanel() {
+        return bIonCoverageChartParentPanel;
+    }
+
+    public JPanel getyIonCoverageChartParentPanel() {
+        return yIonCoverageChartParentPanel;
+    }        
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -59,7 +63,9 @@ public class SummaryPanel extends javax.swing.JPanel {
         precursorMassDeltaChartParentPanel = new javax.swing.JPanel();
         scoresChartParentPanel = new javax.swing.JPanel();
         fragmentIonMassDeltaChartParentPanel = new javax.swing.JPanel();
-        ionCoverageChartParentPanel = new javax.swing.JPanel();
+        ionCoveragesChartPanel = new javax.swing.JPanel();
+        bIonCoverageChartParentPanel = new javax.swing.JPanel();
+        yIonCoverageChartParentPanel = new javax.swing.JPanel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setOpaque(false);
@@ -128,16 +134,35 @@ public class SummaryPanel extends javax.swing.JPanel {
         gridBagConstraints.weighty = 0.5;
         generalSummaryPanel.add(fragmentIonMassDeltaChartParentPanel, gridBagConstraints);
 
-        ionCoverageChartParentPanel.setOpaque(false);
-        ionCoverageChartParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
-        ionCoverageChartParentPanel.setLayout(new java.awt.GridBagLayout());
+        ionCoveragesChartPanel.setOpaque(false);
+        ionCoveragesChartPanel.setPreferredSize(new java.awt.Dimension(20, 20));
+        ionCoveragesChartPanel.setLayout(new java.awt.GridBagLayout());
+
+        bIonCoverageChartParentPanel.setOpaque(false);
+        bIonCoverageChartParentPanel.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.5;
+        ionCoveragesChartPanel.add(bIonCoverageChartParentPanel, gridBagConstraints);
+
+        yIonCoverageChartParentPanel.setOpaque(false);
+        yIonCoverageChartParentPanel.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.5;
+        ionCoveragesChartPanel.add(yIonCoverageChartParentPanel, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
-        generalSummaryPanel.add(ionCoverageChartParentPanel, gridBagConstraints);
+        generalSummaryPanel.add(ionCoveragesChartPanel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -149,12 +174,14 @@ public class SummaryPanel extends javax.swing.JPanel {
         add(generalSummaryPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel bIonCoverageChartParentPanel;
     private javax.swing.JPanel fragmentIonMassDeltaChartParentPanel;
     private javax.swing.JPanel generalSummaryPanel;
     private javax.swing.JPanel identificationsChartParentPanel;
-    private javax.swing.JPanel ionCoverageChartParentPanel;
+    private javax.swing.JPanel ionCoveragesChartPanel;
     private javax.swing.JPanel modificationsChartParentPanel;
     private javax.swing.JPanel precursorMassDeltaChartParentPanel;
     private javax.swing.JPanel scoresChartParentPanel;
+    private javax.swing.JPanel yIonCoverageChartParentPanel;
     // End of variables declaration//GEN-END:variables
 }

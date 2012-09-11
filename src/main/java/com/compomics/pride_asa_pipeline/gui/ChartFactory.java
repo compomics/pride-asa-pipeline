@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -26,7 +29,7 @@ import org.jfree.data.statistics.HistogramType;
  * @author Niels Hulstaert
  */
 public class ChartFactory {
-
+    
     private static final String MODIFIED_LABEL = "modified";
     private static final String UNMODIFIED_LABEL = "unmodified";
     private static final String UNEXPLAINED_LABEL = "unexplained";
@@ -35,7 +38,7 @@ public class ChartFactory {
     private static final int NUMBER_OF_ION_COVERAGE_BINS = 100;
     private static final int NUMBER_OF_SCORE_BINS = 100;
     private static final Color[] PIE_COLORS = new Color[]{Color.GREEN, Color.ORANGE, Color.RED};
-
+    
     public static JFreeChart getPrecursorMassDeltasChart(double[] precursorMassDeltaValues) {
         JFreeChart precursorMassDeltasChart = null;
 
@@ -51,10 +54,10 @@ public class ChartFactory {
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
         precursorMassDeltasChart.getPlot().setBackgroundPaint(Color.WHITE);
         GuiUtils.setShadowVisible(precursorMassDeltasChart, Boolean.FALSE);
-
+        
         return precursorMassDeltasChart;
     }
-
+    
     public static JFreeChart getFragmentMassDeltasChart(List<Double> fragmentMassDeltaValues) {
         JFreeChart fragmentMassDeltasChart = null;
 
@@ -70,61 +73,62 @@ public class ChartFactory {
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
         fragmentMassDeltasChart.getPlot().setBackgroundPaint(Color.WHITE);
         GuiUtils.setShadowVisible(fragmentMassDeltasChart, Boolean.FALSE);
-
+        
         return fragmentMassDeltasChart;
     }
-
-    public static JFreeChart getIonCoverageChart(double[] bIonCoverageValues, double[] yIonCoverageValues) {
+    
+    public static JFreeChart getIonCoverageChart(String title, double[] ion1CoverageValues, double[] ion2CoverageValues) {
         JFreeChart ionCoverageChart = null;
 
         //create new identification scores dataset
         HistogramDataset ionCoverageDataset = new HistogramDataset();
-        ionCoverageDataset.setType(HistogramType.FREQUENCY);
-
-        ionCoverageDataset.addSeries("y ions", yIonCoverageValues, NUMBER_OF_ION_COVERAGE_BINS, 0.0, 100.0);
-        ionCoverageDataset.addSeries("b ions", bIonCoverageValues, NUMBER_OF_ION_COVERAGE_BINS, 0.0, 100.0);
+        ionCoverageDataset.setType(HistogramType.RELATIVE_FREQUENCY);        
+        
+        ionCoverageDataset.addSeries("1+ ladder", ion1CoverageValues, NUMBER_OF_ION_COVERAGE_BINS, 0.0, 100.0);
+        ionCoverageDataset.addSeries("2+ ladder", ion2CoverageValues, NUMBER_OF_ION_COVERAGE_BINS, 0.0, 100.0);
         ionCoverageChart = org.jfree.chart.ChartFactory.createHistogram(
-                "B/Y ion coverage", "coverage (%)", "frequency", ionCoverageDataset,
+                title, "coverage (%)", "rel. freq.", ionCoverageDataset,
                 PlotOrientation.VERTICAL, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);
         ionCoverageChart.getPlot().setBackgroundPaint(Color.WHITE);
+        ionCoverageChart.getPlot().setForegroundAlpha(0.8F);
         GuiUtils.setShadowVisible(ionCoverageChart, Boolean.FALSE);
-
+        
         return ionCoverageChart;
     }
-
+    
     public static JFreeChart getScoresChart(double[] scoresValues) {
         JFreeChart scoresChart = null;
 
         //create new identification scores dataset
         HistogramDataset scoresDataset = new HistogramDataset();
         scoresDataset.setType(HistogramType.FREQUENCY);
-
+        
         scoresDataset.addSeries("scoreSeries", scoresValues, NUMBER_OF_SCORE_BINS, 0.0, 1.0);
         scoresChart = org.jfree.chart.ChartFactory.createHistogram(
                 "Fragment ion score", "score", "frequency", scoresDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
         scoresChart.getPlot().setBackgroundPaint(Color.WHITE);
         GuiUtils.setShadowVisible(scoresChart, Boolean.FALSE);
-
+        
         return scoresChart;
     }
-
+    
     public static JFreeChart getIdentificationsChart(SpectrumAnnotatorResult spectrumAnnotatorResult) {
         JFreeChart identificationsChart = null;
 
         //create new identificiations data set
         DefaultPieDataset identificationsDataset = new DefaultPieDataset();
-        identificationsDataset.setValue(UNMODIFIED_LABEL + "(" + spectrumAnnotatorResult.getUnmodifiedPrecursors().size() + ", " + (MathUtils.roundDouble((double) spectrumAnnotatorResult.getUnmodifiedPrecursors().size() / spectrumAnnotatorResult.getNumberOfIdentifications(), 2)) + "%)", spectrumAnnotatorResult.getUnmodifiedPrecursors().size());
-        identificationsDataset.setValue(MODIFIED_LABEL + "(" + spectrumAnnotatorResult.getModifiedPrecursors().size() + ", " + (MathUtils.roundDouble((double) spectrumAnnotatorResult.getModifiedPrecursors().size() / spectrumAnnotatorResult.getNumberOfIdentifications(), 2)) + "%)", spectrumAnnotatorResult.getModifiedPrecursors().size());
-        identificationsDataset.setValue(UNEXPLAINED_LABEL + "(" + spectrumAnnotatorResult.getUnexplainedIdentifications().size() + ", " + (MathUtils.roundDouble((double) spectrumAnnotatorResult.getUnexplainedIdentifications().size() / spectrumAnnotatorResult.getNumberOfIdentifications(), 2)) + "%)", spectrumAnnotatorResult.getUnexplainedIdentifications().size());
-       
+        identificationsDataset.setValue(UNMODIFIED_LABEL + "(" + spectrumAnnotatorResult.getUnmodifiedPrecursors().size() + ", " + (MathUtils.roundDouble(((double) spectrumAnnotatorResult.getUnmodifiedPrecursors().size() / spectrumAnnotatorResult.getNumberOfIdentifications()) * 100, 2)) + "%)", spectrumAnnotatorResult.getUnmodifiedPrecursors().size());
+        identificationsDataset.setValue(MODIFIED_LABEL + "(" + spectrumAnnotatorResult.getModifiedPrecursors().size() + ", " + (MathUtils.roundDouble(((double) spectrumAnnotatorResult.getModifiedPrecursors().size() / spectrumAnnotatorResult.getNumberOfIdentifications()) * 100, 2)) + "%)", spectrumAnnotatorResult.getModifiedPrecursors().size());
+        identificationsDataset.setValue(UNEXPLAINED_LABEL + "(" + spectrumAnnotatorResult.getUnexplainedIdentifications().size() + ", " + (MathUtils.roundDouble(((double) spectrumAnnotatorResult.getUnexplainedIdentifications().size() / spectrumAnnotatorResult.getNumberOfIdentifications()) * 100, 2)) + "%)", spectrumAnnotatorResult.getUnexplainedIdentifications().size());
+        
         identificationsChart = org.jfree.chart.ChartFactory.createPieChart3D(
                 "Identifications(" + spectrumAnnotatorResult.getNumberOfIdentifications() + ")", // chart title
                 identificationsDataset, // data
                 Boolean.TRUE, // include legend
                 Boolean.FALSE,
                 Boolean.FALSE);
-
+        
         PiePlot plot = (PiePlot) identificationsChart.getPlot();
         plot.setLabelFont(new Font("SansSerif", Font.PLAIN, 12));
         plot.setLabelGenerator(null);
@@ -137,10 +141,10 @@ public class ChartFactory {
             Comparable key = identificationsDataset.getKey(i);
             plot.setSectionPaint(key, PIE_COLORS[i]);
         }
-
+        
         return identificationsChart;
     }
-
+    
     public static JFreeChart getModificationsChart(Map<Modification, Integer> modifications, int numberOfModifications) {
         JFreeChart modificationsChart = null;
 
@@ -150,16 +154,20 @@ public class ChartFactory {
             double relativeCount = (double) (modifications.get(modification)) / (double) (numberOfModifications);
             modificationsDataset.addValue(relativeCount, "relative occurance", modification.getName());
         }
-
+        
         modificationsChart = org.jfree.chart.ChartFactory.createBarChart(
                 "Modifications",
                 "modification",
                 "relative occurance",
                 modificationsDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
-        modificationsChart.getPlot().setBackgroundPaint(Color.WHITE);
+        CategoryPlot countPlot = (CategoryPlot) modificationsChart.getPlot();
+        countPlot.setBackgroundPaint(Color.WHITE);
+        CategoryAxis xAxis = (CategoryAxis) countPlot.getDomainAxis();
+        xAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
+        xAxis.setMaximumCategoryLabelLines(2);
         GuiUtils.setShadowVisible(modificationsChart, Boolean.FALSE);
-
+        
         return modificationsChart;
     }
 }
