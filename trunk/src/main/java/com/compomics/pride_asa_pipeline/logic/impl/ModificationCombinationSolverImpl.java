@@ -4,6 +4,7 @@ import com.compomics.pride_asa_pipeline.cache.Cache;
 import com.compomics.pride_asa_pipeline.logic.ModificationCombinationSolver;
 import com.compomics.pride_asa_pipeline.logic.ZenArcher;
 import com.compomics.pride_asa_pipeline.model.*;
+import com.compomics.pride_asa_pipeline.model.Modification.Location;
 import java.util.*;
 import org.apache.log4j.Logger;
 
@@ -117,7 +118,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
             if (modificationCombinationMasses.size() > 0) {
                 //convert masses back to modifications
                 for (List<Double> combinationMasses : modificationCombinationMasses) {
-                    List<ModificationCombination> modificationCombinationList = mapMassesToModifications(combinationMasses, candidateModificationCombination);
+                    List<ModificationCombination> modificationCombinationList = mapMassesToModifications(peptide, combinationMasses, candidateModificationCombination);
                     for (ModificationCombination comb : modificationCombinationList) {
                         if (!modificationCombinations.contains(comb)) {
                             modificationCombinations.add(comb);
@@ -139,6 +140,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
      * combination of modifications. (to lower the chance for modifications that
      * have the same mass)
      *
+     * @param peptide the precursor to find modifications for
      * @param combinationMasses the Collection of masses making up the precursor
      * mass delta.
      * @param candidateModificationCombination the ModificationCombination that
@@ -147,7 +149,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
      * masses and is a combination of modifications specified in the provided
      * ModificationCombination.
      */
-    private List<ModificationCombination> mapMassesToModifications(Collection<Double> combinationMasses, ModificationCombination candidateModificationCombination) {
+    private List<ModificationCombination> mapMassesToModifications(Peptide peptide, Collection<Double> combinationMasses, ModificationCombination candidateModificationCombination) {
         //since there can be multiple modifications with the same mass, we only take those
         //in to account that are provided in the original ModificationCombination (which
         //hopefully will lower the risk of one mass mapping to more than one modification).
@@ -178,9 +180,11 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
                 List<ModificationCombination> tempModificationCombinations = new ArrayList<ModificationCombination>();
                 for (Modification mappedModification : mappedModifications) {
                     for (ModificationCombination modificationCombination : modificationCombinations) {
-                        ModificationCombination tempModificationCombination = modificationCombination.duplicate();
-                        tempModificationCombination.addModification(mappedModification);
-                        tempModificationCombinations.add(tempModificationCombination);
+                        if (isValidModificationCombination(peptide, mappedModification, modificationCombination)) {
+                            ModificationCombination tempModificationCombination = modificationCombination.duplicate();
+                            tempModificationCombination.addModification(mappedModification);
+                            tempModificationCombinations.add(tempModificationCombination);
+                        }
                     }
                 }
                 modificationCombinations = tempModificationCombinations;
@@ -328,5 +332,54 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
 
         //store the possible modification combinations in the peptide modification holder
         peptideModificationHolder.setCandidateModificationCombinations(modificationCombinations);
+    }
+
+    /**
+     * Checks if the validity of a modification combination if a modification is
+     * added.
+     *
+     * @param peptide the peptide
+     * @param modification the modification to be added
+     * @param modificationCombination the modification combination
+     * @return the is a valid modification combination boolean
+     */
+    private boolean isValidModificationCombination(Peptide peptide, Modification modification, ModificationCombination modificationCombination) {
+        boolean isValidModificationCombination = Boolean.TRUE;
+
+        //count the number of times a modification occurs in the modification combination
+        int modificationCounter = 0;
+        for (Modification mod : modificationCombination.getModifications()) {
+            if (modification.equals(mod)) {
+                modificationCounter++;
+            }
+        }
+
+        //count the number of modifiable locations for the given modification on the peptide
+        int locationCounter = 0;
+        //check all amino acids in the precursor sequence, and if they
+        //can be affected by the modification, increase the counter.
+        if (modification.getLocation().equals(Location.N_TERMINAL)) {
+            if (modification.getAffectedAminoAcids().contains(peptide.getSequence().getAA(0))) {
+                locationCounter = 1;
+            }
+        } else if (modification.getLocation().equals(Location.C_TERMINAL)) {
+            if (modification.getAffectedAminoAcids().contains(peptide.getSequence().getAA(peptide.length() - 1))) {
+                locationCounter = 1;
+            }
+        } else {
+            for (AminoAcid aa : peptide.getSequence().getAASequence()) {
+                if (modification.getAffectedAminoAcids().contains(aa)) {
+                    locationCounter++;
+                }
+            }
+        }
+
+        //check if the number of times the modification occurs in the modification combination 
+        //is smaller than the number of modifiable locations on the peptide
+        if (modificationCounter >= locationCounter) {
+            isValidModificationCombination = Boolean.FALSE;
+        }
+
+        return isValidModificationCombination;
     }
 }

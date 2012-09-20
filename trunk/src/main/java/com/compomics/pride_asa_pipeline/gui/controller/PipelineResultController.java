@@ -125,36 +125,7 @@ public class PipelineResultController {
         scoresChartPanel.setChart(null);
         identificationsChartPanel.setChart(null);
         modificationsChartPanel.setChart(null);
-    }
-
-    private void initIdentificationsPanel() {
-        identificationsPanel = new IdentificationsPanel();
-
-        identificationsEventList = new BasicEventList<Identification>();
-        sortedIdentificationsList = new SortedList<Identification>(identificationsEventList, new IdentificationSequenceComparator());
-        identificationsPanel.getIdentificationsTable().setModel(new EventTableModel(sortedIdentificationsList, new IdentificationsTableFormat()));
-        identificationsPanel.getIdentificationsTable().setSelectionModel(new EventSelectionModel(sortedIdentificationsList));
-
-        //use MULTIPLE_COLUMN_MOUSE to allow sorting by multiple columns
-        TableComparatorChooser tableSorter = TableComparatorChooser.install(
-                identificationsPanel.getIdentificationsTable(), sortedIdentificationsList, TableComparatorChooser.MULTIPLE_COLUMN_MOUSE);
-
-        //add listeners
-        identificationsPanel.getIdentificationsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent lse) {
-                if (!lse.getValueIsAdjusting()) {
-                    if (identificationsPanel.getIdentificationsTable().getSelectedRow() != -1) {
-                        Identification identification = sortedIdentificationsList.get(identificationsPanel.getIdentificationsTable().getSelectedRow());
-
-                        SpectrumPanel spectrumPanel = spectrumPanelService.getSpectrumPanel(identification);
-
-                        addSpectrumPanel(spectrumPanel);
-                    }
-                }
-            }
-        });
-    }
+    }    
 
     private void updateIdentifications() {
         identificationsEventList.clear();
@@ -196,6 +167,35 @@ public class PipelineResultController {
         scoresChartPanel.setChart(ChartFactory.getScoresChart(scoresValues));
         identificationsChartPanel.setChart(ChartFactory.getIdentificationsChart(spectrumAnnotatorResult));
         modificationsChartPanel.setChart(ChartFactory.getModificationsChart(modificationService.getUsedModifications(spectrumAnnotatorResult), spectrumAnnotatorResult.getNumberOfIdentifications()));
+    }
+    
+    private void initIdentificationsPanel() {
+        identificationsPanel = new IdentificationsPanel();
+
+        identificationsEventList = new BasicEventList<Identification>();
+        sortedIdentificationsList = new SortedList<Identification>(identificationsEventList, new IdentificationSequenceComparator());
+        identificationsPanel.getIdentificationsTable().setModel(new EventTableModel(sortedIdentificationsList, new IdentificationsTableFormat()));
+        identificationsPanel.getIdentificationsTable().setSelectionModel(new EventSelectionModel(sortedIdentificationsList));
+
+        //use MULTIPLE_COLUMN_MOUSE to allow sorting by multiple columns
+        TableComparatorChooser tableSorter = TableComparatorChooser.install(
+                identificationsPanel.getIdentificationsTable(), sortedIdentificationsList, TableComparatorChooser.MULTIPLE_COLUMN_MOUSE);
+
+        //add listeners
+        identificationsPanel.getIdentificationsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent lse) {
+                if (!lse.getValueIsAdjusting()) {
+                    if (identificationsPanel.getIdentificationsTable().getSelectedRow() != -1) {
+                        Identification identification = sortedIdentificationsList.get(identificationsPanel.getIdentificationsTable().getSelectedRow());
+
+                        SpectrumPanel spectrumPanel = spectrumPanelService.getSpectrumPanel(identification);
+
+                        addSpectrumPanel(spectrumPanel);
+                    }
+                }
+            }
+        });
     }
 
     private void initSummaryPanel() {

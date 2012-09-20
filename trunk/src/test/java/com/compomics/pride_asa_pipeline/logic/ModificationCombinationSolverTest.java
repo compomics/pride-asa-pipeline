@@ -11,7 +11,6 @@ import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.io.IOException;
 import java.util.Set;
 import static junit.framework.Assert.assertEquals;
-import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +28,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration("classpath:springXMLConfig.xml")
 public class ModificationCombinationSolverTest {
 
-    private static final Logger LOGGER = Logger.getLogger(ModificationCombinationSolverTest.class);
     private static final String peptideSequenceString = "AAKENNYLENNART";
     @Autowired
     private ModificationCombinationSolver modificationCombinationSolver;

@@ -17,7 +17,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
     private static final Logger LOGGER = Logger.getLogger(PeptideVariationsGeneratorImpl.class);
 
     @Override
-    public Set<ModifiedPeptide> generateVariations(Peptide precursor, Set<ModificationCombination> modifications) {
+    public Set<ModifiedPeptide> generateVariations(Peptide precursor, Set<ModificationCombination> modifications) {       
         Set<ModifiedPeptide> result = new HashSet<ModifiedPeptide>();
         if (modifications != null) {
             //for each ModificationCombination generate all possible modified peptide variations

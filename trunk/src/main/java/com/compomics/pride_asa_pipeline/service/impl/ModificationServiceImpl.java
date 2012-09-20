@@ -64,7 +64,7 @@ public class ModificationServiceImpl implements ModificationService {
         //configuration file if not done so before
         if (pipelineModifications == null) {
             loadPipelineModificationsFromResource(modificationsResource);
-        }
+        }        
         return pipelineModifications;
     }
 

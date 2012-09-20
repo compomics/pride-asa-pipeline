@@ -148,7 +148,7 @@
     </bean>
     
     <bean id="noiseThresholdFinder"
-          class="com.compomics.pride_asa_pipeline.logic.spectrum.filter.impl.WinsorNoiseThresholdFinder">        
+          class="com.compomics.pride_asa_pipeline.logic.spectrum.filter.impl.NoiseThresholdFinderImpl">        
     </bean>
     
     <!-- recalibration beans -->
