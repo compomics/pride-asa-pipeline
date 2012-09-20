@@ -84,7 +84,7 @@ public class ModificationCombination {
     /**
      * Equals method for the specific purpose of comparing
      * ModificationCombination objects. NOTE: Although the modifications are
-     * stored internally as a list (and their order is therefore perserved),
+     * stored internally as a list (and their order is therefore preserved),
      * this method does not take the order of modifications into account when
      * comparing the modification lists (as they are sorted prior to the
      * equality test).
@@ -123,15 +123,22 @@ public class ModificationCombination {
         return true;
     }
 
+//    @Override
+//    public int hashCode() {
+//        int result;
+//        long temp;
+//        result = modifications != null ? modifications.hashCode() : 0;
+//        temp = mass != +0.0d ? Double.doubleToLongBits(mass) : 0L;
+//        result = 31 * result + (int) (temp ^ (temp >>> 32));
+//        return result;
+//    }
+
     @Override
     public int hashCode() {
-        int result;
-        long temp;
-        result = modifications != null ? modifications.hashCode() : 0;
-        temp = mass != +0.0d ? Double.doubleToLongBits(mass) : 0L;
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        return result;
-    }
+        int hash = 7;
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.mass) ^ (Double.doubleToLongBits(this.mass) >>> 32));
+        return hash;
+    }       
 
     public ModificationCombination duplicate() {
         ModificationCombination clone = new ModificationCombination();

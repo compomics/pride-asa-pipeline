@@ -27,7 +27,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:springXMLConfig.xml")
-public class PeptideVariartionsGeneratorTest {
+public class PeptideVariationsGeneratorTest {
 
     @Autowired
     private PeptideVariationsGenerator peptideVariationsGenerator;

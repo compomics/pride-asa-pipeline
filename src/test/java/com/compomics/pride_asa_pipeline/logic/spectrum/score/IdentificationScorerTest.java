@@ -1,14 +1,11 @@
 package com.compomics.pride_asa_pipeline.logic.spectrum.score;
 
-import com.compomics.pride_asa_pipeline.logic.spectrum.score.IdentificationScorer;
 import com.compomics.pride_asa_pipeline.model.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import static junit.framework.Assert.*;
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,12 +3,13 @@ package com.compomics.pride_asa_pipeline.logic.spectrum.filter.impl;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.logic.spectrum.filter.NoiseThresholdFinder;
 import com.compomics.pride_asa_pipeline.util.MathUtils;
+import com.google.common.primitives.Doubles;
 
 /**
  * @author Florian Reisinger Date: 10-Sep-2009
  * @since 0.1
  */
-public class WinsorNoiseThresholdFinder implements NoiseThresholdFinder {
+public class NoiseThresholdFinderImpl implements NoiseThresholdFinder {
 
     private double winsorisationConstant = PropertiesConfigurationHolder.getInstance().getDouble("winsorisation.constant");
     /**
@@ -16,25 +17,59 @@ public class WinsorNoiseThresholdFinder implements NoiseThresholdFinder {
      */
     private double outlierLimit = PropertiesConfigurationHolder.getInstance().getDouble("winsorisation.outlier_limit");
     private double convergenceCriterium = PropertiesConfigurationHolder.getInstance().getDouble("winsorisation.convergence_criterion");
+    private double meanRatioThreshold = PropertiesConfigurationHolder.getInstance().getDouble("noisethresholdfinder.mean_ratio_threshold");
+    private double densityThreshold = PropertiesConfigurationHolder.getInstance().getDouble("noisethresholdfinder.density_threshold");
 
     /**
-     * Uses a winsonrisation approach (with the preset configuration) to find
-     * the noise treshold for the privided signal values.
+     * There are different 3 spectrum scenarios this noise threshold finder
+     * considers: 1. a spectrum with few signal peaks compared to the noise
+     * peaks 2. a spectrum consisting out of signal peaks only 3. a spectrum
+     * consisting out of noise peaks only
      *
-     * @param signalValues list of signal values.
-     * @return the calculated treshold separating noise from signal values.
+     * @param signalValues the double array of signal values
+     * @return the double threshold value
      */
     @Override
     public double findNoiseThreshold(double[] signalValues) {
-        //get winsorised peaks (where outlier spectrum intensities are redused to lower values)
-        double[] intensities = winsorise(signalValues);
+        double noiseThreshold = 0.0;
 
-        double median = MathUtils.calculateMedian(intensities);
-        double mean = MathUtils.calculateMean(intensities);
-        double stdDev = Math.sqrt(MathUtils.calcVariance(intensities, mean));
+        //calculate mean and standard deviation
+        double mean = MathUtils.calculateMean(signalValues);
+        double standardDeviation = Math.sqrt(MathUtils.calcVariance(signalValues, mean));
 
-        //calculate and return the noisetreshold for the spectrum (based on the winsorisation result)
-        return median + outlierLimit * stdDev;
+        //first use a winsonrisation approach (with the preset configuration) to find
+        //the noise treshold for the privided signal values.
+        double[] winsorisedValues = winsorise(signalValues);
+
+        double winsorisedMedian = MathUtils.calculateMedian(winsorisedValues);
+        double winsorisedMean = MathUtils.calculateMean(winsorisedValues);
+        double winsorisedStandardDeviation = Math.sqrt(MathUtils.calcVariance(winsorisedValues, winsorisedMean));
+
+        //check if the winsorised mean to mean ratio exceeds a given threshold
+        double meanRatio = ((winsorisedMean - 0.0) < 0.001) ? 0.0 : winsorisedMean / mean;
+//        double standardDeviationRatio = ((winsorisedStandardDeviation - 0.0) < 0.001) ? 0.0 : winsorisedStandardDeviation / standardDeviation;
+
+        if (meanRatio < meanRatioThreshold) {
+            //scenario 1, the winsorisation has significantly decreased the mean
+            //calculate the noise threshold for the spectrum (based on the winsorisation result)
+            noiseThreshold = winsorisedMedian + outlierLimit * winsorisedStandardDeviation;
+        } //scenario 2 or 3
+        //to make a distinction between the only signal or only noise spectrum, check the peak density
+        else {
+            double minimumValue = Doubles.min(signalValues);
+            double maximumValue = Doubles.max(signalValues);
+            //peak density: number of peaks / dalton
+            double density = signalValues.length / (maximumValue - minimumValue);
+            if (density < densityThreshold) {
+                //scenario 2: set the threshold to 
+                noiseThreshold = Math.max(mean - (1.5 * standardDeviation), 0.0);
+            } else {
+                //scenario 3
+                noiseThreshold = mean + 1.5 * standardDeviation;
+            }
+        }
+
+        return noiseThreshold;
     }
 
     ///// ///// ///// ///// ////////// ///// ///// ///// /////

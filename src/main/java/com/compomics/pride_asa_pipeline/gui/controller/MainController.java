@@ -99,6 +99,7 @@ public class MainController implements ActionListener {
             public void uncaughtException(Thread t, Throwable e) {
                 LOGGER.error(e.getMessage(), e);
                 showUnexpectedErrorDialog(e.getMessage());
+                onAnnotationCanceled();
             }
         });
 
