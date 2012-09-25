@@ -8,12 +8,16 @@ import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import org.apache.log4j.Logger;
 import org.jdesktop.beansbinding.ELProperty;
 
@@ -148,11 +152,18 @@ public class MainController implements ActionListener {
     }
 
     public void showMessageDialog(String title, String message, int messageType) {
-        JOptionPane.showMessageDialog(mainFrame.getContentPane(), message, title, messageType);
+        //add message to JTextArea
+        JTextArea textArea = new JTextArea(message);
+        //put JTextArea in JScrollPane
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(400, 100));
+        textArea.setEditable(Boolean.FALSE);
+
+        JOptionPane.showMessageDialog(mainFrame.getContentPane(), scrollPane, title, messageType);
     }
 
     public void showUnexpectedErrorDialog(String message) {
-        showMessageDialog("Unexpected error", "Un expected error occured: "
+        showMessageDialog("Unexpected error", "An expected error occured: "
                 + "\n" + message
                 + "\n" + "please try to rerun the application.", JOptionPane.ERROR_MESSAGE);
     }

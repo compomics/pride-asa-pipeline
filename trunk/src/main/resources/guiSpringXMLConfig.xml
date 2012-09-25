@@ -21,7 +21,8 @@
           class="com.compomics.pride_asa_pipeline.gui.controller.ExperimentSelectionController">
         <property name="mainController" ref="mainController"/>
         <property name="pipelineProgressController" ref="pipelineProgressController"/>
-        <property name="pipelineProceedController" ref="pipelineProceedController"/>
+        <property name="systematicMassErrorsController" ref="systematicMassErrorsController"/>
+        <property name="modificationsMergeController" ref="modificationsMergeController"/>
         <property name="experimentService" ref="experimentService"/>
         <property name="resultHandler" ref="resultHandler"/>
     </bean>
@@ -31,10 +32,15 @@
         <property name="experimentSelectionController" ref="experimentSelectionController"/>    
     </bean>
     
-    <bean id="pipelineProceedController"
-          class="com.compomics.pride_asa_pipeline.gui.controller.PipelineProceedController">
+    <bean id="systematicMassErrorsController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.SystematicMassErrorsController">
         <property name="experimentSelectionController" ref="experimentSelectionController"/>    
     </bean>
+    
+    <bean id="modificationsMergeController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.ModificationsMergeController">
+        <property name="experimentSelectionController" ref="experimentSelectionController"/>    
+    </bean>  
     
     <bean id="modificationsController"
           class="com.compomics.pride_asa_pipeline.gui.controller.ModificationsController"> 

@@ -4,7 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
-import com.compomics.pride_asa_pipeline.gui.view.PipelineProceedDialog;
+import com.compomics.pride_asa_pipeline.gui.view.SystematicMassErrorsDialog;
 import com.compomics.pride_asa_pipeline.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.util.GuiUtils;
 import com.compomics.pride_asa_pipeline.util.MathUtils;
@@ -18,10 +18,10 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author Niels Hulstaert
  */
-public class PipelineProceedController extends WindowAdapter {
+public class SystematicMassErrorsController extends WindowAdapter {
 
     //view
-    private PipelineProceedDialog pipelineProceedDialog;
+    private SystematicMassErrorsDialog pipelineProceedDialog;
     //parent controller
     private ExperimentSelectionController experimentSelectionController;
 
@@ -41,7 +41,7 @@ public class PipelineProceedController extends WindowAdapter {
     }
 
     public void init() {
-        pipelineProceedDialog = new PipelineProceedDialog(experimentSelectionController.getMainController().getMainFrame());
+        pipelineProceedDialog = new SystematicMassErrorsDialog(experimentSelectionController.getMainController().getMainFrame());
         pipelineProceedDialog.addWindowListener(this);
 
         //add action listeners
@@ -57,7 +57,7 @@ public class PipelineProceedController extends WindowAdapter {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pipelineProceedDialog.setVisible(Boolean.FALSE);
-                experimentSelectionController.onAnnotationProceed();
+                experimentSelectionController.onIdentificationsLoaded();
             }
         });
 

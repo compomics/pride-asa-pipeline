@@ -50,7 +50,7 @@ public class CommandLineRunner {
     public void runPipeline(String experimentAccession) {
         try {
             //init the annotiation
-            prideSpectrumAnnotator.initAnnotation(experimentAccession);
+            prideSpectrumAnnotator.initIdentifications(experimentAccession);
 
             //check if the experiment has "useful" identifications
             if (prideSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {

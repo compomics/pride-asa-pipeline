@@ -29,7 +29,6 @@ public class ExperimentServiceImpl implements ExperimentService {
 
     private static final Logger LOGGER = Logger.getLogger(ExperimentServiceImpl.class);
     private static final String MALDI_SOURCE_ACCESSION = "PSI:1000075";
-    
     private ExperimentRepository experimentRepository;
     private SpectrumService spectrumService;
     private ResultHandler resultHandler;
@@ -57,7 +56,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
     public void setResultHandler(ResultHandler resultHandler) {
         this.resultHandler = resultHandler;
-    }     
+    }
 
     @Override
     public Map<String, String> findAllExperimentAccessions() {
@@ -130,7 +129,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         String lPath_tmp = PropertiesConfigurationHolder.getInstance().getString("results_path_tmp");
         File tempDir = new File(lPath_tmp);
-        if(!tempDir.exists()){
+        if (!tempDir.exists()) {
             tempDir.mkdir();
         }
 
@@ -141,7 +140,7 @@ public class ExperimentServiceImpl implements ExperimentService {
             LOGGER.debug(String.format("rebuilding spectrum cache for experiment %s", experimentAccession));
             buildSpectrumCacheForExperiment(experimentAccession);
         }
-                        
+
         BufferedOutputStream outputStream = null;
         try {
             //create new mgf file from scratch
@@ -166,6 +165,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         return file;
     }
+
     @Override
     public void buildSpectrumCacheForExperiment(String experimentAccession) {
 
@@ -196,7 +196,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         }
 
     }
-        
+
     private void writeCachedSpectra(BufferedOutputStream aOutputStream, String experimentAccession) throws IOException {
         MascotGenericFile mascotGenericFile = null;
         PeakToMapFunction peakToMap = new PeakToMapFunction();
@@ -246,10 +246,11 @@ public class ExperimentServiceImpl implements ExperimentService {
     }
 
     /**
-     * Helper function class to Convert the pride-asap
-     * List<Peak> instances in the HashMaps for the MascotGenericFile instance.
+     * Helper function class to Convert the pride-asap List<Peak> instances in
+     * the HashMaps for the MascotGenericFile instance.
      */
     private class PeakToMapFunction implements Function<List<Peak>, HashMap> {
+
         @Override
         public HashMap apply(@Nullable List<Peak> aPeaks) {
             HashMap lResult = Maps.newHashMap();

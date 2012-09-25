@@ -27,6 +27,7 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         N_TERMINAL,
         C_TERMINAL,
         NON_TERMINAL
+                
     }
 
     public Modification(double massShift, Location location, String accession, String accessionValue) {

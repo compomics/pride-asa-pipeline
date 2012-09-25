@@ -61,8 +61,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
     }
 
     @Override
-    public Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> identifications) {
-
+    public Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> identifications) {            
         Map<Identification, Set<ModificationCombination>> possibleExplainedIdentifications = new HashMap<Identification, Set<ModificationCombination>>();
 
         //keep track of ratios determining the loop condition

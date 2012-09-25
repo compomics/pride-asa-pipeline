@@ -48,5 +48,5 @@ public interface ModificationCombinationSolver {
      * @param modificationHolder the modification holder
      */
     void setModificationHolder(ModificationHolder modificationHolder);
-    
+            
 }

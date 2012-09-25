@@ -12,6 +12,7 @@ import java.util.*;
  */
 public class ModificationHolder {
 
+    private static final double MASS_DELTA_TOLERANCE = 0.1;
     private Map<AminoAcid, Set<Modification>> nonTerminalMods;
     private Map<AminoAcid, Set<Modification>> nTerminalMods;
     private Map<AminoAcid, Set<Modification>> cTerminalMods;
@@ -111,5 +112,27 @@ public class ModificationHolder {
 
     public Set<Modification> mapMassToMod(double mass) {
         return massToModification.get(mass);
+    }
+
+    /**
+     * Finds the modifications from the given set that have a modification in
+     * the modification holder with the same monoisotopic mass (with an error
+     * tolerance MASS_DELTA_TOLERANCE).
+     *
+     * @param modifications the given set of modifications
+     * @return the set of modifications filtered by equal mass
+     */
+    public Set<Modification> filterByEqualMasses(Set<Modification> modifications) {
+        Set<Modification> conflictingModifications = new HashSet<Modification>();
+
+        for (Modification modification : getAllModifications()) {
+            for (Modification modificationToCheck : modifications) {
+                if (!modification.equals(modificationToCheck) && Math.abs(modification.getMonoIsotopicMassShift() - modificationToCheck.getMonoIsotopicMassShift()) < MASS_DELTA_TOLERANCE) {
+                    conflictingModifications.add(modificationToCheck);
+                }
+            }
+        }
+
+        return conflictingModifications;
     }
 }
