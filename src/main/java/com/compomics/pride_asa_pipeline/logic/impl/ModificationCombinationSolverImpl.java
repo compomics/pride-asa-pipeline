@@ -19,10 +19,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
     private ModificationHolder modificationHolder;
     private Cache<String, PeptideModificationHolder> peptideModificationHolderCache;
     private ZenArcher zenArcher;
-
-    public ModificationCombinationSolverImpl() {
-    }
-
+    
     @Override
     public ModificationHolder getModificationHolder() {
         return modificationHolder;
@@ -51,6 +48,8 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
             LOGGER.error("ERROR: no selection for all possible modifications has been provided!");
             throw new IllegalArgumentException("The provided ModificationSelection does not contain any modifications!");
         }
+        //reset cache
+        peptideModificationHolderCache.clearCache();
         this.modificationHolder = modificationHolder;
     }
 

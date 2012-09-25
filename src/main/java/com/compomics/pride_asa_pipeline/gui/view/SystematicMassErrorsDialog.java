@@ -14,12 +14,12 @@ import javax.swing.JTable;
  *
  * @author Niels Hulstaert
  */
-public class PipelineProceedDialog extends javax.swing.JDialog {
+public class SystematicMassErrorsDialog extends javax.swing.JDialog {
 
     /**
      * Creates new form ProceedPipelineDialog
      */
-    public PipelineProceedDialog(Frame parent) {
+    public SystematicMassErrorsDialog(Frame parent) {
         super(parent);
         this.getContentPane().setBackground(Color.WHITE);
         initComponents();

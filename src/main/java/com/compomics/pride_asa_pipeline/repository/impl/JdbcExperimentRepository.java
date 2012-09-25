@@ -4,7 +4,9 @@
  */
 package com.compomics.pride_asa_pipeline.repository.impl;
 
+import com.compomics.pride_asa_pipeline.data.extractor.AnalyzerSourcesExctractor;
 import com.compomics.pride_asa_pipeline.data.extractor.ExperimentAccessionResultExtractor;
+import com.compomics.pride_asa_pipeline.data.extractor.IdentificationsExtractor;
 import com.compomics.pride_asa_pipeline.data.mapper.AnalyzerDataMapper;
 import com.compomics.pride_asa_pipeline.data.mapper.IdentificationMapper;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
@@ -155,7 +157,7 @@ public class JdbcExperimentRepository extends JdbcDaoSupport implements Experime
     @Override
     public List<Identification> loadExperimentIdentifications(String experimentAccession) {
         LOGGER.debug("Start loading identifications for experiment " + experimentAccession);
-        List<Identification> identifications = getJdbcTemplate().query(SELECT_EXPERIMENT_IDENTIFICATIONS, new IdentificationMapper(), new Object[]{experimentAccession});
+        List<Identification> identifications = getJdbcTemplate().query(SELECT_EXPERIMENT_IDENTIFICATIONS, new IdentificationsExtractor(), new Object[]{experimentAccession});
         LOGGER.debug("Finished loading " + identifications.size() + " identifications for experiment " + experimentAccession);
         return identifications;
     }
@@ -163,16 +165,7 @@ public class JdbcExperimentRepository extends JdbcDaoSupport implements Experime
     @Override
     public Map<String, String> getAnalyzerSources(String experimentAccession) {
         LOGGER.debug("Start loading analyzer sources for experiment " + experimentAccession);
-        Map<String, String> analyzerSources = getJdbcTemplate().query(SELECT_ANALYZER_SOURCE_FOR_MALDI, new ResultSetExtractor<Map<String, String>>() {
-            @Override
-            public Map<String, String> extractData(ResultSet rs) throws SQLException, DataAccessException {
-                Map<String, String> analyzerSourceMap = new HashMap<String, String>();
-                while (rs.next()) {
-                    analyzerSourceMap.put(rs.getString("accession"), rs.getString("value"));
-                }
-                return analyzerSourceMap;
-            }
-        }, new Object[]{experimentAccession});
+        Map<String, String> analyzerSources = getJdbcTemplate().query(SELECT_ANALYZER_SOURCE_FOR_MALDI, new AnalyzerSourcesExctractor(), new Object[]{experimentAccession});
         LOGGER.debug("Finished loading analyzer sources identifications for experiment " + experimentAccession);
         return analyzerSources;
     }

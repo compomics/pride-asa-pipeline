@@ -32,6 +32,11 @@ public class PrideSpectrumAnnotator {
      */
     private Identifications identifications;
     /**
+     * The pipeline modifications holder; contains all modifications considered
+     * in the pipeline.
+     */
+    private ModificationHolder modificationHolder;
+    /**
      * The analyzer data
      */
     private AnalyzerData analyzerData;
@@ -42,7 +47,7 @@ public class PrideSpectrumAnnotator {
     /**
      * Keep track of the initialization state of the SpectrumAnnotator.
      */
-    private boolean hasInitializedAnnotation = Boolean.TRUE;
+    private boolean isInitialized = Boolean.TRUE;
     /**
      * Beans
      */
@@ -53,12 +58,6 @@ public class PrideSpectrumAnnotator {
     private SpectrumMatcher spectrumMatcher;
     private MassDeltaExplainer massDeltaExplainer;
     private PeptideVariationsGenerator peptideVariationsGenerator;
-
-    /**
-     * No-arg constructor
-     */
-    public PrideSpectrumAnnotator() {
-    }
 
     /**
      * Getters and setters.
@@ -119,6 +118,14 @@ public class PrideSpectrumAnnotator {
         this.identifications = identifications;
     }
 
+    public ModificationHolder getModificationHolder() {
+        return modificationHolder;
+    }
+
+    public void setModificationHolder(ModificationHolder modificationHolder) {
+        this.modificationHolder = modificationHolder;
+    }
+
     public PeptideVariationsGenerator getPeptideVariationsGenerator() {
         return peptideVariationsGenerator;
     }
@@ -152,7 +159,7 @@ public class PrideSpectrumAnnotator {
      *
      * @param experimentAccession the experiment accession number
      */
-    public void initAnnotation(String experimentAccession) {
+    public void initIdentifications(String experimentAccession) {
         LOGGER.debug("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
         spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
 
@@ -169,9 +176,38 @@ public class PrideSpectrumAnnotator {
         MassRecalibrationResult massRecalibrationResult = findSystematicMassError(consideredChargeStates, identifications.getCompletePeptides());
         LOGGER.debug("Finished finding systematic mass errors:" + "\n" + massRecalibrationResult.toString());
         spectrumAnnotatorResult.setMassRecalibrationResult(massRecalibrationResult);
+    }
 
-        // Update the initialization status
-        hasInitializedAnnotation = Boolean.TRUE;
+    /**
+     * Adds the pipeline modifications to the ModificationHolder and returns the
+     * pride modifications as a set. If the pride modifications are not taken
+     * into account, this set is empty.
+     *
+     * @return the modifications found in pride
+     */
+    public Set<Modification> initModifications() {
+        Set<Modification> prideModifications = new HashSet<Modification>();
+
+        //For the solver we need a ModificationHolder (contains all considered modifications)
+        modificationHolder = new ModificationHolder();
+
+        //add the pipeline modifications
+        Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
+        try {
+            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource));
+        } catch (JDOMException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        }
+
+        //add the modifications found in pride for the given experiment
+        if (PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_modifications")) {
+            prideModifications = modificationService.loadExperimentModifications(identifications.getCompletePeptides());
+        }
+
+        //update the initialization status
+        isInitialized = Boolean.TRUE;
+
+        return prideModifications;
     }
 
     /**
@@ -180,9 +216,12 @@ public class PrideSpectrumAnnotator {
      * @param experimentAccession the experiment accession number
      */
     public void annotate(String experimentAccession) {
-        if (!hasInitializedAnnotation) {
+        if (!isInitialized) {
             //check whether first initializationstep has been executed.
-            initAnnotation(experimentAccession);
+            initIdentifications(experimentAccession);
+            //add the modifications found in pride for the given experiment                        
+            Set<Modification> prideModifications = initModifications();
+            modificationHolder.addModifications(prideModifications);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -338,22 +377,6 @@ public class PrideSpectrumAnnotator {
      * value the set of modification combinations)
      */
     private Map<Identification, Set<ModificationCombination>> findModificationCombinations(MassRecalibrationResult massRecalibrationResult, Identifications identifications) {
-        //For the solver we need a ModificationHolder (contains all considered modifications)
-        ModificationHolder modificationHolder = new ModificationHolder();
-
-        //add the pipeline modifications
-        Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
-        try {
-            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource));
-        } catch (JDOMException ex) {
-            LOGGER.error(ex.getMessage(), ex);
-        }
-
-        //add the modifications found in pride for the given experiment
-        if (PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_modifications")) {
-            modificationHolder.addModifications(modificationService.loadExperimentModifications(identifications.getCompletePeptides()));
-        }
-
         //set MassDeltaExplainer ModificationHolder, MassRecalibrationResult and AnalyzerData
         massDeltaExplainer.getModificationCombinationSolver().setModificationHolder(modificationHolder);
         if (massRecalibrationResult != null) {

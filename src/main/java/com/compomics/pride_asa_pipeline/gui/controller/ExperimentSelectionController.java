@@ -7,6 +7,8 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.gui.view.FileSelectionPanel;
 import com.compomics.pride_asa_pipeline.gui.view.PrideSelectionPanel;
+import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.service.ResultHandler;
@@ -16,6 +18,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.File;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JFileChooser;
@@ -39,7 +42,7 @@ public class ExperimentSelectionController {
     //model
     private Integer taxonomyId;
     //hold reference to swingworker for cancelling purposes
-    private SwingWorker<Void, Void> currentSwingWorker;
+    private SwingWorker<?, Void> currentSwingWorker;
     //view
     private PrideSelectionPanel prideSelectionPanel;
     private FileSelectionPanel fileSelectionPanel;
@@ -47,7 +50,8 @@ public class ExperimentSelectionController {
     private MainController mainController;
     //child controllers
     private PipelineProgressController pipelineProgressController;
-    private PipelineProceedController pipelineProceedController;
+    private SystematicMassErrorsController systematicMassErrorsController;
+    private ModificationsMergeController modificationsMergeController;
     //services
     private ExperimentService experimentService;
     private ResultHandler resultHandler;
@@ -92,12 +96,20 @@ public class ExperimentSelectionController {
         this.pipelineProgressController = pipelineProgressController;
     }
 
-    public PipelineProceedController getPipelineProceedController() {
-        return pipelineProceedController;
+    public SystematicMassErrorsController getSystematicMassErrorsController() {
+        return systematicMassErrorsController;
     }
 
-    public void setPipelineProceedController(PipelineProceedController pipelineProceedController) {
-        this.pipelineProceedController = pipelineProceedController;
+    public void setSystematicMassErrorsController(SystematicMassErrorsController systematicMassErrorsController) {
+        this.systematicMassErrorsController = systematicMassErrorsController;
+    }
+
+    public ModificationsMergeController getModificationsMergeController() {
+        return modificationsMergeController;
+    }
+
+    public void setModificationsMergeController(ModificationsMergeController modificationsMergeController) {
+        this.modificationsMergeController = modificationsMergeController;
     }
 
     public void init() {
@@ -106,10 +118,18 @@ public class ExperimentSelectionController {
 
         //init child controllers
         pipelineProgressController.init();
-        pipelineProceedController.init();
+        systematicMassErrorsController.init();
+        modificationsMergeController.init();
     }
 
-    public void onAnnotationProceed() {
+    public void onIdentificationsLoaded() {
+        //execute worker
+        InitModificationsWorker initModificationsWorker = new InitModificationsWorker();
+        currentSwingWorker = initModificationsWorker;
+        initModificationsWorker.execute();
+    }
+
+    public void onModificationsLoaded() {
         //execute worker
         AnnotationWorker annotationWorker = new AnnotationWorker();
         currentSwingWorker = annotationWorker;
@@ -171,9 +191,9 @@ public class ExperimentSelectionController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //execute worker
-                InitAnnotationWorker initAnnotationWorker = new InitAnnotationWorker();
-                currentSwingWorker = initAnnotationWorker;
-                initAnnotationWorker.execute();
+                InitIdentificationsWorker initIdentificationsWorker = new InitIdentificationsWorker();
+                currentSwingWorker = initIdentificationsWorker;
+                initIdentificationsWorker.execute();
 
                 //disable process buttons
                 prideSelectionPanel.getProcessButton().setEnabled(Boolean.FALSE);
@@ -286,14 +306,14 @@ public class ExperimentSelectionController {
     }
 
     //swing workers
-    private class InitAnnotationWorker extends SwingWorker<Void, Void> {
+    private class InitIdentificationsWorker extends SwingWorker<Void, Void> {
 
         @Override
         protected Void doInBackground() throws Exception {
             //show progress bar
             pipelineProgressController.showProgressBar(NUMBER_OF_PRIDE_PROGRESS_STEPS, "Processing");
 
-            mainController.getPrideSpectrumAnnotator().initAnnotation(getExperimentAccesion());
+            mainController.getPrideSpectrumAnnotator().initIdentifications(getExperimentAccesion());
 
             return null;
         }
@@ -309,12 +329,12 @@ public class ExperimentSelectionController {
                     onAnnotationCanceled();
                 } //check if one of the systematic mass errors per charge state exceeds the threshold value. If so, show a confirmation dialog.
                 else if (mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
-                    pipelineProceedController.showDialog("One or more systematic mass errors exceed the threshold value of "
+                    systematicMassErrorsController.showDialog("One or more systematic mass errors exceed the threshold value of "
                             + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error")
                             + ", proceed?", mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult());
                 } //else proceed with the annotation
                 else {
-                    onAnnotationProceed();
+                    onIdentificationsLoaded();
                 }
             } catch (InterruptedException ex) {
                 //hide progress bar
@@ -323,7 +343,52 @@ public class ExperimentSelectionController {
             } catch (ExecutionException ex) {
                 //hide progress bar
                 pipelineProgressController.hideProgressDialog();
-                mainController.showMessageDialog("Unexpected error", "Un expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
+                mainController.showMessageDialog("Unexpected error", "An expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
+            } catch (CancellationException ex) {
+                LOGGER.debug("annotation canceled.");
+            }
+        }
+    }
+
+    private class InitModificationsWorker extends SwingWorker<Set<Modification>, Void> {
+
+        @Override
+        protected Set<Modification> doInBackground() throws Exception {
+            //init the modfications considered in the pipeline
+            Set<Modification> prideModifications = mainController.getPrideSpectrumAnnotator().initModifications();
+
+            return prideModifications;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                Set<Modification> prideModifications = get();
+                //check for pride modifications
+                if (!prideModifications.isEmpty()) {
+                    ModificationHolder modificationHolder = mainController.getPrideSpectrumAnnotator().getModificationHolder();
+
+                    //check for equal mass modifications
+                    Set<Modification> conflictingModifications = modificationHolder.filterByEqualMasses(prideModifications);
+                    if (!conflictingModifications.isEmpty()) {
+                        modificationsMergeController.showDialog(modificationHolder, prideModifications);
+                    }//else add all the pride modifications to the pipeline modifications and proceed with the annotation                                      
+                    else {
+                        modificationHolder.addModifications(prideModifications);
+                        onModificationsLoaded();
+                    }
+                } //else proceed with the annotation
+                else {
+                    onModificationsLoaded();
+                }
+            } catch (InterruptedException ex) {
+                //hide progress bar
+                pipelineProgressController.hideProgressDialog();
+                LOGGER.error(ex.getMessage(), ex);
+            } catch (ExecutionException ex) {
+                //hide progress bar
+                pipelineProgressController.hideProgressDialog();
+                mainController.showMessageDialog("Unexpected error", "An expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
             } catch (CancellationException ex) {
                 LOGGER.debug("annotation canceled.");
             }
