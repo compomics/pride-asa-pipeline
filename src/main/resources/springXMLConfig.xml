@@ -61,6 +61,7 @@
     <bean id="resultHandler"
           class="com.compomics.pride_asa_pipeline.service.impl.ResultHandlerImpl">
         <property name="fileResultHandler" ref="fileResultHandler"/>
+        <property name="modificationService" ref="modificationService"/>
     </bean>  
     
     <bean id="spectrumPanelService"

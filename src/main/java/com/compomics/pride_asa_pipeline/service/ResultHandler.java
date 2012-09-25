@@ -21,11 +21,19 @@ public interface ResultHandler {
     void writeResultToFile(SpectrumAnnotatorResult spectrumAnnotatorResult);
     
     /**
-     * Reads the result file and returns the SpectrumAnnotatorResult
+     * Reads the result file and returns the SpectrumAnnotatorResult.
      *
      * @param resultFile the spectrum annotation pipeline result
      * @return the spectrum annotator result
      */
     SpectrumAnnotatorResult readResultFromFile(File resultFile);
+    
+    
+    /**
+     * Writes the used modifications in the annotation pipeline to file. 
+     * 
+     * @param spectrumAnnotatorResult the spectrum annotator result
+     */
+    void writeUsedModificationsToFile(SpectrumAnnotatorResult spectrumAnnotatorResult);
     
 }

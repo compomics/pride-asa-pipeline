@@ -47,7 +47,7 @@ public class PrideSpectrumAnnotator {
     /**
      * Keep track of the initialization state of the SpectrumAnnotator.
      */
-    private boolean isInitialized = Boolean.TRUE;
+    private boolean isInitialized = Boolean.FALSE;
     /**
      * Beans
      */
@@ -217,11 +217,16 @@ public class PrideSpectrumAnnotator {
      */
     public void annotate(String experimentAccession) {
         if (!isInitialized) {
-            //check whether first initializationstep has been executed.
+            //check wether first initialisation step has been executed
             initIdentifications(experimentAccession);
-            //add the modifications found in pride for the given experiment                        
+            //add the non-conflicting modifications found in pride for the given experiment                        
             Set<Modification> prideModifications = initModifications();
-            modificationHolder.addModifications(prideModifications);
+            Set<Modification> conflictingModifications = modificationHolder.filterByEqualMasses(prideModifications);
+            for (Modification prideModification : prideModifications) {
+                if (!conflictingModifications.contains(prideModification)) {
+                    modificationHolder.addModification(prideModification);
+                }
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -309,6 +314,7 @@ public class PrideSpectrumAnnotator {
         identifications = null;
         spectrumAnnotatorResult = null;
         analyzerData = null;
+        modificationHolder = null;
     }
 
     /**

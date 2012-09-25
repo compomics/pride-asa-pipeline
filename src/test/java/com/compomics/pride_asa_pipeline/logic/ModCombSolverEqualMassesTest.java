@@ -27,7 +27,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration("classpath:springXMLConfig.xml")
 public class ModCombSolverEqualMassesTest {
 
-    private static final String peptideSequenceString = "AAKENNYLENNART";
     @Autowired
     private ModificationCombinationSolver modificationCombinationSolver;
     @Autowired

@@ -66,6 +66,7 @@ public class CommandLineRunner {
                     prideSpectrumAnnotator.annotate(experimentAccession);
                     //write result to file
                     resultHandler.writeResultToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
+                    resultHandler.writeUsedModificationsToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
                 }
             }
         } catch (Exception e) {
