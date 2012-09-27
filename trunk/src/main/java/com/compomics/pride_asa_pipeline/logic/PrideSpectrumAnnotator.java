@@ -153,6 +153,7 @@ public class PrideSpectrumAnnotator {
     /**
      * Public methods.
      */
+    
     /**
      * Loads the experiment identifications and calculates the systematic mass
      * errors per charge state.
@@ -204,7 +205,7 @@ public class PrideSpectrumAnnotator {
             prideModifications = modificationService.loadExperimentModifications(identifications.getCompletePeptides());
         }
 
-        //update the initialization status
+        //update the initialisation status
         isInitialized = Boolean.TRUE;
 
         return prideModifications;
@@ -249,7 +250,6 @@ public class PrideSpectrumAnnotator {
         int completeIdentificationsSize = identifications.getCompleteIdentifications().size();
         LOGGER.debug("Precursors for which no modification combination could be found: " + (completeIdentificationsSize - explainedIdentificationsSize));
         List<Identification> unexplainedIdentifications = getUnexplainedIdentifications(identifications.getCompleteIdentifications(), massDeltaExplanationsMap.keySet());
-        assert (unexplainedIdentifications.size() == (completeIdentificationsSize - explainedIdentificationsSize));
         for (Identification identification : unexplainedIdentifications) {
             try {
                 LOGGER.debug("Unresolved precursor: " + identification.getPeptide().toString() + " with mass delta: " + identification.getPeptide().calculateMassDelta());
@@ -270,12 +270,10 @@ public class PrideSpectrumAnnotator {
                 identification.setPipelineExplanationType(PipelineExplanationType.UNMODIFIED);
                 unmodifiedPrecursors.add(identification);
 
-                //annotate the unmodified identifications if necessary
-                if (!PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.annotate_modified_identifications_only")) {
-                    //score the unmodified identification
-                    AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()));
-                    identification.setAnnotationData(annotationData);
-                }
+                //annotate the unmodified identifications
+                //score the unmodified identification
+                AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()));
+                identification.setAnnotationData(annotationData);
             }
         }
         spectrumAnnotatorResult.setUnmodifiedPrecursors(unmodifiedPrecursors);
@@ -481,13 +479,12 @@ public class PrideSpectrumAnnotator {
         List<Identification> unexplainedIdentifications = new ArrayList<Identification>();
         for (Identification identification : identifications) {
             if (!explainableIdentifications.contains(identification)) {
-                //annotate the unmodified identifications if necessary
-                if (!PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.annotate_modified_identifications_only")) {
-                    //score the unmodified identification
-                    AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()));
-                    identification.setAnnotationData(annotationData);
-                }
+                //annotate the unexplained identifications
+                //score the unexplained identification
+                AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()));
+                identification.setAnnotationData(annotationData);
                 identification.setPipelineExplanationType(PipelineExplanationType.UNEXPLAINED);
+
                 unexplainedIdentifications.add(identification);
             }
         }

@@ -47,7 +47,7 @@ public class SpectrumPanelServiceImpl implements SpectrumPanelService {
                 Integer.toString(identification.getPeptide().getCharge()), 
                 "test");
         
-        spectrumPanel.showAnnotatedPeaksOnly(true);
+        spectrumPanel.showAnnotatedPeaksOnly(Boolean.TRUE);
         
         //add peak annotations
         if (identification.getAnnotationData().getFragmentIonAnnotations() != null) {
