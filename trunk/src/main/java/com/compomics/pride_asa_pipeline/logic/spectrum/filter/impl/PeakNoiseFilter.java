@@ -11,6 +11,8 @@ import java.util.List;
  * @since 0.1
  */
 public class PeakNoiseFilter implements NoiseFilter {
+    
+    private static final double PRECURSOR_MASS_WINDOW = 18.0;
 
     @Override
     public List<Peak> filterNoise(List<Peak> peaks, double threshold, double experimentalPrecursorMass) {
@@ -21,7 +23,7 @@ public class PeakNoiseFilter implements NoiseFilter {
         for (Peak peak : peaks) {
             //add the peak to the peak list if the peak intensity > threshold
             // and if the MZ ratio is not in 18D range of experimental precursor mass
-            if (peak.getIntensity() >= threshold && !(experimentalPrecursorMass - 18 < peak.getMzRatio() && peak.getMzRatio() < experimentalPrecursorMass + 18)) {
+            if (peak.getIntensity() >= threshold && !(experimentalPrecursorMass - PRECURSOR_MASS_WINDOW < peak.getMzRatio() && peak.getMzRatio() < experimentalPrecursorMass + PRECURSOR_MASS_WINDOW)) {
                 result.add(peak);
             }
         }
