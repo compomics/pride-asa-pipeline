@@ -61,7 +61,7 @@ public class NoiseThresholdFinderImpl implements NoiseThresholdFinder {
             //peak density: number of peaks / dalton
             double density = signalValues.length / (maximumValue - minimumValue);
             if (density < densityThreshold) {
-                //scenario 2: set the threshold to 
+                //scenario 2
                 noiseThreshold = Math.max(mean - (1.5 * standardDeviation), 0.0);
             } else {
                 //scenario 3
