@@ -221,7 +221,8 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
         jTextArea1.setColumns(20);
         jTextArea1.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
         jTextArea1.setRows(3);
-        jTextArea1.setText("Some of the modifications found in pride for this experiment have equal masses compared to the fixed set of pipeline modifications.\nPlease resolve these conflicting modifications by adding or removing pride modifications to the pipeline modifications.\nAdding or removing fixed pipeline modifications can be done in the \"Pipeline modifications\" section.");
+        jTextArea1.setText("Some of the modifications found in pride for this experiment have equal masses compared to the fixed set of pipeline modifications.\nPlease resolve these conflicting modifications by adding or removing pride modifications to the pipeline modifications.\nAdding or removing fixed pipeline modifications can be done in the \"Modifications configuration\" section.");
+        jTextArea1.setBorder(null);
 
         jPanel1.setOpaque(false);
 

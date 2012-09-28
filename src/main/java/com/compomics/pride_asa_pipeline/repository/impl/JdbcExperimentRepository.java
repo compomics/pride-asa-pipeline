@@ -8,18 +8,12 @@ import com.compomics.pride_asa_pipeline.data.extractor.AnalyzerSourcesExctractor
 import com.compomics.pride_asa_pipeline.data.extractor.ExperimentAccessionResultExtractor;
 import com.compomics.pride_asa_pipeline.data.extractor.IdentificationsExtractor;
 import com.compomics.pride_asa_pipeline.data.mapper.AnalyzerDataMapper;
-import com.compomics.pride_asa_pipeline.data.mapper.IdentificationMapper;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.repository.ExperimentRepository;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 /**
