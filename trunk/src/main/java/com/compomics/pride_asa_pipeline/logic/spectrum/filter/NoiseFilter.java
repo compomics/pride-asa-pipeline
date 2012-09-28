@@ -10,7 +10,7 @@ import java.util.List;
 public interface NoiseFilter {
 
     /**
-     * Filters the peak list; all peaks that have an instensity lower than the
+     * Filters the peak list; all peaks that have an intensity lower than the
      * given threshold will be omitted. The experimental precursor mass is given
      * as a method argument to exclude this mz value from the filtered spectrum.
      *
