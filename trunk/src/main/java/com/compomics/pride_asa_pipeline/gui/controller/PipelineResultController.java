@@ -27,13 +27,18 @@ import com.compomics.pride_asa_pipeline.service.SpectrumPanelService;
 import com.compomics.pride_asa_pipeline.util.MathUtils;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.google.common.base.Joiner;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableCellRenderer;
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartPanel;
 
@@ -176,6 +181,7 @@ public class PipelineResultController {
         sortedIdentificationsList = new SortedList<Identification>(identificationsEventList, new IdentificationSequenceComparator());
         identificationsPanel.getIdentificationsTable().setModel(new EventTableModel(sortedIdentificationsList, new IdentificationsTableFormat()));
         identificationsPanel.getIdentificationsTable().setSelectionModel(new EventSelectionModel(sortedIdentificationsList));
+        identificationsPanel.getIdentificationsTable().setDefaultRenderer(Color.class, new ColorRenderer());
 
         //use MULTIPLE_COLUMN_MOUSE to allow sorting by multiple columns
         TableComparatorChooser tableSorter = TableComparatorChooser.install(
@@ -420,4 +426,19 @@ public class PipelineResultController {
             return massDelta;
         }
     }
+    
+    public class ColorRenderer extends JLabel
+                           implements TableCellRenderer {
+     
+        @Override
+    public Component getTableCellRendererComponent(
+                            JTable table, Object color,
+                            boolean isSelected, boolean hasFocus,
+                            int row, int column) {
+        
+        setBackground(Color.BLUE);
+    
+        return this;
+    }
+}
 }

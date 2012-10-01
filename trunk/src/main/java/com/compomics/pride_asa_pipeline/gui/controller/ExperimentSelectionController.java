@@ -34,7 +34,7 @@ import org.springframework.core.io.Resource;
  * @author Niels Hulstaert Hulstaert
  */
 public class ExperimentSelectionController {
-    
+
     private static final Logger LOGGER = Logger.getLogger(ExperimentSelectionController.class);
     private static final String EXPERIMENT_ACCESSION_SEPARATOR = ":";
     private static final int NUMBER_OF_PRIDE_PROGRESS_STEPS = 5;
@@ -55,63 +55,63 @@ public class ExperimentSelectionController {
     //services
     private ExperimentService experimentService;
     private ResultHandler resultHandler;
-    
+
     public ExperimentService getExperimentService() {
         return experimentService;
     }
-    
+
     public void setExperimentService(ExperimentService experimentService) {
         this.experimentService = experimentService;
     }
-    
+
     public ResultHandler getResultHandler() {
         return resultHandler;
     }
-    
+
     public void setResultHandler(ResultHandler resultHandler) {
         this.resultHandler = resultHandler;
     }
-    
+
     public MainController getMainController() {
         return mainController;
     }
-    
+
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
     }
-    
+
     public PrideSelectionPanel getPrideSelectionPanel() {
         return prideSelectionPanel;
     }
-    
+
     public FileSelectionPanel getFileSelectionPanel() {
         return fileSelectionPanel;
     }
-    
+
     public PipelineProgressController getPipelineProgressController() {
         return pipelineProgressController;
     }
-    
+
     public void setPipelineProgressController(PipelineProgressController pipelineProgressController) {
         this.pipelineProgressController = pipelineProgressController;
     }
-    
+
     public SystematicMassErrorsController getSystematicMassErrorsController() {
         return systematicMassErrorsController;
     }
-    
+
     public void setSystematicMassErrorsController(SystematicMassErrorsController systematicMassErrorsController) {
         this.systematicMassErrorsController = systematicMassErrorsController;
     }
-    
+
     public ModificationsMergeController getModificationsMergeController() {
         return modificationsMergeController;
     }
-    
+
     public void setModificationsMergeController(ModificationsMergeController modificationsMergeController) {
         this.modificationsMergeController = modificationsMergeController;
     }
-    
+
     public void init() {
         initPrideSelectionPanel();
         initFileSelectionPanel();
@@ -121,21 +121,21 @@ public class ExperimentSelectionController {
         systematicMassErrorsController.init();
         modificationsMergeController.init();
     }
-    
+
     public void onIdentificationsLoaded() {
         //execute worker
         InitModificationsWorker initModificationsWorker = new InitModificationsWorker();
         currentSwingWorker = initModificationsWorker;
         initModificationsWorker.execute();
     }
-    
+
     public void onModificationsLoaded() {
         //execute worker
         AnnotationWorker annotationWorker = new AnnotationWorker();
         currentSwingWorker = annotationWorker;
         annotationWorker.execute();
     }
-    
+
     public void onAnnotationCanceled() {
         //hide progress bar
         pipelineProgressController.hideProgressDialog();
@@ -148,7 +148,7 @@ public class ExperimentSelectionController {
         prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
         fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
     }
-    
+
     private void initPrideSelectionPanel() {
         prideSelectionPanel = new PrideSelectionPanel();
 
@@ -157,6 +157,9 @@ public class ExperimentSelectionController {
 
         //disable taxonomy text field
         prideSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.FALSE);
+
+        //init include pride modifications check box
+        prideSelectionPanel.getIncludePrideModificationsCheckBox().setSelected(PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_modifications"));
 
         //add action listeners
         prideSelectionPanel.getTaxonomyFilterCheckBox().addActionListener(new ActionListener() {
@@ -175,18 +178,29 @@ public class ExperimentSelectionController {
                 }
             }
         });
-        
+
         prideSelectionPanel.getTaxonomyTextField().addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent fe) {
             }
-            
+
             @Override
             public void focusLost(FocusEvent fe) {
                 filterExperimentAccessions();
             }
         });
-        
+
+        prideSelectionPanel.getIncludePrideModificationsCheckBox().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                boolean isSelected = prideSelectionPanel.getIncludePrideModificationsCheckBox().isSelected();
+                if (PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_modifications") != isSelected) {
+                    //update properties file
+                    mainController.updatePipelineParam("spectrumannotator.include_pride_modifications", isSelected);
+                }
+            }
+        });
+
         prideSelectionPanel.getProcessButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -201,7 +215,7 @@ public class ExperimentSelectionController {
             }
         });
     }
-    
+
     private void initFileSelectionPanel() {
         fileSelectionPanel = new FileSelectionPanel();
 
@@ -219,7 +233,7 @@ public class ExperimentSelectionController {
                 if (f.isDirectory()) {
                     return true;
                 }
-                
+
                 int index = f.getName().lastIndexOf(".");
                 String extension = f.getName().substring(index + 1);
                 if (extension != null) {
@@ -229,10 +243,10 @@ public class ExperimentSelectionController {
                         return false;
                     }
                 }
-                
+
                 return false;
             }
-            
+
             @Override
             public String getDescription() {
                 return ("text files only");
@@ -253,7 +267,7 @@ public class ExperimentSelectionController {
                 }
             }
         });
-        
+
         fileSelectionPanel.getProcessButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -270,7 +284,7 @@ public class ExperimentSelectionController {
             }
         });
     }
-    
+
     private void filterExperimentAccessions() {
         if (!prideSelectionPanel.getTaxonomyTextField().getText().isEmpty()) {
             try {
@@ -285,7 +299,7 @@ public class ExperimentSelectionController {
             }
         }
     }
-    
+
     private void updateComboBox(Map<String, String> experimentAccessions) {
         //empty combo box
         prideSelectionPanel.getExperimentSelectionComboBox().removeAllItems();
@@ -294,34 +308,35 @@ public class ExperimentSelectionController {
             prideSelectionPanel.getExperimentSelectionComboBox().addItem(experimentAccession + EXPERIMENT_ACCESSION_SEPARATOR + " " + experimentAccessions.get(experimentAccession));
         }
     }
-    
+
     private String getExperimentAccesion() {
         String experimentAccession = null;
         if (prideSelectionPanel.getExperimentSelectionComboBox().getSelectedItem() != null) {
             String comboBoxString = prideSelectionPanel.getExperimentSelectionComboBox().getSelectedItem().toString();
             experimentAccession = comboBoxString.substring(0, comboBoxString.indexOf(EXPERIMENT_ACCESSION_SEPARATOR));
         }
-        
+
         return experimentAccession;
     }
 
     //swing workers
     private class InitIdentificationsWorker extends SwingWorker<Void, Void> {
-        
+
         @Override
         protected Void doInBackground() throws Exception {
             //show progress bar
             pipelineProgressController.showProgressBar(NUMBER_OF_PRIDE_PROGRESS_STEPS, "Processing");
-            
+
             mainController.getPrideSpectrumAnnotator().initIdentifications(getExperimentAccesion());
-            
+
             return null;
         }
-        
+
         @Override
         protected void done() {
             try {
                 get();
+
                 //check if the experiment has "useful" identifications
                 if (mainController.getPrideSpectrumAnnotator().getIdentifications().getCompleteIdentifications().isEmpty()) {
                     mainController.showMessageDialog("Pipeline error", "No useful identifications were found for experiment " + getExperimentAccesion()
@@ -337,29 +352,27 @@ public class ExperimentSelectionController {
                     onIdentificationsLoaded();
                 }
             } catch (InterruptedException ex) {
-                //hide progress bar
-                pipelineProgressController.hideProgressDialog();
+                onAnnotationCanceled();
                 LOGGER.error(ex.getMessage(), ex);
             } catch (ExecutionException ex) {
-                //hide progress bar
-                pipelineProgressController.hideProgressDialog();
+                onAnnotationCanceled();
                 mainController.showMessageDialog("Unexpected error", "An expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
             } catch (CancellationException ex) {
-                LOGGER.debug("annotation canceled.");
+                LOGGER.info("annotation for experiment " + getExperimentAccesion() + " cancelled.");
             }
         }
     }
-    
+
     private class InitModificationsWorker extends SwingWorker<Set<Modification>, Void> {
-        
+
         @Override
         protected Set<Modification> doInBackground() throws Exception {
             //init the modfications considered in the pipeline
             Set<Modification> prideModifications = mainController.getPrideSpectrumAnnotator().initModifications();
-            
+
             return prideModifications;
         }
-        
+
         @Override
         protected void done() {
             try {
@@ -382,21 +395,19 @@ public class ExperimentSelectionController {
                     onModificationsLoaded();
                 }
             } catch (InterruptedException ex) {
-                //hide progress bar
-                pipelineProgressController.hideProgressDialog();
+                onAnnotationCanceled();
                 LOGGER.error(ex.getMessage(), ex);
             } catch (ExecutionException ex) {
-                //hide progress bar
-                pipelineProgressController.hideProgressDialog();
+                onAnnotationCanceled();
                 mainController.showMessageDialog("Unexpected error", "An expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
             } catch (CancellationException ex) {
-                LOGGER.debug("annotation canceled.");
+                LOGGER.info("annotation for experiment " + getExperimentAccesion() + " cancelled.");
             }
         }
     }
-    
+
     private class AnnotationWorker extends SwingWorker<Void, Void> {
-        
+
         @Override
         protected Void doInBackground() throws Exception {
             mainController.getPrideSpectrumAnnotator().annotate(getExperimentAccesion());
@@ -406,49 +417,52 @@ public class ExperimentSelectionController {
                 resultHandler.writeResultToFile(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
                 resultHandler.writeUsedModificationsToFile(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
             }
-            
+
             return null;
         }
-        
+
         @Override
         protected void done() {
             try {
                 get();
+
                 mainController.onAnnotationFinished(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
-            } catch (InterruptedException ex) {
-                LOGGER.error(ex.getMessage(), ex);
-                mainController.showUnexpectedErrorDialog(ex.getMessage());
-            } catch (ExecutionException ex) {
-                LOGGER.error(ex.getMessage(), ex);
-                mainController.showUnexpectedErrorDialog(ex.getMessage());
-            } catch (CancellationException ex) {
-                LOGGER.info("annotation for experiment " + getExperimentAccesion() + " canceled.");
-            } finally {
+
                 //hide progress bar
                 pipelineProgressController.hideProgressDialog();
                 //enable process buttons
                 prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
                 fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
+            } catch (InterruptedException ex) {
+                onAnnotationCanceled();
+                LOGGER.error(ex.getMessage(), ex);
+                mainController.showUnexpectedErrorDialog(ex.getMessage());
+            } catch (ExecutionException ex) {
+                onAnnotationCanceled();
+                LOGGER.error(ex.getMessage(), ex);
+                mainController.showUnexpectedErrorDialog(ex.getMessage());
+            } catch (CancellationException ex) {
+                LOGGER.info("annotation for experiment " + getExperimentAccesion() + " canceled.");
             }
         }
     }
-    
+
     private class ImportPipelineResultWorker extends SwingWorker<SpectrumAnnotatorResult, Void> {
-        
+
         @Override
         protected SpectrumAnnotatorResult doInBackground() throws Exception {
             SpectrumAnnotatorResult spectrumAnnotatorResult = null;
 
             //show progress bar
             pipelineProgressController.showProgressBar(NUMBER_OF_FILE_PROGRESS_STEPS, "Importing");
-            
+
             LOGGER.info("Importing pipeline result file " + fileSelectionPanel.getFileChooser().getSelectedFile().getName());
             spectrumAnnotatorResult = resultHandler.readResultFromFile(fileSelectionPanel.getFileChooser().getSelectedFile());
             LOGGER.info("Finished importing pipeline result file " + fileSelectionPanel.getFileChooser().getSelectedFile().getName());
-            
+
             return spectrumAnnotatorResult;
         }
-        
+
         @Override
         protected void done() {
             try {
@@ -456,11 +470,13 @@ public class ExperimentSelectionController {
             } catch (InterruptedException ex) {
                 LOGGER.error(ex.getMessage(), ex);
                 mainController.showUnexpectedErrorDialog(ex.getMessage());
+                onAnnotationCanceled();
             } catch (ExecutionException ex) {
                 LOGGER.error(ex.getMessage(), ex);
                 mainController.showUnexpectedErrorDialog(ex.getMessage());
+                onAnnotationCanceled();
             } catch (CancellationException ex) {
-                LOGGER.info("annotation for experiment " + getExperimentAccesion() + " canceled.");
+                LOGGER.info("Annotation for experiment " + getExperimentAccesion() + " cancelled.");
             } finally {
                 //hide progress bar
                 pipelineProgressController.hideProgressDialog();

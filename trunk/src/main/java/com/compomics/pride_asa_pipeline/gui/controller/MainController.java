@@ -168,6 +168,10 @@ public class MainController implements ActionListener {
                 + "\n" + "please try to rerun the application.", JOptionPane.ERROR_MESSAGE);
     }
 
+    public void updatePipelineParam(String propertyName, Object value) {
+        pipelineParamsController.updatePropertyGuiWrapper(propertyName, value);
+    }
+
     public void onAnnotationFinished(SpectrumAnnotatorResult spectrumAnnotatorResult) {
         pipelineResultController.update(spectrumAnnotatorResult);
     }

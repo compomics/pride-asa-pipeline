@@ -13,6 +13,18 @@ import javax.swing.event.SwingPropertyChangeSupport;
  */
 public class Modification implements Comparable<Modification>, ModificationFacade {
 
+    public static enum Location {
+
+        N_TERMINAL,
+        C_TERMINAL,
+        NON_TERMINAL
+    }
+
+    public static enum Origin {
+
+        PIPELINE,
+        PRIDE
+    }
     private String name;
     private double monoIsotopicMassShift;
     private double averageMassShift;
@@ -20,15 +32,8 @@ public class Modification implements Comparable<Modification>, ModificationFacad
     private Set<AminoAcid> affectedAminoAcids;
     private String accession;
     private String accessionValue;
+    private Origin origin;
     private final SwingPropertyChangeSupport propertyChangeSupport = new SwingPropertyChangeSupport(this);
-
-    public static enum Location {
-
-        N_TERMINAL,
-        C_TERMINAL,
-        NON_TERMINAL
-                
-    }
 
     public Modification(double massShift, Location location, String accession, String accessionValue) {
         this.name = accessionValue;
@@ -48,6 +53,7 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         this.affectedAminoAcids = affectedAminoAcids;
         this.accession = accession;
         this.accessionValue = accessionValue;
+        origin = Origin.PIPELINE;
     }
 
     public double getAverageMassShift() {
@@ -108,7 +114,7 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         } else {
             return averageMassShift;
         }
-    }    
+    }
 
     public Location getLocation() {
         return location;
@@ -128,6 +134,14 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         Set<AminoAcid> oldAffectedAminoAcids = this.affectedAminoAcids;
         this.affectedAminoAcids = affectedAminoAcids;
         propertyChangeSupport.firePropertyChange("affectedAminoAcids", oldAffectedAminoAcids, affectedAminoAcids);
+    }
+
+    public Origin getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(Origin origin) {
+        this.origin = origin;
     }
 
     @Override
@@ -174,7 +188,7 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         hash = 79 * hash + (this.location != null ? this.location.hashCode() : 0);
         hash = 79 * hash + (this.affectedAminoAcids != null ? this.affectedAminoAcids.hashCode() : 0);
         return hash;
-    }    
+    }
 
     @Override
     public String toString() {

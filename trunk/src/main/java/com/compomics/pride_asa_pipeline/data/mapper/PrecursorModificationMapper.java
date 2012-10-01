@@ -15,7 +15,7 @@ import org.springframework.jdbc.core.RowMapper;
  *
  * @author Niels Hulstaert
  */
-public class ModificationMapper implements RowMapper<Modification> {
+public class PrecursorModificationMapper implements RowMapper<Modification> {
 
     @Override
     public Modification mapRow(ResultSet rs, int i) throws SQLException {
@@ -24,7 +24,7 @@ public class ModificationMapper implements RowMapper<Modification> {
         String peptideSequence = rs.getString("sequence");
         int locationInt = rs.getInt("location");
         double massShift = rs.getDouble("mass_delta_value");
-        
+
         Location location = null;
         int sequenceIndex = 0;
         if (locationInt == 0) {
@@ -37,9 +37,13 @@ public class ModificationMapper implements RowMapper<Modification> {
             location = Location.NON_TERMINAL;
             sequenceIndex = locationInt - 1;
         }
-        
+
         Modification modification = new Modification(massShift, location, modificationAccession, modificationName);
-        modification.getAffectedAminoAcids().add(AminoAcid.getAA(peptideSequence.substring(sequenceIndex, sequenceIndex + 1)));       
+
+        modification.getAffectedAminoAcids().add(AminoAcid.getAA(peptideSequence.substring(sequenceIndex, sequenceIndex + 1)));
+
+        modification.setOrigin(Modification.Origin.PRIDE);
+
         return modification;
     }
 }
