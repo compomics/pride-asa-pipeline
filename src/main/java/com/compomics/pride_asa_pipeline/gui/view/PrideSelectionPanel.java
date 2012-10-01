@@ -40,8 +40,12 @@ public class PrideSelectionPanel extends javax.swing.JPanel {
 
     public JCheckBox getWriteResultCheckBox() {
         return writeResultCheckBox;
-    }        
+    }
 
+    public JCheckBox getIncludePrideModificationsCheckBox() {
+        return includePrideModificationsCheckBox;
+    }
+        
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -58,6 +62,7 @@ public class PrideSelectionPanel extends javax.swing.JPanel {
         taxonomyTextField = new javax.swing.JTextField();
         experimentProcessButton = new javax.swing.JButton();
         writeResultCheckBox = new javax.swing.JCheckBox();
+        includePrideModificationsCheckBox = new javax.swing.JCheckBox();
 
         setOpaque(false);
         setPreferredSize(new java.awt.Dimension(50, 20));
@@ -78,7 +83,11 @@ public class PrideSelectionPanel extends javax.swing.JPanel {
         experimentProcessButton.setPreferredSize(new java.awt.Dimension(80, 25));
 
         writeResultCheckBox.setText("write result to file");
+        writeResultCheckBox.setToolTipText("The output folder can be set on the \"Pipeline configuration\" panel.");
         writeResultCheckBox.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+
+        includePrideModificationsCheckBox.setText("incude pride modifications");
+        includePrideModificationsCheckBox.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -92,19 +101,21 @@ public class PrideSelectionPanel extends javax.swing.JPanel {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(experimentSelectionComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(taxonomyFilterCheckBox)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(taxonomyLabel))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addGroup(layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(writeResultCheckBox)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(includePrideModificationsCheckBox)
+                                    .addComponent(writeResultCheckBox))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(taxonomyTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
                             .addComponent(experimentProcessButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addGap(14, 14, 14))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -119,7 +130,9 @@ public class PrideSelectionPanel extends javax.swing.JPanel {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(taxonomyFilterCheckBox)
                         .addComponent(taxonomyLabel)))
-                .addGap(18, 18, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(includePrideModificationsCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(experimentProcessButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(writeResultCheckBox)))
@@ -129,6 +142,7 @@ public class PrideSelectionPanel extends javax.swing.JPanel {
     private javax.swing.JButton experimentProcessButton;
     private javax.swing.JComboBox experimentSelectionComboBox;
     private javax.swing.JLabel experimentSelectionLabel;
+    private javax.swing.JCheckBox includePrideModificationsCheckBox;
     private javax.swing.JCheckBox taxonomyFilterCheckBox;
     private javax.swing.JLabel taxonomyLabel;
     private javax.swing.JTextField taxonomyTextField;

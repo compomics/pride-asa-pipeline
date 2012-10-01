@@ -5,6 +5,8 @@
 package com.compomics.pride_asa_pipeline.gui;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
+import java.beans.PropertyChangeListener;
+import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
  *
@@ -20,6 +22,7 @@ public class PropertyGuiWrapper {
      * The property value
      */
     private Object value;
+    private final SwingPropertyChangeSupport propertyChangeSupport = new SwingPropertyChangeSupport(this);
 
     public PropertyGuiWrapper(String key, Object value) {
         this.key = key;
@@ -45,7 +48,17 @@ public class PropertyGuiWrapper {
      * @param value the new property value
      */
     public void setValue(Object value) {
+        Object oldValue = this.value;
         this.value = value;
+        propertyChangeSupport.firePropertyChange("value", oldValue, value);
         PropertiesConfigurationHolder.getInstance().setProperty(key, value);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
     }
 }

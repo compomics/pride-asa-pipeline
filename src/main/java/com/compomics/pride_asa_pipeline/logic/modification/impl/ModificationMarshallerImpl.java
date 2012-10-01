@@ -67,11 +67,11 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
             Filter modFilter = new ElementFilter("modification");
             Iterator<Element> modIter = eRoot.getDescendants(modFilter);
             while (modIter.hasNext()) {
-                Element eModification = modIter.next();
-                Modification.Location location = readLocation(eModification);
-                List<Element> eAffectedAAs = eModification.getChild("affectedAminoAcids").getChildren("affectedAminoAcid");
+                Element modificationElement = modIter.next();
+                Modification.Location location = readLocation(modificationElement);
+                List<Element> affectedAAsElements = modificationElement.getChild("affectedAminoAcids").getChildren("affectedAminoAcid");
                 Set<AminoAcid> affectedAminoAcids = new HashSet<AminoAcid>();
-                for (Element eAffectedAA : eAffectedAAs) {
+                for (Element eAffectedAA : affectedAAsElements) {
                     String letter = eAffectedAA.getValue();
                     if (letter.equals("*")) { // * is wildcard for all amino acids
                         affectedAminoAcids.addAll(Arrays.asList(AminoAcid.values()));
@@ -81,21 +81,22 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
                 }
 
                 //get all the values from the XML elements
-                String name = eModification.getChild("name").getValue();
-                double monoIsotopicMassShift = Double.parseDouble(eModification.getChild("monoIsotopicMassShift").getValue());
-                double averageMassShift = Double.parseDouble(eModification.getChild("averageMassShift").getValue());
-                Element modAccEle = eModification.getChild("accession");
+                String name = modificationElement.getChild("name").getValue();
+                double monoIsotopicMassShift = Double.parseDouble(modificationElement.getChild("monoIsotopicMassShift").getValue());
+                double averageMassShift = Double.parseDouble(modificationElement.getChild("averageMassShift").getValue());
+                Element accessionElement = modificationElement.getChild("accession");
                 String modAccession = null;
-                if (modAccEle != null) {
-                    modAccession = modAccEle.getValue();
+                if (accessionElement != null) {
+                    modAccession = accessionElement.getValue();
                 }
-                Element modAccessionValueEle = eModification.getChild("accessionValue");
+                Element accessionValueElement = modificationElement.getChild("accessionValue");
                 String modAccessionValue = null;
-                if (modAccessionValueEle != null) {
-                    modAccessionValue = modAccessionValueEle.getValue();
+                if (accessionValueElement != null) {
+                    modAccessionValue = accessionValueElement.getValue();
                 }
 
-                result.add(new Modification(name, monoIsotopicMassShift, averageMassShift, location, affectedAminoAcids, modAccession, modAccessionValue));
+                Modification modification = new Modification(name, monoIsotopicMassShift, averageMassShift, location, affectedAminoAcids, modAccession, modAccessionValue);
+                result.add(modification);
             }
         }
 
@@ -122,6 +123,10 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
                 Element averageMassShiftElement = new Element("averageMassShift");
                 averageMassShiftElement.setText(Double.toString(modification.getAverageMassShift()));
                 modificationElement.addContent(averageMassShiftElement);
+
+                Element originElement = new Element("origin");
+                originElement.setText(modification.getOrigin().toString().toLowerCase());
+                modificationElement.addContent(originElement);
 
                 Element locationElement = new Element("location");
                 locationElement.setText(getPositionAsString(modification.getLocation()));
@@ -193,5 +198,4 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
 
         return locationString;
     }
-    
 }

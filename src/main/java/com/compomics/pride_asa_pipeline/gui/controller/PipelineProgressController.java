@@ -7,6 +7,8 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 import com.compomics.pride_asa_pipeline.gui.PipelineProgressAppender;
 import com.compomics.pride_asa_pipeline.gui.view.PipelineProgressDialog;
 import com.compomics.pride_asa_pipeline.util.GuiUtils;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -37,6 +39,15 @@ public class PipelineProgressController extends WindowAdapter {
         
         //set this controller in PipelineProgressAppender
         PipelineProgressAppender.setPipelineProgressController(this);
+        
+        //add action listener
+        pipelineProgressDialog.getCancelButton().addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                experimentSelectionController.onAnnotationCanceled();
+            }
+        });
     }
 
     public void showProgressBar(int numberOfProgressSteps, String progressHeaderText) {
@@ -67,4 +78,5 @@ public class PipelineProgressController extends WindowAdapter {
         super.windowClosed(e);
         experimentSelectionController.onAnnotationCanceled();
     }
+        
 }

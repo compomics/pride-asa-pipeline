@@ -4,14 +4,13 @@
  */
 package com.compomics.pride_asa_pipeline.repository.impl;
 
-import com.compomics.pride_asa_pipeline.data.mapper.PeptideModificationMapper;
 import com.compomics.pride_asa_pipeline.data.mapper.ExperimentModificationMapper;
+import com.compomics.pride_asa_pipeline.data.mapper.PrecursorModificationMapper;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.repository.ModificationRepository;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
-
-import java.util.List;
 
 /**
  * @author Niels Hulstaert
@@ -53,7 +52,7 @@ public class JdbcModificationRepository extends JdbcDaoSupport implements Modifi
     @Override
     public List<Modification> getModificationsByPeptideId(long peptideId) {
         LOGGER.debug("Loading modifications for precursor with peptide id " + peptideId);
-        List<Modification> modifications = getJdbcTemplate().query(SELECT_MODIFICATION_BY_PEPTIDE_ID, new PeptideModificationMapper(), new Object[]{peptideId});
+        List<Modification> modifications = getJdbcTemplate().query(SELECT_MODIFICATION_BY_PEPTIDE_ID, new PrecursorModificationMapper(), new Object[]{peptideId});
         LOGGER.debug("Finished loading modifications for precursor with peptide id " + peptideId);
         return modifications;
     }

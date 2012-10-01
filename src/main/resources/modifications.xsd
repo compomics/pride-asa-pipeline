@@ -12,9 +12,10 @@
     <xs:element name="modification">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="name" type="xs:string"/>
+                <xs:element name="name" type="xs:string"/>                
                 <xs:element name="monoIsotopicMassShift" type="xs:string"/>
                 <xs:element name="averageMassShift" type="xs:string"/>
+                <xs:element ref="origin" minOccurs="0" maxOccurs="1"/>
                 <xs:element ref="location"/>                
                 <xs:element name="affectedAminoAcids">
                     <xs:complexType>
@@ -28,6 +29,14 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="origin">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:enumeration value="pipeline"/>
+                <xs:enumeration value="pride"/>
+            </xs:restriction>    
+        </xs:simpleType>    
+    </xs:element> 
     <xs:element name="location">
         <xs:simpleType>
             <xs:restriction base="xs:string">

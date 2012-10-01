@@ -112,6 +112,14 @@ public class PipelineParamsController {
             }
         });
     }
+    
+    public void updatePropertyGuiWrapper(String propertyName, Object value){
+        for(PropertyGuiWrapper propertyGuiWrapper : propertyGuiWrapperBindingList){
+            if(propertyGuiWrapper.getKey().equals(propertyName)){
+                propertyGuiWrapper.setValue(value);
+            }
+        }
+    }
 
     private void initPropertyGuiWrappersBindingList() {
         Iterator<String> iterator = PropertiesConfigurationHolder.getInstance().getKeys();
