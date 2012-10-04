@@ -1,10 +1,5 @@
-/*
- *
-
- */
 package com.compomics.pride_asa_pipeline;
 
-import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.gui.controller.MainController;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import java.awt.EventQueue;
@@ -12,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.logging.Level;
 import javax.swing.UIManager;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -22,11 +16,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 
 /**
  *
@@ -38,13 +29,13 @@ public class PrideAsaPipelineStarter {
     private static final String HEADER = "[Pride automtic spectrum annotation pipeline]\n";
     private static final String USAGE = "java -jar <jar file name>";
     private static Options options;
-                
+
     /**
      * Main executable.
      *
      * @param commandLineArguments Commmand-line arguments.
      */
-    public static void main(String[] commandLineArguments) {           
+    public static void main(String[] commandLineArguments) {
         constructOptions();
 
         displayBlankLines(1, System.out);
@@ -85,6 +76,7 @@ public class PrideAsaPipelineStarter {
          * Create and display the form
          */
         EventQueue.invokeLater(new Runnable() {
+
             @Override
             public void run() {
                 //set GUI application context

@@ -27,16 +27,16 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <Component id="fileSelectionLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="419" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      <Component id="processButton" min="-2" max="-2" attributes="0"/>
+                      <Component id="processButton" linkSize="1" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="fileNameLabel" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="selectFileButton" min="-2" max="-2" attributes="0"/>
+                      <Component id="selectFileButton" linkSize="1" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -46,16 +46,16 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="selectFileButton" min="-2" max="-2" attributes="0"/>
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
                       <Component id="fileSelectionLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="fileNameLabel" min="-2" pref="25" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="139" max="32767" attributes="0"/>
               <Component id="processButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -65,12 +65,12 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="fileSelectionLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Select a pipeline result file"/>
+        <Property name="text" type="java.lang.String" value="Select a Pipeline Result File"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="processButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="process"/>
+        <Property name="text" type="java.lang.String" value="Process"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[80, 25]"/>
         </Property>
@@ -95,7 +95,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="selectFileButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="select"/>
+        <Property name="text" type="java.lang.String" value="Browse"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[80, 25]"/>
         </Property>

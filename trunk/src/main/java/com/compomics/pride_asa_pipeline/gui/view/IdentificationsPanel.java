@@ -1,7 +1,3 @@
-/*
- *
-
- */
 package com.compomics.pride_asa_pipeline.gui.view;
 
 import javax.swing.JPanel;
@@ -10,6 +6,7 @@ import javax.swing.JTable;
 /**
  *
  * @author Niels Hulstaert
+ * @author Harald Barsnes
  */
 public class IdentificationsPanel extends javax.swing.JPanel {
 
@@ -18,6 +15,9 @@ public class IdentificationsPanel extends javax.swing.JPanel {
      */
     public IdentificationsPanel() {
         initComponents();
+        identificationsTabelScrollPane.getViewport().setOpaque(false);
+        identificationsTable.getTableHeader().setReorderingAllowed(false);
+        identificationsTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
     }
 
     public JTable getIdentificationsTable() {
@@ -36,10 +36,9 @@ public class IdentificationsPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         identificationsTablePanel = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        identificationsTabelScrollPane = new javax.swing.JScrollPane();
         identificationsTable = new javax.swing.JTable();
         identificationDetailPanel = new javax.swing.JPanel();
 
@@ -47,7 +46,6 @@ public class IdentificationsPanel extends javax.swing.JPanel {
         setMinimumSize(new java.awt.Dimension(520, 520));
         setOpaque(false);
         setPreferredSize(new java.awt.Dimension(520, 520));
-        setLayout(new java.awt.GridBagLayout());
 
         identificationsTablePanel.setBackground(new java.awt.Color(255, 255, 255));
         identificationsTablePanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Identifications"));
@@ -66,48 +64,59 @@ public class IdentificationsPanel extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(identificationsTable);
+        identificationsTabelScrollPane.setViewportView(identificationsTable);
 
         org.jdesktop.layout.GroupLayout identificationsTablePanelLayout = new org.jdesktop.layout.GroupLayout(identificationsTablePanel);
         identificationsTablePanel.setLayout(identificationsTablePanelLayout);
         identificationsTablePanelLayout.setHorizontalGroup(
             identificationsTablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 508, Short.MAX_VALUE)
+            .add(0, 0, Short.MAX_VALUE)
             .add(identificationsTablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE))
+                .add(identificationsTablePanelLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .add(identificationsTabelScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
         identificationsTablePanelLayout.setVerticalGroup(
             identificationsTablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 141, Short.MAX_VALUE)
+            .add(0, 170, Short.MAX_VALUE)
             .add(identificationsTablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
+                .add(identificationsTablePanelLayout.createSequentialGroup()
+                    .add(identificationsTabelScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.3;
-        add(identificationsTablePanel, gridBagConstraints);
-
-        identificationDetailPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Identification detail"));
+        identificationDetailPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Identification Details"));
         identificationDetailPanel.setMinimumSize(new java.awt.Dimension(20, 20));
         identificationDetailPanel.setOpaque(false);
         identificationDetailPanel.setPreferredSize(new java.awt.Dimension(20, 20));
         identificationDetailPanel.setLayout(new java.awt.GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.7;
-        add(identificationDetailPanel, gridBagConstraints);
+
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(identificationDetailPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+                    .add(identificationsTablePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(identificationsTablePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 197, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(identificationDetailPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
+                .addContainerGap())
+        );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel identificationDetailPanel;
+    private javax.swing.JScrollPane identificationsTabelScrollPane;
     private javax.swing.JTable identificationsTable;
     private javax.swing.JPanel identificationsTablePanel;
-    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

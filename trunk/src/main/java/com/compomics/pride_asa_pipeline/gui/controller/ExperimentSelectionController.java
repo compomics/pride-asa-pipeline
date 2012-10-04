@@ -1,7 +1,3 @@
-/*
- *
-
- */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
@@ -31,7 +27,8 @@ import org.springframework.core.io.Resource;
 
 /**
  *
- * @author Niels Hulstaert Hulstaert
+ * @author Niels Hulstaert
+ * @author Harald Barsnes
  */
 public class ExperimentSelectionController {
 
@@ -163,6 +160,7 @@ public class ExperimentSelectionController {
 
         //add action listeners
         prideSelectionPanel.getTaxonomyFilterCheckBox().addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (prideSelectionPanel.getTaxonomyFilterCheckBox().isSelected()) {
@@ -180,6 +178,7 @@ public class ExperimentSelectionController {
         });
 
         prideSelectionPanel.getTaxonomyTextField().addFocusListener(new FocusListener() {
+
             @Override
             public void focusGained(FocusEvent fe) {
             }
@@ -191,6 +190,7 @@ public class ExperimentSelectionController {
         });
 
         prideSelectionPanel.getIncludePrideModificationsCheckBox().addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent ae) {
                 boolean isSelected = prideSelectionPanel.getIncludePrideModificationsCheckBox().isSelected();
@@ -202,6 +202,7 @@ public class ExperimentSelectionController {
         });
 
         prideSelectionPanel.getProcessButton().addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 //execute worker
@@ -228,6 +229,7 @@ public class ExperimentSelectionController {
         fileChooser.setMultiSelectionEnabled(Boolean.FALSE);
         //set MGF file filter
         fileChooser.setFileFilter(new FileFilter() {
+
             @Override
             public boolean accept(File f) {
                 if (f.isDirectory()) {
@@ -255,6 +257,7 @@ public class ExperimentSelectionController {
 
         //add listeners
         fileSelectionPanel.getSelectFileButton().addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 //in response to the button click, show open dialog 
@@ -269,6 +272,7 @@ public class ExperimentSelectionController {
         });
 
         fileSelectionPanel.getProcessButton().addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (fileSelectionPanel.getFileChooser().getSelectedFile() != null) {
@@ -279,7 +283,7 @@ public class ExperimentSelectionController {
                     prideSelectionPanel.getProcessButton().setEnabled(Boolean.FALSE);
                     fileSelectionPanel.getProcessButton().setEnabled(Boolean.FALSE);
                 } else {
-                    mainController.showMessageDialog("Pipeline result import", "Please select an pipeline result file", JOptionPane.WARNING_MESSAGE);
+                    mainController.showMessageDialog("Pipeline Result Import", "Please select an pipeline result file", JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
@@ -294,7 +298,7 @@ public class ExperimentSelectionController {
                     updateComboBox(experimentService.findExperimentAccessionsByTaxonomy(taxonomyId));
                 }
             } catch (NumberFormatException e) {
-                mainController.showMessageDialog("Format error", "Please insert a correct taxonomy ID (e.g. Homo Sapiens ID: 9606)", JOptionPane.ERROR_MESSAGE);
+                mainController.showMessageDialog("Format Error", "Please insert a correct taxonomy ID (e.g. Homo Sapiens ID: 9606)", JOptionPane.ERROR_MESSAGE);
                 prideSelectionPanel.getTaxonomyTextField().setText("");
             }
         }
@@ -325,10 +329,8 @@ public class ExperimentSelectionController {
         @Override
         protected Void doInBackground() throws Exception {
             //show progress bar
-            pipelineProgressController.showProgressBar(NUMBER_OF_PRIDE_PROGRESS_STEPS, "Processing");
-
+            pipelineProgressController.showProgressBar(NUMBER_OF_PRIDE_PROGRESS_STEPS, "Processing.");
             mainController.getPrideSpectrumAnnotator().initIdentifications(getExperimentAccesion());
-
             return null;
         }
 
@@ -339,7 +341,7 @@ public class ExperimentSelectionController {
 
                 //check if the experiment has "useful" identifications
                 if (mainController.getPrideSpectrumAnnotator().getIdentifications().getCompleteIdentifications().isEmpty()) {
-                    mainController.showMessageDialog("Pipeline error", "No useful identifications were found for experiment " + getExperimentAccesion()
+                    mainController.showMessageDialog("Pipeline Error", "No useful identifications were found for experiment " + getExperimentAccesion()
                             + "." + "\n" + "Please try another experiment.", JOptionPane.ERROR_MESSAGE);
                     onAnnotationCanceled();
                 } //check if one of the systematic mass errors per charge state exceeds the threshold value. If so, show a confirmation dialog.
@@ -356,7 +358,7 @@ public class ExperimentSelectionController {
                 LOGGER.error(ex.getMessage(), ex);
             } catch (ExecutionException ex) {
                 onAnnotationCanceled();
-                mainController.showMessageDialog("Unexpected error", "An expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
+                mainController.showMessageDialog("Unexpected Error", "An expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
             } catch (CancellationException ex) {
                 LOGGER.info("annotation for experiment " + getExperimentAccesion() + " cancelled.");
             }
@@ -369,7 +371,6 @@ public class ExperimentSelectionController {
         protected Set<Modification> doInBackground() throws Exception {
             //init the modfications considered in the pipeline
             Set<Modification> prideModifications = mainController.getPrideSpectrumAnnotator().initModifications();
-
             return prideModifications;
         }
 
@@ -399,7 +400,7 @@ public class ExperimentSelectionController {
                 LOGGER.error(ex.getMessage(), ex);
             } catch (ExecutionException ex) {
                 onAnnotationCanceled();
-                mainController.showMessageDialog("Unexpected error", "An expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
+                mainController.showMessageDialog("Unexpected Error", "An expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
             } catch (CancellationException ex) {
                 LOGGER.info("annotation for experiment " + getExperimentAccesion() + " cancelled.");
             }
@@ -452,13 +453,12 @@ public class ExperimentSelectionController {
 
         @Override
         protected SpectrumAnnotatorResult doInBackground() throws Exception {
-            SpectrumAnnotatorResult spectrumAnnotatorResult = null;
 
             //show progress bar
-            pipelineProgressController.showProgressBar(NUMBER_OF_FILE_PROGRESS_STEPS, "Importing");
+            pipelineProgressController.showProgressBar(NUMBER_OF_FILE_PROGRESS_STEPS, "Importing.");
 
             LOGGER.info("Importing pipeline result file " + fileSelectionPanel.getFileChooser().getSelectedFile().getName());
-            spectrumAnnotatorResult = resultHandler.readResultFromFile(fileSelectionPanel.getFileChooser().getSelectedFile());
+            SpectrumAnnotatorResult spectrumAnnotatorResult = resultHandler.readResultFromFile(fileSelectionPanel.getFileChooser().getSelectedFile());
             LOGGER.info("Finished importing pipeline result file " + fileSelectionPanel.getFileChooser().getSelectedFile().getName());
 
             return spectrumAnnotatorResult;

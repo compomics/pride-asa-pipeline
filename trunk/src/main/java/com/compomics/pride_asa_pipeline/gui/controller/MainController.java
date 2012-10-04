@@ -1,35 +1,34 @@
-/*
- *
-
- */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
-import java.awt.CardLayout;
+import com.compomics.util.examples.BareBonesBrowserLaunch;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import org.apache.log4j.Logger;
 import org.jdesktop.beansbinding.ELProperty;
 
 /**
  *
  * @author Niels Hulstaert
+ * @author Harald Barsnes
  */
 public class MainController implements ActionListener {
 
     private static final Logger LOGGER = Logger.getLogger(MainController.class);
-    private static final String PIPELINE_PANEL_CARD_NAME = "pipelinePanel";
-    private static final String MODIFICATIONS_CARD_NAME = "modificationsParentPanel";
-    private static final String PIPELINE_PARAMS_CARD_NAME = "pipelineParamsParentPanel";
     //view
     private MainFrame mainFrame;
     //child controllers
@@ -89,15 +88,18 @@ public class MainController implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        String cardName = actionEvent.getActionCommand();
-
-        CardLayout cardLayout = (CardLayout) mainFrame.getMainPanel().getLayout();
-        cardLayout.show(mainFrame.getMainPanel(), cardName);
+        
+        if (((JMenuItem) actionEvent.getSource()).getText().equalsIgnoreCase("Configuration")) {
+            pipelineParamsController.getPipelineConfigDialog().setVisible(true);
+        } else { // modification details
+            modificationsController.getModificationsConfigDialog().setVisible(true);
+        }
     }
 
     public void init() {
         //set uncaught exception handler
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 LOGGER.error(e.getMessage(), e);
@@ -105,10 +107,17 @@ public class MainController implements ActionListener {
                 onAnnotationCanceled();
             }
         });
+        
+        // check for new version
+        checkForNewVersion(getVersion());
 
         mainFrame = new MainFrame();
 
-        //workaround for betterbeansbinding logging issue
+        // set the title of the frame and add the icon
+        mainFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/pride-asap.png")));
+        mainFrame.setTitle("pride-asap " + getVersion());
+
+        //workaround for better beansbinding logging issue
         org.jdesktop.beansbinding.util.logging.Logger.getLogger(ELProperty.class.getName()).setLevel(Level.SEVERE);
 
         //init child controllers
@@ -125,23 +134,11 @@ public class MainController implements ActionListener {
 
         mainFrame.getPrideSelectionParentPanel().add(experimentSelectionController.getPrideSelectionPanel(), gridBagConstraints);
         mainFrame.getFileSelectionParentPanel().add(experimentSelectionController.getFileSelectionPanel(), gridBagConstraints);
-        mainFrame.getModificationsParentPanel().add(modificationsController.getModificationsPanel(), gridBagConstraints);
         mainFrame.getIdentificationsParentPanel().add(pipelineResultController.getIdentificationsPanel(), gridBagConstraints);
         mainFrame.getSummaryParentPanel().add(pipelineResultController.getSummaryPanel(), gridBagConstraints);
-        mainFrame.getPipelineParamsParentPanel().add(pipelineParamsController.getPipelineParamsPanel(), gridBagConstraints);
-
-        //add action listeners and action commands       
-        mainFrame.getPipelineButton().setActionCommand(PIPELINE_PANEL_CARD_NAME);
-        mainFrame.getPipelineButton().addActionListener(this);
-        mainFrame.getPipelineParamsButton().setActionCommand(PIPELINE_PARAMS_CARD_NAME);
-        mainFrame.getPipelineParamsButton().addActionListener(this);
-        mainFrame.getModificationsButton().setActionCommand(MODIFICATIONS_CARD_NAME);
-        mainFrame.getModificationsButton().addActionListener(this);
-
-
-        //set pipeline panel visible in card layout
-        CardLayout cardLayout = (CardLayout) mainFrame.getMainPanel().getLayout();
-        cardLayout.show(mainFrame.getMainPanel(), PIPELINE_PANEL_CARD_NAME);
+        
+        mainFrame.getModificationsMenuItem().addActionListener(this);
+        mainFrame.getPipelineConfigurationMenuItem().addActionListener(this);
 
         //fit to screen
         mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -166,7 +163,7 @@ public class MainController implements ActionListener {
     }
 
     public void showUnexpectedErrorDialog(String message) {
-        showMessageDialog("Unexpected error", "An expected error occured: "
+        showMessageDialog("Unexpected Error", "An expected error occured: "
                 + "\n" + message
                 + "\n" + "please try to rerun the application.", JOptionPane.ERROR_MESSAGE);
     }
@@ -183,5 +180,92 @@ public class MainController implements ActionListener {
         LOGGER.info("Annotation canceled.");
         prideSpectrumAnnotator.clearPipeline();
         pipelineResultController.clear();
+    }
+
+    /**
+     * Retrieves the version number set in the pom file.
+     *
+     * @return the version number of PeptideShaker
+     */
+    public String getVersion() {
+
+        java.util.Properties p = new java.util.Properties();
+
+        try {
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream("pride-asap.properties");
+            p.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return p.getProperty("pride-asap.version");
+    }
+
+    /**
+     * Check if a newer version of pride-asap is available.
+     *
+     * @param currentVersion the version number of the currently running
+     * reporter
+     */
+    private static void checkForNewVersion(String currentVersion) {
+
+        try {
+            boolean deprecatedOrDeleted = false;
+            URL downloadPage = new URL(
+                    "http://code.google.com/p/pride-asa-pipeline/downloads/detail?name=pride-asa-pipeline-"
+                    + currentVersion + ".zip");
+
+            if ((java.net.HttpURLConnection) downloadPage.openConnection() != null) {
+
+                int respons = ((java.net.HttpURLConnection) downloadPage.openConnection()).getResponseCode();
+
+                // 404 means that the file no longer exists, which means that
+                // the running version is no longer available for download,
+                // which again means that a never version is available.
+                if (respons == 404) {
+                    deprecatedOrDeleted = true;
+                } else {
+
+                    // also need to check if the available running version has been
+                    // deprecated (but not deleted)
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(downloadPage.openStream()));
+
+                    String inputLine;
+
+                    while ((inputLine = in.readLine()) != null && !deprecatedOrDeleted) {
+                        if (inputLine.lastIndexOf("Deprecated") != -1
+                                && inputLine.lastIndexOf("Deprecated Downloads") == -1
+                                && inputLine.lastIndexOf("Deprecated downloads") == -1) {
+                            deprecatedOrDeleted = true;
+                        }
+                    }
+
+                    in.close();
+                }
+
+                // informs the user about an updated version of the tool, unless the user
+                // is running a beta version
+                if (deprecatedOrDeleted && currentVersion.lastIndexOf("beta") == -1) {
+                    int option = JOptionPane.showConfirmDialog(null,
+                            "A newer version of pride-asap is available.\n"
+                            + "Do you want to upgrade?",
+                            "Upgrade Available",
+                            JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (option == JOptionPane.YES_OPTION) {
+                        BareBonesBrowserLaunch.openURL("http://pride-asa-pipeline.googlecode.com/");
+                        System.exit(0);
+                    } else if (option == JOptionPane.CANCEL_OPTION) {
+                        System.exit(0);
+                    }
+                }
+            }
+        } catch (UnknownHostException e) {
+            // ignore exception
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

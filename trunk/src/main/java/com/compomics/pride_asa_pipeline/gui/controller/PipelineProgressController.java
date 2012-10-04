@@ -1,29 +1,27 @@
-/*
- *
-
- */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.gui.PipelineProgressAppender;
-import com.compomics.pride_asa_pipeline.gui.view.PipelineProgressDialog;
 import com.compomics.pride_asa_pipeline.util.GuiUtils;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import com.compomics.util.gui.waiting.waitinghandlers.ProgressDialogX;
+import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 /**
  *
  * @author Niels Hulstaert Hulstaert
+ * @author Harald Barsnes
  */
 public class PipelineProgressController extends WindowAdapter {
-        
+
     //model
     private int progress;
     //view
-    private PipelineProgressDialog pipelineProgressDialog;
+    private ProgressDialogX pipelineProgressDialog;
     //parent controller
     private ExperimentSelectionController experimentSelectionController;
+    
+    private boolean progressFinished = false;
 
     public ExperimentSelectionController getExperimentSelectionController() {
         return experimentSelectionController;
@@ -34,36 +32,48 @@ public class PipelineProgressController extends WindowAdapter {
     }
 
     public void init() {
-        pipelineProgressDialog = new PipelineProgressDialog(experimentSelectionController.getMainController().getMainFrame());
-        pipelineProgressDialog.addWindowListener(this);
-        
         //set this controller in PipelineProgressAppender
         PipelineProgressAppender.setPipelineProgressController(this);
-        
-        //add action listener
-        pipelineProgressDialog.getCancelButton().addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                experimentSelectionController.onAnnotationCanceled();
-            }
-        });
     }
 
     public void showProgressBar(int numberOfProgressSteps, String progressHeaderText) {
-        pipelineProgressDialog.getProgressBar().setMaximum(numberOfProgressSteps);
-        pipelineProgressDialog.getProgressHeaderLabel().setText(progressHeaderText);
+
+        pipelineProgressDialog = new ProgressDialogX(experimentSelectionController.getMainController().getMainFrame(),
+                Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/pride-asap.png")),
+                Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/pride-asap-orange.png")),
+                true);
+        pipelineProgressDialog.addWindowListener(this);
+
+        pipelineProgressDialog.getProgressBar().setMaximum(numberOfProgressSteps + 1);
+        pipelineProgressDialog.setTitle(progressHeaderText + " Please Wait...");
         progress = 1;
         GuiUtils.centerDialogOnFrame(experimentSelectionController.getMainController().getMainFrame(), pipelineProgressDialog);
-        pipelineProgressDialog.setVisible(Boolean.TRUE);
+        progressFinished = false;
+
+        new Thread(new Runnable() {
+
+            public void run() {
+                try {
+                    pipelineProgressDialog.setVisible(Boolean.TRUE);
+                } catch (IndexOutOfBoundsException e) {
+                    // ignore
+                }
+            }
+        }, "ProgressDialog").start();
+    }
+    
+    public boolean isRunCancelled () {
+        return pipelineProgressDialog.isRunCanceled();
     }
 
     public void hideProgressDialog() {
+        progressFinished = true;
+        pipelineProgressDialog.setRunFinished(); // @TODO: this should be on but interfers with the windowClosed event
         pipelineProgressDialog.setVisible(Boolean.FALSE);
     }
 
     public void setProgressInfoText(String progressInfoText) {
-        pipelineProgressDialog.getProgressInfoLabel().setText(progressInfoText);
+        pipelineProgressDialog.setString(progressInfoText);
 
         pipelineProgressDialog.getProgressBar().setValue(progress);
         progress++;
@@ -76,7 +86,8 @@ public class PipelineProgressController extends WindowAdapter {
     @Override
     public void windowClosed(WindowEvent e) {
         super.windowClosed(e);
-        experimentSelectionController.onAnnotationCanceled();
+        if (!progressFinished) {
+            experimentSelectionController.onAnnotationCanceled();
+        } 
     }
-        
 }

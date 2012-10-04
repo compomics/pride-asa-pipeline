@@ -1,7 +1,3 @@
-/*
- *
-
- */
 package com.compomics.pride_asa_pipeline.service.impl;
 
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
@@ -20,6 +16,7 @@ import java.util.Vector;
 /**
  *
  * @author Niels Hulstaert
+ * @author Harald Barsnes
  */
 public class SpectrumPanelServiceImpl implements SpectrumPanelService {
 
@@ -35,20 +32,21 @@ public class SpectrumPanelServiceImpl implements SpectrumPanelService {
 
     @Override
     public SpectrumPanel getSpectrumPanel(Identification identification) {
-        SpectrumPanel spectrumPanel = null;
 
         //get spectrum peaks for the selected identification
         List<Peak> peaks = spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
 
         //initialize new SpectrumPanel
-        spectrumPanel = new SpectrumPanel(PeakUtils.getMzRatiosAsArray(peaks), 
-                PeakUtils.getIntensitiesAsArray(peaks), 
-                identification.getPeptide().getMzRatio(), 
-                Integer.toString(identification.getPeptide().getCharge()), 
-                "test");
-        
+        SpectrumPanel spectrumPanel = new SpectrumPanel(PeakUtils.getMzRatiosAsArray(peaks),
+                PeakUtils.getIntensitiesAsArray(peaks),
+                identification.getPeptide().getMzRatio(),
+                Integer.toString(identification.getPeptide().getCharge()), "", 40, false, false, false);
+
+        // remove the border
+        spectrumPanel.setBorder(null);
+
         spectrumPanel.showAnnotatedPeaksOnly(Boolean.TRUE);
-        
+
         //add peak annotations
         if (identification.getAnnotationData().getFragmentIonAnnotations() != null) {
             spectrumPanel.setAnnotations(getPeakAnnotations(identification));
@@ -71,8 +69,15 @@ public class SpectrumPanelServiceImpl implements SpectrumPanelService {
         Vector<DefaultSpectrumAnnotation> peakAnnotations = new Vector();
 
         for (FragmentIonAnnotation fragmentIonAnnotation : identification.getAnnotationData().getFragmentIonAnnotations()) {
-            String label = fragmentIonAnnotation.getIon_type_name().substring(0, 1) + getIonChargeString(fragmentIonAnnotation.getIon_charge()) + fragmentIonAnnotation.getFragment_ion_number();
-            DefaultSpectrumAnnotation defaultSpectrumAnnotation = new DefaultSpectrumAnnotation(fragmentIonAnnotation.getMz(), fragmentIonAnnotation.getMass_error(), SpectrumPanel.determineColorOfPeak(label), label);
+            String label = fragmentIonAnnotation.getIon_type_name().substring(0, 1);
+            label += fragmentIonAnnotation.getFragment_ion_number();
+            
+            if (fragmentIonAnnotation.getIon_charge() > 1) {
+                label += getIonChargeString(fragmentIonAnnotation.getIon_charge());
+            }
+            
+            DefaultSpectrumAnnotation defaultSpectrumAnnotation = new DefaultSpectrumAnnotation(
+                    fragmentIonAnnotation.getMz(), fragmentIonAnnotation.getMass_error(), SpectrumPanel.determineColorOfPeak(label), label);
             peakAnnotations.add(defaultSpectrumAnnotation);
         }
 

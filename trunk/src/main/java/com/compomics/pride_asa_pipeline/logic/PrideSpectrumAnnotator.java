@@ -61,6 +61,8 @@ public class PrideSpectrumAnnotator {
 
     /**
      * Getters and setters.
+     * 
+     * @return the mass recalibrator
      */
     public MassRecalibrator getMassRecalibrator() {
         return massRecalibrator;
@@ -167,13 +169,13 @@ public class PrideSpectrumAnnotator {
         LOGGER.debug("Loading charge states for experiment " + experimentAccession);
         initChargeStates();
 
-        LOGGER.info("Loading identifications for experiment " + experimentAccession);
+        LOGGER.info("loading identifications for experiment " + experimentAccession);
         loadExperimentIdentifications(experimentAccession);
         LOGGER.debug("Finished loading identifications for experiment " + experimentAccession);
 
         ///////////////////////////////////////////////////////////////////////
         //FIRST STEP: find the systematic mass error (if there is one)
-        LOGGER.info("Finding systematic mass errors");
+        LOGGER.info("finding systematic mass errors");
         MassRecalibrationResult massRecalibrationResult = findSystematicMassError(consideredChargeStates, identifications.getCompletePeptides());
         LOGGER.debug("Finished finding systematic mass errors:" + "\n" + massRecalibrationResult.toString());
         spectrumAnnotatorResult.setMassRecalibrationResult(massRecalibrationResult);
@@ -235,7 +237,7 @@ public class PrideSpectrumAnnotator {
         //              explain a given mass delta (if there is one) -> Zen Archer
         //get analyzer data
         analyzerData = experimentService.getAnalyzerData(experimentAccession);
-        LOGGER.info("Finding modification combinations");
+        LOGGER.info("finding modification combinations");
         //set fragment mass error for the identification scorer
         spectrumMatcher.getIdentificationScorer().setFragmentMassError(analyzerData.getFragmentMassError());
         Map<Identification, Set<ModificationCombination>> massDeltaExplanationsMap = findModificationCombinations(spectrumAnnotatorResult.getMassRecalibrationResult(), identifications);

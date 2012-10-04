@@ -1,5 +1,3 @@
-/*
- */
 package com.compomics.pride_asa_pipeline.gui;
 
 import com.compomics.pride_asa_pipeline.model.Modification;
@@ -34,6 +32,7 @@ import org.jfree.data.statistics.HistogramType;
 /**
  *
  * @author Niels Hulstaert
+ * @author Harald Barsnes
  */
 public class ChartFactory {
 
@@ -49,7 +48,6 @@ public class ChartFactory {
     private static final Color PRIDE_MODIFICATION_COLOR = Color.BLUE;
 
     public static JFreeChart getPrecursorMassDeltasChart(double[] precursorMassDeltaValues) {
-        JFreeChart precursorMassDeltasChart = null;
 
         //create new precursor mass delta dataset
         HistogramDataset precMassDeltasDataset = new HistogramDataset();
@@ -58,17 +56,17 @@ public class ChartFactory {
         //sort array in order to find min and max values
         Arrays.sort(precursorMassDeltaValues);
         precMassDeltasDataset.addSeries("precursorMassDeltaSeries", precursorMassDeltaValues, NUMBER_OF_PRECURSOR_MASS_DELTA_BINS, precursorMassDeltaValues[0] - 0.5, precursorMassDeltaValues[precursorMassDeltaValues.length - 1] + 0.5);
-        precursorMassDeltasChart = org.jfree.chart.ChartFactory.createHistogram(
-                "Precursor mass delta", "mass delta (d.)", "frequency", precMassDeltasDataset,
+        JFreeChart precursorMassDeltasChart = org.jfree.chart.ChartFactory.createHistogram(
+                "Precursor Mass Delta", "mass delta (d.)", "frequency", precMassDeltasDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
         precursorMassDeltasChart.getPlot().setBackgroundPaint(Color.WHITE);
+        precursorMassDeltasChart.getPlot().setOutlineVisible(false);
         GuiUtils.setShadowVisible(precursorMassDeltasChart, Boolean.FALSE);
 
         return precursorMassDeltasChart;
     }
 
     public static JFreeChart getFragmentMassDeltasChart(List<Double> fragmentMassDeltaValues) {
-        JFreeChart fragmentMassDeltasChart = null;
 
         //create new fragment ion mass delta dataset
         HistogramDataset fragMassDeltasDataset = new HistogramDataset();
@@ -77,17 +75,17 @@ public class ChartFactory {
         //sort array in order to find min and max values
         Collections.sort(fragmentMassDeltaValues);
         fragMassDeltasDataset.addSeries("precursorMassDeltaSeries", Doubles.toArray(fragmentMassDeltaValues), NUMBER_OF_ION_FRAGMENT_MASS_DELTA_BINS, fragmentMassDeltaValues.get(0) - 0.5, fragmentMassDeltaValues.get(fragmentMassDeltaValues.size() - 1) + 0.5);
-        fragmentMassDeltasChart = org.jfree.chart.ChartFactory.createHistogram(
-                "Fragment ion mass delta", "mass delta (d.)", "frequency", fragMassDeltasDataset,
+        JFreeChart fragmentMassDeltasChart = org.jfree.chart.ChartFactory.createHistogram(
+                "Fragment Ion Mass Delta", "mass delta (d.)", "frequency", fragMassDeltasDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
         fragmentMassDeltasChart.getPlot().setBackgroundPaint(Color.WHITE);
+        fragmentMassDeltasChart.getPlot().setOutlineVisible(false);
         GuiUtils.setShadowVisible(fragmentMassDeltasChart, Boolean.FALSE);
 
         return fragmentMassDeltasChart;
     }
 
     public static JFreeChart getIonCoverageChart(String title, double[] ion1CoverageValues, double[] ion2CoverageValues) {
-        JFreeChart ionCoverageChart = null;
 
         //create new identification scores dataset
         HistogramDataset ionCoverageDataset = new HistogramDataset();
@@ -95,35 +93,35 @@ public class ChartFactory {
 
         ionCoverageDataset.addSeries("1+ ladder", ion1CoverageValues, NUMBER_OF_ION_COVERAGE_BINS, 0.0, 100.0);
         ionCoverageDataset.addSeries("2+ ladder", ion2CoverageValues, NUMBER_OF_ION_COVERAGE_BINS, 0.0, 100.0);
-        ionCoverageChart = org.jfree.chart.ChartFactory.createHistogram(
+        JFreeChart ionCoverageChart = org.jfree.chart.ChartFactory.createHistogram(
                 title, "coverage (%)", "rel. freq.", ionCoverageDataset,
                 PlotOrientation.VERTICAL, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);
         ionCoverageChart.getPlot().setBackgroundPaint(Color.WHITE);
         ionCoverageChart.getPlot().setForegroundAlpha(0.8F);
+        ionCoverageChart.getPlot().setOutlineVisible(false);
         GuiUtils.setShadowVisible(ionCoverageChart, Boolean.FALSE);
 
         return ionCoverageChart;
     }
 
     public static JFreeChart getScoresChart(double[] scoresValues) {
-        JFreeChart scoresChart = null;
 
         //create new identification scores dataset
         HistogramDataset scoresDataset = new HistogramDataset();
         scoresDataset.setType(HistogramType.FREQUENCY);
 
         scoresDataset.addSeries("scoreSeries", scoresValues, NUMBER_OF_SCORE_BINS, 0.0, 1.0);
-        scoresChart = org.jfree.chart.ChartFactory.createHistogram(
-                "Fragment ion score", "score", "frequency", scoresDataset,
+        JFreeChart scoresChart = org.jfree.chart.ChartFactory.createHistogram(
+                "Fragment Ion Score", "score", "frequency", scoresDataset,
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
         scoresChart.getPlot().setBackgroundPaint(Color.WHITE);
+        scoresChart.getPlot().setOutlineVisible(false);
         GuiUtils.setShadowVisible(scoresChart, Boolean.FALSE);
 
         return scoresChart;
     }
 
     public static JFreeChart getIdentificationsChart(SpectrumAnnotatorResult spectrumAnnotatorResult) {
-        JFreeChart identificationsChart = null;
 
         //create new identificiations data set
         DefaultPieDataset identificationsDataset = new DefaultPieDataset();
@@ -131,8 +129,8 @@ public class ChartFactory {
         identificationsDataset.setValue(MODIFIED_LABEL + "(" + spectrumAnnotatorResult.getModifiedPrecursors().size() + ", " + (MathUtils.roundDouble(((double) spectrumAnnotatorResult.getModifiedPrecursors().size() / spectrumAnnotatorResult.getNumberOfIdentifications()) * 100, 2)) + "%)", spectrumAnnotatorResult.getModifiedPrecursors().size());
         identificationsDataset.setValue(UNEXPLAINED_LABEL + "(" + spectrumAnnotatorResult.getUnexplainedIdentifications().size() + ", " + (MathUtils.roundDouble(((double) spectrumAnnotatorResult.getUnexplainedIdentifications().size() / spectrumAnnotatorResult.getNumberOfIdentifications()) * 100, 2)) + "%)", spectrumAnnotatorResult.getUnexplainedIdentifications().size());
 
-        identificationsChart = org.jfree.chart.ChartFactory.createPieChart3D(
-                "Identifications(" + spectrumAnnotatorResult.getNumberOfIdentifications() + ")", // chart title
+        JFreeChart identificationsChart = org.jfree.chart.ChartFactory.createPieChart(
+                "Identifications (" + spectrumAnnotatorResult.getNumberOfIdentifications() + ")", // chart title
                 identificationsDataset, // data
                 Boolean.TRUE, // include legend
                 Boolean.FALSE,
@@ -145,21 +143,26 @@ public class ChartFactory {
         plot.setCircular(Boolean.TRUE);
         plot.setLabelGap(0.02);
         plot.setBackgroundPaint(Color.WHITE);
+        
+        // remove the shadow
+        plot.setShadowXOffset(0);
+        plot.setShadowYOffset(0);
+        
         //change pie colors
         for (int i = 0; i < identificationsDataset.getItemCount(); i++) {
             Comparable key = identificationsDataset.getKey(i);
             plot.setSectionPaint(key, PIE_COLORS[i]);
         }
 
+        identificationsChart.getPlot().setOutlineVisible(false);
         return identificationsChart;
     }
 
     public static JFreeChart getModificationsChart(Map<Modification, Integer> modifications, int numberOfModifications) {
-        JFreeChart modificationsChart = null;
 
         //keep track of origins for color rendering
         Modification.Origin[] origins = new Modification.Origin[numberOfModifications];
-        int index = 0;        
+        int index = 0;
         DefaultCategoryDataset modificationsDataset = new DefaultCategoryDataset();
         for (Modification modification : modifications.keySet()) {
             double relativeCount = (double) (modifications.get(modification)) / (double) (numberOfModifications);
@@ -168,7 +171,7 @@ public class ChartFactory {
             index++;
         }
 
-        modificationsChart = org.jfree.chart.ChartFactory.createBarChart(
+        JFreeChart modificationsChart = org.jfree.chart.ChartFactory.createBarChart(
                 "Modifications",
                 "modification",
                 "relative occurance",
@@ -185,6 +188,7 @@ public class ChartFactory {
         CategoryAxis xAxis = (CategoryAxis) countPlot.getDomainAxis();
         xAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
         xAxis.setMaximumCategoryLabelLines(2);
+        modificationsChart.getPlot().setOutlineVisible(false);
         GuiUtils.setShadowVisible(modificationsChart, Boolean.FALSE);
 
         return modificationsChart;
@@ -193,9 +197,9 @@ public class ChartFactory {
     private static void addModificationsLegend(Set<Modification> modifications, CategoryPlot countPlot) {
         LegendItemCollection legendItemCollection = new LegendItemCollection();
         if (!modifications.isEmpty()) {
-            if(containsModificationsFromOrigin(modifications, Modification.Origin.PIPELINE)){
-            LegendItem pipelineModLegendItem = new LegendItem("pipeline modification(s)", "-", null, null, Plot.DEFAULT_LEGEND_ITEM_BOX, PIPELINE_MODIFICATION_COLOR);
-            legendItemCollection.add(pipelineModLegendItem);
+            if (containsModificationsFromOrigin(modifications, Modification.Origin.PIPELINE)) {
+                LegendItem pipelineModLegendItem = new LegendItem("pipeline modification(s)", "-", null, null, Plot.DEFAULT_LEGEND_ITEM_BOX, PIPELINE_MODIFICATION_COLOR);
+                legendItemCollection.add(pipelineModLegendItem);
             }
             if (containsModificationsFromOrigin(modifications, Modification.Origin.PRIDE)) {
                 LegendItem prideModLegendItem = new LegendItem("pride modification(s)", "-", null, null, Plot.DEFAULT_LEGEND_ITEM_BOX, PRIDE_MODIFICATION_COLOR);
@@ -207,7 +211,7 @@ public class ChartFactory {
 
     private static boolean containsModificationsFromOrigin(Set<Modification> modifications, Modification.Origin origin) {
         boolean containsModificationsFromOrigin = Boolean.FALSE;
-        for (Modification modification : modifications) {            
+        for (Modification modification : modifications) {
             if (modification.getOrigin().equals(origin)) {
                 containsModificationsFromOrigin = Boolean.TRUE;
                 break;
