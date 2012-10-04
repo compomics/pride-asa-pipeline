@@ -396,7 +396,9 @@ public class FileResultHandlerImpl implements FileResultHandler {
         if (modifications.containsKey(modificationName)) {
             return modifications.get(modificationName);
         } else {
-            return new Modification(0.0, Modification.Location.NON_TERMINAL, NOT_AVAILABLE, modificationName);
+            Modification modification = new Modification(0.0, Modification.Location.NON_TERMINAL, NOT_AVAILABLE, modificationName);
+            modification.setOrigin(Modification.Origin.PIPELINE);
+            return modification;
         }
     }
 }

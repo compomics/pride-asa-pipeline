@@ -285,13 +285,7 @@
             <artifactId>spring-test</artifactId>
             <version>${org.springframework.version}</version>
         </dependency>
-
-        <!--        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-            <version>${org.springframework.version}</version>
-        </dependency>-->
-
+        
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
@@ -311,20 +305,6 @@
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.pride</groupId>
-            <artifactId>pride-core</artifactId>
-            <type>jar</type>
-            <version>2.8.11</version>
-        </dependency>
-
-        <dependency>
-            <groupId>uk.ac.ebi.pride</groupId>
-            <artifactId>pride-core</artifactId>
-            <type>javadoc</type>
-            <version>2.8.11</version>
-        </dependency>       
-
-        <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>omssa-xsd</artifactId>
             <version>0.3.1</version>
@@ -339,7 +319,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
-            <version>3.8.6</version>
+            <version>3.9.6</version>
         </dependency>
 
         <dependency>

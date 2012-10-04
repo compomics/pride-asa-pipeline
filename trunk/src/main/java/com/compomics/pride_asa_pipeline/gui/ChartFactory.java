@@ -159,9 +159,7 @@ public class ChartFactory {
 
         //keep track of origins for color rendering
         Modification.Origin[] origins = new Modification.Origin[numberOfModifications];
-        int index = 0;
-        //create 2 new modifications data sets,
-        //one for the pipeline mods and one for the pride mods
+        int index = 0;        
         DefaultCategoryDataset modificationsDataset = new DefaultCategoryDataset();
         for (Modification modification : modifications.keySet()) {
             double relativeCount = (double) (modifications.get(modification)) / (double) (numberOfModifications);
@@ -209,7 +207,7 @@ public class ChartFactory {
 
     private static boolean containsModificationsFromOrigin(Set<Modification> modifications, Modification.Origin origin) {
         boolean containsModificationsFromOrigin = Boolean.FALSE;
-        for (Modification modification : modifications) {
+        for (Modification modification : modifications) {            
             if (modification.getOrigin().equals(origin)) {
                 containsModificationsFromOrigin = Boolean.TRUE;
                 break;

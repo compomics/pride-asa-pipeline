@@ -4,8 +4,10 @@
  */
 package com.compomics.pride_asa_pipeline.service;
 
+import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import java.io.File;
+import java.util.Set;
 
 /**
  *
@@ -35,5 +37,13 @@ public interface ResultHandler {
      * @param spectrumAnnotatorResult the spectrum annotator result
      */
     void writeUsedModificationsToFile(SpectrumAnnotatorResult spectrumAnnotatorResult);
+    
+    /**
+     * Writes the used modifications in the annotation pipeline to file. 
+     * 
+     * @param experimentAccession the experiment accession
+     * @param usedModifications the used modifications
+     */
+    void writeUsedModificationsToFile(String experimentAccession, Set<Modification> usedModifications);
     
 }
