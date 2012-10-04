@@ -131,7 +131,7 @@ public class MainFrame extends javax.swing.JFrame {
         prideSelectionParentPanel.setOpaque(false);
         prideSelectionParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
         prideSelectionParentPanel.setLayout(new java.awt.GridBagLayout());
-        experimentSelectionTabbedPane.addTab("Pride", prideSelectionParentPanel);
+        experimentSelectionTabbedPane.addTab("PRIDE", prideSelectionParentPanel);
 
         fileSelectionParentPanel.setOpaque(false);
         fileSelectionParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));

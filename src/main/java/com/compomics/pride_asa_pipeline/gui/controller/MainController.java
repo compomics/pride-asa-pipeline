@@ -12,7 +12,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -152,14 +151,18 @@ public class MainController implements ActionListener {
     }
 
     public void showMessageDialog(String title, String message, int messageType) {
-        //add message to JTextArea
-        JTextArea textArea = new JTextArea(message);
-        //put JTextArea in JScrollPane
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(400, 100));
-        textArea.setEditable(Boolean.FALSE);
+        if (messageType == JOptionPane.ERROR_MESSAGE) {
+            //add message to JTextArea
+            JTextArea textArea = new JTextArea(message);
+            //put JTextArea in JScrollPane
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setPreferredSize(new Dimension(600, 200));
+            textArea.setEditable(Boolean.FALSE);
 
-        JOptionPane.showMessageDialog(mainFrame.getContentPane(), scrollPane, title, messageType);
+            JOptionPane.showMessageDialog(mainFrame.getContentPane(), scrollPane, title, messageType);
+        } else {
+            JOptionPane.showMessageDialog(mainFrame.getContentPane(), message, title, messageType);
+        }
     }
 
     public void showUnexpectedErrorDialog(String message) {

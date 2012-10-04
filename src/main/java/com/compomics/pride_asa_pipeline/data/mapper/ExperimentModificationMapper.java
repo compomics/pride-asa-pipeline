@@ -49,8 +49,7 @@ public class ExperimentModificationMapper implements RowMapper<Modification> {
         
         if(location == Location.NON_TERMINAL){
             modification.getAffectedAminoAcids().add(AminoAcid.getAA(peptide.substring(sequenceIndex, sequenceIndex + 1)));
-        }
-        
+        }        
         modification.setOrigin(Modification.Origin.PRIDE);
         
         return modification;

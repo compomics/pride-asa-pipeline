@@ -55,8 +55,6 @@ public class IdentificationsPanel extends javax.swing.JPanel {
         identificationsTablePanel.setOpaque(false);
         identificationsTablePanel.setPreferredSize(new java.awt.Dimension(20, 20));
 
-        jScrollPane1.setOpaque(false);
-
         identificationsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -74,11 +72,15 @@ public class IdentificationsPanel extends javax.swing.JPanel {
         identificationsTablePanel.setLayout(identificationsTablePanelLayout);
         identificationsTablePanelLayout.setHorizontalGroup(
             identificationsTablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
+            .add(0, 508, Short.MAX_VALUE)
+            .add(identificationsTablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE))
         );
         identificationsTablePanelLayout.setVerticalGroup(
             identificationsTablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+            .add(0, 141, Short.MAX_VALUE)
+            .add(identificationsTablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();

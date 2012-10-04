@@ -415,7 +415,8 @@ public class ExperimentSelectionController {
             //write result to file if necessary
             if (prideSelectionPanel.getWriteResultCheckBox().isSelected()) {
                 resultHandler.writeResultToFile(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
-                resultHandler.writeUsedModificationsToFile(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
+                resultHandler.writeUsedModificationsToFile(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getExperimentAccession(),
+                        mainController.getPipelineResultController().getUsedModifications().keySet());
             }
 
             return null;

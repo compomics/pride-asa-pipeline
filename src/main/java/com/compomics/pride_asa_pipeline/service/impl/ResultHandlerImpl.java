@@ -61,13 +61,16 @@ public class ResultHandlerImpl implements ResultHandler {
     }
 
     @Override
-    public void writeUsedModificationsToFile(SpectrumAnnotatorResult spectrumAnnotatorResult) {
-        Resource usedModificationsResource = new FileSystemResource(PropertiesConfigurationHolder.getInstance().getString("results_path") + File.separator + spectrumAnnotatorResult.getExperimentAccession() + "_mods.xml");
-
+    public void writeUsedModificationsToFile(SpectrumAnnotatorResult spectrumAnnotatorResult) {        
         //get used modifications
         Set<Modification> usedModifications = modificationService.getUsedModifications(spectrumAnnotatorResult).keySet();
-        
+        writeUsedModificationsToFile(spectrumAnnotatorResult.getExperimentAccession(), usedModifications);        
+    }
+
+    @Override
+    public void writeUsedModificationsToFile(String experimentAccession, Set<Modification> usedModifications) {
+        Resource usedModificationsResource = new FileSystemResource(PropertiesConfigurationHolder.getInstance().getString("results_path") + File.separator + experimentAccession + "_mods.xml");        
         modificationService.savePipelineModifications(usedModificationsResource, usedModifications);
     }
-    
+        
 }

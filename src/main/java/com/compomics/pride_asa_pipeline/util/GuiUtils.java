@@ -10,7 +10,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
@@ -25,7 +24,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
  * @author Niels Hulstaert
  */
 public class GuiUtils {
-
+            
     /**
      * Centers the dialog on the parent frame.
      *

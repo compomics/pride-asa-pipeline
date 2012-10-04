@@ -39,9 +39,8 @@ public class PrecursorModificationMapper implements RowMapper<Modification> {
         }
 
         Modification modification = new Modification(massShift, location, modificationAccession, modificationName);
-
+        
         modification.getAffectedAminoAcids().add(AminoAcid.getAA(peptideSequence.substring(sequenceIndex, sequenceIndex + 1)));
-
         modification.setOrigin(Modification.Origin.PRIDE);
 
         return modification;

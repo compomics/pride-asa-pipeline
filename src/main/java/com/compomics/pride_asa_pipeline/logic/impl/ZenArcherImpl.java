@@ -7,8 +7,7 @@ import com.compomics.pride_asa_pipeline.util.MathUtils;
 import java.util.*;
 
 /**
- * @author Jonathan Rameseder
- * Date: 15-Jan-2008
+ * @author Jonathan Rameseder Date: 15-Jan-2008
  * @since 0.1
  */
 public class ZenArcherImpl implements ZenArcher {
@@ -32,7 +31,6 @@ public class ZenArcherImpl implements ZenArcher {
                 Collections.sort(combination);
                 if (!results.contains(combination)) {
                     results.add(combination);
-                    //System.out.println("Sum " + sum + " between " + minimalSum + " and " + maximalSum);
                 }
             }
         }
@@ -43,10 +41,9 @@ public class ZenArcherImpl implements ZenArcher {
     public void setMinimalSum(double minimalSum) {
         this.minimalSum = minimalSum;
     }
-        
+
     @Override
     public void setMaximalSum(double maximalSum) {
         this.maximalSum = maximalSum;
     }
-
 }
