@@ -1,12 +1,8 @@
-/*
- *
-
- */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.gui.view.PipelineParamsPanel;
 import com.compomics.pride_asa_pipeline.gui.PropertyGuiWrapper;
+import com.compomics.pride_asa_pipeline.gui.view.PipelineConfigDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -35,17 +31,17 @@ public class PipelineParamsController {
     private BindingGroup bindingGroup;
     private ObservableList<PropertyGuiWrapper> propertyGuiWrapperBindingList;
     //view
-    private PipelineParamsPanel pipelineParamsPanel;
+    private PipelineConfigDialog pipelineConfigDialog;
     //parent controller
     private MainController mainController;
     //services
 
-    public PipelineParamsPanel getPipelineParamsPanel() {
-        return pipelineParamsPanel;
+    public PipelineConfigDialog getPipelineConfigDialog() {
+        return pipelineConfigDialog;
     }
 
-    public void setPipelineParamsPanel(PipelineParamsPanel pipelineParamsPanel) {
-        this.pipelineParamsPanel = pipelineParamsPanel;
+    public void setPipelineConfigDialog(PipelineConfigDialog pipelineConfigDialog) {
+        this.pipelineConfigDialog = pipelineConfigDialog;
     }
 
     public MainController getMainController() {
@@ -57,7 +53,7 @@ public class PipelineParamsController {
     }
 
     public void init() {
-        pipelineParamsPanel = new PipelineParamsPanel();
+        pipelineConfigDialog = new PipelineConfigDialog(mainController.getMainFrame(), true);
 
         //init bindings
         bindingGroup = new BindingGroup();
@@ -65,7 +61,7 @@ public class PipelineParamsController {
         propertyGuiWrapperBindingList = ObservableCollections.observableList(new ArrayList<PropertyGuiWrapper>());
         initPropertyGuiWrappersBindingList();
 
-        JTableBinding pipelineParamsTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ_WRITE, propertyGuiWrapperBindingList, pipelineParamsPanel.getPipelineParamsTable());
+        JTableBinding pipelineParamsTableBinding = SwingBindings.createJTableBinding(AutoBinding.UpdateStrategy.READ_WRITE, propertyGuiWrapperBindingList, pipelineConfigDialog.getPipelineParamsTable());
 
         //Add column bindings
         JTableBinding.ColumnBinding columnBinding = pipelineParamsTableBinding.addColumnBinding(ELProperty.create("${key}"));
@@ -82,19 +78,21 @@ public class PipelineParamsController {
         bindingGroup.bind();
 
         //add listeners
-        pipelineParamsPanel.getSaveButton().addActionListener(new ActionListener() {
+        pipelineConfigDialog.getSaveButton().addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     PropertiesConfigurationHolder.getInstance().save();
-                    mainController.showMessageDialog("Save successful", "The pipeline parameters were saved successfully.", JOptionPane.INFORMATION_MESSAGE);
+                    mainController.showMessageDialog("Save Successful", "The pipeline parameters were saved successfully.", JOptionPane.INFORMATION_MESSAGE);
                 } catch (ConfigurationException ex) {
                     LOGGER.error(ex.getMessage(), ex);
                 }
             }
         });
 
-        pipelineParamsPanel.getResetButton().addActionListener(new ActionListener() {
+        pipelineConfigDialog.getResetButton().addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -112,10 +110,10 @@ public class PipelineParamsController {
             }
         });
     }
-    
-    public void updatePropertyGuiWrapper(String propertyName, Object value){
-        for(PropertyGuiWrapper propertyGuiWrapper : propertyGuiWrapperBindingList){
-            if(propertyGuiWrapper.getKey().equals(propertyName)){
+
+    public void updatePropertyGuiWrapper(String propertyName, Object value) {
+        for (PropertyGuiWrapper propertyGuiWrapper : propertyGuiWrapperBindingList) {
+            if (propertyGuiWrapper.getKey().equals(propertyName)) {
                 propertyGuiWrapper.setValue(value);
             }
         }

@@ -1,25 +1,22 @@
-/*
- *
-
- */
 package com.compomics.pride_asa_pipeline.gui.view;
 
 import java.awt.Color;
-import javax.swing.JButton;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 /**
  *
- * @author Niels Hulstaert Hulstaert
+ * @author Niels Hulstaert
+ * @author Harald Barsnes
  */
 public class MainFrame extends javax.swing.JFrame {
 
     /**
      * Creates new form MainFrame
      */
-    public MainFrame() {        
+    public MainFrame() {
         initComponents();
-        this.getContentPane().setBackground(new Color(255,255,255));
+        this.getContentPane().setBackground(new Color(255, 255, 255));
     }
 
     public JPanel getPrideSelectionParentPanel() {
@@ -29,25 +26,13 @@ public class MainFrame extends javax.swing.JFrame {
     public JPanel getFileSelectionParentPanel() {
         return fileSelectionParentPanel;
     }
-        
-    public JPanel getPipelinePanel() {
-        return pipelinePanel;
-    }
 
-    public JPanel getModificationsParentPanel() {
-        return modificationsParentPanel;
+    public JMenuItem getModificationsMenuItem() {
+        return editPtmsMenuItem;
     }
-
-    public JButton getModificationsButton() {
-        return modificationsButton;
-    }
-
-    public JButton getPipelineButton() {
-        return pipelineButton;
-    }
-
-    public JButton getPipelineParamsButton() {
-        return pipelineParamsButton;
+    
+    public JMenuItem getPipelineConfigurationMenuItem() {
+        return editConfigsMenuItem;
     }
 
     public JPanel getIdentificationsParentPanel() {
@@ -58,14 +43,10 @@ public class MainFrame extends javax.swing.JFrame {
         return summaryParentPanel;
     }
 
-    public JPanel getPipelineParamsParentPanel() {
-        return pipelineParamsParentPanel;
+    public JPanel getMainPanel() {
+        return backgroundPanel;
     }
 
-    public JPanel getMainPanel() {
-        return mainPanel;
-    }       
-        
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -74,56 +55,31 @@ public class MainFrame extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
-        gradientToolbar = new com.compomics.pride_asa_pipeline.gui.GradientToolbar();
-        pipelineButton = new javax.swing.JButton();
-        pipelineParamsButton = new javax.swing.JButton();
-        modificationsButton = new javax.swing.JButton();
-        mainPanel = new javax.swing.JPanel();
-        pipelinePanel = new javax.swing.JPanel();
+        backgroundPanel = new javax.swing.JPanel();
+        experimentSelectionPanel = new javax.swing.JPanel();
         experimentSelectionTabbedPane = new javax.swing.JTabbedPane();
         prideSelectionParentPanel = new javax.swing.JPanel();
         fileSelectionParentPanel = new javax.swing.JPanel();
+        pipelineResultsPanel = new javax.swing.JPanel();
         pipelineResultTabbedPane = new javax.swing.JTabbedPane();
         summaryParentPanel = new javax.swing.JPanel();
         identificationsParentPanel = new javax.swing.JPanel();
-        modificationsParentPanel = new javax.swing.JPanel();
-        pipelineParamsParentPanel = new javax.swing.JPanel();
+        menuBar = new javax.swing.JMenuBar();
+        fileMenu = new javax.swing.JMenu();
+        exitMenuItem = new javax.swing.JMenuItem();
+        editMenu = new javax.swing.JMenu();
+        editConfigsMenuItem = new javax.swing.JMenuItem();
+        editPtmsMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(800, 600));
 
-        gradientToolbar.setFloatable(false);
-        gradientToolbar.setRollover(true);
+        backgroundPanel.setBackground(new java.awt.Color(255, 255, 255));
 
-        pipelineButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        pipelineButton.setText("Pipeline");
-        pipelineButton.setFocusable(false);
-        pipelineButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        pipelineButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        gradientToolbar.add(pipelineButton);
+        experimentSelectionPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Experiment Selection"));
+        experimentSelectionPanel.setOpaque(false);
 
-        pipelineParamsButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        pipelineParamsButton.setText("Pipeline configuration");
-        pipelineParamsButton.setFocusable(false);
-        pipelineParamsButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        pipelineParamsButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        gradientToolbar.add(pipelineParamsButton);
-
-        modificationsButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        modificationsButton.setText("Modifications configuration");
-        modificationsButton.setFocusable(false);
-        modificationsButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        modificationsButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        gradientToolbar.add(modificationsButton);
-
-        mainPanel.setBackground(new java.awt.Color(255, 255, 255));
-        mainPanel.setLayout(new java.awt.CardLayout());
-
-        pipelinePanel.setOpaque(false);
-        pipelinePanel.setLayout(new java.awt.GridBagLayout());
-
-        experimentSelectionTabbedPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Experiment selection"));
         experimentSelectionTabbedPane.setMinimumSize(new java.awt.Dimension(20, 20));
         experimentSelectionTabbedPane.setPreferredSize(new java.awt.Dimension(20, 20));
 
@@ -136,16 +92,33 @@ public class MainFrame extends javax.swing.JFrame {
         fileSelectionParentPanel.setOpaque(false);
         fileSelectionParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
         fileSelectionParentPanel.setLayout(new java.awt.GridBagLayout());
-        experimentSelectionTabbedPane.addTab("Pipeline result file", fileSelectionParentPanel);
+        experimentSelectionTabbedPane.addTab("Pipeline Result File", fileSelectionParentPanel);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.3;
-        pipelinePanel.add(experimentSelectionTabbedPane, gridBagConstraints);
+        javax.swing.GroupLayout experimentSelectionPanelLayout = new javax.swing.GroupLayout(experimentSelectionPanel);
+        experimentSelectionPanel.setLayout(experimentSelectionPanelLayout);
+        experimentSelectionPanelLayout.setHorizontalGroup(
+            experimentSelectionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(experimentSelectionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(experimentSelectionPanelLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(experimentSelectionTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1007, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+        experimentSelectionPanelLayout.setVerticalGroup(
+            experimentSelectionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 227, Short.MAX_VALUE)
+            .addGroup(experimentSelectionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(experimentSelectionPanelLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(experimentSelectionTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+
+        pipelineResultsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Pipeline Result"));
+        pipelineResultsPanel.setOpaque(false);
 
         pipelineResultTabbedPane.setBackground(new java.awt.Color(255, 255, 255));
-        pipelineResultTabbedPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Pipeline result"));
         pipelineResultTabbedPane.setMinimumSize(new java.awt.Dimension(20, 20));
         pipelineResultTabbedPane.setPreferredSize(new java.awt.Dimension(20, 20));
 
@@ -160,54 +133,106 @@ public class MainFrame extends javax.swing.JFrame {
         identificationsParentPanel.setLayout(new java.awt.GridBagLayout());
         pipelineResultTabbedPane.addTab("Identifications", identificationsParentPanel);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.7;
-        pipelinePanel.add(pipelineResultTabbedPane, gridBagConstraints);
+        javax.swing.GroupLayout pipelineResultsPanelLayout = new javax.swing.GroupLayout(pipelineResultsPanel);
+        pipelineResultsPanel.setLayout(pipelineResultsPanelLayout);
+        pipelineResultsPanelLayout.setHorizontalGroup(
+            pipelineResultsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pipelineResultsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pipelineResultTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
+                .addGap(17, 17, 17))
+        );
+        pipelineResultsPanelLayout.setVerticalGroup(
+            pipelineResultsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pipelineResultsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pipelineResultTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
-        mainPanel.add(pipelinePanel, "pipelinePanel");
+        javax.swing.GroupLayout backgroundPanelLayout = new javax.swing.GroupLayout(backgroundPanel);
+        backgroundPanel.setLayout(backgroundPanelLayout);
+        backgroundPanelLayout.setHorizontalGroup(
+            backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(backgroundPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pipelineResultsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(experimentSelectionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        backgroundPanelLayout.setVerticalGroup(
+            backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(backgroundPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(experimentSelectionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pipelineResultsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
-        modificationsParentPanel.setOpaque(false);
-        modificationsParentPanel.setLayout(new java.awt.GridBagLayout());
-        mainPanel.add(modificationsParentPanel, "modificationsParentPanel");
+        fileMenu.setText("File");
 
-        pipelineParamsParentPanel.setOpaque(false);
-        pipelineParamsParentPanel.setLayout(new java.awt.GridBagLayout());
-        mainPanel.add(pipelineParamsParentPanel, "pipelineParamsParentPanel");
+        exitMenuItem.setText("Exit");
+        exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exitMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(exitMenuItem);
+
+        menuBar.add(fileMenu);
+
+        editMenu.setText("Edit");
+
+        editConfigsMenuItem.setText("Configuration");
+        editMenu.add(editConfigsMenuItem);
+
+        editPtmsMenuItem.setText("Modifications");
+        editMenu.add(editPtmsMenuItem);
+
+        menuBar.add(editMenu);
+
+        setJMenuBar(menuBar);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
-            .addComponent(gradientToolbar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(backgroundPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(gradientToolbar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 863, Short.MAX_VALUE))
+            .addComponent(backgroundPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    /**
+     * Close the tool.
+     * 
+     * @param evt 
+     */
+    private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
+        dispose();
+        System.exit(0);
+    }//GEN-LAST:event_exitMenuItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel backgroundPanel;
+    private javax.swing.JMenuItem editConfigsMenuItem;
+    private javax.swing.JMenu editMenu;
+    private javax.swing.JMenuItem editPtmsMenuItem;
+    private javax.swing.JMenuItem exitMenuItem;
+    private javax.swing.JPanel experimentSelectionPanel;
     private javax.swing.JTabbedPane experimentSelectionTabbedPane;
+    private javax.swing.JMenu fileMenu;
     private javax.swing.JPanel fileSelectionParentPanel;
-    private com.compomics.pride_asa_pipeline.gui.GradientToolbar gradientToolbar;
     private javax.swing.JPanel identificationsParentPanel;
-    private javax.swing.JPanel mainPanel;
-    private javax.swing.JButton modificationsButton;
-    private javax.swing.JPanel modificationsParentPanel;
-    private javax.swing.JButton pipelineButton;
-    private javax.swing.JPanel pipelinePanel;
-    private javax.swing.JButton pipelineParamsButton;
-    private javax.swing.JPanel pipelineParamsParentPanel;
+    private javax.swing.JMenuBar menuBar;
     private javax.swing.JTabbedPane pipelineResultTabbedPane;
+    private javax.swing.JPanel pipelineResultsPanel;
     private javax.swing.JPanel prideSelectionParentPanel;
     private javax.swing.JPanel summaryParentPanel;
     // End of variables declaration//GEN-END:variables

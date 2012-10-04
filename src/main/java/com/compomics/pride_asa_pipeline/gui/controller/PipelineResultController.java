@@ -1,7 +1,3 @@
-/*
- *
-
- */
 package com.compomics.pride_asa_pipeline.gui.controller;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -51,6 +47,7 @@ import org.jfree.chart.ChartPanel;
 /**
  *
  * @author Niels Hulstaert
+ * @author Harald Barsnes
  */
 public class PipelineResultController {
 
@@ -184,8 +181,8 @@ public class PipelineResultController {
         //get charts from factory and add them to the right panels
         precursorMassDeltasChartPanel.setChart(ChartFactory.getPrecursorMassDeltasChart(precursorMassDeltaValues));
         fragmentIonMassDeltasChartPanel.setChart(ChartFactory.getFragmentMassDeltasChart(fragmentMassDeltaValues));
-        bIonCoverageChartPanel.setChart(ChartFactory.getIonCoverageChart("B fragment ion coverage", b1IonCoverageValues, b2IonCoverageValues));
-        yIonCoverageChartPanel.setChart(ChartFactory.getIonCoverageChart("Y fragment ion coverage", y1IonCoverageValues, y2IonCoverageValues));
+        bIonCoverageChartPanel.setChart(ChartFactory.getIonCoverageChart("B Fragment Ion Coverage", b1IonCoverageValues, b2IonCoverageValues));
+        yIonCoverageChartPanel.setChart(ChartFactory.getIonCoverageChart("Y Fragment Ion Coverage", y1IonCoverageValues, y2IonCoverageValues));
         scoresChartPanel.setChart(ChartFactory.getScoresChart(scoresValues));
         identificationsChartPanel.setChart(ChartFactory.getIdentificationsChart(spectrumAnnotatorResult));
         modificationsChartPanel.setChart(ChartFactory.getModificationsChart(usedModifications, spectrumAnnotatorResult.getNumberOfIdentifications()));
@@ -197,7 +194,7 @@ public class PipelineResultController {
         identificationsEventList = new BasicEventList<Identification>();
         sortedIdentificationsList = new SortedList<Identification>(identificationsEventList, new IdentificationSequenceComparator());
         identificationsPanel.getIdentificationsTable().setModel(new EventTableModel(sortedIdentificationsList, new IdentificationsTableFormat()));
-        identificationsPanel.getIdentificationsTable().setSelectionModel(new EventSelectionModel(sortedIdentificationsList));        
+        identificationsPanel.getIdentificationsTable().setSelectionModel(new EventSelectionModel(sortedIdentificationsList));
         identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.PEPTIDE).setCellRenderer(new PeptideColumnRenderer());
         identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.MODIFICATIONS).setCellRenderer(new ModificationColumnRenderer());
 
@@ -217,6 +214,7 @@ public class PipelineResultController {
 
         //add listeners
         identificationsPanel.getIdentificationsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
             @Override
             public void valueChanged(ListSelectionEvent lse) {
                 if (!lse.getValueIsAdjusting()) {
@@ -442,7 +440,7 @@ public class PipelineResultController {
                                 attributedModificationsString.addAttribute(TextAttribute.FOREGROUND, modificationColors.get(modification), i, i + 1);
                             }
                         }
-                        index = modificationsString.indexOf(modification, index + modification.length()); 
+                        index = modificationsString.indexOf(modification, index + modification.length());
                     }
                 }
             }

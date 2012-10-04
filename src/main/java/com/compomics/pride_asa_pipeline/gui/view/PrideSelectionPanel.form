@@ -22,62 +22,55 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="experimentSelectionComboBox" alignment="0" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
                       <Component id="experimentSelectionLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="experimentSelectionComboBox" alignment="0" max="32767" attributes="0"/>
-                  <Group type="102" alignment="1" attributes="0">
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="taxonomyFilterCheckBox" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
-                              <Component id="taxonomyLabel" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" attributes="0">
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="includePrideModificationsCheckBox" min="-2" max="-2" attributes="0"/>
-                                  <Component id="writeResultCheckBox" alignment="1" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                      </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="taxonomyFilterCheckBox" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="taxonomyLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="taxonomyTextField" pref="100" max="32767" attributes="0"/>
-                          <Component id="experimentProcessButton" max="32767" attributes="0"/>
+                      <Component id="taxonomyTextField" min="-2" pref="132" max="-2" attributes="0"/>
+                      <EmptySpace min="129" pref="424" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="includePrideModificationsCheckBox" min="-2" max="-2" attributes="0"/>
+                          <Component id="experimentProcessButton" alignment="1" min="-2" pref="100" max="-2" attributes="0"/>
+                          <Component id="writeResultCheckBox" alignment="1" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
               <Component id="experimentSelectionLabel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="experimentSelectionComboBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="taxonomyTextField" alignment="1" min="-2" pref="25" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="taxonomyFilterCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="taxonomyLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
+              <Group type="103" groupAlignment="2" attributes="0">
+                  <Component id="taxonomyFilterCheckBox" alignment="2" min="-2" max="-2" attributes="0"/>
+                  <Component id="taxonomyLabel" alignment="2" min="-2" max="-2" attributes="0"/>
+                  <Component id="taxonomyTextField" alignment="2" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="14" max="32767" attributes="0"/>
               <Component id="includePrideModificationsCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="writeResultCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="experimentProcessButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="writeResultCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
+              <Component id="experimentProcessButton" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -85,7 +78,7 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="experimentSelectionLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="select a pride experiment"/>
+        <Property name="text" type="java.lang.String" value="Select a PRIDE Experiment"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JComboBox" name="experimentSelectionComboBox">
@@ -97,13 +90,14 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="taxonomyFilterCheckBox">
       <Properties>
-        <Property name="text" type="java.lang.String" value="filter on taxonomy"/>
+        <Property name="text" type="java.lang.String" value="Filter on Taxonomy"/>
         <Property name="horizontalTextPosition" type="int" value="2"/>
+        <Property name="iconTextGap" type="int" value="15"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="taxonomyLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="taxonomy ID"/>
+        <Property name="text" type="java.lang.String" value="Taxonomy ID"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="taxonomyTextField">
@@ -118,7 +112,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="experimentProcessButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="process"/>
+        <Property name="text" type="java.lang.String" value="Process"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[80, 25]"/>
         </Property>
@@ -132,15 +126,17 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="writeResultCheckBox">
       <Properties>
-        <Property name="text" type="java.lang.String" value="write result to file"/>
+        <Property name="text" type="java.lang.String" value="Write Result to File"/>
         <Property name="toolTipText" type="java.lang.String" value="The output folder can be set on the &quot;Pipeline configuration&quot; panel."/>
         <Property name="horizontalTextPosition" type="int" value="10"/>
+        <Property name="iconTextGap" type="int" value="15"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="includePrideModificationsCheckBox">
       <Properties>
-        <Property name="text" type="java.lang.String" value="incude pride modifications"/>
+        <Property name="text" type="java.lang.String" value="Incude PRIDE Modifications"/>
         <Property name="horizontalTextPosition" type="int" value="10"/>
+        <Property name="iconTextGap" type="int" value="15"/>
       </Properties>
     </Component>
   </SubComponents>

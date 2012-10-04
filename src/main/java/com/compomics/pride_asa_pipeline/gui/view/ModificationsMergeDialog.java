@@ -1,5 +1,3 @@
-/*
- */
 package com.compomics.pride_asa_pipeline.gui.view;
 
 import java.awt.Color;
@@ -10,12 +8,15 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
+ * @author Harald Barsnes
  */
 public class ModificationsMergeDialog extends javax.swing.JDialog {
 
     /**
      * Creates new form ModificationsMergeDialog
+     * 
+     * param parent
      */
     public ModificationsMergeDialog(Frame parent) {
         super(parent);
@@ -102,7 +103,7 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
     public JTextField getPrideModMonoMassShiftTextField() {
         return prideModMonoMassShiftTextField;
     }
-        
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -112,10 +113,6 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        prideModificationsList = new javax.swing.JList();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        pipelineModificationsList = new javax.swing.JList();
         cancelButton = new javax.swing.JButton();
         proceedButton = new javax.swing.JButton();
         prideModAccessionLabel = new javax.swing.JLabel();
@@ -138,44 +135,42 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         addPrideModificationButton = new javax.swing.JButton();
         removeModificationButton = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        prideModificationsList = new javax.swing.JList();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        pipelineModificationsList = new javax.swing.JList();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Modifications conflict(s)");
+        setTitle("Modifications Conflict(s)");
         setResizable(false);
 
-        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Pride modifications"));
-
-        jScrollPane1.setViewportView(prideModificationsList);
-
-        jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder("Pipeline modifications"));
-
-        jScrollPane2.setViewportView(pipelineModificationsList);
-
-        cancelButton.setText("cancel");
+        cancelButton.setText("Cancel");
         cancelButton.setMaximumSize(new java.awt.Dimension(80, 25));
         cancelButton.setMinimumSize(new java.awt.Dimension(80, 25));
         cancelButton.setPreferredSize(new java.awt.Dimension(80, 25));
 
-        proceedButton.setText("proceed");
+        proceedButton.setText("Proceed");
         proceedButton.setMaximumSize(new java.awt.Dimension(80, 25));
         proceedButton.setMinimumSize(new java.awt.Dimension(80, 25));
         proceedButton.setPreferredSize(new java.awt.Dimension(80, 25));
 
-        prideModAccessionLabel.setText("accession");
+        prideModAccessionLabel.setText("Accession");
 
-        prideModAccessionValueLabel.setText("value");
+        prideModAccessionValueLabel.setText("Value");
 
-        modAccessionLabel.setText("accession");
+        modAccessionLabel.setText("Accession");
 
-        modAccessionValueLabel.setText("value");
+        modAccessionValueLabel.setText("Value");
 
-        modMonoIsotopicMassShiftLabel.setText("monoisotopic mass shift");
+        modMonoIsotopicMassShiftLabel.setText("Monoisotopic Mass Shift");
 
-        prideModMonoIsotopicMassShiftLabel.setText("monoisotopic mass shift");
+        prideModMonoIsotopicMassShiftLabel.setText("Monoisotopic Mass Shift");
 
-        modAverageMassShiftLabel.setText("average mass shift");
+        modAverageMassShiftLabel.setText("Average Mass Shift");
 
-        prideModAverageMassShiftLabel.setText("average mass shift");
+        prideModAverageMassShiftLabel.setText("Average Mass Shift");
 
         modMonoMassShiftTextField.setEditable(false);
         modMonoMassShiftTextField.setMinimumSize(new java.awt.Dimension(80, 20));
@@ -217,8 +212,8 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
         modAverageModMassShiftTextField.setOpaque(false);
         modAverageModMassShiftTextField.setPreferredSize(new java.awt.Dimension(300, 30));
 
-        jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
+        jTextArea1.setEditable(false);
         jTextArea1.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
         jTextArea1.setRows(3);
         jTextArea1.setText("Some of the modifications found in pride for this experiment have equal masses compared to the fixed set of pipeline modifications.\nPlease resolve these conflicting modifications by adding or removing pride modifications to the pipeline modifications.\nAdding or removing fixed pipeline modifications can be done in the \"Modifications configuration\" section.");
@@ -226,7 +221,7 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
 
         jPanel1.setOpaque(false);
 
-        addPrideModificationButton.setText(">>>");
+        addPrideModificationButton.setText(">>");
         addPrideModificationButton.setMaximumSize(new java.awt.Dimension(80, 25));
         addPrideModificationButton.setMinimumSize(new java.awt.Dimension(80, 25));
         addPrideModificationButton.setPreferredSize(new java.awt.Dimension(80, 25));
@@ -236,7 +231,7 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
             }
         });
 
-        removeModificationButton.setText("<<<");
+        removeModificationButton.setText("<<");
         removeModificationButton.setToolTipText("Only pride modifications can be removed from the pipeline modifications.");
         removeModificationButton.setMaximumSize(new java.awt.Dimension(80, 25));
         removeModificationButton.setMinimumSize(new java.awt.Dimension(80, 25));
@@ -263,6 +258,52 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("PRIDE Modifications"));
+
+        jScrollPane1.setBorder(null);
+
+        jScrollPane1.setViewportView(prideModificationsList);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Pipeline Modifications"));
+
+        jScrollPane2.setBorder(null);
+
+        jScrollPane2.setViewportView(pipelineModificationsList);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2)
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -281,14 +322,15 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addComponent(prideModMonoIsotopicMassShiftLabel)
-                                                    .addComponent(prideModAverageMassShiftLabel))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addComponent(prideModAverageModMassShiftTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
-                                                    .addComponent(prideModMonoMassShiftTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)))
+                                            .addComponent(prideModMonoIsotopicMassShiftLabel)
+                                            .addComponent(prideModAverageMassShiftLabel))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(prideModAverageModMassShiftTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
+                                            .addComponent(prideModMonoMassShiftTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
+                                        .addGap(118, 118, 118))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                             .addGroup(layout.createSequentialGroup()
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                     .addComponent(prideModAccessionLabel)
@@ -296,17 +338,12 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                     .addComponent(prideModAccessionValueTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
-                                                    .addGroup(layout.createSequentialGroup()
-                                                        .addComponent(prideModAccessionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addGap(0, 0, Short.MAX_VALUE)))))
-                                        .addGap(118, 118, 118))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addComponent(jScrollPane1)
+                                                    .addComponent(prideModAccessionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
                                     .addGroup(layout.createSequentialGroup()
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(modAccessionLabel)
@@ -322,26 +359,31 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(modAverageModMassShiftTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
-                                            .addComponent(modMonoMassShiftTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)))))
-                            .addComponent(jTextArea1))))
+                                            .addComponent(modMonoMassShiftTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)))
+                                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jTextArea1, javax.swing.GroupLayout.DEFAULT_SIZE, 794, Short.MAX_VALUE))))
                 .addContainerGap())
         );
+
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jPanel2, jPanel3});
+
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jTextArea1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(prideModAccessionLabel)
-                    .addComponent(prideModAccessionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(modAccessionLabel)
-                    .addComponent(modAccessionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(prideModAccessionTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(prideModAccessionLabel)
+                        .addComponent(modAccessionLabel)
+                        .addComponent(modAccessionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(prideModAccessionValueLabel)
@@ -373,11 +415,12 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
     private void addPrideModificationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addPrideModificationButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_addPrideModificationButtonActionPerformed
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addPrideModificationButton;
     private javax.swing.JButton cancelButton;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;

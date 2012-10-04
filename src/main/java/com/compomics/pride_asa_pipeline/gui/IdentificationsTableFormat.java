@@ -1,5 +1,3 @@
-/*
- */
 package com.compomics.pride_asa_pipeline.gui;
 
 import ca.odell.glazedlists.GlazedLists;
@@ -18,7 +16,8 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
+ * @author Harald Barsnes
  */
 public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
 
@@ -30,7 +29,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
     public static final String MODS_DELIMITER = ", ";
     private static final String UNMOD_MASS_DELTA_OPEN = "[";
     private static final String UNMOD_MASS_DELTA_CLOSE = "]";
-    private static final String[] columnNames = {"Peptide", "Modifications", "Charge", "Mass delta", "M/Z delta", "Precursor m/z", "Noise threshold", "Score"};
+    private static final String[] columnNames = {"Peptide", "Modifications", "Charge", "Mass Delta", "M/Z Delta", "Precursor m/z", "Noise Threshold", "Score"};
     public static final int PEPTIDE = 0;
     public static final int CHARGE = 2;
     public static final int MASS_DELTA = 3;
