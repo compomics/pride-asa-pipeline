@@ -1,6 +1,7 @@
 
 package com.compomics.pride_asa_pipeline.gui.view;
 
+import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JTable;
 
@@ -20,6 +21,7 @@ public class PipelineConfigDialog extends javax.swing.JDialog {
     public PipelineConfigDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.getContentPane().setBackground(Color.WHITE);
         pipelineParamsTableScrollPane.getViewport().setOpaque(false);
         pipelineParamsTable.getTableHeader().setReorderingAllowed(false);
         pipelineParamsTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -57,6 +59,7 @@ public class PipelineConfigDialog extends javax.swing.JDialog {
         setTitle("Pipleline Configuration");
 
         configPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Parameters"));
+        configPanel.setOpaque(false);
 
         pipelineParamsTableScrollPane.setOpaque(false);
 

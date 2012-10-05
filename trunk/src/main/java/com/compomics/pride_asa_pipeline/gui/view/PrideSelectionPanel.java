@@ -72,8 +72,8 @@ public class PrideSelectionPanel extends javax.swing.JPanel {
 
         taxonomyLabel.setText("Taxonomy ID");
 
-        taxonomyTextField.setMinimumSize(new java.awt.Dimension(69, 20));
-        taxonomyTextField.setPreferredSize(new java.awt.Dimension(69, 20));
+        taxonomyTextField.setMinimumSize(new java.awt.Dimension(69, 25));
+        taxonomyTextField.setPreferredSize(new java.awt.Dimension(69, 25));
 
         experimentProcessButton.setText("Process");
         experimentProcessButton.setMaximumSize(new java.awt.Dimension(80, 25));
@@ -106,7 +106,7 @@ public class PrideSelectionPanel extends javax.swing.JPanel {
                         .addComponent(taxonomyLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(taxonomyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(129, 424, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -127,7 +127,7 @@ public class PrideSelectionPanel extends javax.swing.JPanel {
                     .addComponent(taxonomyFilterCheckBox)
                     .addComponent(taxonomyLabel)
                     .addComponent(taxonomyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(includePrideModificationsCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(writeResultCheckBox)

@@ -434,7 +434,8 @@ public class PipelineResultController {
                 int index = 0;
                 for (String modification : splits) {
                     index = modificationsString.indexOf(modification, index);
-                    while (index != -1) {
+                    if (modificationColors.containsKey(modification)) {
+                        Color modificationColor = modificationColors.get(modification);
                         for (int i = modificationsString.indexOf(modification, index); i < modificationsString.indexOf(modification, index) + modification.length(); i++) {
                             if (modificationColors.containsKey(modification)) {
                                 attributedModificationsString.addAttribute(TextAttribute.FOREGROUND, modificationColors.get(modification), i, i + 1);

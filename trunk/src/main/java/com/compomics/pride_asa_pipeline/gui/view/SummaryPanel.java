@@ -70,7 +70,10 @@ public class SummaryPanel extends javax.swing.JPanel {
         setBackground(new java.awt.Color(255, 255, 255));
         setOpaque(false);
         setPreferredSize(new java.awt.Dimension(400, 200));
-        setLayout(new java.awt.GridBagLayout());
+        java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
+        layout.columnWidths = new int[] {0, 5, 0};
+        layout.rowHeights = new int[] {0, 5, 0};
+        setLayout(layout);
 
         identificationsChartParentPanel.setBackground(new java.awt.Color(255, 255, 255));
         identificationsChartParentPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Identifications"));
@@ -82,6 +85,7 @@ public class SummaryPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.33;
         gridBagConstraints.weighty = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 0);
         add(identificationsChartParentPanel, gridBagConstraints);
 
         modificationsChartParentPanel.setBackground(new java.awt.Color(255, 255, 255));
@@ -90,10 +94,11 @@ public class SummaryPanel extends javax.swing.JPanel {
         modificationsChartParentPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.33;
         gridBagConstraints.weighty = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 0);
         add(modificationsChartParentPanel, gridBagConstraints);
 
         generalSummaryPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("General"));
@@ -165,12 +170,13 @@ public class SummaryPanel extends javax.swing.JPanel {
         generalSummaryPanel.add(ionCoveragesChartPanel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridheight = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.66;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 10, 10);
         add(generalSummaryPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables

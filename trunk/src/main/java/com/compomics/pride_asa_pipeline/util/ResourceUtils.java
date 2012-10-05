@@ -25,8 +25,7 @@ public class ResourceUtils {
      * @param relativePath the relative path of the resource
      * @return the found resource
      */
-    public static Resource getResourceByRelativePath(String relativePath) {
-        //create file        
+    public static Resource getResourceByRelativePath(String relativePath) {       
         Resource resource = new FileSystemResource(relativePath);
 
         if (!resource.exists()) {

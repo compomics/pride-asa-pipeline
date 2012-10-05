@@ -238,36 +238,7 @@
         
     </build>
 
-    <repositories>   
-        <repository>
-            <id>PRIDE_SourceForge_Maven2_Repository</id>
-            <url>http://pride-proteome.sourceforge.net/maven2</url>
-        </repository>
-        
-        <repository>
-            <id>ebi-repo</id>
-            <name>The EBI internal repository</name>
-            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        
-        <repository>
-            <id>ebi-snapshot-repo</id>
-            <name>The EBI internal snapshot repository</name>
-            <url>http://www.ebi.ac.uk/~maven/m2repo_snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        
+    <repositories>                   
         <repository>
             <id>genesis-maven2-repo</id>
             <name>Genesis maven2 repository</name>
