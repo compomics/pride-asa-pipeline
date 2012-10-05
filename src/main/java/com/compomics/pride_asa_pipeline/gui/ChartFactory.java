@@ -18,6 +18,7 @@ import org.jfree.chart.LegendItem;
 import org.jfree.chart.LegendItemCollection;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
@@ -61,7 +62,7 @@ public class ChartFactory {
                 PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
         precursorMassDeltasChart.getPlot().setBackgroundPaint(Color.WHITE);
         precursorMassDeltasChart.getPlot().setOutlineVisible(false);
-        GuiUtils.setShadowVisible(precursorMassDeltasChart, Boolean.FALSE);
+        GuiUtils.setShadowVisible(precursorMassDeltasChart, Boolean.FALSE); 
 
         return precursorMassDeltasChart;
     }
@@ -100,6 +101,7 @@ public class ChartFactory {
         ionCoverageChart.getPlot().setForegroundAlpha(0.8F);
         ionCoverageChart.getPlot().setOutlineVisible(false);
         GuiUtils.setShadowVisible(ionCoverageChart, Boolean.FALSE);
+        ionCoverageChart.getLegend().setFrame(BlockBorder.NONE);
 
         return ionCoverageChart;
     }
@@ -155,6 +157,7 @@ public class ChartFactory {
         }
 
         identificationsChart.getPlot().setOutlineVisible(false);
+        identificationsChart.getLegend().setFrame(BlockBorder.NONE);
         return identificationsChart;
     }
 
@@ -190,6 +193,9 @@ public class ChartFactory {
         xAxis.setMaximumCategoryLabelLines(2);
         modificationsChart.getPlot().setOutlineVisible(false);
         GuiUtils.setShadowVisible(modificationsChart, Boolean.FALSE);
+        if (modificationsChart.getLegend() != null) {
+            modificationsChart.getLegend().setFrame(BlockBorder.NONE);
+        }
 
         return modificationsChart;
     }

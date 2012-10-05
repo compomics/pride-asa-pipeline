@@ -69,7 +69,7 @@ public class PipelineProgressController extends WindowAdapter {
 
     public void hideProgressDialog() {
         progressFinished = true;
-        pipelineProgressDialog.setRunFinished(); // @TODO: this should be on but interfers with the windowClosed event
+        pipelineProgressDialog.setRunFinished();
         pipelineProgressDialog.setVisible(Boolean.FALSE);
     }
 
@@ -90,5 +90,14 @@ public class PipelineProgressController extends WindowAdapter {
         if (!progressFinished) {
             experimentSelectionController.onAnnotationCanceled();
         } 
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+        super.windowClosing(e);
+        e.getWindow().dispose();
+        if (!progressFinished) {
+            experimentSelectionController.onAnnotationCanceled();
+        }
     }
 }
