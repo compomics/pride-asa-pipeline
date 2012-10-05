@@ -19,9 +19,9 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
      * param parent
      */
     public ModificationsMergeDialog(Frame parent) {
-        super(parent);
-        this.getContentPane().setBackground(Color.WHITE);
+        super(parent);        
         initComponents();
+        this.getContentPane().setBackground(Color.WHITE);
     }
 
     public JButton getAddPrideModificationButton() {

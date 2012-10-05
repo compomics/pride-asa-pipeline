@@ -48,6 +48,7 @@
             <TitledBorder title="Parameters"/>
           </Border>
         </Property>
+        <Property name="opaque" type="boolean" value="false"/>
       </Properties>
 
       <Layout>

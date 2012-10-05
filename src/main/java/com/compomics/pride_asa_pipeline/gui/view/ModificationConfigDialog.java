@@ -1,6 +1,7 @@
 
 package com.compomics.pride_asa_pipeline.gui.view;
 
+import java.awt.Color;
 import javax.swing.*;
 
 /**
@@ -21,7 +22,8 @@ public class ModificationConfigDialog extends javax.swing.JDialog {
     public ModificationConfigDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        fileChooser = new JFileChooser();
+        this.getContentPane().setBackground(Color.WHITE);
+        fileChooser = new JFileChooser();        
         modificationsTableScrollPane.getViewport().setOpaque(false);
         modifcationsTable.getTableHeader().setReorderingAllowed(false);
         modifcationsTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -105,6 +107,13 @@ public class ModificationConfigDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        modificationsTablePanel = new javax.swing.JPanel();
+        modificationsTableScrollPane = new javax.swing.JScrollPane();
+        modifcationsTable = new javax.swing.JTable();
+        saveButton = new javax.swing.JButton();
+        importButton = new javax.swing.JButton();
+        addModificationButton = new javax.swing.JButton();
+        removeModificationButton = new javax.swing.JButton();
         editModificationPanel = new javax.swing.JPanel();
         modNameLabel = new javax.swing.JLabel();
         modNameTextField = new javax.swing.JTextField();
@@ -126,17 +135,84 @@ public class ModificationConfigDialog extends javax.swing.JDialog {
         modAccessionValueLabel = new javax.swing.JLabel();
         modAccessionValueTextField = new javax.swing.JTextField();
         bindingLoggingLabel = new javax.swing.JLabel();
-        modificationsTablePanel = new javax.swing.JPanel();
-        modificationsTableScrollPane = new javax.swing.JScrollPane();
-        modifcationsTable = new javax.swing.JTable();
-        saveButton = new javax.swing.JButton();
-        importButton = new javax.swing.JButton();
-        addModificationButton = new javax.swing.JButton();
-        removeModificationButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Modification Configuration");
         setMinimumSize(new java.awt.Dimension(500, 700));
+
+        modificationsTablePanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Modifications"));
+        modificationsTablePanel.setOpaque(false);
+
+        modificationsTableScrollPane.setOpaque(false);
+        modificationsTableScrollPane.setPreferredSize(new java.awt.Dimension(25, 25));
+
+        modifcationsTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        modifcationsTable.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        modifcationsTable.setOpaque(false);
+        modificationsTableScrollPane.setViewportView(modifcationsTable);
+
+        saveButton.setText("Save");
+        saveButton.setToolTipText("Click to save the modifications to the modifications file.");
+        saveButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        saveButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        saveButton.setPreferredSize(new java.awt.Dimension(80, 25));
+
+        importButton.setText("Import");
+        importButton.setToolTipText("Click to import a modification file.");
+        importButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        importButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        importButton.setPreferredSize(new java.awt.Dimension(80, 25));
+
+        addModificationButton.setText("Add");
+        addModificationButton.setToolTipText("Click to add a modification.");
+        addModificationButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        addModificationButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        addModificationButton.setPreferredSize(new java.awt.Dimension(80, 25));
+
+        removeModificationButton.setText("Remove");
+        removeModificationButton.setToolTipText("Click to delete the selected modification");
+        removeModificationButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        removeModificationButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        removeModificationButton.setPreferredSize(new java.awt.Dimension(80, 25));
+
+        javax.swing.GroupLayout modificationsTablePanelLayout = new javax.swing.GroupLayout(modificationsTablePanel);
+        modificationsTablePanel.setLayout(modificationsTablePanelLayout);
+        modificationsTablePanelLayout.setHorizontalGroup(
+            modificationsTablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, modificationsTablePanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(modificationsTablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(modificationsTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(modificationsTablePanelLayout.createSequentialGroup()
+                        .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(importButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(addModificationButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(removeModificationButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        modificationsTablePanelLayout.setVerticalGroup(
+            modificationsTablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(modificationsTablePanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(modificationsTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(modificationsTablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(addModificationButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(removeModificationButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(importButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
 
         editModificationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Modification Details"));
         editModificationPanel.setMinimumSize(new java.awt.Dimension(100, 100));
@@ -209,48 +285,54 @@ public class ModificationConfigDialog extends javax.swing.JDialog {
             .addGroup(editModificationPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(modAccessionLabel)
-                    .addComponent(modAccessionValueLabel)
-                    .addComponent(modAverageMassShiftLabel)
-                    .addComponent(modLocationLabel)
-                    .addComponent(affectedAminoAcidsLabel)
-                    .addComponent(modNameLabel)
-                    .addComponent(modMonoIsotopicMassShiftLabel))
-                .addGap(26, 26, 26)
-                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, editModificationPanelLayout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(addAminoAcidButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(removeAminoAcidButton, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, editModificationPanelLayout.createSequentialGroup()
-                        .addGap(1, 1, 1)
-                        .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(modAccessionValueTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(modMonoIsotopicMassShiftTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(modAverageMassShiftTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(modLocationComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(editModificationPanelLayout.createSequentialGroup()
-                                .addComponent(modNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
-                                .addGap(195, 195, 195))))
                     .addGroup(editModificationPanelLayout.createSequentialGroup()
-                        .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(bindingLoggingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(modAccessionTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(1, 1, 1)))
-                .addGap(9, 9, 9))
+                        .addComponent(bindingLoggingLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(editModificationPanelLayout.createSequentialGroup()
+                        .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(modAccessionLabel)
+                            .addComponent(modAccessionValueLabel)
+                            .addComponent(modAverageMassShiftLabel)
+                            .addComponent(modLocationLabel)
+                            .addComponent(affectedAminoAcidsLabel)
+                            .addComponent(modNameLabel)
+                            .addComponent(modMonoIsotopicMassShiftLabel))
+                        .addGap(26, 26, 26)
+                        .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(editModificationPanelLayout.createSequentialGroup()
+                                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, editModificationPanelLayout.createSequentialGroup()
+                                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(addAminoAcidButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(removeAminoAcidButton, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, editModificationPanelLayout.createSequentialGroup()
+                                        .addGap(1, 1, 1)
+                                        .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(modAccessionValueTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
+                                            .addComponent(modMonoIsotopicMassShiftTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(modAverageMassShiftTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(modLocationComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addGroup(editModificationPanelLayout.createSequentialGroup()
+                                        .addComponent(modAccessionTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGap(1, 1, 1)))
+                                .addGap(9, 9, 9))
+                            .addGroup(editModificationPanelLayout.createSequentialGroup()
+                                .addComponent(modNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())))))
         );
         editModificationPanelLayout.setVerticalGroup(
             editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(editModificationPanelLayout.createSequentialGroup()
-                .addGap(11, 11, 11)
+                .addContainerGap()
+                .addComponent(bindingLoggingLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(modNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(modNameLabel)
-                    .addComponent(bindingLoggingLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(modNameLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(modAccessionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -281,82 +363,8 @@ public class ModificationConfigDialog extends javax.swing.JDialog {
                     .addGroup(editModificationPanelLayout.createSequentialGroup()
                         .addGap(63, 63, 63)
                         .addComponent(affectedAminoAcidsLabel))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-
-        modificationsTablePanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Modifications"));
-
-        modificationsTableScrollPane.setOpaque(false);
-        modificationsTableScrollPane.setPreferredSize(new java.awt.Dimension(25, 25));
-
-        modifcationsTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-
-            }
-        ));
-        modifcationsTable.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        modifcationsTable.setOpaque(false);
-        modificationsTableScrollPane.setViewportView(modifcationsTable);
-
-        saveButton.setText("Save");
-        saveButton.setToolTipText("Click to save the modifications to the modifications file.");
-        saveButton.setMaximumSize(new java.awt.Dimension(80, 25));
-        saveButton.setMinimumSize(new java.awt.Dimension(80, 25));
-        saveButton.setPreferredSize(new java.awt.Dimension(80, 25));
-
-        importButton.setText("Import");
-        importButton.setToolTipText("Click to import a modification file.");
-        importButton.setMaximumSize(new java.awt.Dimension(80, 25));
-        importButton.setMinimumSize(new java.awt.Dimension(80, 25));
-        importButton.setPreferredSize(new java.awt.Dimension(80, 25));
-
-        addModificationButton.setText("Add");
-        addModificationButton.setToolTipText("Click to add a modification.");
-        addModificationButton.setMaximumSize(new java.awt.Dimension(80, 25));
-        addModificationButton.setMinimumSize(new java.awt.Dimension(80, 25));
-        addModificationButton.setPreferredSize(new java.awt.Dimension(80, 25));
-
-        removeModificationButton.setText("Remove");
-        removeModificationButton.setToolTipText("Click to delete the selected modification");
-        removeModificationButton.setMaximumSize(new java.awt.Dimension(80, 25));
-        removeModificationButton.setMinimumSize(new java.awt.Dimension(80, 25));
-        removeModificationButton.setPreferredSize(new java.awt.Dimension(80, 25));
-
-        javax.swing.GroupLayout modificationsTablePanelLayout = new javax.swing.GroupLayout(modificationsTablePanel);
-        modificationsTablePanel.setLayout(modificationsTablePanelLayout);
-        modificationsTablePanelLayout.setHorizontalGroup(
-            modificationsTablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, modificationsTablePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(modificationsTablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(modificationsTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(modificationsTablePanelLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(importButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(addModificationButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(removeModificationButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-        );
-        modificationsTablePanelLayout.setVerticalGroup(
-            modificationsTablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(modificationsTablePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(modificationsTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(modificationsTablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(addModificationButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(removeModificationButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(importButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 

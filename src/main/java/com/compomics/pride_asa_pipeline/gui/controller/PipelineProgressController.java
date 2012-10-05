@@ -16,12 +16,11 @@ public class PipelineProgressController extends WindowAdapter {
 
     //model
     private int progress;
+    private boolean progressFinished;
     //view
     private ProgressDialogX pipelineProgressDialog;
     //parent controller
-    private ExperimentSelectionController experimentSelectionController;
-    
-    private boolean progressFinished = false;
+    private ExperimentSelectionController experimentSelectionController;        
 
     public ExperimentSelectionController getExperimentSelectionController() {
         return experimentSelectionController;
@@ -32,6 +31,7 @@ public class PipelineProgressController extends WindowAdapter {
     }
 
     public void init() {
+        progressFinished = Boolean.FALSE;
         //set this controller in PipelineProgressAppender
         PipelineProgressAppender.setPipelineProgressController(this);
     }
@@ -52,6 +52,7 @@ public class PipelineProgressController extends WindowAdapter {
 
         new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     pipelineProgressDialog.setVisible(Boolean.TRUE);
