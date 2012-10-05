@@ -1,7 +1,3 @@
-/*
- *
-
- */
 package com.compomics.pride_asa_pipeline.gui.view;
 
 import javax.swing.JPanel;
@@ -9,6 +5,7 @@ import javax.swing.JPanel;
 /**
  *
  * @author Niels Hulstaert
+ * @author Harald Barsnes
  */
 public class SummaryPanel extends javax.swing.JPanel {
 
@@ -33,7 +30,7 @@ public class SummaryPanel extends javax.swing.JPanel {
 
     public JPanel getPrecursorMassDeltaChartParentPanel() {
         return precursorMassDeltaChartParentPanel;
-    }    
+    }
 
     public JPanel getFragmentIonMassDeltaChartParentPanel() {
         return fragmentIonMassDeltaChartParentPanel;
@@ -45,7 +42,7 @@ public class SummaryPanel extends javax.swing.JPanel {
 
     public JPanel getyIonCoverageChartParentPanel() {
         return yIonCoverageChartParentPanel;
-    }        
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -85,7 +82,7 @@ public class SummaryPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.33;
         gridBagConstraints.weighty = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
         add(identificationsChartParentPanel, gridBagConstraints);
 
         modificationsChartParentPanel.setBackground(new java.awt.Color(255, 255, 255));
@@ -98,7 +95,7 @@ public class SummaryPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.33;
         gridBagConstraints.weighty = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 6, 0);
         add(modificationsChartParentPanel, gridBagConstraints);
 
         generalSummaryPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("General"));
@@ -176,7 +173,7 @@ public class SummaryPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.66;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 10, 10);
+        gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 6);
         add(generalSummaryPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
