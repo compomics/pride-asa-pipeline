@@ -29,19 +29,23 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
     public static final String MODS_DELIMITER = ", ";
     private static final String UNMOD_MASS_DELTA_OPEN = "[";
     private static final String UNMOD_MASS_DELTA_CLOSE = "]";
-    private static final String[] columnNames = {"Peptide", "Modifications", "Charge", "Mass Delta", "M/Z Delta", "Precursor m/z", "Noise Threshold", "Score"};
-    public static final int PEPTIDE = 0;
-    public static final int CHARGE = 2;
-    public static final int MASS_DELTA = 3;
-    public static final int MZ_DELTA = 4;
-    public static final int PRECURSOR_MZ = 5;
-    public static final int NOISE_THRESHOLD = 6;
-    public static final int SCORE = 7;
-    public static final int MODIFICATIONS = 1;
+    private static final String[] columnNames = {"ID", "Peptide", "Modifications", "Charge", "Mass Delta", "M/Z Delta", "Precursor m/z", "Noise Threshold", "Score"};    
+    public static final int PEPTIDE_ID = 0;
+    public static final int PEPTIDE = 1;
+    public static final int MODIFICATIONS = 2;
+    public static final int CHARGE = 3;
+    public static final int MASS_DELTA = 4;
+    public static final int MZ_DELTA = 5;
+    public static final int PRECURSOR_MZ = 6;
+    public static final int NOISE_THRESHOLD = 7;
+    public static final int SCORE = 8;
+    
 
     @Override
     public Class getColumnClass(int column) {
         switch (column) {
+            case PEPTIDE_ID:
+                return Long.class;
             case PEPTIDE:
                 return String.class;
             case MODIFICATIONS:
@@ -70,7 +74,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
 
     @Override
     public int getColumnCount() {
-        return 8;
+        return 9;
     }
 
     @Override
@@ -82,6 +86,8 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
     public Object getColumnValue(Object baseObject, int column) {
         Identification identification = (Identification) baseObject;
         switch (column) {
+            case PEPTIDE_ID:
+                return identification.getPeptide().getPeptideId();
             case PEPTIDE:
                 return identification.getPeptide().getSequenceString();
             case MODIFICATIONS:

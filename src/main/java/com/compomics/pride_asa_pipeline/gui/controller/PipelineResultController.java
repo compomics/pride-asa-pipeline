@@ -199,6 +199,7 @@ public class PipelineResultController {
         identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.MODIFICATIONS).setCellRenderer(new ModificationColumnRenderer());
 
         //set column widths
+        identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.PEPTIDE_ID).setPreferredWidth(5);
         identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.PEPTIDE).setPreferredWidth(200);
         identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.MODIFICATIONS).setPreferredWidth(200);
         identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.CHARGE).setPreferredWidth(10);
@@ -214,7 +215,6 @@ public class PipelineResultController {
 
         //add listeners
         identificationsPanel.getIdentificationsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
             @Override
             public void valueChanged(ListSelectionEvent lse) {
                 if (!lse.getValueIsAdjusting()) {
@@ -356,9 +356,9 @@ public class PipelineResultController {
                 this.setBackground(table.getSelectionBackground());
             } else {
                 if (row % 2 == 0) {
-                    setBackground(UIManager.getColor("Table.alternateRowColor"));
-                } else {
                     setBackground(Color.WHITE);
+                } else {
+                    setBackground(UIManager.getColor("Table.alternateRowColor"));
                 }
             }
             this.revalidate();
@@ -412,9 +412,9 @@ public class PipelineResultController {
                 this.setBackground(table.getSelectionBackground());
             } else {
                 if (row % 2 == 0) {
-                    setBackground(UIManager.getColor("Table.alternateRowColor"));
-                } else {
                     setBackground(Color.WHITE);
+                } else {
+                    setBackground(UIManager.getColor("Table.alternateRowColor"));
                 }
             }
             this.revalidate();
