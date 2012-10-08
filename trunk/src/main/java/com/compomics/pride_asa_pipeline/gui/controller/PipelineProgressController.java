@@ -41,14 +41,14 @@ public class PipelineProgressController extends WindowAdapter {
         pipelineProgressDialog = new ProgressDialogX(experimentSelectionController.getMainController().getMainFrame(),
                 Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/pride-asap.png")),
                 Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/pride-asap-orange.png")),
-                true);
+                Boolean.TRUE);
         pipelineProgressDialog.addWindowListener(this);
 
         pipelineProgressDialog.getProgressBar().setMaximum(numberOfProgressSteps + 1);
         pipelineProgressDialog.setTitle(progressHeaderText + " Please Wait...");
         progress = 1;
         GuiUtils.centerDialogOnFrame(experimentSelectionController.getMainController().getMainFrame(), pipelineProgressDialog);
-        progressFinished = false;
+        progressFinished = Boolean.FALSE;
 
         new Thread(new Runnable() {
 

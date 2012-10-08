@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.gui.view;
 
+import com.compomics.pride_asa_pipeline.util.GuiUtils;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;

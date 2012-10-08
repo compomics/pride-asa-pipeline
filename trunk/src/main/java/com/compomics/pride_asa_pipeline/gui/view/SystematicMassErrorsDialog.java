@@ -58,6 +58,7 @@ public class SystematicMassErrorsDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Pipeline Proceed Confirmation");
+        setModal(true);
         setResizable(false);
 
         proceedButton.setText("Proceed");

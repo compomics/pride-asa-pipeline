@@ -144,6 +144,7 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Modifications Conflict(s)");
+        setModal(true);
         setResizable(false);
 
         cancelButton.setText("Cancel");
@@ -212,8 +213,8 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
         modAverageModMassShiftTextField.setOpaque(false);
         modAverageModMassShiftTextField.setPreferredSize(new java.awt.Dimension(300, 30));
 
-        jTextArea1.setColumns(20);
         jTextArea1.setEditable(false);
+        jTextArea1.setColumns(20);
         jTextArea1.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
         jTextArea1.setRows(3);
         jTextArea1.setText("Some of the modifications found in pride for this experiment have equal masses compared to the fixed set of pipeline modifications.\nPlease resolve these conflicting modifications by adding or removing pride modifications to the pipeline modifications.\nAdding or removing fixed pipeline modifications can be done in the \"Modifications configuration\" section.");
@@ -259,6 +260,7 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("PRIDE Modifications"));
+        jPanel2.setOpaque(false);
 
         jScrollPane1.setBorder(null);
 
@@ -282,6 +284,7 @@ public class ModificationsMergeDialog extends javax.swing.JDialog {
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Pipeline Modifications"));
+        jPanel3.setOpaque(false);
 
         jScrollPane2.setBorder(null);
 

@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.gui.controller;
 
+import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
@@ -188,17 +189,7 @@ public class MainController implements ActionListener {
      * @return the version number of PeptideShaker
      */
     public String getVersion() {
-
-        java.util.Properties p = new java.util.Properties();
-
-        try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream("pride-asap.properties");
-            p.load(is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return p.getProperty("pride-asap.version");
+        return PropertiesConfigurationHolder.getInstance().getString("pride-asap.version");
     }
 
     /**
