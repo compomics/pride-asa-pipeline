@@ -89,7 +89,7 @@ public class MainController implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        
+
         if (((JMenuItem) actionEvent.getSource()).getText().equalsIgnoreCase("Configuration")) {
             pipelineParamsController.getPipelineConfigDialog().setVisible(true);
         } else { // modification details
@@ -100,7 +100,6 @@ public class MainController implements ActionListener {
     public void init() {
         //set uncaught exception handler
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 LOGGER.error(e.getMessage(), e);
@@ -108,7 +107,7 @@ public class MainController implements ActionListener {
                 onAnnotationCanceled();
             }
         });
-        
+
         // check for new version
         checkForNewVersion(getVersion());
 
@@ -137,7 +136,7 @@ public class MainController implements ActionListener {
         mainFrame.getFileSelectionParentPanel().add(experimentSelectionController.getFileSelectionPanel(), gridBagConstraints);
         mainFrame.getIdentificationsParentPanel().add(pipelineResultController.getIdentificationsPanel(), gridBagConstraints);
         mainFrame.getSummaryParentPanel().add(pipelineResultController.getSummaryPanel(), gridBagConstraints);
-        
+
         mainFrame.getModificationsMenuItem().addActionListener(this);
         mainFrame.getPipelineConfigurationMenuItem().addActionListener(this);
 
@@ -189,7 +188,19 @@ public class MainController implements ActionListener {
      * @return the version number of PeptideShaker
      */
     public String getVersion() {
-        return PropertiesConfigurationHolder.getInstance().getString("pride-asap.version");
+        String version = "UNKNOWN";
+        
+        java.util.Properties properties = new java.util.Properties();
+
+        try {
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream("version.prop");
+            properties.load(is);
+            version = properties.getProperty("pride-asap.version");
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
+        return version;
     }
 
     /**
