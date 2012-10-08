@@ -1,6 +1,5 @@
 package com.compomics.pride_asa_pipeline.gui.controller;
 
-import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
