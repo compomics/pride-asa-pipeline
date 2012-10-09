@@ -5,18 +5,20 @@
 For a given experiment, identifications and spectra are retrieved from the PRIDE public MySQL database and processed into three categories, with `Δm` the mass difference between the experimental and theoretical precursor mass:
   * _unmodified_: `Δm` is smaller than the mass error
   * _modified_: `Δm` is significant but can’t be explained by a modification combination   
-  * _unexplained_: `Δm` can be fitted to a combination of modification masses, so the precursor has likely one or more PTMs. 
+  * _unexplained_: `Δm` can be fitted to a combination of modification masses, so the precursor carries likely one or more PTMs. 
 The peptide sequences are then matched to the corresponding spectra after adaptive noise filtering, and a score is derived for each peptide-to-spectrum match. The final output of the tool consists of the complete list of annotated identifications and spectra, and the list of modifications used to explain the observed precursor mass deviations in that experiment.
 
 = Configuration =
-The pipeline configuration files can be found in the resources folder. These files can be edited by the user if necessary. If no files are found in the resources folder, default values will be used instead. Note that the pipeline can be configured in GUI mode as well. 
-=== pride_asa_pipeline.properties ===
+The pipeline configuration files can be found in the resources folder. These files can be edited by the user if necessary. If no files are found in the resources folder, default values will be used instead. Note that the pipeline can be configured in GUI (_Edit_ -> _Configuration_) mode as well. 
+== pride_asa_pipeline.properties ==
 Most of the parameter values in this file should be left to their default values. The settings that the user might need the change are listed below
   * `spectrumannotator.include_pride_modifications`: include the modifications in found in PRIDE for a given experiment. Note that setting this parameter to `true` can increase the processing time. The [#modifications.xml modifications] defined in the pipeline are always taken into account.
   * `results_path`: the path on the file system where the pipeline result files will be stored.
   * `modification.use_monoisotopic_mass`: use the monoisotopic or the average mass for the PTMs.
   * `pipeline.considered_charge_states`: the considered charge states for a precursor.
-=== modifications.xml ===
+== modifications.xml ==
+This XML file contains the modifications used to explain a possible difference between the experimental and theorecical precursor mass. It can be edited or replaced (_Edit_ -> _Modifications_ in GUI mode) by a modifications result file. The accompanying XML schema can be found in the  
+
 == Input ==
 
 == Output ==
