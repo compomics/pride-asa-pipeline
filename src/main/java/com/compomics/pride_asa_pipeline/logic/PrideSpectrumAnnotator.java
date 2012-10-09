@@ -220,8 +220,6 @@ public class PrideSpectrumAnnotator {
      */
     public void annotate(String experimentAccession) {
         if (!isInitialized) {
-            //check wether first initialisation step has been executed
-            initIdentifications(experimentAccession);
             //add the non-conflicting modifications found in pride for the given experiment                        
             Set<Modification> prideModifications = initModifications();
             Set<Modification> conflictingModifications = modificationHolder.filterByEqualMasses(prideModifications);
