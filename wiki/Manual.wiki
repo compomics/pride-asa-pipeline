@@ -6,6 +6,7 @@ For a given experiment, identifications and spectra are retrieved from the PRIDE
   * _unmodified_: `Δm` is smaller than the mass error
   * _modified_: `Δm` is significant but can’t be explained by a modification combination   
   * _unexplained_: `Δm` can be fitted to a combination of modification masses, so the precursor carries likely one or more PTMs. 
+
 The peptide sequences are then matched to the corresponding spectra after adaptive noise filtering, and a score is derived for each peptide-to-spectrum match. The final output of the tool consists of the complete list of annotated identifications and spectra, and the list of modifications used to explain the observed precursor mass deviations in that experiment.
 
 == Configuration ==
@@ -35,5 +36,13 @@ java -jar pride-asa-pipeline-<version>.jar [-a <accession> | -f <experiment_acce
 Using argument `-a` followed by a PRIDE experiment accession annotates one experiment whereas `-f` followed by the path of a _.txt_ file containing one or more experiment accessions (line separated) annotates multiple experiments sequentially.
 
 == GUI mode ==
-Run the pipeline in GUI mode by double clicking the _.jar_ file. On the main panel, an experiment can be selected out of the publicly available PRIDE experiments. If the experiment contains no useful identifications, a message is shown. While processing a given experiment, two dialogs might pop up:
-  *
+Run the pipeline in GUI mode by double clicking the _.jar_ file. The GUI consists of three parts
+
+=== Pipeline panel ===
+On the main panel, an experiment can be selected out of the publicly available PRIDE experiments. If the experiment contains no useful identifications, a message is shown. While processing a given experiment, two dialogs might pop up:
+  * Systematic mass error dialog: one or more systematic mass errors exceed the threshold value. The user can decide to proceed or not.
+  * Conflicting modifications dialog: The conflicting PRIDE modifications are shown on left, the pipeline modifications and non-conflicting PRIDE modifications on the right. The user can include or exclude PRIDE modifications in this dialog. The pipeline modifications can be edited in the 
+
+=== Configuration dialog ===
+
+=== Modifications dialog ===
