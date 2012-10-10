@@ -46,7 +46,7 @@ On the main panel, an experiment can be selected out of the publicly available P
   * Conflicting modifications dialog: The conflicting PRIDE modifications are shown on left, the pipeline modifications and non-conflicting PRIDE modifications on the right. The user can include or exclude PRIDE modifications in this dialog. The pipeline modifications can be edited in the [GUI_mode#Modifications_dialog Modifications] dialog. Note that the pipeline can handle equal mass modifications, although they increase the processing time significantly. 
 
 === Configuration dialog ===
-The pipeline settings described in the [Manual#Configuration Modifications] can be viewed and modified in this dialog. The user is able to restore the default settings by clicking the _reset_ button. Saving the setting will write the current parameter values to the `pride_asa_pipeline.properties` file in the resources folder.
+The pipeline settings described in the [Manual#Configuration Configuration] section can be viewed and modified in this dialog. The user is able to restore the default settings by clicking the _reset_ button. Saving the setting will write the current parameter values to the `pride_asa_pipeline.properties` file in the resources folder.
 
 === Modifications dialog ===
 In this dialog, the user can add, modify and delete modifications. As mentioned before, a modifications XML file can be imported as well. In case of validation error against the schema, an error dialog will be shown.
