@@ -25,7 +25,7 @@ Most of the parameter values in this file should be left to their default values
 === modifications.xml ===
 This XML file contains the modifications used to explain a possible difference between the experimental and theoretical precursor mass. It can be edited or replaced (_Edit_ -> _Modifications_ in GUI mode) by a modifications result file. The accompanying XML schema can be found in the [http://code.google.com/p/pride-asa-pipeline/downloads/list downloads] section. 
 
-As mentioned before, this fixed set of pipeline modifications can be complemented with modifications found in PRIDE for the experiment of interest. In GUI mode, a dialog is shown if one or more PRIDE modifications have a similar mass compared to the pipeline PTMs (see this [GUI_mode#Pipeline_panel section]).
+As mentioned before, this fixed set of pipeline modifications can be complemented with modifications found in PRIDE for the experiment of interest. In GUI mode, a dialog is shown if one or more PRIDE modifications have a similar mass compared to the pipeline PTMs (see this [Manual#GUI_mode section]).
 == Output ==
 The pipeline produces two result files. The first one (_<experiment accession>_.txt) contains the fragment ion annotations for each identified spectrum. The second one (_<experiment accession>_`_`mods.txt) contains the subset of modifications that could actually explain a precursor mass deviation. These files can be imported into the GUI for further analysis.
 
