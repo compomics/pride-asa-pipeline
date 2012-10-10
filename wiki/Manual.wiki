@@ -17,6 +17,7 @@ Most of the parameter values in this file should be left to their default values
   * `results_path`: the path on the file system where the pipeline result files will be stored.
   * `modification.use_monoisotopic_mass`: use the monoisotopic or the average mass for the PTMs.
   * `pipeline.considered_charge_states`: the considered charge states for a precursor.
+  * `massrecalibrator.maximum_systematic_mass_error`: the threshold systematic mass error value. The systematic mass errors (per charge state) as result of a recalibration step are checked against this value.  
 
 === modifications.xml ===
 This XML file contains the modifications used to explain a possible difference between the experimental and theorecical precursor mass. It can be edited or replaced (_Edit_ -> _Modifications_ in GUI mode) by a modifications result file. The accompanying XML schema can be found in the [http://code.google.com/p/pride-asa-pipeline/downloads/list downloads] section. 
@@ -31,8 +32,8 @@ Execute the following command in the folder where the pipeline .jar file is loca
 {{{
 java -jar pride-asa-pipeline-<version>.jar [-a <accession> | -f <experiment_accessions_file_path>]
 }}}
-Using argument `-a` followed by a PRIDE experiment accession annotates one experiment whereas `-f` followed by the path of a _.txt_ file containing one or more experiment accessions annotates multiple experiments sequentially.
-
-
+Using argument `-a` followed by a PRIDE experiment accession annotates one experiment whereas `-f` followed by the path of a _.txt_ file containing one or more experiment accessions (line separated) annotates multiple experiments sequentially.
 
 == GUI mode ==
+Run the pipeline in GUI mode by double clicking the _.jar_ file. On the main panel, an experiment can be selected out of the publicly available PRIDE experiments. If the experiment contains no useful identifications, a message is shown. While processing a given experiment, two dialogs might pop up:
+  *
