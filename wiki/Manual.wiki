@@ -42,7 +42,7 @@ Run the pipeline in GUI mode by double clicking the _.jar_ file. The GUI consist
 === Pipeline panel ===
 On the main panel, an experiment can be selected from the publicly available PRIDE experiments. If the experiment contains no useful identifications, a message is shown. While processing a given experiment, two dialogs might pop up:
   * Systematic mass error dialog: one or more systematic mass errors exceed the threshold value. The user can decide to proceed or not.
-  * Conflicting modifications dialog: The conflicting PRIDE modifications are shown on left, the pipeline modifications and non-conflicting PRIDE modifications on the right. The user can include or exclude PRIDE modifications in this dialog. The pipeline modifications can be edited in the [#Modifications_dialog Modifications] dialog. Note that the pipeline can handle equal mass modifications, although they increase the processing time significantly. 
+  * Conflicting modifications dialog: The conflicting PRIDE modifications are shown on left, the pipeline modifications and non-conflicting PRIDE modifications on the right. The user can include or exclude PRIDE modifications in this dialog. The pipeline modifications can be edited in the [#Modifications_dialog modifications] dialog. Note that the pipeline can handle equal mass modifications, although they increase the processing time significantly. 
 
 === Configuration dialog ===
 The pipeline settings described in the [Manual#Configuration Configuration] section can be viewed and modified in this dialog. The user is able to restore the default settings by clicking the _reset_ button. Saving the setting will write the current parameter values to the `pride_asa_pipeline.properties` file in the resources folder.
