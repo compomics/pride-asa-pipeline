@@ -1,7 +1,9 @@
 #labels Featured
 #How to use the pipeline
 
-== Overview == 
+= Manual =
+
+== In a nutshell == 
 For a given experiment, identifications and spectra are retrieved from the PRIDE public MySQL database and processed into three categories, with `Δm` the mass difference between the experimental and theoretical precursor mass:
   * _unmodified_: `Δm` is smaller than the mass error
   * _modified_: `Δm` is significant but can’t be explained by a modification combination   
@@ -21,12 +23,12 @@ Most of the parameter values in this file should be left to their default values
   * `massrecalibrator.maximum_systematic_mass_error`: the threshold systematic mass error value. The systematic mass errors (per charge state) as result of a recalibration step are checked against this value.  
 
 === modifications.xml ===
-This XML file contains the modifications used to explain a possible difference between the experimental and theorecical precursor mass. It can be edited or replaced (_Edit_ -> _Modifications_ in GUI mode) by a modifications result file. The accompanying XML schema can be found in the [http://code.google.com/p/pride-asa-pipeline/downloads/list downloads] section. 
+This XML file contains the modifications used to explain a possible difference between the experimental and theoretical precursor mass. It can be edited or replaced (_Edit_ -> _Modifications_ in GUI mode) by a modifications result file. The accompanying XML schema can be found in the [http://code.google.com/p/pride-asa-pipeline/downloads/list downloads] section. 
 
-As mentioned before, this fixed set of pipeline modifications can be complemented with modifications found in PRIDE for the experiment of interest. In GUI mode, a dialog is shown if one or more PRIDE modifications have a similar mass compared to the pipeline PTMs. The user can then decide wether or not to include these _conflicting modifications_.
+As mentioned before, this fixed set of pipeline modifications can be complemented with modifications found in PRIDE for the experiment of interest. In GUI mode, a dialog is shown if one or more PRIDE modifications have a similar mass compared to the pipeline PTMs. The user can then decide whether or not to include these _conflicting modifications_.
 
 == Output ==
-The pipeline produces two result files. The first one (_<experiment accession>_.txt) contains the fragment ion annotations for each identified spectrum. The second one (_<experiment accession>_`_`mods.txt) contains the subset of modifications that could actually explain a precursor mass deviation. These files can be imported into the gui for further analysis.
+The pipeline produces two result files. The first one (_<experiment accession>_.txt) contains the fragment ion annotations for each identified spectrum. The second one (_<experiment accession>_`_`mods.txt) contains the subset of modifications that could actually explain a precursor mass deviation. These files can be imported into the GUI for further analysis.
 
 == Command line mode ==
 Execute the following command in the folder where the pipeline .jar file is located:
@@ -36,13 +38,49 @@ java -jar pride-asa-pipeline-<version>.jar [-a <accession> | -f <experiment_acce
 Using argument `-a` followed by a PRIDE experiment accession annotates one experiment whereas `-f` followed by the path of a _.txt_ file containing one or more experiment accessions (line separated) annotates multiple experiments sequentially.
 
 == GUI mode ==
-Run the pipeline in GUI mode by double clicking the _.jar_ file. The GUI consists of three parts
+Run the pipeline in GUI mode by double clicking the _.jar_ file. The GUI consists of three parts, described in the following.
 
 === Pipeline panel ===
 On the main panel, an experiment can be selected out of the publicly available PRIDE experiments. If the experiment contains no useful identifications, a message is shown. While processing a given experiment, two dialogs might pop up:
   * Systematic mass error dialog: one or more systematic mass errors exceed the threshold value. The user can decide to proceed or not.
-  * Conflicting modifications dialog: The conflicting PRIDE modifications are shown on left, the pipeline modifications and non-conflicting PRIDE modifications on the right. The user can include or exclude PRIDE modifications in this dialog. The pipeline modifications can be edited in the 
+  * Conflicting modifications dialog: The conflicting PRIDE modifications are shown on left, the pipeline modifications and non-conflicting PRIDE modifications on the right. The user can include or exclude PRIDE modifications in this dialog. The pipeline modifications can be edited in the [GUI_mode#Modifications_dialog Modifications] dialog. Note that the pipeline can handle equal mass modifications, although they increase the processing time significantly. 
 
 === Configuration dialog ===
+The pipeline settings described in the [Manual#Configuration Modifications] can be viewed and modified in this dialog. The user is able to restore the default settings by clicking the _reset_ button. Saving the setting will write the current parameter values to the `pride_asa_pipeline.properties` file in the resources folder.
 
 === Modifications dialog ===
+In this dialog, the user can add, modify and delete modifications. As mentioned before, a modifications XML file can be imported as well. In case of validation error against the schema, an error dialog will be shown.
+
+== Use pride-asap a Maven dependency ==
+Include the following repositories in your _pom.xml_ file:
+{{{
+    <repositories>                   
+        <repository>
+            <id>genesis-maven2-repo</id>
+            <name>Genesis maven2 repository</name>
+            <url>http://genesis.UGent.be/maven2</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>genesis-maven-repo</id>
+            <name>Genesis maven repository</name>
+            <url>http://genesis.UGent.be/maven</url>
+            <layout>default</layout>
+        </repository>                
+    </repositories>
+}}}
+
+This project uses the _Spring_ framework for depency injection, so the _application context_ needs to be loaded before a _bean_ can be accessed, e.g.:
+{{{
+import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
+
+ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+PrideSpectrumAnnotator prideSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator"); 
+//annotate the first PRIDE experiment
+prideSpectrumAnnotator.annotate("1"); 
+}}}
+
+The two _Spring_ config files (`springXMLConfig.xml` and `guiSpringXMLConfig.xml`) can be found in the `scr\main\resources` folder.
