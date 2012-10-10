@@ -25,7 +25,7 @@ Most of the parameter values in this file should be left to their default values
 === modifications.xml ===
 This XML file contains the modifications used to explain a possible difference between the experimental and theoretical precursor mass. It can be edited or replaced (_Edit_ -> _Modifications_ in GUI mode) by a modifications result file. The accompanying XML schema can be found in the [http://code.google.com/p/pride-asa-pipeline/downloads/list downloads section]. 
 
-As mentioned before, this fixed set of pipeline modifications can be complemented with modifications found in PRIDE for the experiment of interest. In [Manual#GUI_mode GUI] mode, a dialog is shown if one or more PRIDE modifications have a similar mass compared to the pipeline PTMs.
+As mentioned before, this fixed set of pipeline modifications can be complemented with modifications found in PRIDE for the experiment of interest. In [Manual#GUI_mode GUI mode], a dialog is shown if one or more PRIDE modifications have a similar mass compared to the pipeline PTMs.
 == Output ==
 The pipeline produces two result files. The first one (_<experiment accession>_.txt) contains the fragment ion annotations for each identified spectrum. The second one (_<experiment accession>_`_`mods.txt) contains the subset of modifications that could actually explain a precursor mass deviation. These files can be imported (back) into the GUI for further analysis.
 
@@ -45,7 +45,7 @@ Run the pipeline in GUI mode by double clicking the _.jar_ file. The GUI consist
 
 On the main panel, an experiment can be selected from the publicly available PRIDE experiments. If the experiment contains no useful identifications, a message is shown. While processing a given experiment, two dialogs might pop up:
   * Systematic mass error dialog: one or more systematic mass errors exceed the threshold value. The user can decide to proceed or not.
-  * Conflicting modifications dialog: The conflicting PRIDE modifications are shown on the left, the pipeline modifications and non-conflicting PRIDE modifications on the right. The user can include or exclude PRIDE modifications in this dialog. The pipeline modifications can be edited in the [#Modifications_dialog modifications] dialog. Note that the pipeline can handle equal mass modifications, although they increase the processing time significantly. 
+  * Conflicting modifications dialog: The conflicting PRIDE modifications are shown on the left, the pipeline modifications and non-conflicting PRIDE modifications on the right. The user can include or exclude PRIDE modifications in this dialog. The pipeline modifications can be edited in the [#Modifications_dialog modifications dialog]. Note that the pipeline can handle equal mass modifications, although they increase the processing time significantly. 
 
 In the _Pipeline Result File_ tab, an already processed result file can be loaded.
 
