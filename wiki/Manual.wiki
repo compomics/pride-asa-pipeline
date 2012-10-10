@@ -54,13 +54,21 @@ In the _Pipeline Result File_ tab, an already processed result file can be loade
 In the _Summary_ tab, some descriptive graphs are shown.In the _Identifications_ tab, all identifications are listed. Clicking on an identifaction shows the annotated spectrum.
 
 === Configuration dialog ===
-The pipeline settings described in the [Manual#Configuration Configuration] section can be viewed and modified in this dialog. The user is able to restore the default settings by clicking the _reset_ button. Saving the setting will write the current parameter values to the `pride_asa_pipeline.properties` file in the resources folder.
+The pipeline settings described in the [Manual#Configuration Configuration] section can be viewed and modified in this dialog. The user is able to restore the default settings by clicking the _reset_ button. Saving the setting will write the current parameter values to the `pride_asa_pipeline.properties` file in the _resources_ folder.
 
 === Modifications dialog ===
 In this dialog, the user can add, modify and delete modifications. As mentioned before, a modifications XML file can be imported as well. In case of validation error against the schema, an error dialog will be shown.
 
 == Use pride-asap a Maven dependency ==
-Include the following repositories in your _pom.xml_ file:
+Include the following dependecy
+{{{
+    <dependency>
+        <groupId>com.compomics</groupId>
+        <artifactId>pride-asa-pipeline</artifactId>
+        <version>X.Y.Z</version>
+    </dependency>
+}}}
+and the following repositories in your _pom.xml_ file:
 {{{
     <repositories>                   
         <repository>
