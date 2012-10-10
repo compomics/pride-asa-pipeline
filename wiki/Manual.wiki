@@ -12,7 +12,7 @@ For a given experiment, identifications and spectra are retrieved from the PRIDE
 The peptide sequences are then matched to the corresponding spectra after adaptive noise filtering, and a score is derived for each peptide-to-spectrum match. The final output of the tool consists of the complete list of annotated identifications and spectra, and the list of modifications used to explain the observed precursor mass deviations in that experiment.
 
 == Configuration ==
-The pipeline configuration files can be found in the resources folder. These files can be edited by the user if necessary. If no files are found in the resources folder, default values will be used instead. Note that the pipeline can be configured in GUI mode (_Edit_ -> _Configuration_) as well. 
+The pipeline configuration files can be found in the _resources_ folder. These files can be edited by the user if necessary. If no files are found in the _resources_ directory, default values will be used instead. Note that the pipeline can be configured in GUI mode (_Edit_ -> _Configuration_) as well. 
 
 === pride_asa_pipeline.properties ===
 Most of the parameter values in this file should be left to their default values. The settings that the user might need the change are listed below
@@ -27,22 +27,31 @@ This XML file contains the modifications used to explain a possible difference b
 
 As mentioned before, this fixed set of pipeline modifications can be complemented with modifications found in PRIDE for the experiment of interest. In [Manual#GUI_mode GUI] mode, a dialog is shown if one or more PRIDE modifications have a similar mass compared to the pipeline PTMs.
 == Output ==
-The pipeline produces two result files. The first one (_<experiment accession>_.txt) contains the fragment ion annotations for each identified spectrum. The second one (_<experiment accession>_`_`mods.txt) contains the subset of modifications that could actually explain a precursor mass deviation. These files can be imported into the GUI for further analysis.
+The pipeline produces two result files. The first one (_<experiment accession>_.txt) contains the fragment ion annotations for each identified spectrum. The second one (_<experiment accession>_`_`mods.txt) contains the subset of modifications that could actually explain a precursor mass deviation. These files can be imported (back) into the GUI for further analysis.
 
 == Command line mode ==
-Execute the following command in the folder where the pipeline .jar file is located:
+Execute the following command in the folder where the pipeline _.jar_ file is located:
 {{{
 java -jar pride-asa-pipeline-<version>.jar [-a <accession> | -f <experiment_accessions_file_path>]
 }}}
-Using argument `-a` followed by a PRIDE experiment accession annotates one experiment whereas `-f` followed by the path of a _.txt_ file containing one or more experiment accessions (line separated) annotates multiple experiments sequentially.
+Using argument `-a` followed by a PRIDE experiment accession annotates one experiment whereas `-f` followed by the path of a _.txt_ file containing one or more experiment accessions (line separated) annotates multiple experiments sequentially. Arguments `-h` and `-u` give more information about the possible command line parameters.
 
 == GUI mode ==
 Run the pipeline in GUI mode by double clicking the _.jar_ file. The GUI consists of three parts, described in the following.
 
 === Pipeline panel ===
+
+*Experiment selection*
+
 On the main panel, an experiment can be selected from the publicly available PRIDE experiments. If the experiment contains no useful identifications, a message is shown. While processing a given experiment, two dialogs might pop up:
   * Systematic mass error dialog: one or more systematic mass errors exceed the threshold value. The user can decide to proceed or not.
   * Conflicting modifications dialog: The conflicting PRIDE modifications are shown on left, the pipeline modifications and non-conflicting PRIDE modifications on the right. The user can include or exclude PRIDE modifications in this dialog. The pipeline modifications can be edited in the [#Modifications_dialog modifications] dialog. Note that the pipeline can handle equal mass modifications, although they increase the processing time significantly. 
+
+In the _Pipeline Result File_ tab, an already processed result file can be loaded.
+
+*Pipeline result*
+
+In the _Summary_ tab, some descriptive graphs are shown.In the _Identifications_ tab, all identifications are listed. Clicking on an identifaction shows the annotated spectrum.
 
 === Configuration dialog ===
 The pipeline settings described in the [Manual#Configuration Configuration] section can be viewed and modified in this dialog. The user is able to restore the default settings by clicking the _reset_ button. Saving the setting will write the current parameter values to the `pride_asa_pipeline.properties` file in the resources folder.
