@@ -29,6 +29,8 @@ As mentioned before, this fixed set of pipeline modifications can be complemente
 == Output ==
 The pipeline produces two result files. The first one (_<experiment accession>_.txt) contains the fragment ion annotations for each identified spectrum. The second one (_<experiment accession>_`_`mods.txt) contains the subset of modifications that could actually explain a precursor mass deviation. These files can be imported (back) into the GUI for further analysis.
 
+In case of an unexpected error, the log file (pride-asa-pipeline.log) can be found in the _user_ root folder.
+
 == Command line mode ==
 Execute the following command in the folder where the pipeline _.jar_ file is located:
 {{{
