@@ -47,7 +47,7 @@ On the main panel, an experiment can be selected from the publicly available PRI
   * Systematic mass error dialog: one or more systematic mass errors exceed the threshold value. The user can decide to proceed or not.
   * Conflicting modifications dialog: The conflicting PRIDE modifications are shown on the left, the pipeline modifications and non-conflicting PRIDE modifications on the right. The user can include or exclude PRIDE modifications in this dialog. The pipeline modifications can be edited in the [#Modifications_dialog modifications dialog]. Note that the pipeline can handle equal mass modifications, although they increase the processing time significantly. 
 
-In the _Pipeline Result File_ tab, an already processed result file can be loaded.
+In the _Pipeline Result File_ tab, a result file from an already processed experiment can be loaded.
 
 *Pipeline result*
 
