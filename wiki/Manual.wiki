@@ -54,7 +54,7 @@ In the _Pipeline Result File_ tab, a result file from an already processed exper
 In the _Summary_ tab, some descriptive graphs are shown.In the _Identifications_ tab, all identifications are listed. Clicking on an identifaction shows the annotated spectrum.
 
 === Configuration dialog ===
-The pipeline settings described in the [Manual#Configuration Configuration section] can be viewed and modified in this dialog. The user is able to restore the default settings by clicking the _reset_ button. Saving the setting will write the current parameter values to the `pride_asa_pipeline.properties` file in the _resources_ folder.
+The pipeline settings described in the [Manual#Configuration Configuration section] can be viewed and modified in this dialog. The user is able to restore the default settings by clicking the _reset_ button. Saving the current settings will write the parameter values to the `pride_asa_pipeline.properties` file in the _resources_ folder.
 
 === Modifications dialog ===
 In this dialog, the user can add, modify and delete modifications. As mentioned before, a modifications XML file can be imported as well. In case of validation error against the schema, an error dialog will be shown.
@@ -99,4 +99,4 @@ PrideSpectrumAnnotator prideSpectrumAnnotator = (PrideSpectrumAnnotator) applica
 prideSpectrumAnnotator.annotate("1"); 
 }}}
 
-The two _Spring_ config files (`springXMLConfig.xml` and `guiSpringXMLConfig.xml`) can be found in the `scr\main\resources` folder.
+The two _Spring_ configuration files (`springXMLConfig.xml` and `guiSpringXMLConfig.xml`) can be found in the `scr\main\resources` folder.
