@@ -34,7 +34,7 @@ Execute the following command in the folder where the pipeline _.jar_ file is lo
 {{{
 java -jar pride-asa-pipeline-<version>.jar [-a <accession> | -f <experiment_accessions_file_path>]
 }}}
-Using argument `-a` followed by a PRIDE experiment accession annotates one experiment, whereas `-f` followed by the path of a _.txt_ file containing one or more experiment accessions (line separated) annotates multiple experiments sequentially. Arguments `-h` and `-u` give more information about the possible command line parameters.
+Using argument `-a` followed by a PRIDE experiment accession annotates one experiment, whereas `-f` followed by the path of a _.txt_ file containing one or more experiment accessions (line separated) annotates multiple experiments sequentially. Arguments `-h` and `-u` give more information about the available command line parameters.
 
 == GUI mode ==
 Run the pipeline in GUI mode by double clicking the _.jar_ file. The GUI consists of three parts, described in the following.
