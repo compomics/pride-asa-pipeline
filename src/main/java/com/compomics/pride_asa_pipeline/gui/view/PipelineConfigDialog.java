@@ -56,7 +56,7 @@ public class PipelineConfigDialog extends javax.swing.JDialog {
         saveButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Pipleline Configuration");
+        setTitle("Pipeline Configuration");
 
         configPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Parameters"));
         configPanel.setOpaque(false);
