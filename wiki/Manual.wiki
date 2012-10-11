@@ -1,4 +1,4 @@
-#summary How to use the pipeline
+#summary How to run the pipeline
 #labels Featured
 
 = Manual =
