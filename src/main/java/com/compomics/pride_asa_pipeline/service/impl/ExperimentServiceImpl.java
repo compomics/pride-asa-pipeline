@@ -141,7 +141,7 @@ public class ExperimentServiceImpl implements ExperimentService {
             buildSpectrumCacheForExperiment(experimentAccession);
         }
 
-        BufferedOutputStream outputStream = null;
+            BufferedOutputStream outputStream = null;
         try {
             //create new mgf file from scratch
             MascotGenericFile mascotGenericFile = new MascotGenericFile();

@@ -37,7 +37,7 @@ public class SystematicMassErrorsController extends WindowAdapter {
         pipelineProceedDialog.getInfoMessageLabel().setText(infoMessage);
         pipelineProceedDialog.getMassRecalibrationResultTable().setModel(new MassRecalibrationResultTableModel(massRecalibrationResult));
         GuiUtils.centerDialogOnFrame(experimentSelectionController.getMainController().getMainFrame(), pipelineProceedDialog);
-        pipelineProceedDialog.setVisible(Boolean.TRUE);
+        pipelineProceedDialog.setVisible(true);
     }
 
     public void init() {

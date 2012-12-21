@@ -394,7 +394,7 @@ public class ModificationsController {
         if (selectedModification.getAffectedAminoAcids().size() == 1) {
             modificationsConfigDialog.getRemoveAminoAcidButton().setEnabled(Boolean.FALSE);
         } else {
-            modificationsConfigDialog.getRemoveAminoAcidButton().setEnabled(Boolean.TRUE);
+            modificationsConfigDialog.getRemoveAminoAcidButton().setEnabled(true);
         }
     }
 
@@ -407,7 +407,7 @@ public class ModificationsController {
         if (modificationsBindingList.size() == 1) {
             modificationsConfigDialog.getRemoveModificationButton().setEnabled(Boolean.FALSE);
         } else {
-            modificationsConfigDialog.getRemoveModificationButton().setEnabled(Boolean.TRUE);
+            modificationsConfigDialog.getRemoveModificationButton().setEnabled(true);
         }
     }
 
@@ -436,7 +436,7 @@ public class ModificationsController {
     }
 
     /**
-     * Validator class used for binding. Checks if the bound field is not empty
+     * Validator class used for binding. Checks if the bound field is not empty.
      */
     private class RequiredStringValidator extends Validator<String> {
 

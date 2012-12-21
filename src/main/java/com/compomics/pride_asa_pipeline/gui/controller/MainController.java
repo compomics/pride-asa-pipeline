@@ -143,7 +143,7 @@ public class MainController implements ActionListener {
         mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //set main frame visible
         mainFrame.setLocationRelativeTo(null);
-        mainFrame.setVisible(Boolean.TRUE);
+        mainFrame.setVisible(true);
     }
 
     public void showMessageDialog(String title, String message, int messageType) {

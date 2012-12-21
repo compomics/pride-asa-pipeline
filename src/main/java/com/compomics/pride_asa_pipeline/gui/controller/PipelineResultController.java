@@ -344,7 +344,7 @@ public class PipelineResultController {
         private AttributedString attributedSequence = null;
 
         public PeptideColumnRenderer() {
-            setOpaque(Boolean.TRUE);
+            setOpaque(true);
         }
 
         @Override
@@ -400,7 +400,7 @@ public class PipelineResultController {
         private AttributedString attributedModificationsString = null;
 
         public ModificationColumnRenderer() {
-            setOpaque(Boolean.TRUE);
+            setOpaque(true);
         }
 
         @Override
@@ -435,7 +435,6 @@ public class PipelineResultController {
                 for (String modification : splits) {
                     index = modificationsString.indexOf(modification, index);
                     if (modificationColors.containsKey(modification)) {
-                        Color modificationColor = modificationColors.get(modification);
                         for (int i = modificationsString.indexOf(modification, index); i < modificationsString.indexOf(modification, index) + modification.length(); i++) {
                             if (modificationColors.containsKey(modification)) {
                                 attributedModificationsString.addAttribute(TextAttribute.FOREGROUND, modificationColors.get(modification), i, i + 1);

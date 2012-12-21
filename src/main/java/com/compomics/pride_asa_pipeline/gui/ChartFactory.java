@@ -59,7 +59,7 @@ public class ChartFactory {
         precMassDeltasDataset.addSeries("precursorMassDeltaSeries", precursorMassDeltaValues, NUMBER_OF_PRECURSOR_MASS_DELTA_BINS, precursorMassDeltaValues[0] - 0.5, precursorMassDeltaValues[precursorMassDeltaValues.length - 1] + 0.5);
         JFreeChart precursorMassDeltasChart = org.jfree.chart.ChartFactory.createHistogram(
                 "Precursor Mass Delta", "mass delta (d.)", "frequency", precMassDeltasDataset,
-                PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
+                PlotOrientation.VERTICAL, Boolean.FALSE, true, Boolean.FALSE);
         precursorMassDeltasChart.getPlot().setBackgroundPaint(Color.WHITE);
         precursorMassDeltasChart.getPlot().setOutlineVisible(false);
         GuiUtils.setShadowVisible(precursorMassDeltasChart, Boolean.FALSE); 
@@ -78,7 +78,7 @@ public class ChartFactory {
         fragMassDeltasDataset.addSeries("precursorMassDeltaSeries", Doubles.toArray(fragmentMassDeltaValues), NUMBER_OF_ION_FRAGMENT_MASS_DELTA_BINS, fragmentMassDeltaValues.get(0) - 0.5, fragmentMassDeltaValues.get(fragmentMassDeltaValues.size() - 1) + 0.5);
         JFreeChart fragmentMassDeltasChart = org.jfree.chart.ChartFactory.createHistogram(
                 "Fragment Ion Mass Delta", "mass delta (d.)", "frequency", fragMassDeltasDataset,
-                PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
+                PlotOrientation.VERTICAL, Boolean.FALSE, true, Boolean.FALSE);
         fragmentMassDeltasChart.getPlot().setBackgroundPaint(Color.WHITE);
         fragmentMassDeltasChart.getPlot().setOutlineVisible(false);
         GuiUtils.setShadowVisible(fragmentMassDeltasChart, Boolean.FALSE);
@@ -96,7 +96,7 @@ public class ChartFactory {
         ionCoverageDataset.addSeries("2+ ladder", ion2CoverageValues, NUMBER_OF_ION_COVERAGE_BINS, 0.0, 100.0);
         JFreeChart ionCoverageChart = org.jfree.chart.ChartFactory.createHistogram(
                 title, "coverage (%)", "rel. freq.", ionCoverageDataset,
-                PlotOrientation.VERTICAL, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);
+                PlotOrientation.VERTICAL, true, true, Boolean.FALSE);
         ionCoverageChart.getPlot().setBackgroundPaint(Color.WHITE);
         ionCoverageChart.getPlot().setForegroundAlpha(0.8F);
         ionCoverageChart.getPlot().setOutlineVisible(false);
@@ -115,7 +115,7 @@ public class ChartFactory {
         scoresDataset.addSeries("scoreSeries", scoresValues, NUMBER_OF_SCORE_BINS, 0.0, 1.0);
         JFreeChart scoresChart = org.jfree.chart.ChartFactory.createHistogram(
                 "Fragment Ion Score", "score", "frequency", scoresDataset,
-                PlotOrientation.VERTICAL, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
+                PlotOrientation.VERTICAL, Boolean.FALSE, true, Boolean.FALSE);
         scoresChart.getPlot().setBackgroundPaint(Color.WHITE);
         scoresChart.getPlot().setOutlineVisible(false);
         GuiUtils.setShadowVisible(scoresChart, Boolean.FALSE);
@@ -134,7 +134,7 @@ public class ChartFactory {
         JFreeChart identificationsChart = org.jfree.chart.ChartFactory.createPieChart(
                 "Identifications (" + spectrumAnnotatorResult.getNumberOfIdentifications() + ")", // chart title
                 identificationsDataset, // data
-                Boolean.TRUE, // include legend
+                true, // include legend
                 Boolean.FALSE,
                 Boolean.FALSE);
 
@@ -142,7 +142,7 @@ public class ChartFactory {
         plot.setLabelFont(new Font("SansSerif", Font.PLAIN, 12));
         plot.setLabelGenerator(null);
         plot.setNoDataMessage("No data available");
-        plot.setCircular(Boolean.TRUE);
+        plot.setCircular(true);
         plot.setLabelGap(0.02);
         plot.setBackgroundPaint(Color.WHITE);
         
@@ -179,7 +179,7 @@ public class ChartFactory {
                 "modification",
                 "relative occurance",
                 modificationsDataset,
-                PlotOrientation.VERTICAL, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);
+                PlotOrientation.VERTICAL, true, true, Boolean.FALSE);
 
         CategoryPlot countPlot = modificationsChart.getCategoryPlot();
         //add custom legend
@@ -219,7 +219,7 @@ public class ChartFactory {
         boolean containsModificationsFromOrigin = Boolean.FALSE;
         for (Modification modification : modifications) {
             if (modification.getOrigin().equals(origin)) {
-                containsModificationsFromOrigin = Boolean.TRUE;
+                containsModificationsFromOrigin = true;
                 break;
             }
         }

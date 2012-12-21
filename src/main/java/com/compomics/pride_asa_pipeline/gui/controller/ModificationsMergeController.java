@@ -81,7 +81,7 @@ public class ModificationsMergeController extends WindowAdapter {
         Collections.sort(pipelineModificationsBindingList);
 
         GuiUtils.centerDialogOnFrame(experimentSelectionController.getMainController().getMainFrame(), modificationsMergeDialog);
-        modificationsMergeDialog.setVisible(Boolean.TRUE);
+        modificationsMergeDialog.setVisible(true);
     }
 
     public void init() {

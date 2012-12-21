@@ -161,9 +161,7 @@
     <bean id="massWindowFinder"
           class="com.compomics.pride_asa_pipeline.logic.recalibration.impl.SimpleMassWindowFinder">        
     </bean>
-    
-    
-    
+            
     <!-- other beans -->
     <bean id="spectrumPeaksCache"
           class="com.compomics.pride_asa_pipeline.cache.impl.SpectrumPeaksCache">        

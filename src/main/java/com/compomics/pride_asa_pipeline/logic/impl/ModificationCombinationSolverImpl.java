@@ -343,7 +343,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
      * @return the is a valid modification combination boolean
      */
     private boolean isValidModificationCombination(Peptide peptide, Modification modification, ModificationCombination modificationCombination) {
-        boolean isValidModificationCombination = Boolean.TRUE;
+        boolean isValidModificationCombination = true;
 
         //count the number of times a modification occurs in the modification combination
         int modificationCounter = 0;

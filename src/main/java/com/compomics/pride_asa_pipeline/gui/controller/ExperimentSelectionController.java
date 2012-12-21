@@ -139,11 +139,11 @@ public class ExperimentSelectionController {
         mainController.onAnnotationCanceled();
 
         //cancel swingworker
-        currentSwingWorker.cancel(Boolean.TRUE);
+        currentSwingWorker.cancel(true);
 
         //enable process buttons
-        prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
-        fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
+        prideSelectionPanel.getProcessButton().setEnabled(true);
+        fileSelectionPanel.getProcessButton().setEnabled(true);
     }
 
     private void initPrideSelectionPanel() {
@@ -165,7 +165,7 @@ public class ExperimentSelectionController {
             public void actionPerformed(ActionEvent ae) {
                 if (prideSelectionPanel.getTaxonomyFilterCheckBox().isSelected()) {
                     //enable taxonomy text field
-                    prideSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.TRUE);
+                    prideSelectionPanel.getTaxonomyTextField().setEnabled(true);
                     filterExperimentAccessions();
                 } else {
                     //disable taxonomy text field
@@ -433,8 +433,8 @@ public class ExperimentSelectionController {
                 //hide progress bar
                 pipelineProgressController.hideProgressDialog();
                 //enable process buttons
-                prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
-                fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
+                prideSelectionPanel.getProcessButton().setEnabled(true);
+                fileSelectionPanel.getProcessButton().setEnabled(true);
             } catch (InterruptedException ex) {
                 onAnnotationCanceled();
                 LOGGER.error(ex.getMessage(), ex);
@@ -482,8 +482,8 @@ public class ExperimentSelectionController {
                 //hide progress bar
                 pipelineProgressController.hideProgressDialog();
                 //enable process buttons
-                prideSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
-                fileSelectionPanel.getProcessButton().setEnabled(Boolean.TRUE);
+                prideSelectionPanel.getProcessButton().setEnabled(true);
+                fileSelectionPanel.getProcessButton().setEnabled(true);
             }
         }
     }

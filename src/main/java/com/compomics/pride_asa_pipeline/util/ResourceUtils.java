@@ -52,7 +52,7 @@ public class ResourceUtils {
 
         Resource resource = new FileSystemResource(relativePath);
         if (resource.exists()) {
-            isExistingResource = Boolean.TRUE;
+            isExistingResource = true;
         }
 
         return isExistingResource;
