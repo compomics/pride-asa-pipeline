@@ -41,7 +41,7 @@ public class PipelineProgressController extends WindowAdapter {
         pipelineProgressDialog = new ProgressDialogX(experimentSelectionController.getMainController().getMainFrame(),
                 Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/pride-asap.png")),
                 Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/pride-asap-orange.png")),
-                Boolean.TRUE);
+                true);
         pipelineProgressDialog.addWindowListener(this);
 
         pipelineProgressDialog.getProgressBar().setMaximum(numberOfProgressSteps + 1);
@@ -55,7 +55,7 @@ public class PipelineProgressController extends WindowAdapter {
             @Override
             public void run() {
                 try {
-                    pipelineProgressDialog.setVisible(Boolean.TRUE);
+                    pipelineProgressDialog.setVisible(true);
                 } catch (IndexOutOfBoundsException e) {
                     // ignore
                 }

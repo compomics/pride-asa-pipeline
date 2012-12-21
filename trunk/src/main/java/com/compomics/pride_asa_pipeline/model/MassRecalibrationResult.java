@@ -80,7 +80,7 @@ public class MassRecalibrationResult {
         boolean exceedsMaxError = Boolean.FALSE;
         for (int charge : getCharges()) {
             if (getError(charge) > PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error")) {
-                exceedsMaxError = Boolean.TRUE;
+                exceedsMaxError = true;
                 break;
             }
         }

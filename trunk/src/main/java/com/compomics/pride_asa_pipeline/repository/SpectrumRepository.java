@@ -5,7 +5,6 @@
 package com.compomics.pride_asa_pipeline.repository;
 
 import com.compomics.pride_asa_pipeline.model.Peak;
-
 import java.util.List;
 import java.util.Map;
 

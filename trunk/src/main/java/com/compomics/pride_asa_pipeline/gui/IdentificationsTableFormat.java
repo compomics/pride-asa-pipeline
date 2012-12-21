@@ -97,7 +97,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
             case MASS_DELTA:
                 return constructMassDeltaString(identification.getPeptide(), Boolean.FALSE);
             case MZ_DELTA:
-                return constructMassDeltaString(identification.getPeptide(), Boolean.TRUE);
+                return constructMassDeltaString(identification.getPeptide(), true);
             case PRECURSOR_MZ:
                 return MathUtils.roundDouble(identification.getPeptide().getMzRatio());
             case NOISE_THRESHOLD:

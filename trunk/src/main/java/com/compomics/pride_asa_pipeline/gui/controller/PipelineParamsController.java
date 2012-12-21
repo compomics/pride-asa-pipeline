@@ -71,7 +71,7 @@ public class PipelineParamsController {
 
         columnBinding = pipelineParamsTableBinding.addColumnBinding(ELProperty.create("${value}"));
         columnBinding.setColumnName("Value");
-        columnBinding.setEditable(Boolean.TRUE);
+        columnBinding.setEditable(true);
         columnBinding.setColumnClass(Object.class);
 
         bindingGroup.addBinding(pipelineParamsTableBinding);

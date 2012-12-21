@@ -45,7 +45,7 @@ public class SpectrumPanelServiceImpl implements SpectrumPanelService {
         // remove the border
         spectrumPanel.setBorder(null);
 
-        spectrumPanel.showAnnotatedPeaksOnly(Boolean.TRUE);
+        spectrumPanel.showAnnotatedPeaksOnly(true);
 
         //add peak annotations
         if (identification.getAnnotationData().getFragmentIonAnnotations() != null) {
@@ -92,7 +92,7 @@ public class SpectrumPanelServiceImpl implements SpectrumPanelService {
                 noiseThreshold, // end of area
                 Color.blue, // color of area
                 0.1f, // transparency level
-                Boolean.TRUE, // drawn on top of or behind the data
+                true, // drawn on top of or behind the data
                 Boolean.FALSE);
     }
 

@@ -208,7 +208,7 @@ public class PrideSpectrumAnnotator {
         }
 
         //update the initialisation status
-        isInitialized = Boolean.TRUE;
+        isInitialized = true;
 
         return prideModifications;
     }

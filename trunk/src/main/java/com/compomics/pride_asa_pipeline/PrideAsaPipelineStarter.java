@@ -159,9 +159,9 @@ public class PrideAsaPipelineStarter {
         options.addOption("h", "help", Boolean.FALSE, "Help");
         options.addOption("u", "usage", Boolean.FALSE, "Usage");
 
-        Option accessionStringOption = new Option("a", "accession", Boolean.TRUE, "Experiment accession");
+        Option accessionStringOption = new Option("a", "accession", true, "Experiment accession");
         accessionStringOption.setArgName("accession");
-        Option accessionFileOption = new Option("f", "accessions_file", Boolean.TRUE, "Experiment accessions file path");
+        Option accessionFileOption = new Option("f", "accessions_file", true, "Experiment accessions file path");
         accessionFileOption.setArgName("file_path");
         OptionGroup commandLineModeOptionGroup = new OptionGroup();
         commandLineModeOptionGroup.addOption(accessionFileOption);

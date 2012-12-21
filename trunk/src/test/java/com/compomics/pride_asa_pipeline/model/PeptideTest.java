@@ -14,7 +14,7 @@ import org.junit.Test;
 public class PeptideTest {
 
     /**
-     * Test the ion mass ladder with one NT modification
+     * Test the ion mass ladder
      */
     @Test
     public void testIonMassLadder_1() throws UnknownAAException, AASequenceMassUnknownException {
