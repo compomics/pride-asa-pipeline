@@ -45,9 +45,9 @@ public class PrideSpectrumAnnotator {
      */
     private SpectrumAnnotatorResult spectrumAnnotatorResult;
     /**
-     * Keep track of the initialization state of the SpectrumAnnotator.
+     * Boolean that keeps track of the modifications state.
      */
-    private boolean isInitialized = Boolean.FALSE;
+    private boolean areModificationsLoaded;
     /**
      * Beans
      */
@@ -163,6 +163,8 @@ public class PrideSpectrumAnnotator {
      * @param experimentAccession the experiment accession number
      */
     public void initIdentifications(String experimentAccession) {
+        areModificationsLoaded = false;
+        
         LOGGER.debug("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
         spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
 
@@ -207,8 +209,8 @@ public class PrideSpectrumAnnotator {
             prideModifications = modificationService.loadExperimentModifications(identifications.getCompletePeptides());
         }
 
-        //update the initialisation status
-        isInitialized = true;
+        //update the initialization status
+        areModificationsLoaded = true;
 
         return prideModifications;
     }
@@ -219,7 +221,7 @@ public class PrideSpectrumAnnotator {
      * @param experimentAccession the experiment accession number
      */
     public void annotate(String experimentAccession) {
-        if (!isInitialized) {
+        if (!areModificationsLoaded) {
             //add the non-conflicting modifications found in pride for the given experiment                        
             Set<Modification> prideModifications = initModifications();
             Set<Modification> conflictingModifications = modificationHolder.filterByEqualMasses(prideModifications);
@@ -308,6 +310,7 @@ public class PrideSpectrumAnnotator {
      * Clears the pipeline resources
      */
     public void clearPipeline() {
+        areModificationsLoaded = false;
         consideredChargeStates = null;
         identifications = null;
         spectrumAnnotatorResult = null;
