@@ -106,7 +106,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
     @Override
     public long getNumberOfSpectra(String experimentAccession) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return experimentRepository.getNumberOfSpectra(experimentAccession);
     }
 
     @Override
