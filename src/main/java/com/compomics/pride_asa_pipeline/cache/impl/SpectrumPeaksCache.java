@@ -17,7 +17,8 @@ import java.util.Map;
  * @author Niels Hulstaert
  */
 public class SpectrumPeaksCache extends LinkedHashMap<Long, List<Peak>> implements Cache<Long, List<Peak>> {
-
+    
+    private static final long serialVersionUID = 1L;
     //set maximum cache size from properties file
     private int MAXIMUM_CACHE_SIZE = PropertiesConfigurationHolder.getInstance().getInt("spectrum_peaks_cache.maximum_cache_size");
 

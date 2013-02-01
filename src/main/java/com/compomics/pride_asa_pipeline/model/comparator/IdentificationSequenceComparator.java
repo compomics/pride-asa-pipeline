@@ -11,8 +11,8 @@ import java.util.Comparator;
  *
  * @author Niels Hulstaert
  */
-public class IdentificationSequenceComparator implements Comparator<Identification> {
-
+public class IdentificationSequenceComparator implements Comparator<Identification> {    
+    
     @Override
     public int compare(Identification identification1, Identification identification2) {
         return identification1.getPeptide().getSequenceString().compareTo(identification2.getPeptide().getSequenceString());

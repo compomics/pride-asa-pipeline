@@ -90,7 +90,6 @@ public class ModificationsController {
         fileChooser.setMultiSelectionEnabled(Boolean.FALSE);
         //set MGF file filter
         fileChooser.setFileFilter(new FileFilter() {
-
             @Override
             public boolean accept(File f) {
                 if (f.isDirectory()) {
@@ -99,15 +98,11 @@ public class ModificationsController {
 
                 int index = f.getName().lastIndexOf(".");
                 String extension = f.getName().substring(index + 1);
-                if (extension != null) {
-                    if (extension.equals("xml")) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                if (extension.equals("xml")) {
+                    return true;
+                } else {
+                    return false;
                 }
-
-                return false;
             }
 
             @Override
@@ -206,7 +201,6 @@ public class ModificationsController {
 
         //add listeners
         modificationsConfigDialog.getModifcationsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
             @Override
             public void valueChanged(ListSelectionEvent lse) {
                 if (!lse.getValueIsAdjusting()) {
@@ -230,7 +224,6 @@ public class ModificationsController {
         });
 
         modificationsConfigDialog.getAddAminoAcidButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (modificationsConfigDialog.getModifcationsTable().getSelectedRow() != -1) {
@@ -255,7 +248,6 @@ public class ModificationsController {
         });
 
         modificationsConfigDialog.getRemoveAminoAcidButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (modificationsConfigDialog.getModifcationsTable().getSelectedRow() != -1) {
@@ -280,7 +272,6 @@ public class ModificationsController {
         });
 
         modificationsConfigDialog.getAddModificationButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 Set<AminoAcid> affectedAminoAcids = new HashSet<AminoAcid>();
@@ -294,7 +285,6 @@ public class ModificationsController {
         });
 
         modificationsConfigDialog.getRemoveModificationButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (modificationsConfigDialog.getModifcationsTable().getSelectedRow() != -1) {
@@ -308,7 +298,6 @@ public class ModificationsController {
         });
 
         modificationsConfigDialog.getImportButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 //in response to the button click, show open dialog 
@@ -342,7 +331,6 @@ public class ModificationsController {
         });
 
         modificationsConfigDialog.getSaveButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 //check if modifications file in resources folder can be found

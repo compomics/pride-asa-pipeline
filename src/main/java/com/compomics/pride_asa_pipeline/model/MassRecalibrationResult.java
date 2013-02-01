@@ -90,10 +90,10 @@ public class MassRecalibrationResult {
 
     @Override
     public String toString() {
-        String s = "";
+        StringBuilder stringBuilder = new StringBuilder();
         for (Integer charge : massErrors.keySet()) {
-            s += "charge: " + charge + ", " + massErrors.get(charge) + ", error window: " + massErrorWindows.get(charge) + "\n";
+            stringBuilder.append("charge: " + charge + ", " + massErrors.get(charge) + ", error window: " + massErrorWindows.get(charge) + "\n");
         }
-        return s;
+        return stringBuilder.toString();
     }
 }

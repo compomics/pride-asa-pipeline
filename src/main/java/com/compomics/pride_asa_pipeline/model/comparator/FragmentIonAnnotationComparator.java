@@ -5,6 +5,7 @@
 package com.compomics.pride_asa_pipeline.model.comparator;
 
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Comparator;
  * @author Niels Hulstaert
  */
 public class FragmentIonAnnotationComparator implements Comparator<FragmentIonAnnotation>{
-
+       
     @Override
     public int compare(FragmentIonAnnotation o1, FragmentIonAnnotation o2) {
         //first check the ion type

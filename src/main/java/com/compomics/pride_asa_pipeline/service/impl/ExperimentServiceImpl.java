@@ -83,14 +83,14 @@ public class ExperimentServiceImpl implements ExperimentService {
         Map<String, String> analyzerSources = experimentRepository.getAnalyzerSources(experimentAccession);
         if (analyzerSources.containsKey(MALDI_SOURCE_ACCESSION)) {
             LOGGER.debug("Found MALDI source, setting charge state to 1.");
-            chargeStates = new HashSet<Integer>();
+            chargeStates.clear();
             chargeStates.add(1);
         } else {
             //iterate over values to check if a maldi source is found
             for (String value : analyzerSources.values()) {
                 if (value.indexOf("maldi") > -1 || value.indexOf("matrix") > -1) {
                     LOGGER.debug("Found MALDI source, setting charge state to 1.");
-                    chargeStates = new HashSet<Integer>();
+                    chargeStates.clear();
                     chargeStates.add(1);
                 }
             }
