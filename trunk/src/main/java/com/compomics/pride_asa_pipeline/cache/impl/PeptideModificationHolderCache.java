@@ -15,7 +15,9 @@ import java.util.Map;
  * @author Niels Hulstaert
  */
 public class PeptideModificationHolderCache extends LinkedHashMap<String, PeptideModificationHolder> implements Cache<String, PeptideModificationHolder> {
-
+    
+    private static final long serialVersionUID = 1L;
+    
     //set maximum cache size from properties file
     private static final int MAXIMUM_CACHE_SIZE = PropertiesConfigurationHolder.getInstance().getInt("modification_cache.maximum_cache_size");
     

@@ -38,8 +38,8 @@ public class LoggingBindingListener extends AbstractBindingListener {
 
     @Override
     public void synced(Binding binding) {
-        String bindName = binding.getName();
-        String msg = "[" + bindName + "] Synced";
+        //String bindName = binding.getName();
+        //String msg = "[" + bindName + "] Synced";
         outputLabel.setText("");
     }
 }

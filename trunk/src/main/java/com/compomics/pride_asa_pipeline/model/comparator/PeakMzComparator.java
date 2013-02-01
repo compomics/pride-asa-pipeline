@@ -9,7 +9,7 @@ import java.util.Comparator;
  * @since $version
  */
 public class PeakMzComparator implements Comparator<Peak> {
-
+    
     @Override
     public int compare(Peak p1, Peak p2) {
         //compare the two provided peaks according to there m/z value

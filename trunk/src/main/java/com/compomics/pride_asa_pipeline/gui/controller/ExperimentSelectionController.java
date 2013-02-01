@@ -160,7 +160,6 @@ public class ExperimentSelectionController {
 
         //add action listeners
         prideSelectionPanel.getTaxonomyFilterCheckBox().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (prideSelectionPanel.getTaxonomyFilterCheckBox().isSelected()) {
@@ -178,7 +177,6 @@ public class ExperimentSelectionController {
         });
 
         prideSelectionPanel.getTaxonomyTextField().addFocusListener(new FocusListener() {
-
             @Override
             public void focusGained(FocusEvent fe) {
             }
@@ -190,7 +188,6 @@ public class ExperimentSelectionController {
         });
 
         prideSelectionPanel.getIncludePrideModificationsCheckBox().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 boolean isSelected = prideSelectionPanel.getIncludePrideModificationsCheckBox().isSelected();
@@ -202,7 +199,6 @@ public class ExperimentSelectionController {
         });
 
         prideSelectionPanel.getProcessButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 //execute worker
@@ -229,7 +225,6 @@ public class ExperimentSelectionController {
         fileChooser.setMultiSelectionEnabled(Boolean.FALSE);
         //set MGF file filter
         fileChooser.setFileFilter(new FileFilter() {
-
             @Override
             public boolean accept(File f) {
                 if (f.isDirectory()) {
@@ -238,15 +233,11 @@ public class ExperimentSelectionController {
 
                 int index = f.getName().lastIndexOf(".");
                 String extension = f.getName().substring(index + 1);
-                if (extension != null) {
-                    if (extension.equals("txt")) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                if (extension.equals("txt")) {
+                    return true;
+                } else {
+                    return false;
                 }
-
-                return false;
             }
 
             @Override
@@ -257,7 +248,6 @@ public class ExperimentSelectionController {
 
         //add listeners
         fileSelectionPanel.getSelectFileButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 //in response to the button click, show open dialog 
@@ -272,7 +262,6 @@ public class ExperimentSelectionController {
         });
 
         fileSelectionPanel.getProcessButton().addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (fileSelectionPanel.getFileChooser().getSelectedFile() != null) {
@@ -293,7 +282,7 @@ public class ExperimentSelectionController {
         if (!prideSelectionPanel.getTaxonomyTextField().getText().isEmpty()) {
             try {
                 Integer newTaxonomyId = Integer.parseInt(prideSelectionPanel.getTaxonomyTextField().getText());
-                if (taxonomyId != newTaxonomyId) {
+                if (!taxonomyId.equals(newTaxonomyId)) {
                     taxonomyId = newTaxonomyId;
                     updateComboBox(experimentService.findExperimentAccessionsByTaxonomy(taxonomyId));
                 }
