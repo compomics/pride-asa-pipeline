@@ -29,7 +29,7 @@ public class ExperimentModificationMapper implements RowMapper<Modification> {
         String modificationConcatLocationName = rs.getString("gr");
 
         if(modificationConcatLocationName == null){
-            return(null);
+            return null;
         }
 
         Location location = null;

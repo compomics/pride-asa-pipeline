@@ -38,12 +38,20 @@
     </bean>
             
     <!-- service beans -->
-    <bean id="experimentService"
+<!--    <bean id="experimentService"
           class="com.compomics.pride_asa_pipeline.service.impl.ExperimentServiceImpl">
         <property name="experimentRepository" ref="experimentRepository"/>
         <property name="spectrumService" ref="spectrumService"/>
         <property name="resultHandler" ref="resultHandler"/>
-    </bean> 
+    </bean>-->
+    
+    <bean id="experimentService"
+          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlExperimentService">
+        <property name="experimentRepository" ref="experimentRepository"/>
+        <property name="spectrumService" ref="spectrumService"/>
+        <property name="resultHandler" ref="resultHandler"/>
+        <property name="prideXmlParser" ref="prideXmlParser"/>
+    </bean>  
     
     <bean id="spectrumService"
           class="com.compomics.pride_asa_pipeline.service.impl.SpectrumServiceImpl">
@@ -88,7 +96,11 @@
     <bean id="fileResultHandler"
           class="com.compomics.pride_asa_pipeline.repository.impl.FileResultHandlerImpl">  
         <property name="modificationService" ref="modificationService"/>      
-    </bean> 
+    </bean>
+    
+    <bean id="prideXmlParser"
+          class="com.compomics.pride_asa_pipeline.repository.impl.PrideXmlParserImpl">
+    </bean>  
     
     <!-- encode/decode beans -->
     <bean id="base64DecoderMapper"

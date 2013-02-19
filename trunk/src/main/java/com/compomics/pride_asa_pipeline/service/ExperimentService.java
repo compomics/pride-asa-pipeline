@@ -90,12 +90,5 @@ public interface ExperimentService {
      * 
      * @return the spectra file
      */
-    File getSpectrumCacheAsMgfFile(String experimentAccession, boolean rebuildCache);
-
-    /**
-     * Build up the spectrum cache for an entire experiment.
-     *
-     * @param experimentAccession
-     */
-    void buildSpectrumCacheForExperiment(String experimentAccession);
+    File getSpectraAsMgfFile(String experimentAccession, boolean rebuildCache);
 }
