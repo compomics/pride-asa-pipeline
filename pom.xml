@@ -302,19 +302,34 @@
         
     </build>
 
-    <repositories>                   
+    <repositories>                                          
         <repository>
             <id>genesis-maven2-repo</id>
             <name>Genesis maven2 repository</name>
             <url>http://genesis.UGent.be/maven2</url>
             <layout>default</layout>
         </repository>
+        
         <repository>
             <id>genesis-maven-repo</id>
             <name>Genesis maven repository</name>
             <url>http://genesis.UGent.be/maven</url>
             <layout>default</layout>
-        </repository>                
+        </repository> 
+        
+        <repository>
+            <id>ebi-repo</id>
+            <name>The EBI internal repository</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>   
+
+                                        
     </repositories>
 
     <dependencies>
@@ -445,7 +460,13 @@
             <groupId>net.java.dev.glazedlists</groupId>
             <artifactId>glazedlists_java15</artifactId>
             <version>1.8.0</version>
-        </dependency>                
+        </dependency>     
+        
+        <dependency>
+            <groupId>uk.ac.ebi.pride.jaxb</groupId>
+            <artifactId>pride-jaxb</artifactId>
+            <version>1.0.4</version>
+        </dependency>                      
     </dependencies>
     
     <distributionManagement>        

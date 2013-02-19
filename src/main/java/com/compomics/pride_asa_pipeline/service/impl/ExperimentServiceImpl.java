@@ -125,7 +125,7 @@ public class ExperimentServiceImpl implements ExperimentService {
     }
 
     @Override
-    public File getSpectrumCacheAsMgfFile(String experimentAccession, boolean rebuildCache) {
+    public File getSpectraAsMgfFile(String experimentAccession, boolean rebuildCache) {
 
         String lPath_tmp = PropertiesConfigurationHolder.getInstance().getString("results_path_tmp");
         File tempDir = new File(lPath_tmp);
@@ -166,10 +166,14 @@ public class ExperimentServiceImpl implements ExperimentService {
         return file;
     }
 
-    @Override
-    public void buildSpectrumCacheForExperiment(String experimentAccession) {
+    /**
+     * Builds up the spectrum cache for an entire experiment.
+     *
+     * @param experimentAccession
+     */
+    private void buildSpectrumCacheForExperiment(String experimentAccession) {
 
-        // First clear the existing cache.
+        //clear the existing cache
         LOGGER.debug(String.format("clearing spectrum cache before starting to cache all spectra for experiment %s", experimentAccession));
         spectrumService.clearCache();
 
