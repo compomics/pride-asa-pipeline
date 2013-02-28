@@ -33,8 +33,8 @@ public class Modification implements Comparable<Modification>, ModificationFacad
     private String accession;
     private String accessionValue;
     private Origin origin;
-    private final SwingPropertyChangeSupport propertyChangeSupport = new SwingPropertyChangeSupport(this);
-
+    private final SwingPropertyChangeSupport propertyChangeSupport = new SwingPropertyChangeSupport(this);        
+    
     public Modification(double massShift, Location location, String accession, String accessionValue) {
         this.name = accessionValue;
         this.location = location;
@@ -43,7 +43,7 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         this.accession = accession;
         this.accessionValue = accessionValue;
         affectedAminoAcids = new HashSet<AminoAcid>();
-    }
+    }        
 
     public Modification(String name, double monoIsotopicMassShift, double averageMassShift, Location location, Set<AminoAcid> affectedAminoAcids, String accession, String accessionValue) {
         this.name = name;

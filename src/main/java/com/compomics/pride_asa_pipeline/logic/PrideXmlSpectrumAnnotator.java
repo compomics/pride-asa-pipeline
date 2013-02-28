@@ -4,8 +4,10 @@ import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.logic.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.model.*;
-import com.compomics.pride_asa_pipeline.service.DbExperimentService;
-import com.compomics.pride_asa_pipeline.service.DbModificationService;
+import com.compomics.pride_asa_pipeline.service.ExperimentService;
+import com.compomics.pride_asa_pipeline.service.ModificationService;
+import com.compomics.pride_asa_pipeline.service.PrideXmlExperimentService;
+import com.compomics.pride_asa_pipeline.service.PrideXmlModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import com.google.common.io.Files;
@@ -20,9 +22,9 @@ import org.springframework.core.io.Resource;
  * Created by IntelliJ IDEA. User: niels Date: 9/11/11 Time: 13:22 To change
  * this template use File | Settings | File Templates.
  */
-public class PrideSpectrumAnnotator {
+public class PrideXmlSpectrumAnnotator {
 
-    private static final Logger LOGGER = Logger.getLogger(PrideSpectrumAnnotator.class);
+    private static final Logger LOGGER = Logger.getLogger(PrideXmlSpectrumAnnotator.class);
     /**
      * The considered charge states
      */
@@ -47,12 +49,12 @@ public class PrideSpectrumAnnotator {
     /**
      * Boolean that keeps track of the modifications state.
      */
-    private boolean areModificationsLoaded;
+    private boolean modificationsLoaded;
     /**
      * Beans
      */
-    private DbExperimentService experimentService;
-    private DbModificationService modificationService;
+    private PrideXmlExperimentService experimentService;
+    private PrideXmlModificationService modificationService;
     private MassRecalibrator massRecalibrator;
     private SpectrumService spectrumService;
     private SpectrumMatcher spectrumMatcher;
@@ -61,7 +63,7 @@ public class PrideSpectrumAnnotator {
 
     /**
      * Getters and setters.
-     * 
+     *
      * @return the mass recalibrator
      */
     public MassRecalibrator getMassRecalibrator() {
@@ -96,21 +98,21 @@ public class PrideSpectrumAnnotator {
         this.massDeltaExplainer = massDeltaExplainer;
     }
 
-    public DbExperimentService getExperimentService() {
+    public PrideXmlExperimentService getExperimentService() {
         return experimentService;
     }
 
-    public void setExperimentService(DbExperimentService experimentService) {
+    public void setExperimentService(PrideXmlExperimentService experimentService) {
         this.experimentService = experimentService;
-    }    
+    }
 
-    public DbModificationService getModificationService() {
+    public PrideXmlModificationService getModificationService() {
         return modificationService;
     }
 
-    public void setModificationService(DbModificationService modificationService) {
+    public void setModificationService(PrideXmlModificationService modificationService) {
         this.modificationService = modificationService;
-    }    
+    }
 
     public Identifications getIdentifications() {
         return identifications;
@@ -155,16 +157,18 @@ public class PrideSpectrumAnnotator {
     /**
      * Public methods.
      */
-    
     /**
      * Loads the experiment identifications and calculates the systematic mass
      * errors per charge state.
      *
-     * @param experimentAccession the experiment accession number
+     * @param experimentPrideXmlFile the experiment pride XML file
      */
-    public void initIdentifications(String experimentAccession) {
-        areModificationsLoaded = false;
-        
+    public void initIdentifications(File experimentPrideXmlFile) {
+        //@todo get a name take makes sense
+        String experimentAccession = experimentPrideXmlFile.getName();
+
+        modificationsLoaded = false;
+
         LOGGER.debug("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
         spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
 
@@ -172,7 +176,7 @@ public class PrideSpectrumAnnotator {
         initChargeStates();
 
         LOGGER.info("loading identifications for experiment " + experimentAccession);
-        loadExperimentIdentifications(experimentAccession);
+        loadExperimentIdentifications(experimentPrideXmlFile);
         LOGGER.debug("Finished loading identifications for experiment " + experimentAccession);
 
         ///////////////////////////////////////////////////////////////////////
@@ -206,11 +210,11 @@ public class PrideSpectrumAnnotator {
 
         //add the modifications found in pride for the given experiment
         if (PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_modifications")) {
-            prideModifications = modificationService.loadExperimentModifications(identifications.getCompletePeptides());
+            prideModifications = modificationService.loadExperimentModifications();
         }
 
         //update the initialization status
-        areModificationsLoaded = true;
+        modificationsLoaded = true;
 
         return prideModifications;
     }
@@ -218,10 +222,13 @@ public class PrideSpectrumAnnotator {
     /**
      * Annotates the experiment identifications
      *
-     * @param experimentAccession the experiment accession number
+     * @param experimentPrideXmlFile the experiment pride XML file
      */
-    public void annotate(String experimentAccession) {
-        if (!areModificationsLoaded) {
+    public void annotate(File experimentPrideXmlFile) {
+        //@todo get a name take makes sense
+        String experimentAccession = experimentPrideXmlFile.getName();
+
+        if (!modificationsLoaded) {
             //add the non-conflicting modifications found in pride for the given experiment                        
             Set<Modification> prideModifications = initModifications();
             Set<Modification> conflictingModifications = modificationHolder.filterByEqualMasses(prideModifications);
@@ -236,7 +243,7 @@ public class PrideSpectrumAnnotator {
         //SECOND STEP: find all the modification combinations that could
         //              explain a given mass delta (if there is one) -> Zen Archer
         //get analyzer data
-        analyzerData = experimentService.getAnalyzerData(experimentAccession);
+        analyzerData = experimentService.getAnalyzerData();
         LOGGER.info("finding modification combinations");
         //set fragment mass error for the identification scorer
         spectrumMatcher.getIdentificationScorer().setFragmentMassError(analyzerData.getFragmentMassError());
@@ -310,7 +317,7 @@ public class PrideSpectrumAnnotator {
      * Clears the pipeline resources
      */
     public void clearPipeline() {
-        areModificationsLoaded = false;
+        modificationsLoaded = false;
         consideredChargeStates = null;
         identifications = null;
         spectrumAnnotatorResult = null;
@@ -339,13 +346,13 @@ public class PrideSpectrumAnnotator {
     /**
      * Loads the experiment identifications.
      *
-     * @param experimentAccession the experiment accession number
+     * @param experimentPrideXmlFile the experiment pride XML file
      */
-    private void loadExperimentIdentifications(String experimentAccession) {
+    private void loadExperimentIdentifications(File experimentPrideXmlFile) {
         //load the identifications for the given experiment
-        identifications = experimentService.loadExperimentIdentifications(experimentAccession);
+        identifications = experimentService.loadExperimentIdentifications(experimentPrideXmlFile);
         //update the considered charge states (if necessary)
-        experimentService.updateChargeStates(experimentAccession, consideredChargeStates);
+        experimentService.updateChargeStates(consideredChargeStates);
     }
 
     /**

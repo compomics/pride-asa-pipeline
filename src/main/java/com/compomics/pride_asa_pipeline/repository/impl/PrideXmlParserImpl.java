@@ -1,6 +1,9 @@
 package com.compomics.pride_asa_pipeline.repository.impl;
 
+import com.compomics.pride_asa_pipeline.data.mapper.AnalyzerDataMapper;
+import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
@@ -8,10 +11,16 @@ import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import com.compomics.pride_asa_pipeline.repository.PrideXmlParser;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import uk.ac.ebi.pride.jaxb.model.AnalyzerList;
 import uk.ac.ebi.pride.jaxb.model.CvParam;
+import uk.ac.ebi.pride.jaxb.model.Instrument;
+import uk.ac.ebi.pride.jaxb.model.ModificationItem;
+import uk.ac.ebi.pride.jaxb.model.Param;
 import uk.ac.ebi.pride.jaxb.model.PeptideItem;
 import uk.ac.ebi.pride.jaxb.model.Precursor;
 import uk.ac.ebi.pride.jaxb.xml.PrideXmlReader;
@@ -23,11 +32,12 @@ import uk.ac.ebi.pride.jaxb.xml.PrideXmlReader;
 public class PrideXmlParserImpl implements PrideXmlParser {
 
     private static final Logger LOGGER = Logger.getLogger(PrideXmlParserImpl.class);
+    private static final String IONIZER_TYPE = "PSI:1000008";
+    private static final String MALDI_SOURCE_ACCESSION = "PSI:1000075";
     /**
      * The PrideXmlReader instance
      */
     private PrideXmlReader prideXmlReader;
-    private List<String> identificationIds;
 
     /**
      * Creates a new PrideXmlReader instance
@@ -38,30 +48,33 @@ public class PrideXmlParserImpl implements PrideXmlParser {
     public void init(File prideXmlFile) {
         prideXmlReader = new PrideXmlReader(prideXmlFile);
     }
-    
+
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        prideXmlReader = null;
     }
 
     @Override
-    public List<Identification> loadExperimentIdentifications() {
+    public List<Identification> getExperimentIdentifications() {
         List<Identification> identifications = new ArrayList<Identification>();
-        
-        //Get a list of Identification ids
-        identificationIds = prideXmlReader.getIdentIds();
 
-        //Iterate over each identification
-        for (String identificationId : identificationIds) {
-            uk.ac.ebi.pride.jaxb.model.Identification prideXmlIdentification = prideXmlReader.getIdentById(identificationId);
-            String identificationAccession = prideXmlIdentification.getAccession();
+        //Iterate over each protein identification
+        for (String proteinIdentificationId : prideXmlReader.getIdentIds()) {
+            //uk.ac.ebi.pride.jaxb.model.Identification prideXmlIdentification = prideXmlReader.getIdentById(identificationId);
 
             //Get the number of peptides within an identification
-            int numOfPeptides = prideXmlReader.getNumberOfPeptides(identificationId);
+            int numOfPeptides = prideXmlReader.getNumberOfPeptides(proteinIdentificationId);
 
-            //Iterate over each peptide
+            //Iterate over each peptide identification
             for (int i = 0; i < numOfPeptides; i++) {
-                PeptideItem peptideItem = prideXmlReader.getPeptide(identificationId, i);
+                PeptideItem peptideItem = prideXmlReader.getPeptide(proteinIdentificationId, i);
+
+                //get modifications
+                List<ModificationItem> modificationItems = peptideItem.getModificationItem();
+                for (ModificationItem modificationItem : modificationItems) {
+                    Modification modification = mapModification(modificationItem, peptideItem.getSequence());
+                }
+
                 //get spectrum precursor for m/z and charge
                 Precursor precursor = peptideItem.getSpectrum().getSpectrumDesc().getPrecursorList().getPrecursor().get(0);
 
@@ -78,19 +91,19 @@ public class PrideXmlParserImpl implements PrideXmlParser {
                         charge = Integer.parseInt(cvParam.getValue());
                     }
                 }
-                try {                    
+                try {
                     //new Peptide instance
                     Peptide peptide = new Peptide(charge, mzRatio, new AminoAcidSequence(peptideItem.getSequence()));
                     //new Identification instance
                     long spectrumId = peptideItem.getSpectrum().getId();
-                    Identification identification = new Identification(peptide, identificationId, spectrumId, 0L);
-                    
+                    Identification identification = new Identification(peptide, proteinIdentificationId, spectrumId, 0L);
+
                     //add to identifications
                     identifications.add(identification);
                 } catch (UnknownAAException ex) {
                     LOGGER.error(ex.getMessage(), ex);
                 }
-            }                        
+            }
         }
 
         return identifications;
@@ -109,7 +122,7 @@ public class PrideXmlParserImpl implements PrideXmlParser {
     @Override
     public List<Map<String, Object>> getSpectraMetadata() {
         List<String> testing = prideXmlReader.getSpectrumIds();
-        
+
         return null;
     }
 
@@ -120,12 +133,116 @@ public class PrideXmlParserImpl implements PrideXmlParser {
 
     @Override
     public List<Modification> getModifications() {
-        //prideXmlReader.get
-        
-        
-        return null;
+        List<Modification> modifications = new ArrayList<Modification>();
+
+        //Iterate over each protein identification
+        for (String proteinIdentificationId : prideXmlReader.getIdentIds()) {
+            //Get the number of peptides within an identification
+            int numOfPeptides = prideXmlReader.getNumberOfPeptides(proteinIdentificationId);
+
+            //Iterate over each peptide identification
+            for (int i = 0; i < numOfPeptides; i++) {
+                PeptideItem peptideItem = prideXmlReader.getPeptide(proteinIdentificationId, i);
+
+                //get modifications
+                List<ModificationItem> modificationItems = peptideItem.getModificationItem();
+                for (ModificationItem modificationItem : modificationItems) {
+                    Modification modification = mapModification(modificationItem, peptideItem.getSequence());
+                    modifications.add(modification);
+                }
+            }
+        }
+
+        return modifications;
     }
-    
-    
-    
+
+    /**
+     * Map a ModificationItem onto the pipeline Modification
+     *
+     * @param modificationItem the ModificationItem
+     * @param peptideSequence the peptide sequence
+     * @return the mapped modification
+     */
+    private Modification mapModification(ModificationItem modificationItem, String peptideSequence) {
+        Integer modificationLocation = modificationItem.getModLocation().intValue();
+
+        Modification.Location location = null;
+        int sequenceIndex = 0;
+
+        if (modificationLocation == 0) {
+            location = Modification.Location.N_TERMINAL;
+            sequenceIndex = 0;
+        } else if (modificationLocation == (peptideSequence.length() + 1)) {
+            location = Modification.Location.C_TERMINAL;
+            sequenceIndex = peptideSequence.length() + 1;
+        } else {
+            location = Modification.Location.NON_TERMINAL;
+            sequenceIndex = modificationLocation - 1;
+        }
+
+        double monoIsotopicMassShift = (modificationItem.getModMonoDelta().isEmpty()) ? 0.0 : Double.parseDouble(modificationItem.getModMonoDelta().get(0));
+        //if average mass shift is empty, use the monoisotopic mass.
+        double averageMassShift = (modificationItem.getModAvgDelta().isEmpty()) ? monoIsotopicMassShift : Double.parseDouble(modificationItem.getModAvgDelta().get(0));
+        String accessionValue = (modificationItem.getAdditional().getCvParamByAcc(modificationItem.getModAccession()) == null) ? modificationItem.getModAccession() : modificationItem.getAdditional().getCvParamByAcc(modificationItem.getModAccession()).getName();
+
+        Modification modification = new Modification(accessionValue, monoIsotopicMassShift, averageMassShift, location, new HashSet<AminoAcid>(), modificationItem.getModAccession(), accessionValue);
+
+        modification.getAffectedAminoAcids().add(AminoAcid.getAA(peptideSequence.substring(sequenceIndex, sequenceIndex + 1)));
+        modification.setOrigin(Modification.Origin.PRIDE);
+
+        return modification;
+    }
+
+    @Override
+    public Map<String, String> getAnalyzerSources() {
+        Map<String, String> analyzerSources = new HashMap<String, String>();
+
+        //get instrument
+        Instrument instrument = prideXmlReader.getDescription().getInstrument();
+        //get ionizer type cv param and maldi source cv param
+        CvParam ionizerTypeCvParam = instrument.getSource().getCvParamByAcc(IONIZER_TYPE);
+        CvParam maldiSourceCvParam = instrument.getSource().getCvParamByAcc(MALDI_SOURCE_ACCESSION);
+        
+        if(ionizerTypeCvParam != null){
+            analyzerSources.put(ionizerTypeCvParam.getAccession(), ionizerTypeCvParam.getName());
+        }
+        if(maldiSourceCvParam != null){
+            analyzerSources.put(maldiSourceCvParam.getAccession(), maldiSourceCvParam.getName());
+        }
+
+        return analyzerSources;
+    }
+
+    @Override
+    public List<AnalyzerData> getAnalyzerData() {
+        List<AnalyzerData> analyzerDataList = new ArrayList<AnalyzerData>();
+
+        //get instrument
+        Instrument instrument = prideXmlReader.getDescription().getInstrument();
+        //get analyzer list
+        AnalyzerList analyzerList = instrument.getAnalyzerList();
+        //get analyzer params
+        List<Param> analyzerParams = analyzerList.getAnalyzer();
+        for (Param analyzerParam : analyzerParams) {
+            for (CvParam cvParam : analyzerParam.getCvParam()) {
+                AnalyzerData analyzerData = AnalyzerDataMapper.getAnalyzerDataByAnalyzerType(cvParam.getName());
+                analyzerDataList.add(analyzerData);
+            }
+        }
+
+        return analyzerDataList;
+    }
+
+    @Override
+    public List<String> getProteinAccessions() {
+        List<String> proteinAccessions = new ArrayList<String>();
+        
+        //Iterate over each protein identification
+        for (String proteinIdentificationId : prideXmlReader.getIdentIds()) {
+            uk.ac.ebi.pride.jaxb.model.Identification prideXmlIdentification = prideXmlReader.getIdentById(proteinIdentificationId);
+
+            proteinAccessions.add(prideXmlIdentification.getAccession());
+        }
+        return proteinAccessions;
+    }
 }
