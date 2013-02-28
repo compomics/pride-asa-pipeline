@@ -327,9 +327,7 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>   
-
-                                        
+        </repository>                                           
     </repositories>
 
     <dependencies>
@@ -467,6 +465,12 @@
             <artifactId>pride-jaxb</artifactId>
             <version>1.0.4</version>
         </dependency>                      
+        
+        <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>PrideXMLValidator</artifactId>
+            <version>0.2</version>
+        </dependency>
     </dependencies>
     
     <distributionManagement>        

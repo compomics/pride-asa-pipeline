@@ -54,23 +54,7 @@ public interface ModificationService {
      * @exception JDOMException
      */
     Set<Modification> importPipelineModifications(Resource modificationsResource) throws JDOMException;
-
-    /**
-     * Loads the experiment modifications from pride
-     *
-     * @param completePeptides the experiment complete peptides
-     * @return the list of modifications
-     */
-    Set<Modification> loadExperimentModifications(List<Peptide> completePeptides);
-
-    /**
-     * Loads the experiment modifications from a pride experiment
-     *
-     * @param experimentId the experiment identifier
-     * @return the list of modifications
-     */
-    Set<Modification> loadExperimentModifications(long experimentId);
-
+   
     /**
      * Gets the modifications as a map (key: modification, value: occurence
      * count) that were actually used in the pipeline; i.e. modifications that

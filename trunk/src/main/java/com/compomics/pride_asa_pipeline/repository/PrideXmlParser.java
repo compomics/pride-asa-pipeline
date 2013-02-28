@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.repository;
 
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.io.File;
@@ -29,7 +30,7 @@ public interface PrideXmlParser {
      *
      * @return the list of experiment identifications
      */
-    List<Identification> loadExperimentIdentifications();
+    List<Identification> getExperimentIdentifications();
 
     /**
      * Gets the number of spectra
@@ -63,7 +64,29 @@ public interface PrideXmlParser {
     /**
      * Gets the modifications found in the file.
      * 
-     * @return the found modifications
+     * @return the list of found modifications
      */
-    List<Modification> getModifications();
+    List<Modification> getModifications();  
+    
+    /**
+     * Gets the analyzer sources as a map (key: cv accession, value: cv value)
+     *
+     * @return the analyzer source map
+     */
+    Map<String, String> getAnalyzerSources();
+    
+    /**
+     * Gets the experiment analyzer data
+     *
+     * @return the experiment analyzer data list
+     */
+    List<AnalyzerData> getAnalyzerData();
+    
+    /**
+     * Gets protein accessions for a given experiment
+     *
+     * @return the protein accession list
+     */
+    List<String> getProteinAccessions();
+        
 }

@@ -79,7 +79,7 @@ public class IdentificationsPanel extends javax.swing.JPanel {
         );
         identificationsTablePanelLayout.setVerticalGroup(
             identificationsTablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 170, Short.MAX_VALUE)
+            .add(0, 174, Short.MAX_VALUE)
             .add(identificationsTablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(identificationsTablePanelLayout.createSequentialGroup()
                     .add(identificationsTabelScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
