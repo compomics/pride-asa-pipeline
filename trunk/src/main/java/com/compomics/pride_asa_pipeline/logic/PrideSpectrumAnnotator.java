@@ -61,7 +61,7 @@ public class PrideSpectrumAnnotator {
 
     /**
      * Getters and setters.
-     * 
+     *
      * @return the mass recalibrator
      */
     public MassRecalibrator getMassRecalibrator() {
@@ -102,7 +102,7 @@ public class PrideSpectrumAnnotator {
 
     public void setExperimentService(DbExperimentService experimentService) {
         this.experimentService = experimentService;
-    }    
+    }
 
     public DbModificationService getModificationService() {
         return modificationService;
@@ -110,7 +110,7 @@ public class PrideSpectrumAnnotator {
 
     public void setModificationService(DbModificationService modificationService) {
         this.modificationService = modificationService;
-    }    
+    }
 
     public Identifications getIdentifications() {
         return identifications;
@@ -155,16 +155,15 @@ public class PrideSpectrumAnnotator {
     /**
      * Public methods.
      */
-    
     /**
      * Loads the experiment identifications and calculates the systematic mass
      * errors per charge state.
      *
      * @param experimentAccession the experiment accession number
      */
-     public void initIdentifications(String experimentAccession) {
+    public void initIdentifications(String experimentAccession) {
         areModificationsLoaded = false;
-        
+
         LOGGER.debug("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
         spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
 
@@ -177,8 +176,10 @@ public class PrideSpectrumAnnotator {
 
         ///////////////////////////////////////////////////////////////////////
         //FIRST STEP: find the systematic mass error (if there is one)
+        //get analyzer data
+        analyzerData = experimentService.getAnalyzerData(experimentAccession);
         LOGGER.info("finding systematic mass errors");
-        MassRecalibrationResult massRecalibrationResult = findSystematicMassError(consideredChargeStates, identifications.getCompletePeptides());
+        MassRecalibrationResult massRecalibrationResult = findSystematicMassError(identifications.getCompletePeptides());
         LOGGER.debug("Finished finding systematic mass errors:" + "\n" + massRecalibrationResult.toString());
         spectrumAnnotatorResult.setMassRecalibrationResult(massRecalibrationResult);
     }
@@ -235,8 +236,6 @@ public class PrideSpectrumAnnotator {
         ///////////////////////////////////////////////////////////////////////
         //SECOND STEP: find all the modification combinations that could
         //              explain a given mass delta (if there is one) -> Zen Archer
-        //get analyzer data
-        analyzerData = experimentService.getAnalyzerData(experimentAccession);
         LOGGER.info("finding modification combinations");
         //set fragment mass error for the identification scorer
         spectrumMatcher.getIdentificationScorer().setFragmentMassError(analyzerData.getFragmentMassError());
@@ -351,19 +350,18 @@ public class PrideSpectrumAnnotator {
     /**
      * finds the systematic mass errors per charge state
      *
-     * @param consideredChargeStates a set of considered charge states
      * @param completePeptides list of complete peptides (i.e. all sequence AA
      * masses known)
      * @return the mass recalibration result (systemic mass error) per charge
      * state
      */
-    private MassRecalibrationResult findSystematicMassError(Set<Integer> consideredChargeStates, List<Peptide> completePeptides) {
+    private MassRecalibrationResult findSystematicMassError(List<Peptide> completePeptides) {
         //set considered charge states
         massRecalibrator.setConsideredChargeStates(consideredChargeStates);
 
         MassRecalibrationResult massRecalibrationResult = null;
         try {
-            massRecalibrationResult = massRecalibrator.recalibrate(completePeptides);
+            massRecalibrationResult = massRecalibrator.recalibrate(analyzerData, completePeptides);
         } catch (AASequenceMassUnknownException e) {
             //this should not happen here, since we only handle 'complete precursors' where
             //all the amino acids have a known mass

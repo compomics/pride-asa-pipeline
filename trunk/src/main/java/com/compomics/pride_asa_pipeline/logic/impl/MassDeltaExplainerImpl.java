@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 public class MassDeltaExplainerImpl implements MassDeltaExplainer {
 
     private static final Logger LOGGER = Logger.getLogger(MassDeltaExplainerImpl.class);
-    
     private double convergenceCriterion;
     private ModificationCombinationSolver modificationCombinationSolver;
     private MassRecalibrationResult massRecalibrationResult;
@@ -61,7 +60,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
     }
 
     @Override
-    public Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> identifications) {            
+    public Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> identifications) {
         Map<Identification, Set<ModificationCombination>> possibleExplainedIdentifications = new HashMap<Identification, Set<ModificationCombination>>();
 
         //keep track of ratios determining the loop condition
@@ -92,38 +91,21 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
 
                 //if we have a mass adjustment from previously calculated mass recalibration results
                 //we apply the adjustment for the charge state of the current peptide
-                if (massRecalibrationResult != null) {
-                    //work with adjusted masses
-                    Double errorAdjustment = massRecalibrationResult.getError(peptide.getCharge());
-                    if (errorAdjustment != null) {
-                        precursorMassDelta -= errorAdjustment;
-                    }
+                //work with adjusted masses
+                Double errorAdjustment = massRecalibrationResult.getError(peptide.getCharge());
+                //check if errorAdjustment is not null and is not equal to zero
+                if (errorAdjustment != null && (Math.abs(0.0 - errorAdjustment) > 0.00001)) {
+                    precursorMassDelta -= errorAdjustment;
                 }
 
-                //if adjustment, use error window,
-                //else use default or reported value for analyzer                
-
-                //get default deviation
-                Double deviation = PropertiesConfigurationHolder.getInstance().getDouble("massdeltaexplainer.default_deviation") / peptide.getCharge();
-                if (massRecalibrationResult == null) {
-                    //if mass recalibration result is null, use precursor mass error from analyzer data
-                    if (analyzerData != null) {
-                        if (analyzerData.getPrecursorMassError() != null) {
-                            deviation = analyzerData.getPrecursorMassError();
-                        }
-                    }
-                } else {
-                    //ToDo: is it correct to use this value here?
-                    Double errorWindow = massRecalibrationResult.getErrorWindow(peptide.getCharge());
-                    if (errorWindow != null) {
-                        deviation = errorWindow;
-                    }
-                }
+                //take the error window from the mass recalibration as deviation
+                //ToDo: is it correct to use this value here?
+                Double deviation = massRecalibrationResult.getErrorWindow(peptide.getCharge());
 
                 Set<ModificationCombination> combinations = null;
                 //if the mass delta is larger than a possible mass error (deviation) then
                 //we might have modifications we need to explain (or at least try to)
-                if (precursorMassDelta > deviation) {                    
+                if (precursorMassDelta > deviation) {
                     combinations = modificationCombinationSolver.findModificationCombinations(peptide, modificationCombinationSizeLimit, precursorMassDelta, deviation);
 
                     //add all newly found combinations (if any) to the set of all modifications for this peptide

@@ -3,6 +3,7 @@ package com.compomics.pride_asa_pipeline.logic.recalibration.impl;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.logic.recalibration.AbstractMassRecalibrator;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.util.MathUtils;
@@ -17,7 +18,7 @@ public class MassRecalibratorImpl extends AbstractMassRecalibrator {
             
     //ToDo: update, so modified peptides are taken into account (not just skipped)
     @Override
-    public MassRecalibrationResult recalibrate(Collection<Peptide> peptides) throws AASequenceMassUnknownException {
+    public MassRecalibrationResult recalibrate(AnalyzerData analyzerData, Collection<Peptide> peptides) throws AASequenceMassUnknownException {
         checkSetup();
         if (peptides == null) {
             throw new IllegalStateException("Can not recalibrate null list of peptides!");
@@ -27,7 +28,7 @@ public class MassRecalibratorImpl extends AbstractMassRecalibrator {
         double centre = 0.0D;
 
         //init the mass calibration result with the default values
-        MassRecalibrationResult result = initMassRecalibrationResult();
+        MassRecalibrationResult result = initMassRecalibrationResult(analyzerData);
 
         //calculate for each charge state separately
         for (Integer charge : consideredChargeStates) {

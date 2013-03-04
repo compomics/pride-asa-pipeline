@@ -34,6 +34,7 @@ public class MassRecalibratorTest {
     private Collection<Peptide> peptides;
     @Autowired
     private MassRecalibrator massRecalibrator;
+    private AnalyzerData analyzerData;
 
     @Before
     public void initialize() throws UnknownAAException, AASequenceMassUnknownException {
@@ -55,6 +56,8 @@ public class MassRecalibratorTest {
             peptides.add(peptide);
             counter++;
         }
+        
+        analyzerData = new AnalyzerData(0.4, 0.4, AnalyzerData.ANALYZER_FAMILY.UNKNOWN);
     }
 
     /**
@@ -66,7 +69,7 @@ public class MassRecalibratorTest {
      */
     @Test
     public void testRecalibarate() throws AASequenceMassUnknownException {
-        MassRecalibrationResult massRecalibrationResult = massRecalibrator.recalibrate(peptides);
+        MassRecalibrationResult massRecalibrationResult = massRecalibrator.recalibrate(analyzerData, peptides);
         
         double massErrorChargeState1 = massRecalibrationResult.getError(1);
         assertEquals(8.0, massErrorChargeState1, 0.01);

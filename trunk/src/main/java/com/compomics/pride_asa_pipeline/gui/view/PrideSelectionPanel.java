@@ -85,7 +85,7 @@ public class PrideSelectionPanel extends javax.swing.JPanel {
         writeResultCheckBox.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         writeResultCheckBox.setIconTextGap(15);
 
-        includePrideModificationsCheckBox.setText("Incude PRIDE Modifications");
+        includePrideModificationsCheckBox.setText("Include PRIDE Modifications");
         includePrideModificationsCheckBox.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         includePrideModificationsCheckBox.setIconTextGap(15);
 
@@ -105,8 +105,7 @@ public class PrideSelectionPanel extends javax.swing.JPanel {
                         .addGap(18, 18, 18)
                         .addComponent(taxonomyLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(taxonomyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(taxonomyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
