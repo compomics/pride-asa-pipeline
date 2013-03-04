@@ -7,6 +7,7 @@ import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
+import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.service.ResultHandler;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -51,6 +52,7 @@ public class ExperimentSelectionController {
     private ModificationsMergeController modificationsMergeController;
     //services
     private ExperimentService experimentService;
+    private ModificationService modificationService;
     private ResultHandler resultHandler;
 
     public ExperimentService getExperimentService() {
@@ -60,6 +62,14 @@ public class ExperimentSelectionController {
     public void setExperimentService(ExperimentService experimentService) {
         this.experimentService = experimentService;
     }
+
+    public ModificationService getModificationService() {
+        return modificationService;
+    }
+
+    public void setModificationService(ModificationService modificationService) {
+        this.modificationService = modificationService;
+    }       
 
     public ResultHandler getResultHandler() {
         return resultHandler;
@@ -405,8 +415,9 @@ public class ExperimentSelectionController {
             //write result to file if necessary
             if (prideSelectionPanel.getWriteResultCheckBox().isSelected()) {
                 resultHandler.writeResultToFile(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult());
+                Set<Modification> usedModifications = modificationService.getUsedModifications(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult()).keySet();
                 resultHandler.writeUsedModificationsToFile(mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getExperimentAccession(),
-                        mainController.getPipelineResultController().getUsedModifications().keySet());
+                        usedModifications);
             }
 
             return null;

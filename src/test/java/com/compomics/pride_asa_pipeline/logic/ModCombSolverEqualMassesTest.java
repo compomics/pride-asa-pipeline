@@ -5,7 +5,7 @@
 package com.compomics.pride_asa_pipeline.logic;
 
 import com.compomics.pride_asa_pipeline.model.*;
-import com.compomics.pride_asa_pipeline.service.ModificationService;
+import com.compomics.pride_asa_pipeline.service.DbModificationService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.io.IOException;
 import java.util.Set;
@@ -30,7 +30,7 @@ public class ModCombSolverEqualMassesTest {
     @Autowired
     private ModificationCombinationSolver modificationCombinationSolver;
     @Autowired
-    private ModificationService modificationService;
+    private DbModificationService modificationService;
 
     @Before
     public void initialize() throws IOException, JDOMException {

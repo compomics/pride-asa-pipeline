@@ -11,7 +11,7 @@ import com.compomics.pride_asa_pipeline.model.Identifications;
 import com.compomics.pride_asa_pipeline.model.MascotGenericFile;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.service.DbExperimentService;
-import com.compomics.pride_asa_pipeline.service.SpectrumService;
+import com.compomics.pride_asa_pipeline.service.DbSpectrumService;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -26,14 +26,14 @@ import org.apache.log4j.Logger;
 public class DbExperimentServiceImpl extends ExperimentServiceImpl implements DbExperimentService {
 
     private static final Logger LOGGER = Logger.getLogger(DbExperimentServiceImpl.class);
-    private SpectrumService spectrumService;
+    private DbSpectrumService spectrumService;
     private boolean iFirstMfgFile;
 
-    public SpectrumService getSpectrumService() {
+    public DbSpectrumService getSpectrumService() {
         return spectrumService;
     }
 
-    public void setSpectrumService(SpectrumService spectrumService) {
+    public void setSpectrumService(DbSpectrumService spectrumService) {
         this.spectrumService = spectrumService;
     }
 
@@ -94,16 +94,8 @@ public class DbExperimentServiceImpl extends ExperimentServiceImpl implements Db
     }
 
     @Override
-    public File getSpectraAsMgfFile(String experimentAccession, boolean rebuildCache) {
-
-        String lPath_tmp = PropertiesConfigurationHolder.getInstance().getString("results_path_tmp");
-        File tempDir = new File(lPath_tmp);
-        if (!tempDir.exists()) {
-            tempDir.mkdir();
-        }
-
-        File file = new File(tempDir, experimentAccession + ".mgf");
-        LOGGER.debug(String.format("writing spectra from experiment %s to %s", experimentAccession, file.getAbsolutePath()));
+    public void getSpectraAsMgfFile(String experimentAccession, File mgfFile, boolean rebuildCache) {
+        LOGGER.debug(String.format("writing spectra from experiment %s to %s", experimentAccession, mgfFile.getAbsolutePath()));
 
         if (rebuildCache) {
             LOGGER.debug(String.format("rebuilding spectrum cache for experiment %s", experimentAccession));
@@ -116,7 +108,7 @@ public class DbExperimentServiceImpl extends ExperimentServiceImpl implements Db
             MascotGenericFile mascotGenericFile = new MascotGenericFile();
             mascotGenericFile.setFilename(experimentAccession);
 
-            outputStream = new BufferedOutputStream(new FileOutputStream(file));
+            outputStream = new BufferedOutputStream(new FileOutputStream(mgfFile));
             writeCachedSpectra(outputStream, experimentAccession);
         } catch (FileNotFoundException e) {
             LOGGER.error(e.getMessage(), e);
@@ -131,8 +123,6 @@ public class DbExperimentServiceImpl extends ExperimentServiceImpl implements Db
                 }
             }
         }
-
-        return file;
     }
 
     /**

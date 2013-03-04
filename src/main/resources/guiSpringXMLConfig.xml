@@ -23,8 +23,9 @@
         <property name="pipelineProgressController" ref="pipelineProgressController"/>
         <property name="systematicMassErrorsController" ref="systematicMassErrorsController"/>
         <property name="modificationsMergeController" ref="modificationsMergeController"/>
-        <property name="experimentService" ref="experimentService"/>
-        <property name="resultHandler" ref="resultHandler"/>
+        <property name="experimentService" ref="dbExperimentService"/>
+        <property name="modificationService" ref="dbModificationService"/>
+        <property name="resultHandler" ref="dbResultHandler"/>
     </bean>
     
     <bean id="pipelineProgressController"
@@ -45,14 +46,14 @@
     <bean id="modificationsController"
           class="com.compomics.pride_asa_pipeline.gui.controller.ModificationsController"> 
         <property name="mainController" ref="mainController"/>
-        <property name="modificationService" ref="modificationService"/>
+        <property name="modificationService" ref="dbModificationService"/>
     </bean>
     
     <bean id="pipelineResultController"
           class="com.compomics.pride_asa_pipeline.gui.controller.PipelineResultController"> 
         <property name="mainController" ref="mainController"/>
         <property name="spectrumPanelService" ref="spectrumPanelService"/>        
-        <property name="modificationService" ref="modificationService"/>        
+        <property name="modificationService" ref="dbModificationService"/>        
     </bean>
     
     <bean id="pipelineParamsController"

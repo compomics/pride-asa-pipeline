@@ -2,7 +2,7 @@
  */
 package com.compomics.pride_asa_pipeline.model;
 
-import com.compomics.pride_asa_pipeline.service.ModificationService;
+import com.compomics.pride_asa_pipeline.service.DbModificationService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,7 +26,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class ModificationCombinationTest {
 
     @Autowired
-    private ModificationService modificationService;
+    private DbModificationService modificationService;
 
     @Test
     public void testEqualsAndHashCode() throws JDOMException {

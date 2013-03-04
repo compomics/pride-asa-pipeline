@@ -5,7 +5,7 @@
 package com.compomics.pride_asa_pipeline.model;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.service.ModificationService;
+import com.compomics.pride_asa_pipeline.service.DbModificationService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.io.IOException;
 import java.util.HashSet;
@@ -28,7 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class ModifiedPeptideTest {
 
     @Autowired
-    private ModificationService modificationService;
+    private DbModificationService modificationService;
 
     /**
      * Test the ion mass ladder with one NT modification

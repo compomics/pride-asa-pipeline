@@ -3,8 +3,9 @@ package com.compomics.pride_asa_pipeline.repository;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.repository.impl.PrideXmlParserImpl;
+import com.compomics.pride_asa_pipeline.model.Peak;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class PrideXmlParserTest {
 
     private static boolean fileLoaded = false;
     @Autowired
-    private PrideXmlParserImpl prideXmlParser;
+    private PrideXmlParser prideXmlParser;
     private Resource prideXmlResource = new ClassPathResource("PRIDE_Experiment_11954.xml");
 
     @Before
@@ -88,5 +89,19 @@ public class PrideXmlParserTest {
         List<String> proteinAccessions = prideXmlParser.getProteinAccessions();
         
         Assert.assertEquals(43, proteinAccessions.size());
+    }
+    
+    @Test
+    public void testGetSpectrumPeaksBySpectrumId(){
+        List<Peak> spectrumPeaks = prideXmlParser.getSpectrumPeaksBySpectrumId("1");
+        
+        Assert.assertEquals(292, spectrumPeaks.size());
+    }
+    
+    @Test
+    public void testGetSpectrumMapBySpectrumId(){
+        HashMap<Double, Double> spectrumPeaks = prideXmlParser.getSpectrumPeakMapBySpectrumId("1");
+        
+        Assert.assertEquals(292, spectrumPeaks.size());
     }
 }

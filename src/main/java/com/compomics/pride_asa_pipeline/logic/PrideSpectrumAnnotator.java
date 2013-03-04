@@ -162,7 +162,7 @@ public class PrideSpectrumAnnotator {
      *
      * @param experimentAccession the experiment accession number
      */
-    public void initIdentifications(String experimentAccession) {
+     public void initIdentifications(String experimentAccession) {
         areModificationsLoaded = false;
         
         LOGGER.debug("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
