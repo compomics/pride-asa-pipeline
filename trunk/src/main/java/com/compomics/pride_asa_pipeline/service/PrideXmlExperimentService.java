@@ -23,7 +23,12 @@ public interface PrideXmlExperimentService extends ExperimentService {
      * @param experimentPrideXmlFile the experiment pride XML file
      * @return the experiment identifications
      */
-    public void init(File experimentPrideXmlFile);
+    void init(File experimentPrideXmlFile);
+    
+    /**
+     * Clears the tmp resources.
+     */
+    void clear();
 
     /**
      * Loads the experiment identifications
