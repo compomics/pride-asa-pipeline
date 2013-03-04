@@ -13,7 +13,6 @@ import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import java.util.*;
-import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.springframework.core.io.Resource;
 

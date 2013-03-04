@@ -6,13 +6,24 @@ package com.compomics.pride_asa_pipeline.service;
 
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identifications;
+import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
+import com.compomics.pridexmltomgfconverter.errors.exceptions.XMLConversionException;
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 /**
  * @author Niels Hulstaert
  */
 public interface PrideXmlExperimentService extends ExperimentService {
+
+    /**
+     * Inits the service; indexes the given pride XML file
+     *
+     * @param experimentPrideXmlFile the experiment pride XML file
+     * @return the experiment identifications
+     */
+    public void init(File experimentPrideXmlFile);
 
     /**
      * Loads the experiment identifications
@@ -60,9 +71,14 @@ public interface PrideXmlExperimentService extends ExperimentService {
     long getNumberOfPeptides();
 
     /**
-     * Gets the spectra as a file in mgf format
+     * Gets the spectra as a file in mgf format. Returns a list of non fatal
+     * conversion errors. Throws a XMLConversionException in case of a fatal
+     * parser error.
      *
-     * @return the spectra file
+     * @param experimentPrideXmlFile the pride XML file
+     * @param mgfFile the destination MGF file
+     * @return the list of conversion errors
+     * @throws XMLConversionException the XML conversion exception
      */
-    File getSpectraAsMgfFile();
+    List<ConversionError> getSpectraAsMgf(File experimentPrideXmlFile, File mgfFile) throws XMLConversionException;
 }

@@ -7,7 +7,7 @@ package com.compomics.pride_asa_pipeline.service.impl;
 import com.compomics.pride_asa_pipeline.cache.Cache;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.repository.SpectrumRepository;
-import com.compomics.pride_asa_pipeline.service.SpectrumService;
+import com.compomics.pride_asa_pipeline.service.DbSpectrumService;
 import java.util.*;
 import org.apache.log4j.Logger;
 
@@ -15,9 +15,9 @@ import org.apache.log4j.Logger;
  *
  * @author Niels Hulstaert
  */
-public class SpectrumServiceImpl implements SpectrumService {
+public class DbSpectrumServiceImpl implements DbSpectrumService {
 
-    private static final Logger LOGGER = Logger.getLogger(SpectrumServiceImpl.class);
+    private static final Logger LOGGER = Logger.getLogger(DbSpectrumServiceImpl.class);
     
     private SpectrumRepository spectrumRepository;
     private Cache<Long, List<Peak>> spectrumPeaksCache;

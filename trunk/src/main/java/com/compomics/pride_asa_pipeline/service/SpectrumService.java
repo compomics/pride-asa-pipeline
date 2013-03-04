@@ -30,17 +30,6 @@ public interface SpectrumService {
      * @param spectrumId the spectrum ID
      * @return the spectrum peaks
      */
-    HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(long spectrumId);
-
-    /**
-     * Fill the spectrum cache with the specified spectrumids
-     * @param aSpectrumidCacheList
-     */
-    void cacheSpectra(List<Long> aSpectrumidCacheList);
-
-    /**
-     * Clear the current cache.
-     */
-    void clearCache();
+    HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(long spectrumId);    
 
 }

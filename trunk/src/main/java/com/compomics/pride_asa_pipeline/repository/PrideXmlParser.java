@@ -3,13 +3,17 @@ package com.compomics.pride_asa_pipeline.repository;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.Peak;
+import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
+import com.compomics.pridexmltomgfconverter.errors.exceptions.XMLConversionException;
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  *
- * @author niels
+ * @author Niels Hulstaert
  */
 public interface PrideXmlParser {
 
@@ -19,9 +23,10 @@ public interface PrideXmlParser {
      * @param prideXmlFile the Pride XML file
      */
     void init(File prideXmlFile);
-
+    
     /**
-     * Clears the resources used by the parser
+     * Clears the parser resources
+     * 
      */
     void clear();
 
@@ -60,33 +65,61 @@ public interface PrideXmlParser {
      * @return the spectrum IDs
      */
     List<String> getSpectrumIds();
-    
+
     /**
      * Gets the modifications found in the file.
-     * 
+     *
      * @return the list of found modifications
      */
-    List<Modification> getModifications();  
-    
+    List<Modification> getModifications();
+
     /**
      * Gets the analyzer sources as a map (key: cv accession, value: cv value)
      *
      * @return the analyzer source map
      */
     Map<String, String> getAnalyzerSources();
-    
+
     /**
      * Gets the experiment analyzer data
      *
      * @return the experiment analyzer data list
      */
     List<AnalyzerData> getAnalyzerData();
-    
+
     /**
      * Gets protein accessions for a given experiment
      *
      * @return the protein accession list
      */
     List<String> getProteinAccessions();
-        
+
+    /**
+     * Gets the spectrum peak list by spectrum ID.
+     *
+     * @param spectrumId the spectrum ID
+     * @return the spectrum peaks
+     */
+    List<Peak> getSpectrumPeaksBySpectrumId(String spectrumId);
+
+    /**
+     * Gets the spectrum peak map (key: mz value, value: intensity value) by
+     * spectrum ID.
+     *
+     * @param spectrumId the spectrum ID
+     * @return the spectrum peaks
+     */
+    HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(String spectrumId);
+    
+    /**
+     * Gets the spectra as a file in mgf format. Returns a list of non fatal
+     * conversion errors. Throws a XMLConversionException in case of a fatal
+     * parser error.
+     *
+     * @param experimentPrideXmlFile the pride XML file
+     * @param mgfFile the destination MGF file
+     * @return the list of conversion errors
+     * @throws XMLConversionException the XML conversion exception
+     */
+    List<ConversionError> getSpectraAsMgf(File experimentPrideXmlFile, File mgfFile) throws XMLConversionException;
 }

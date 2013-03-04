@@ -6,7 +6,7 @@ package com.compomics.pride_asa_pipeline.logic;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.*;
-import com.compomics.pride_asa_pipeline.service.ModificationService;
+import com.compomics.pride_asa_pipeline.service.DbModificationService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.io.IOException;
 import java.util.HashSet;
@@ -32,7 +32,7 @@ public class PeptideVariationsGeneratorTest {
     @Autowired
     private PeptideVariationsGenerator peptideVariationsGenerator;
     @Autowired
-    private ModificationService modificationService;
+    private DbModificationService modificationService;
     private Set<Modification> modifications;
 
     @Before

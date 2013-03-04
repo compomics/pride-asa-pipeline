@@ -107,10 +107,6 @@ public class PipelineResultController {
         this.modificationService = modificationService;
     }
 
-    public Map<Modification, Integer> getUsedModifications() {
-        return usedModifications;
-    }
-
     public void init() {
         usedModifications = new HashMap<Modification, Integer>();
         modificationColors = new HashMap<String, Color>();
@@ -302,14 +298,14 @@ public class PipelineResultController {
             }
             ionCoverages.put(FragmentIonAnnotation.IonType.B_ION,
                     new double[]{
-                        (double) numberOfB1Ions / identification.getPeptide().length() * 100,
-                        (double) numberOfB2Ions / identification.getPeptide().length() * 100
-                    });
+                (double) numberOfB1Ions / identification.getPeptide().length() * 100,
+                (double) numberOfB2Ions / identification.getPeptide().length() * 100
+            });
             ionCoverages.put(FragmentIonAnnotation.IonType.Y_ION,
                     new double[]{
-                        (double) numberOfY1Ions / identification.getPeptide().length() * 100,
-                        (double) numberOfY2Ions / identification.getPeptide().length() * 100
-                    });
+                (double) numberOfY1Ions / identification.getPeptide().length() * 100,
+                (double) numberOfY2Ions / identification.getPeptide().length() * 100
+            });
         } else {
             ionCoverages.put(FragmentIonAnnotation.IonType.B_ION, new double[]{0.0, 0.0});
             ionCoverages.put(FragmentIonAnnotation.IonType.Y_ION, new double[]{0.0, 0.0});

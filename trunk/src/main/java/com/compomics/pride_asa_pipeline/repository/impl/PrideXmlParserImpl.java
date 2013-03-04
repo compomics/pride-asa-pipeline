@@ -6,9 +6,13 @@ import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import com.compomics.pride_asa_pipeline.repository.PrideXmlParser;
+import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
+import com.compomics.pridexmltomgfconverter.errors.exceptions.XMLConversionException;
+import com.compomics.pridexmltomgfconverter.tools.PrideXMLToMGFConverter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +27,7 @@ import uk.ac.ebi.pride.jaxb.model.ModificationItem;
 import uk.ac.ebi.pride.jaxb.model.Param;
 import uk.ac.ebi.pride.jaxb.model.PeptideItem;
 import uk.ac.ebi.pride.jaxb.model.Precursor;
+import uk.ac.ebi.pride.jaxb.model.Spectrum;
 import uk.ac.ebi.pride.jaxb.xml.PrideXmlReader;
 
 /**
@@ -46,11 +51,13 @@ public class PrideXmlParserImpl implements PrideXmlParser {
      */
     @Override
     public void init(File prideXmlFile) {
-        prideXmlReader = new PrideXmlReader(prideXmlFile);
+        PrideXMLToMGFConverter.getInstance().init(prideXmlFile);
+        prideXmlReader = PrideXMLToMGFConverter.getInstance().getPrideXmlReader();
     }
-
+    
     @Override
     public void clear() {
+        PrideXMLToMGFConverter.getInstance().clearTempFiles();
         prideXmlReader = null;
     }
 
@@ -156,6 +163,95 @@ public class PrideXmlParserImpl implements PrideXmlParser {
         return modifications;
     }
 
+    @Override
+    public List<Peak> getSpectrumPeaksBySpectrumId(String spectrumId) {
+        List<Peak> peaks = new ArrayList<Peak>();
+
+        Spectrum spectrum = prideXmlReader.getSpectrumById(spectrumId);
+        Number[] mzRatios = spectrum.getMzNumberArray();
+        Number[] intensities = spectrum.getIntentArray();
+
+        for (int i = 0; i < mzRatios.length; i++) {
+            Peak peak = new Peak((Double) mzRatios[i], (Double) intensities[i]);
+            peaks.add(peak);
+        }
+
+        return peaks;
+    }
+
+    @Override
+    public HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(String spectrumId) {
+        HashMap<Double, Double> peaks = new HashMap<Double, Double>();
+
+        Spectrum spectrum = prideXmlReader.getSpectrumById(spectrumId);
+        Number[] mzRatios = spectrum.getMzNumberArray();
+        Number[] intensities = spectrum.getIntentArray();
+
+        for (int i = 0; i < mzRatios.length; i++) {
+            peaks.put((Double) mzRatios[i], (Double) intensities[i]);
+        }
+
+        return peaks;
+    }        
+
+    @Override
+    public Map<String, String> getAnalyzerSources() {
+        Map<String, String> analyzerSources = new HashMap<String, String>();
+
+        //get instrument
+        Instrument instrument = prideXmlReader.getDescription().getInstrument();
+        //get ionizer type cv param and maldi source cv param
+        CvParam ionizerTypeCvParam = instrument.getSource().getCvParamByAcc(IONIZER_TYPE);
+        CvParam maldiSourceCvParam = instrument.getSource().getCvParamByAcc(MALDI_SOURCE_ACCESSION);
+
+        if (ionizerTypeCvParam != null) {
+            analyzerSources.put(ionizerTypeCvParam.getAccession(), ionizerTypeCvParam.getName());
+        }
+        if (maldiSourceCvParam != null) {
+            analyzerSources.put(maldiSourceCvParam.getAccession(), maldiSourceCvParam.getName());
+        }
+
+        return analyzerSources;
+    }
+
+    @Override
+    public List<AnalyzerData> getAnalyzerData() {
+        List<AnalyzerData> analyzerDataList = new ArrayList<AnalyzerData>();
+
+        //get instrument
+        Instrument instrument = prideXmlReader.getDescription().getInstrument();
+        //get analyzer list
+        AnalyzerList analyzerList = instrument.getAnalyzerList();
+        //get analyzer params
+        List<Param> analyzerParams = analyzerList.getAnalyzer();
+        for (Param analyzerParam : analyzerParams) {
+            for (CvParam cvParam : analyzerParam.getCvParam()) {
+                AnalyzerData analyzerData = AnalyzerDataMapper.getAnalyzerDataByAnalyzerType(cvParam.getName());
+                analyzerDataList.add(analyzerData);
+            }
+        }
+
+        return analyzerDataList;
+    }
+
+    @Override
+    public List<String> getProteinAccessions() {
+        List<String> proteinAccessions = new ArrayList<String>();
+
+        //Iterate over each protein identification
+        for (String proteinIdentificationId : prideXmlReader.getIdentIds()) {
+            uk.ac.ebi.pride.jaxb.model.Identification prideXmlIdentification = prideXmlReader.getIdentById(proteinIdentificationId);
+
+            proteinAccessions.add(prideXmlIdentification.getAccession());
+        }
+        return proteinAccessions;
+    }
+    
+    @Override
+    public List<ConversionError> getSpectraAsMgf(File experimentPrideXmlFile, File mgfFile) throws XMLConversionException {
+        return PrideXMLToMGFConverter.getInstance().extractMGFFromPrideXML(experimentPrideXmlFile, mgfFile);
+    }
+    
     /**
      * Map a ModificationItem onto the pipeline Modification
      *
@@ -191,58 +287,5 @@ public class PrideXmlParserImpl implements PrideXmlParser {
         modification.setOrigin(Modification.Origin.PRIDE);
 
         return modification;
-    }
-
-    @Override
-    public Map<String, String> getAnalyzerSources() {
-        Map<String, String> analyzerSources = new HashMap<String, String>();
-
-        //get instrument
-        Instrument instrument = prideXmlReader.getDescription().getInstrument();
-        //get ionizer type cv param and maldi source cv param
-        CvParam ionizerTypeCvParam = instrument.getSource().getCvParamByAcc(IONIZER_TYPE);
-        CvParam maldiSourceCvParam = instrument.getSource().getCvParamByAcc(MALDI_SOURCE_ACCESSION);
-        
-        if(ionizerTypeCvParam != null){
-            analyzerSources.put(ionizerTypeCvParam.getAccession(), ionizerTypeCvParam.getName());
-        }
-        if(maldiSourceCvParam != null){
-            analyzerSources.put(maldiSourceCvParam.getAccession(), maldiSourceCvParam.getName());
-        }
-
-        return analyzerSources;
-    }
-
-    @Override
-    public List<AnalyzerData> getAnalyzerData() {
-        List<AnalyzerData> analyzerDataList = new ArrayList<AnalyzerData>();
-
-        //get instrument
-        Instrument instrument = prideXmlReader.getDescription().getInstrument();
-        //get analyzer list
-        AnalyzerList analyzerList = instrument.getAnalyzerList();
-        //get analyzer params
-        List<Param> analyzerParams = analyzerList.getAnalyzer();
-        for (Param analyzerParam : analyzerParams) {
-            for (CvParam cvParam : analyzerParam.getCvParam()) {
-                AnalyzerData analyzerData = AnalyzerDataMapper.getAnalyzerDataByAnalyzerType(cvParam.getName());
-                analyzerDataList.add(analyzerData);
-            }
-        }
-
-        return analyzerDataList;
-    }
-
-    @Override
-    public List<String> getProteinAccessions() {
-        List<String> proteinAccessions = new ArrayList<String>();
-        
-        //Iterate over each protein identification
-        for (String proteinIdentificationId : prideXmlReader.getIdentIds()) {
-            uk.ac.ebi.pride.jaxb.model.Identification prideXmlIdentification = prideXmlReader.getIdentById(proteinIdentificationId);
-
-            proteinAccessions.add(prideXmlIdentification.getAccession());
-        }
-        return proteinAccessions;
-    }
+    }    
 }

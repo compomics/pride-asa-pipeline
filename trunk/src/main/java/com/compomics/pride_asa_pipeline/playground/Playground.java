@@ -4,6 +4,12 @@
  */
 package com.compomics.pride_asa_pipeline.playground;
 
+import com.compomics.pride_asa_pipeline.CommandLineRunner;
+import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.service.ResultHandler;
+import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,17 +22,50 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 /**
  * @author Niels Hulstaert
  */
 public class Playground {
 
+    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(Playground.class);
+    
     public static void main(String[] args) {
         //load application context
-        //ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
 
-        Playground.filterExperimentAccessions(new File("C:\\Users\\niels\\Desktop\\pride_experiment_accessions.txt"), new File("C:\\Users\\niels\\Documents\\annotation_test\\pride"));
+        PrideXmlSpectrumAnnotator prideSpectrumAnnotator = (PrideXmlSpectrumAnnotator) applicationContext.getBean("prideXmlSpectrumAnnotator");
+        ResultHandler resultHandler = (ResultHandler) applicationContext.getBean("prideXmlResultHandler");
+        Resource prideXmlResource = new FileSystemResource("C:\\Users\\niels\\Desktop\\PRIDE_Experiment_11954.xml");
+        
+        try {
+            //init the annotiation
+            prideSpectrumAnnotator.initIdentifications(prideXmlResource.getFile());
+
+            //check if the experiment has "useful" identifications
+            if (prideSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
+                //LOGGER.warn("No useful identifications were found for experiment " + experimentAccession + ". This experiment will be skipped.");
+                prideSpectrumAnnotator.clearPipeline();
+            } else {
+                //check if the maximum systematic mass error is exceeded
+                if (prideSpectrumAnnotator.getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
+                    LOGGER.warn("One or more systematic mass error exceed the maximum value of " + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error") + ", experiment " + prideXmlResource.getFilename() + " will be skipped.");
+                    prideSpectrumAnnotator.clearPipeline();
+                } else {
+                    //continue with the annotiation
+                    prideSpectrumAnnotator.annotate(prideXmlResource.getFile());
+                    //write result to file
+                    resultHandler.writeResultToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
+                    resultHandler.writeUsedModificationsToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     public static File filterExperimentAccessions(File experimentAccessionsFile, File resultsDirectory) {
