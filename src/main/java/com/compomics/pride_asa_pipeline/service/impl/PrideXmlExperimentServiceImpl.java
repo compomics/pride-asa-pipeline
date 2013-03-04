@@ -116,6 +116,11 @@ public class PrideXmlExperimentServiceImpl extends ExperimentServiceImpl impleme
     }
 
     @Override
+    public void clear() {
+        prideXmlParser.clear();
+    }        
+
+    @Override
     public List<ConversionError> getSpectraAsMgf(File experimentPrideXmlFile, File mgfFile) throws XMLConversionException {
         return prideXmlParser.getSpectraAsMgf(experimentPrideXmlFile, mgfFile);
     }        
