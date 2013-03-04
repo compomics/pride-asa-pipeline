@@ -8,9 +8,7 @@ import com.compomics.pride_asa_pipeline.service.PrideXmlExperimentService;
 import com.compomics.pride_asa_pipeline.service.PrideXmlModificationService;
 import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
-import com.google.common.io.Files;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
@@ -182,8 +180,10 @@ public class PrideXmlSpectrumAnnotator {
 
         ///////////////////////////////////////////////////////////////////////
         //FIRST STEP: find the systematic mass error (if there is one)
+        //get analyzer data
+        analyzerData = experimentService.getAnalyzerData();
         LOGGER.info("finding systematic mass errors");
-        MassRecalibrationResult massRecalibrationResult = findSystematicMassError(consideredChargeStates, identifications.getCompletePeptides());
+        MassRecalibrationResult massRecalibrationResult = findSystematicMassError(identifications.getCompletePeptides());
         LOGGER.debug("Finished finding systematic mass errors:" + "\n" + massRecalibrationResult.toString());
         spectrumAnnotatorResult.setMassRecalibrationResult(massRecalibrationResult);
     }
@@ -242,9 +242,7 @@ public class PrideXmlSpectrumAnnotator {
 
         ///////////////////////////////////////////////////////////////////////
         //SECOND STEP: find all the modification combinations that could
-        //              explain a given mass delta (if there is one) -> Zen Archer
-        //get analyzer data
-        analyzerData = experimentService.getAnalyzerData();
+        //              explain a given mass delta (if there is one) -> Zen Archer        
         LOGGER.info("finding modification combinations");
         //set fragment mass error for the identification scorer
         spectrumMatcher.getIdentificationScorer().setFragmentMassError(analyzerData.getFragmentMassError());
@@ -351,19 +349,18 @@ public class PrideXmlSpectrumAnnotator {
     /**
      * finds the systematic mass errors per charge state
      *
-     * @param consideredChargeStates a set of considered charge states
      * @param completePeptides list of complete peptides (i.e. all sequence AA
      * masses known)
      * @return the mass recalibration result (systemic mass error) per charge
      * state
      */
-    private MassRecalibrationResult findSystematicMassError(Set<Integer> consideredChargeStates, List<Peptide> completePeptides) {
+    private MassRecalibrationResult findSystematicMassError(List<Peptide> completePeptides) {
         //set considered charge states
         massRecalibrator.setConsideredChargeStates(consideredChargeStates);
 
         MassRecalibrationResult massRecalibrationResult = null;
         try {
-            massRecalibrationResult = massRecalibrator.recalibrate(completePeptides);
+            massRecalibrationResult = massRecalibrator.recalibrate(analyzerData, completePeptides);
         } catch (AASequenceMassUnknownException e) {
             //this should not happen here, since we only handle 'complete precursors' where
             //all the amino acids have a known mass

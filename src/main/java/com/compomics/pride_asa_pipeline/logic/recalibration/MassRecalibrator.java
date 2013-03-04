@@ -6,6 +6,7 @@ package com.compomics.pride_asa_pipeline.logic.recalibration;
 
 import com.compomics.pride_asa_pipeline.logic.recalibration.MassWindowFinder;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import java.util.Collection;
@@ -47,10 +48,11 @@ public interface MassRecalibrator {
      *      -calculates the mass error window
      * 
      * @param peptides the peptide collection
+     * @param analyzerData the analyzer data
      * @return the mass recalibration result
      * @throws AASequenceMassUnknownException 
      */
-    MassRecalibrationResult recalibrate(Collection<Peptide> peptides) throws AASequenceMassUnknownException;
+    MassRecalibrationResult recalibrate(AnalyzerData analyzerData, Collection<Peptide> peptides) throws AASequenceMassUnknownException;
     
     /**
      * Gets the default systematic mass error

@@ -2,6 +2,7 @@ package com.compomics.pride_asa_pipeline.logic.recalibration;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import java.util.ArrayList;
@@ -10,20 +11,17 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: niels
- * Date: 26/10/11
- * Time: 10:21
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: niels Date: 26/10/11 Time: 10:21 To change
+ * this template use File | Settings | File Templates.
  */
 public abstract class AbstractMassRecalibrator implements MassRecalibrator {
 
     protected MassWindowFinder massWindowFinder;
     protected Set<Integer> consideredChargeStates;
     //the default systematic error to use if none could be established automatically
-    protected double defaultSystematicMassError = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_systematic_mass_error"); 
+    protected double defaultSystematicMassError = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_systematic_mass_error");
     //the default error tolerance (one side of a error window) to use if none could be established automatically
-    protected double defaultErrorTolerance = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance");  
+    protected double defaultErrorTolerance = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance");
 
     @Override
     public void setMassWindowFinder(MassWindowFinder massWindowFinder) {
@@ -61,40 +59,43 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
     }
 
     @Override
-    public abstract MassRecalibrationResult recalibrate(Collection<Peptide> peptides) throws AASequenceMassUnknownException;
+    public abstract MassRecalibrationResult recalibrate(AnalyzerData analyzerData, Collection<Peptide> peptides) throws AASequenceMassUnknownException;
 
     protected void checkSetup() {
         if (massWindowFinder == null) {
             throw new IllegalStateException("MassRecalibrator needs a MassWindowFinder! Please set one.");
         }
         if (consideredChargeStates == null) {
-            throw new IllegalStateException("MassRecalibrator needs a list of charge states! " +
-                    "Please specify the charge states to consider.");
+            throw new IllegalStateException("MassRecalibrator needs a list of charge states! "
+                    + "Please specify the charge states to consider.");
         }
     }
 
     /**
      * Inits the mass recalibration result; 
-     *      -checks if there are charge states defined
-     *      -add the default systematic mass error for each charge state
+     *  -checks if there are charge states defined 
+     *  -add the default systematic mass error for each charge state; takes the precursor mass error from the analyzer data
+     *
+     * @param analyzerData the analyzer data
      * @return the initialized mass recalibration result
      */
-    protected MassRecalibrationResult initMassRecalibrationResult() {
+    protected MassRecalibrationResult initMassRecalibrationResult(AnalyzerData analyzerData) {
         MassRecalibrationResult result = new MassRecalibrationResult();
         if (consideredChargeStates == null) {
             throw new IllegalStateException("No charge states defined! Can not initialise calibration result.");
         }
 
+        double errorTolerance = (analyzerData == null) ? defaultErrorTolerance : analyzerData.getPrecursorMassError();
         for (Integer charge : consideredChargeStates) {
-            result.addMassError(charge, defaultSystematicMassError, (defaultErrorTolerance / charge));
+            result.addMassError(charge, defaultSystematicMassError, (errorTolerance / charge));
         }
 
         return result;
     }
-    
+
     /**
      * Returns the peptides with the spefied charge
-     * 
+     *
      * @param peptides the peptide collection
      * @param charge the charge value
      * @return the list of peptides
@@ -108,10 +109,10 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
         }
         return precs;
     }
-    
+
     /**
      * Returns the 'usable' peptides; those that exceed a given mass threshold
-     * 
+     *
      * @param peptidesByCharge the peptides with a specific charge
      * @return the usable peptide with a specific charge
      */
@@ -133,31 +134,31 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
 
         return peptides;
     }
-    
+
     /**
      * Gets the mass errors of the peptides
-     * 
+     *
      * @param peptides the peptides
      * @return the mass errors
-     * @throws AASequenceMassUnknownException 
+     * @throws AASequenceMassUnknownException
      */
     protected List<Double> getMassErrors(List<Peptide> peptides) throws AASequenceMassUnknownException {
         List<Double> errors = new ArrayList<Double>();
         for (Peptide peptide : peptides) {
-            errors.add(peptide.calculateMassDelta());            
+            errors.add(peptide.calculateMassDelta());
         }
         return errors;
     }
-    
+
     /**
-     * Filters the mass errors with a window [lower bound, upper bound].
-     * Only the mass errors in the window pass the filter.
-     * 
+     * Filters the mass errors with a window [lower bound, upper bound]. Only
+     * the mass errors in the window pass the filter.
+     *
      * @param massErrors the mass errors
      * @param lower the lower bound value
      * @param upper the upper bound value
      * @return the filtered mass errors
-     */    
+     */
     protected List<Double> filterMassErrors(List<Double> massErrors, double lower, double upper) {
         List<Double> errors = new ArrayList<Double>();
         for (Double massError : massErrors) {
@@ -167,5 +168,4 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
         }
         return errors;
     }
-
 }
