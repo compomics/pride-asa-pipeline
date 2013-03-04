@@ -6,8 +6,8 @@
 == In a nutshell == 
 For a given experiment, identifications and spectra are retrieved from the PRIDE public MySQL database and processed into three categories, with `Δm` the mass difference between the experimental and theoretical precursor mass:
   * _unmodified_: `Δm` is smaller than the mass error.
-  * _modified_: `Δm` is significant but can’t be explained by a modification combination.   
-  * _unexplained_: `Δm` can be fitted to a combination of modification masses, so the precursor carries likely one or more PTMs. 
+  * _modified_: `Δm` can be fitted to a combination of modification masses, so the precursor carries likely one or more PTMs.   
+  * _unexplained_: `Δm` is significant but can’t be explained by a modification combination.  
 
 The peptide sequences are then matched to the corresponding spectra after adaptive noise filtering, and a score is derived for each peptide-to-spectrum match. The final output of the tool consists of the complete list of annotated identifications and spectra, and the list of modifications used to explain the observed precursor mass deviations in that experiment.
 
