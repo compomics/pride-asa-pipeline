@@ -9,7 +9,7 @@ For a given experiment, identifications and spectra are retrieved from the PRIDE
   * _modified_: `Δm` can be fitted to a combination of modification masses, so the precursor carries likely one or more PTMs.   
   * _unexplained_: `Δm` is significant but can’t be explained by a modification combination.  
 
-For the evaluation of the mass difference `Δm`, a systematic mass error and error window are calculated per charge state. If not enough identifications were found for a given charge state, a default systematic mass error and the instrument precursor mass error are used instead.    
+Before the evaluation of the mass difference `Δm`, a systematic mass error and error window are calculated per charge state in a recalibration step. If not enough identifications were found for a given charge state, a default systematic mass error and the instrument precursor mass error are used instead.    
 
 The peptide sequences are then matched to the corresponding spectra after adaptive noise filtering, and a score is derived for each peptide-to-spectrum match. The final output of the tool consists of the complete list of annotated identifications and spectra, and the list of modifications used to explain the observed precursor mass deviations in that experiment.
 
@@ -22,7 +22,9 @@ Most of the parameter values in this file should be left to their default values
   * `spectrumannotator.include_pride_modifications`: include the modifications in found in PRIDE for a given experiment. Note that setting this parameter to `true` can increase the processing time. The modifications defined in the pipeline ([#modifications.xml modifications.xml]) are always taken into account.  
   * `modification.use_monoisotopic_mass`: use the monoisotopic or the average mass for the PTMs.
   * `pipeline.considered_charge_states`: the considered charge states for a precursor.
-  * `massrecalibrator.maximum_systematic_mass_error`: the threshold systematic mass error value. The systematic mass errors (per charge state) as result of a recalibration step are checked against this value.  
+  * `massrecalibrator.maximum_systematic_mass_error`: the threshold systematic mass error value. The systematic mass errors (per charge state) as result of a recalibration step are checked against this value.
+  * `massrecalibrator.mass_delta_threshold`: only identifications with a lower `Δm` are taken into account for the recalibration step.  
+  * `massrecalibrator.minimum_peptide_count`: the minimum number of identifications per charge state used for the recalibration. Else the analyzer instrument default values are used.
 
 === modifications.xml ===
 This XML file contains the modifications used to explain a possible difference between the experimental and theoretical precursor mass. It can be edited or replaced (_Edit_ -> _Modifications_ in GUI mode) by a modifications result file. The accompanying XML schema can be found in the [http://code.google.com/p/pride-asa-pipeline/downloads/list downloads section]. 
