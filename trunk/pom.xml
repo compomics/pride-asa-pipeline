@@ -421,6 +421,10 @@
                     <artifactId>braf</artifactId>
                     <groupId>uk.ac.ebi.pride.tools</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>batik-all</artifactId>
+                    <groupId>batik</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
