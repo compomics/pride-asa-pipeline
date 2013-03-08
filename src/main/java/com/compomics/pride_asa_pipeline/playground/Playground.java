@@ -43,6 +43,8 @@ public class Playground {
         Resource prideXmlResource = new FileSystemResource("C:\\Users\\niels\\Desktop\\PRIDE_Experiment_11954.xml");
         
         try {
+            prideSpectrumAnnotator.initPrideXmlFile(prideXmlResource.getFile());
+            
             //init the annotiation
             prideSpectrumAnnotator.initIdentifications(prideXmlResource.getFile());
 
