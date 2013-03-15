@@ -9,7 +9,7 @@ For a given experiment, identifications and spectra are retrieved from the PRIDE
   * _modified_: `Δm` can be fitted to a combination of modification masses, so the precursor carries likely one or more PTMs.   
   * _unexplained_: `Δm` is significant but can’t be explained by a modification combination.  
 
-Before the evaluation of the mass difference `Δm`, a systematic mass error and error window are calculated per charge state in a recalibration step. If not enough identifications were found for a given charge state, a default systematic mass error and the instrument precursor mass error are used instead.    
+Before the evaluation of the mass difference `Δm`, a systematic mass error and error window are calculated per charge state in a recalibration step. If not enough identifications were found for a given charge state, a default systematic mass error and the annotated instrument precursor mass error are used instead.    
 
 The peptide sequences are then matched to the corresponding spectra after adaptive noise filtering, and a score is derived for each peptide-to-spectrum match. In this step, the instrument fragment mass error is taken as the fragment ion mass deviation. The final output of the tool consists of the complete list of annotated identifications and spectra, and the list of modifications used to explain the observed precursor mass deviations in that experiment.
 
