@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class MathUtils {
 
-    private static final Integer NUMBER_OF_DECIMALS = 4;
+    public static final Integer NUMBER_OF_DECIMALS = 4;
 
     /**
      * Utility method to calculate the median of a given list of values. Note:
@@ -223,13 +223,36 @@ public class MathUtils {
         return Math.abs(a - b) < allowedError;
     }
 
+    /**
+     * Rounds a given double to the default number of decimals.
+     * 
+     * @param d the double
+     * @return the rounded double
+     */
     public static double roundDouble(double d) {
         return roundDouble(d, NUMBER_OF_DECIMALS);
     }
 
-    public static double roundDouble(double d, int numberOfDecimals) {
-        BigDecimal bigDecimal = new BigDecimal(Double.toString(d));
-        bigDecimal = bigDecimal.setScale(numberOfDecimals, BigDecimal.ROUND_HALF_UP);
-        return bigDecimal.doubleValue();
+    /**
+     * Rounds a given double with the given number of decimals.
+     * 
+     * @param d the double
+     * @param numberOfDecimals the number of decimals
+     * @return the rounded double
+     */
+    public static double roundDouble(double d, int numberOfDecimals) {        
+        return roundDoubleAsBigDecimal(d, numberOfDecimals).doubleValue();
+    }
+    
+    /**
+     * Rounds a double with the given number of decimals and returns a BigDecimal.
+     * 
+     * @param d the double
+     * @param numberOfDecimals the number of decimals
+     * @return the rounded BigDecimal
+     */
+    public static BigDecimal roundDoubleAsBigDecimal(double d, int numberOfDecimals) {
+        BigDecimal bigDecimal = new BigDecimal(d).setScale(numberOfDecimals, BigDecimal.ROUND_HALF_UP);
+        return bigDecimal;
     }
 }

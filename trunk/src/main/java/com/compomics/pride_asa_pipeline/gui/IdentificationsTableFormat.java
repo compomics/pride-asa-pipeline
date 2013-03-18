@@ -144,7 +144,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
             if (doChargeAdjustment) {
                 massDeltaValue = massDeltaValue / peptide.getCharge();
             }
-            massDelta = Double.toString(MathUtils.roundDouble(massDeltaValue));
+            massDelta = MathUtils.roundDoubleAsBigDecimal(massDeltaValue, MathUtils.NUMBER_OF_DECIMALS).toPlainString();
             //check if the peptide is a modified peptide,
             //if so, show the corrected mass delta as well.
             if (peptide instanceof ModifiedPeptide) {
@@ -152,7 +152,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
                 if (doChargeAdjustment) {
                     massDeltaValueWithMods = massDeltaValueWithMods / peptide.getCharge();
                 }
-                massDelta = Double.toString(MathUtils.roundDouble(massDeltaValueWithMods)) + " " + UNMOD_MASS_DELTA_OPEN + massDelta + UNMOD_MASS_DELTA_CLOSE;
+                massDelta = MathUtils.roundDoubleAsBigDecimal(massDeltaValueWithMods, MathUtils.NUMBER_OF_DECIMALS).toPlainString() + " " + UNMOD_MASS_DELTA_OPEN + massDelta + UNMOD_MASS_DELTA_CLOSE;
             }
         } catch (AASequenceMassUnknownException ex) {
             LOGGER.error(ex.getMessage(), ex);
