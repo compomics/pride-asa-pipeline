@@ -95,7 +95,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
             case CHARGE:
                 return identification.getPeptide().getCharge();
             case MASS_DELTA:
-                return constructMassDeltaString(identification.getPeptide(), Boolean.FALSE);
+                return constructMassDeltaString(identification.getPeptide(), false);
             case MZ_DELTA:
                 return constructMassDeltaString(identification.getPeptide(), true);
             case PRECURSOR_MZ:

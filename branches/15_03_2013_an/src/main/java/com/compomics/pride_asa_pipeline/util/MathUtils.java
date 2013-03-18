@@ -228,8 +228,7 @@ public class MathUtils {
     }
 
     public static double roundDouble(double d, int numberOfDecimals) {
-        BigDecimal bigDecimal = new BigDecimal(Double.toString(d));
-        bigDecimal = bigDecimal.setScale(numberOfDecimals, BigDecimal.ROUND_HALF_UP);
+        BigDecimal bigDecimal = new BigDecimal(d).setScale(numberOfDecimals, BigDecimal.ROUND_HALF_UP);
         return bigDecimal.doubleValue();
     }
 }

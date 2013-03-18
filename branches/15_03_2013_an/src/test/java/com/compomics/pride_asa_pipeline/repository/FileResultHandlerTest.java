@@ -43,7 +43,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Niels Hulstaert
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
+@ContextConfiguration(locations = {"classpath:springXMLConfig.xml", "classpath:testSpringXMLConfig.xml"})
 public class FileResultHandlerTest {
 
     @Autowired

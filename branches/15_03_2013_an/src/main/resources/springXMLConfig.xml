@@ -122,7 +122,7 @@
     </bean>
     
     <bean id="fileResultHandler"
-          class="com.compomics.pride_asa_pipeline.repository.impl.FileResultHandlerImpl">  
+          class="com.compomics.pride_asa_pipeline.repository.impl.FileResultHandlerImpl2">  
         <property name="modificationService" ref="dbModificationService"/>      
     </bean>
     
