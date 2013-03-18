@@ -18,6 +18,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -35,39 +36,42 @@ public class Playground {
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(Playground.class);
     
     public static void main(String[] args) {
-        //load application context
-        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-
-        PrideXmlSpectrumAnnotator prideSpectrumAnnotator = (PrideXmlSpectrumAnnotator) applicationContext.getBean("prideXmlSpectrumAnnotator");
-        ResultHandler resultHandler = (ResultHandler) applicationContext.getBean("prideXmlResultHandler");
-        Resource prideXmlResource = new FileSystemResource("C:\\Users\\niels\\Desktop\\PRIDE_Experiment_11954.xml");
+//        //load application context
+//        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+//
+//        PrideXmlSpectrumAnnotator prideSpectrumAnnotator = (PrideXmlSpectrumAnnotator) applicationContext.getBean("prideXmlSpectrumAnnotator");
+//        ResultHandler resultHandler = (ResultHandler) applicationContext.getBean("prideXmlResultHandler");
+//        Resource prideXmlResource = new FileSystemResource("C:\\Users\\niels\\Desktop\\PRIDE_Experiment_11954.xml");
+//        
+//        try {
+//            prideSpectrumAnnotator.initPrideXmlFile(prideXmlResource.getFile());
+//            
+//            //init the annotiation
+//            prideSpectrumAnnotator.initIdentifications(prideXmlResource.getFile());
+//
+//            //check if the experiment has "useful" identifications
+//            if (prideSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
+//                //LOGGER.warn("No useful identifications were found for experiment " + experimentAccession + ". This experiment will be skipped.");
+//                prideSpectrumAnnotator.clearPipeline();
+//            } else {
+//                //check if the maximum systematic mass error is exceeded
+//                if (prideSpectrumAnnotator.getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
+//                    LOGGER.warn("One or more systematic mass error exceed the maximum value of " + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error") + ", experiment " + prideXmlResource.getFilename() + " will be skipped.");
+//                    prideSpectrumAnnotator.clearPipeline();
+//                } else {
+//                    //continue with the annotiation
+//                    prideSpectrumAnnotator.annotate(prideXmlResource.getFile());
+//                    //write result to file
+//                    resultHandler.writeResultToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
+//                    resultHandler.writeUsedModificationsToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
+//                }
+//            }
+//        } catch (Exception e) {
+//            LOGGER.error(e.getMessage(), e);
+//        }
         
-        try {
-            prideSpectrumAnnotator.initPrideXmlFile(prideXmlResource.getFile());
-            
-            //init the annotiation
-            prideSpectrumAnnotator.initIdentifications(prideXmlResource.getFile());
-
-            //check if the experiment has "useful" identifications
-            if (prideSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
-                //LOGGER.warn("No useful identifications were found for experiment " + experimentAccession + ". This experiment will be skipped.");
-                prideSpectrumAnnotator.clearPipeline();
-            } else {
-                //check if the maximum systematic mass error is exceeded
-                if (prideSpectrumAnnotator.getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
-                    LOGGER.warn("One or more systematic mass error exceed the maximum value of " + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error") + ", experiment " + prideXmlResource.getFilename() + " will be skipped.");
-                    prideSpectrumAnnotator.clearPipeline();
-                } else {
-                    //continue with the annotiation
-                    prideSpectrumAnnotator.annotate(prideXmlResource.getFile());
-                    //write result to file
-                    resultHandler.writeResultToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
-                    resultHandler.writeUsedModificationsToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+        BigDecimal mzDelta = new BigDecimal(0.123456789).setScale(4, BigDecimal.ROUND_HALF_UP);
+        System.out.println("--" +  mzDelta.toPlainString());
     }
 
     public static File filterExperimentAccessions(File experimentAccessionsFile, File resultsDirectory) {
