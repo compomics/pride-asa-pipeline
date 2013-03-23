@@ -21,10 +21,9 @@ public interface PrideXmlExperimentService extends ExperimentService {
      * Inits the service; indexes the given pride XML file
      *
      * @param experimentPrideXmlFile the experiment pride XML file
-     * @return the experiment identifications
      */
     void init(File experimentPrideXmlFile);
-    
+
     /**
      * Clears the tmp resources.
      */

@@ -6,6 +6,7 @@ package com.compomics.pride_asa_pipeline;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.service.ResultHandler;
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,6 +25,7 @@ public class CommandLineRunner {
     
     private static final Logger LOGGER = Logger.getLogger(CommandLineRunner.class);
     private PrideSpectrumAnnotator prideSpectrumAnnotator;
+    private PrideXmlSpectrumAnnotator prideXmlSpectrumAnnotator;
     private ResultHandler resultHandler;
     
     public PrideSpectrumAnnotator getPrideSpectrumAnnotator() {
@@ -33,6 +35,14 @@ public class CommandLineRunner {
     public void setPrideSpectrumAnnotator(PrideSpectrumAnnotator prideSpectrumAnnotator) {
         this.prideSpectrumAnnotator = prideSpectrumAnnotator;
     }
+
+    public PrideXmlSpectrumAnnotator getPrideXmlSpectrumAnnotator() {
+        return prideXmlSpectrumAnnotator;
+    }
+
+    public void setPrideXmlSpectrumAnnotator(PrideXmlSpectrumAnnotator prideXmlSpectrumAnnotator) {
+        this.prideXmlSpectrumAnnotator = prideXmlSpectrumAnnotator;
+    }    
     
     public ResultHandler getResultHandler() {
         return resultHandler;
@@ -73,10 +83,44 @@ public class CommandLineRunner {
             LOGGER.error(e.getMessage(), e);
         }
     }
+    
+    /**
+     * Runs the pride XML file in command line mode.
+     *
+     * @param prideXmlFile the pride XML file
+     */
+    public void runPrideXmlPipeline(File prideXmlFile) {
+        try {
+            String experimentAccession = prideXmlFile.getName().substring(0, prideXmlFile.getName().indexOf(".xml"));
+            
+            //init the annotiation
+            prideXmlSpectrumAnnotator.initIdentifications(prideXmlFile);
+
+            //check if the experiment has "useful" identifications
+            if (prideXmlSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
+                LOGGER.warn("No useful identifications were found for experiment " + experimentAccession + ". This experiment will be skipped.");
+                prideXmlSpectrumAnnotator.clearTmpResources();
+            } else {
+                //check if the maximum systematic mass error is exceeded
+                if (prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
+                    LOGGER.warn("One or more systematic mass error exceed the maximum value of " + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error") + ", experiment " + experimentAccession + " will be skipped.");
+                    prideXmlSpectrumAnnotator.clearTmpResources();
+                } else {
+                    //continue with the annotiation
+                    prideXmlSpectrumAnnotator.annotate(prideXmlFile);
+                    //write result to file
+                    resultHandler.writeResultToFile(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult());
+                    resultHandler.writeUsedModificationsToFile(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult());
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
 
     /**
-     * Runs the experiment in command line mode, for the experiments found in
-     * the
+     * Runs the experiment in command line mode, for the experiment accessions found in
+     * the given file
      *
      * @param experimentAccessionsFile the experiment accessions file
      */

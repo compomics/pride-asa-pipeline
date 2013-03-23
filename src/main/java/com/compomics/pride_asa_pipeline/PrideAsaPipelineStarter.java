@@ -76,7 +76,6 @@ public class PrideAsaPipelineStarter {
          * Create and display the form
          */
         EventQueue.invokeLater(new Runnable() {
-
             @Override
             public void run() {
                 //set GUI application context
@@ -89,17 +88,21 @@ public class PrideAsaPipelineStarter {
     }
 
     public static void launchCommandLineMode(String experimentAccession) {
-        //LOGGER.debug("launching command line mode with experiment " + experimentAccession);
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
         CommandLineRunner commandLineRunner = (CommandLineRunner) applicationContext.getBean("commandLineRunner");
         commandLineRunner.runPipeline(experimentAccession);
     }
 
     public static void launchCommandLineMode(File experimentAccessionsFile) {
-        //LOGGER.debug("launching command line mode with experiment accessions file " + experimentAccessionsFile.getAbsolutePath());
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
         CommandLineRunner commandLineRunner = (CommandLineRunner) applicationContext.getBean("commandLineRunner");
         commandLineRunner.runPipeline(experimentAccessionsFile);
+    }
+
+    public static void launchPrideXmlCommandLineMode(File prideXmlFile) {
+        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+        CommandLineRunner commandLineRunner = (CommandLineRunner) applicationContext.getBean("commandLineRunner");
+        commandLineRunner.runPrideXmlPipeline(prideXmlFile);
     }
 
     /**
@@ -135,6 +138,18 @@ public class PrideAsaPipelineStarter {
                             5, 3, true, System.out);
                 }
             }
+            if (commandLine.hasOption('p')) {
+                String prideXmlFilePath = commandLine.getOptionValue('p');
+                File prideXmlFile = new File(prideXmlFilePath);
+                if (prideXmlFile.exists()) {
+                    launchPrideXmlCommandLineMode(prideXmlFile);
+                } else {
+                    System.out.println("No file with path \"" + prideXmlFilePath + "\" could be found.");
+                    printHelp(
+                            options, 80, "Help", "End of Help",
+                            5, 3, true, System.out);
+                }
+            }
             if (commandLine.hasOption('a')) {
                 String experimentAccession = commandLine.getOptionValue('a');
                 launchCommandLineMode(experimentAccession);
@@ -161,11 +176,14 @@ public class PrideAsaPipelineStarter {
 
         Option accessionStringOption = new Option("a", "accession", true, "Experiment accession");
         accessionStringOption.setArgName("accession");
+        Option prideXmlFileOption = new Option("p", "pride_xml_file", true, "Pride XML file path");
+        prideXmlFileOption.setArgName("pride_xml_file_path");
         Option accessionFileOption = new Option("f", "accessions_file", true, "Experiment accessions file path");
         accessionFileOption.setArgName("file_path");
         OptionGroup commandLineModeOptionGroup = new OptionGroup();
-        commandLineModeOptionGroup.addOption(accessionFileOption);
         commandLineModeOptionGroup.addOption(accessionStringOption);
+        commandLineModeOptionGroup.addOption(prideXmlFileOption);
+        commandLineModeOptionGroup.addOption(accessionFileOption);
 
         options.addOptionGroup(commandLineModeOptionGroup);
     }
