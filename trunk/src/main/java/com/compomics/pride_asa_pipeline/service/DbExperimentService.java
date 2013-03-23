@@ -71,8 +71,6 @@ public interface DbExperimentService extends ExperimentService {
      * @param experimentAccession the experiment accession number
      * @param mgfFile the destination MGF file
      * @param rebuildCache If set to TRUE then the cache will first be rebuilt.
-     * 
-     * @return the spectra file
      */
     void getSpectraAsMgfFile(String experimentAccession, File mgfFile, boolean rebuildCache);
 }

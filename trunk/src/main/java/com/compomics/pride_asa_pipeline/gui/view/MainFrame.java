@@ -47,6 +47,10 @@ public class MainFrame extends javax.swing.JFrame {
         return backgroundPanel;
     }
 
+    public JPanel getPrideXmlFileSelectionParentPanel() {
+        return prideXmlFileSelectionParentPanel;
+    }        
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -60,6 +64,7 @@ public class MainFrame extends javax.swing.JFrame {
         experimentSelectionPanel = new javax.swing.JPanel();
         experimentSelectionTabbedPane = new javax.swing.JTabbedPane();
         prideSelectionParentPanel = new javax.swing.JPanel();
+        prideXmlFileSelectionParentPanel = new javax.swing.JPanel();
         fileSelectionParentPanel = new javax.swing.JPanel();
         pipelineResultsPanel = new javax.swing.JPanel();
         pipelineResultTabbedPane = new javax.swing.JTabbedPane();
@@ -88,6 +93,10 @@ public class MainFrame extends javax.swing.JFrame {
         prideSelectionParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
         prideSelectionParentPanel.setLayout(new java.awt.GridBagLayout());
         experimentSelectionTabbedPane.addTab("PRIDE", prideSelectionParentPanel);
+
+        prideXmlFileSelectionParentPanel.setOpaque(false);
+        prideXmlFileSelectionParentPanel.setLayout(new java.awt.GridBagLayout());
+        experimentSelectionTabbedPane.addTab("PRIDE XML", prideXmlFileSelectionParentPanel);
 
         fileSelectionParentPanel.setOpaque(false);
         fileSelectionParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
@@ -234,6 +243,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTabbedPane pipelineResultTabbedPane;
     private javax.swing.JPanel pipelineResultsPanel;
     private javax.swing.JPanel prideSelectionParentPanel;
+    private javax.swing.JPanel prideXmlFileSelectionParentPanel;
     private javax.swing.JPanel summaryParentPanel;
     // End of variables declaration//GEN-END:variables
 }

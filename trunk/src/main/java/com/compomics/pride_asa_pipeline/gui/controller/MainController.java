@@ -2,6 +2,7 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.util.examples.BareBonesBrowserLaunch;
 import java.awt.Dimension;
@@ -38,6 +39,7 @@ public class MainController implements ActionListener {
     private PipelineParamsController pipelineParamsController;
     //services
     private PrideSpectrumAnnotator prideSpectrumAnnotator;
+    private PrideXmlSpectrumAnnotator prideXmlSpectrumAnnotator;
 
     public MainController() {
     }
@@ -64,6 +66,14 @@ public class MainController implements ActionListener {
 
     public void setPrideSpectrumAnnotator(PrideSpectrumAnnotator prideSpectrumAnnotator) {
         this.prideSpectrumAnnotator = prideSpectrumAnnotator;
+    }
+
+    public PrideXmlSpectrumAnnotator getPrideXmlSpectrumAnnotator() {
+        return prideXmlSpectrumAnnotator;
+    }
+
+    public void setPrideXmlSpectrumAnnotator(PrideXmlSpectrumAnnotator prideXmlSpectrumAnnotator) {
+        this.prideXmlSpectrumAnnotator = prideXmlSpectrumAnnotator;
     }
 
     public PipelineResultController getPipelineResultController() {
@@ -96,17 +106,7 @@ public class MainController implements ActionListener {
         }
     }
 
-    public void init() {
-        //set uncaught exception handler
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                LOGGER.error(e.getMessage(), e);
-                showUnexpectedErrorDialog(e.getMessage());
-                onAnnotationCanceled();
-            }
-        });
-
+    public void init() {        
         // check for new version
         checkForNewVersion(getVersion());
 
@@ -124,6 +124,16 @@ public class MainController implements ActionListener {
         modificationsController.init();
         pipelineResultController.init();
         pipelineParamsController.init();
+        
+        //set uncaught exception handler
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                LOGGER.error(e.getMessage(), e);
+                showUnexpectedErrorDialog(e.getMessage());
+                onAnnotationCanceled();
+            }
+        });
 
         //add panel components                        
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -132,7 +142,8 @@ public class MainController implements ActionListener {
         gridBagConstraints.weighty = 1.0;
 
         mainFrame.getPrideSelectionParentPanel().add(experimentSelectionController.getPrideSelectionPanel(), gridBagConstraints);
-        mainFrame.getFileSelectionParentPanel().add(experimentSelectionController.getFileSelectionPanel(), gridBagConstraints);
+        mainFrame.getFileSelectionParentPanel().add(experimentSelectionController.getResultFileSelectionPanel(), gridBagConstraints);
+        mainFrame.getPrideXmlFileSelectionParentPanel().add(experimentSelectionController.getPrideXmlFileSelectionPanel(), gridBagConstraints);
         mainFrame.getIdentificationsParentPanel().add(pipelineResultController.getIdentificationsPanel(), gridBagConstraints);
         mainFrame.getSummaryParentPanel().add(pipelineResultController.getSummaryPanel(), gridBagConstraints);
 
@@ -171,14 +182,26 @@ public class MainController implements ActionListener {
         pipelineParamsController.updatePropertyGuiWrapper(propertyName, value);
     }
 
-    public void onAnnotationFinished(SpectrumAnnotatorResult spectrumAnnotatorResult) {
+    public void onAnnotationFinished() {
+        SpectrumAnnotatorResult spectrumAnnotatorResult = null;
+        if(experimentSelectionController.isPrideXml()){
+            spectrumAnnotatorResult = prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult();
+        }
+        else{
+            spectrumAnnotatorResult = prideSpectrumAnnotator.getSpectrumAnnotatorResult();
+        }
         pipelineResultController.update(spectrumAnnotatorResult);
     }
 
     public void onAnnotationCanceled() {
         LOGGER.info("Annotation canceled.");
-        prideSpectrumAnnotator.clearPipeline();
-        pipelineResultController.clear();
+        if (experimentSelectionController.isPrideXml()) {
+            prideXmlSpectrumAnnotator.clearTmpResources();
+            pipelineResultController.clear();
+        } else {
+            prideSpectrumAnnotator.clearPipeline();
+            pipelineResultController.clear();
+        }
     }
 
     /**
@@ -188,7 +211,7 @@ public class MainController implements ActionListener {
      */
     public String getVersion() {
         String version = "UNKNOWN";
-        
+
         java.util.Properties properties = new java.util.Properties();
 
         try {

@@ -175,12 +175,7 @@ public class PrideXmlSpectrumAnnotator {
      */
     public void initIdentifications(File experimentPrideXmlFile) {
         //@todo get a name take makes sense
-        String experimentAccession = experimentPrideXmlFile.getName();
-
-        //init the service if necessary
-        if (!prideXmlLoaded) {
-            experimentService.init(experimentPrideXmlFile);
-        }
+        String experimentAccession = experimentPrideXmlFile.getName().substring(0, experimentPrideXmlFile.getName().indexOf(".xml"));        
 
         modificationsLoaded = false;
 
@@ -226,7 +221,7 @@ public class PrideXmlSpectrumAnnotator {
         }
 
         //add the modifications found in pride for the given experiment
-        if (PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_modifications")) {
+        if (PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_xml_modifications")) {
             prideModifications = modificationService.loadExperimentModifications();
         }
 
@@ -359,6 +354,11 @@ public class PrideXmlSpectrumAnnotator {
      * @param experimentPrideXmlFile the experiment pride XML file
      */
     private void loadExperimentIdentifications(File experimentPrideXmlFile) {
+        //init the service if necessary
+        if (!prideXmlLoaded) {
+            experimentService.init(experimentPrideXmlFile);
+        }
+        
         //load the identifications for the given experiment
         identifications = experimentService.loadExperimentIdentifications(experimentPrideXmlFile);
         //update the considered charge states (if necessary)

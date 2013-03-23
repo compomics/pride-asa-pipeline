@@ -10,14 +10,14 @@ import javax.swing.JLabel;
  * @author Niels Hulstaert
  * @author Harald Barsnes
  */
-public class FileSelectionPanel extends javax.swing.JPanel {
+public class ResultFileSelectionPanel extends javax.swing.JPanel {
 
     private JFileChooser fileChooser;
 
     /**
      * Creates new form FileSelectionPanel
      */
-    public FileSelectionPanel() {
+    public ResultFileSelectionPanel() {
         initComponents();
         fileChooser = new JFileChooser();
     }

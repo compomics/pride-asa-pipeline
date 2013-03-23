@@ -74,7 +74,7 @@ public class PrideXmlParserImpl implements PrideXmlParser {
 
             //Iterate over each peptide identification
             for (int i = 0; i < numOfPeptides; i++) {
-                PeptideItem peptideItem = prideXmlReader.getPeptide(proteinIdentificationId, i);
+                PeptideItem peptideItem = prideXmlReader.getPeptide(proteinIdentificationId, i);                
 
                 //get modifications
                 List<ModificationItem> modificationItems = peptideItem.getModificationItem();

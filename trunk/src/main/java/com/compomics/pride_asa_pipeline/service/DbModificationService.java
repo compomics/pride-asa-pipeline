@@ -4,16 +4,10 @@
  */
 package com.compomics.pride_asa_pipeline.service;
 
-import com.compomics.omssa.xsd.UserModCollection;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
-import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import org.jdom2.JDOMException;
-import org.springframework.core.io.Resource;
 
 /**
  *

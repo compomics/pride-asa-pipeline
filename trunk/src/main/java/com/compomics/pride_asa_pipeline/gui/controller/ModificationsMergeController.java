@@ -172,7 +172,12 @@ public class ModificationsMergeController extends WindowAdapter {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //add "added" pride modifications to the ModificationHolder
-                experimentSelectionController.getMainController().getPrideSpectrumAnnotator().getModificationHolder().addModifications(addedPrideModifications);
+                if(experimentSelectionController.isPrideXml()){
+                    experimentSelectionController.getMainController().getPrideXmlSpectrumAnnotator().getModificationHolder().addModifications(addedPrideModifications);
+                }
+                else{
+                    experimentSelectionController.getMainController().getPrideSpectrumAnnotator().getModificationHolder().addModifications(addedPrideModifications);
+                }
                 
                 modificationsMergeDialog.setVisible(Boolean.FALSE);
                 experimentSelectionController.onModificationsLoaded();

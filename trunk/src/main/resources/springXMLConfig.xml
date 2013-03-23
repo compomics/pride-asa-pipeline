@@ -13,6 +13,7 @@
     <bean id="commandLineRunner"
           class="com.compomics.pride_asa_pipeline.CommandLineRunner">
         <property name="prideSpectrumAnnotator" ref="prideSpectrumAnnotator"/>
+        <property name="prideXmlSpectrumAnnotator" ref="prideXmlSpectrumAnnotator"/>
         <property name="resultHandler" ref="dbResultHandler"/>
     </bean>
             
@@ -70,7 +71,7 @@
     </bean>
     
     <bean id="prideXmlSpectrumService"
-                  class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlSpectrumServiceImpl">
+          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlSpectrumServiceImpl">
         <property name="prideXmlParser" ref="prideXmlParser"/>
     </bean>        
     
@@ -98,12 +99,7 @@
           class="com.compomics.pride_asa_pipeline.service.impl.ResultHandlerImpl">
         <property name="fileResultHandler" ref="fileResultHandler"/>
         <property name="modificationService" ref="prideXmlModificationService"/>
-    </bean>  
-    
-    <bean id="spectrumPanelService"
-          class="com.compomics.pride_asa_pipeline.service.impl.SpectrumPanelServiceImpl">
-        <property name="spectrumService" ref="dbSpectrumService"/>
-    </bean>                               
+    </bean>                                       
     
     <!-- repository beans -->
     <bean id="experimentRepository"

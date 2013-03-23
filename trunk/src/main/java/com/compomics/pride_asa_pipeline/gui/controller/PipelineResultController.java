@@ -8,6 +8,7 @@ import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import com.compomics.pride_asa_pipeline.gui.ChartFactory;
 import com.compomics.pride_asa_pipeline.gui.IdentificationsTableFormat;
+import com.compomics.pride_asa_pipeline.gui.SpectrumPanelFactory;
 import com.compomics.pride_asa_pipeline.gui.view.IdentificationsPanel;
 import com.compomics.pride_asa_pipeline.gui.view.SummaryPanel;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
@@ -20,7 +21,6 @@ import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.model.comparator.IdentificationSequenceComparator;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
-import com.compomics.pride_asa_pipeline.service.SpectrumPanelService;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import java.awt.Color;
 import java.awt.Component;
@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
@@ -72,7 +73,7 @@ public class PipelineResultController {
     //parent controller
     private MainController mainController;
     //services
-    private SpectrumPanelService spectrumPanelService;
+    private SpectrumPanelFactory spectrumPanelFactory;
     private ModificationService modificationService;
 
     public MainController getMainController() {
@@ -91,12 +92,12 @@ public class PipelineResultController {
         return summaryPanel;
     }
 
-    public SpectrumPanelService getSpectrumPanelService() {
-        return spectrumPanelService;
+    public SpectrumPanelFactory getSpectrumPanelFactory() {
+        return spectrumPanelFactory;
     }
 
-    public void setSpectrumPanelService(SpectrumPanelService spectrumPanelService) {
-        this.spectrumPanelService = spectrumPanelService;
+    public void setSpectrumPanelFactory(SpectrumPanelFactory spectrumPanelFactory) {
+        this.spectrumPanelFactory = spectrumPanelFactory;
     }
 
     public ModificationService getModificationService() {
@@ -217,7 +218,7 @@ public class PipelineResultController {
                     if (identificationsPanel.getIdentificationsTable().getSelectedRow() != -1) {
                         Identification identification = sortedIdentificationsList.get(identificationsPanel.getIdentificationsTable().getSelectedRow());
 
-                        SpectrumPanel spectrumPanel = spectrumPanelService.getSpectrumPanel(identification);
+                        SpectrumPanel spectrumPanel = spectrumPanelFactory.getSpectrumPanel(identification, mainController.getExperimentSelectionController().isPrideXml());
 
                         addSpectrumPanel(spectrumPanel);
                     }
@@ -264,14 +265,15 @@ public class PipelineResultController {
             identificationsPanel.getIdentificationDetailPanel().remove(0);
         }
 
+        //add the spectrum panel to the identifications detail panel
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         if (spectrumPanel != null) {
-            //add the spectrum panel to the identifications detail panel
-            GridBagConstraints gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 1.0;
-
             identificationsPanel.getIdentificationDetailPanel().add(spectrumPanel, gridBagConstraints);
+        } else {
+            identificationsPanel.getIdentificationDetailPanel().add(new JPanel(), gridBagConstraints);
         }
 
         identificationsPanel.getIdentificationDetailPanel().validate();
