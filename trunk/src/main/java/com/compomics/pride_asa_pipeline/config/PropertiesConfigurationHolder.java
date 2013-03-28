@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.config;
 
+import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.io.IOException;
 import org.apache.commons.configuration.ConfigurationException;
@@ -20,6 +21,7 @@ public class PropertiesConfigurationHolder extends PropertiesConfiguration {
         try {
             Resource propertiesResource = ResourceUtils.getResourceByRelativePath("resources/pride_asa_pipeline.properties");
             ourInstance = new PropertiesConfigurationHolder(propertiesResource);
+            
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         } catch (ConfigurationException e) {

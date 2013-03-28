@@ -5,7 +5,7 @@
 
     <groupId>com.compomics</groupId>
     <artifactId>pride-asa-pipeline</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
     <packaging>jar</packaging>
     <name>pride-asa-pipeline</name>
     <url>http://maven.apache.org</url>
@@ -32,14 +32,16 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>version.prop</include>
+                    <include>**/pride_asa_pipeline.properties</include>
+                    <include>springXMLConfig.xml</include>
                 </includes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <excludes>
-                    <exclude>version.prop</exclude>
+                    <exclude>**/pride_asa_pipeline.properties</exclude>
+                    <exclude>springXMLConfig.xml</exclude>
                 </excludes>
             </resource>
         </resources>
@@ -147,7 +149,7 @@
                 <executions>
                     <execution>
                         <id>copy-package-resources</id>
-                        <phase>package</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -157,14 +159,15 @@
                             </outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>src/main/resources/resources</directory>                                    
+                                    <directory>src/main/resources/resources</directory> 
+                                    <filtering>true</filtering>                                   
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
                     <execution>
                         <id>copy-package-license</id>
-                        <phase>package</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -473,7 +476,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>PrideXMLValidator</artifactId>
-            <version>0.3</version>
+            <version>0.4</version>
         </dependency>
     </dependencies>
     
@@ -484,5 +487,20 @@
             <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
         </repository>
     </distributionManagement>
+    
+    <profiles>
+        <profile>
+            <id>development</id>
+            <properties>
+                <property_file.source>classpath</property_file.source>    
+            </properties>
+        </profile>
+        <profile>
+            <id>production</id>
+            <properties>
+                <property_file.source>file</property_file.source> 
+            </properties>   
+        </profile>
+    </profiles>
         
 </project>
