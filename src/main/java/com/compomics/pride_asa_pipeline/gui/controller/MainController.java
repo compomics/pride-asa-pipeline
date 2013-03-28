@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.gui.controller;
 
+import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
@@ -12,7 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -147,6 +147,7 @@ public class MainController implements ActionListener {
         mainFrame.getIdentificationsParentPanel().add(pipelineResultController.getIdentificationsPanel(), gridBagConstraints);
         mainFrame.getSummaryParentPanel().add(pipelineResultController.getSummaryPanel(), gridBagConstraints);
 
+        //add action listeners
         mainFrame.getModificationsMenuItem().addActionListener(this);
         mainFrame.getPipelineConfigurationMenuItem().addActionListener(this);
 
@@ -209,20 +210,8 @@ public class MainController implements ActionListener {
      *
      * @return the version number of PeptideShaker
      */
-    public String getVersion() {
-        String version = "UNKNOWN";
-
-        java.util.Properties properties = new java.util.Properties();
-
-        try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream("version.prop");
-            properties.load(is);
-            version = properties.getProperty("pride-asap.version");
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-
-        return version;
+    public String getVersion() {        
+        return PropertiesConfigurationHolder.getInstance().getString("pride-asap.version", "UNKNOWN");        
     }
 
     /**
