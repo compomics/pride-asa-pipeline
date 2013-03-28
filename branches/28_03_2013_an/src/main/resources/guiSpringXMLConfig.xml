@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"       
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       ">
+    
+    <!-- import main spring config file -->
+    <import resource="springXMLConfig.xml"/>   
+    
+    <!-- controller beans -->
+    <bean id="mainController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.MainController">
+        <property name="prideSpectrumAnnotator" ref="prideSpectrumAnnotator"/>
+        <property name="prideXmlSpectrumAnnotator" ref="prideXmlSpectrumAnnotator"/>
+        <property name="experimentSelectionController" ref="experimentSelectionController"/>
+        <property name="modificationsController" ref="modificationsController"/>
+        <property name="pipelineResultController" ref="pipelineResultController"/>
+        <property name="pipelineParamsController" ref="pipelineParamsController"/>
+    </bean>
+    
+    <bean id="experimentSelectionController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.ExperimentSelectionController">
+        <property name="mainController" ref="mainController"/>
+        <property name="pipelineProgressController" ref="pipelineProgressController"/>
+        <property name="systematicMassErrorsController" ref="systematicMassErrorsController"/>
+        <property name="modificationsMergeController" ref="modificationsMergeController"/>
+        <property name="experimentService" ref="dbExperimentService"/>
+        <property name="modificationService" ref="dbModificationService"/>
+        <property name="resultHandler" ref="dbResultHandler"/>
+    </bean>
+    
+    <bean id="pipelineProgressController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.PipelineProgressController">
+        <property name="experimentSelectionController" ref="experimentSelectionController"/>    
+    </bean>
+    
+    <bean id="systematicMassErrorsController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.SystematicMassErrorsController">
+        <property name="experimentSelectionController" ref="experimentSelectionController"/>    
+    </bean>
+    
+    <bean id="modificationsMergeController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.ModificationsMergeController">
+        <property name="experimentSelectionController" ref="experimentSelectionController"/>    
+    </bean>  
+    
+    <bean id="modificationsController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.ModificationsController"> 
+        <property name="mainController" ref="mainController"/>
+        <property name="modificationService" ref="dbModificationService"/>
+    </bean>
+    
+    <bean id="pipelineResultController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.PipelineResultController"> 
+        <property name="mainController" ref="mainController"/>
+        <property name="spectrumPanelFactory" ref="spectrumPanelFactory"/>        
+        <property name="modificationService" ref="dbModificationService"/>        
+    </bean>
+    
+    <bean id="spectrumPanelFactory"
+          class="com.compomics.pride_asa_pipeline.gui.SpectrumPanelFactory"> 
+        <property name="dbSpectrumService" ref="dbSpectrumService"/>
+        <property name="prideXmlSpectrumService" ref="prideXmlSpectrumService"/>
+    </bean>
+    
+    <bean id="pipelineParamsController"
+          class="com.compomics.pride_asa_pipeline.gui.controller.PipelineParamsController"> 
+        <property name="mainController" ref="mainController"/>
+    </bean>
+                                      
+</beans>
