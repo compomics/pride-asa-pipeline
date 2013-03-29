@@ -26,7 +26,8 @@ public class CommandLineRunner {
     private static final Logger LOGGER = Logger.getLogger(CommandLineRunner.class);
     private PrideSpectrumAnnotator prideSpectrumAnnotator;
     private PrideXmlSpectrumAnnotator prideXmlSpectrumAnnotator;
-    private ResultHandler resultHandler;
+    private ResultHandler dbResultHandler;
+    private ResultHandler prideXmlResultHandler;
     
     public PrideSpectrumAnnotator getPrideSpectrumAnnotator() {
         return prideSpectrumAnnotator;
@@ -43,14 +44,22 @@ public class CommandLineRunner {
     public void setPrideXmlSpectrumAnnotator(PrideXmlSpectrumAnnotator prideXmlSpectrumAnnotator) {
         this.prideXmlSpectrumAnnotator = prideXmlSpectrumAnnotator;
     }    
-    
-    public ResultHandler getResultHandler() {
-        return resultHandler;
+
+    public ResultHandler getDbResultHandler() {
+        return dbResultHandler;
     }
-    
-    public void setResultHandler(ResultHandler resultHandler) {
-        this.resultHandler = resultHandler;
+
+    public void setDbResultHandler(ResultHandler dbResultHandler) {
+        this.dbResultHandler = dbResultHandler;
     }
+
+    public ResultHandler getPrideXmlResultHandler() {
+        return prideXmlResultHandler;
+    }
+
+    public void setPrideXmlResultHandler(ResultHandler prideXmlResultHandler) {
+        this.prideXmlResultHandler = prideXmlResultHandler;
+    }        
 
     /**
      * Runs the experiment in command line mode.
@@ -75,8 +84,8 @@ public class CommandLineRunner {
                     //continue with the annotiation
                     prideSpectrumAnnotator.annotate(experimentAccession);
                     //write result to file
-                    resultHandler.writeResultToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
-                    resultHandler.writeUsedModificationsToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
+                    dbResultHandler.writeResultToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
+                    dbResultHandler.writeUsedModificationsToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
                 }
             }
         } catch (Exception e) {
@@ -109,8 +118,8 @@ public class CommandLineRunner {
                     //continue with the annotiation
                     prideXmlSpectrumAnnotator.annotate(prideXmlFile);
                     //write result to file
-                    resultHandler.writeResultToFile(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult());
-                    resultHandler.writeUsedModificationsToFile(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult());
+                    prideXmlResultHandler.writeResultToFile(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult());
+                    prideXmlResultHandler.writeUsedModificationsToFile(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult());
                 }
             }
         } catch (Exception e) {

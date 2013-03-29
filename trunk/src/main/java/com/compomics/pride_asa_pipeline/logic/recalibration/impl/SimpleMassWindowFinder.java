@@ -23,71 +23,38 @@ import java.util.List;
  */
 public class SimpleMassWindowFinder implements MassWindowFinder {
 
-    private double stepSize;
-    private double coverage;
-    private double maxWindow;
-    private double centre; // the centre around which the window has to be centered.
-
-    /**
-     * Default constructor to use default configuration values, retrieved from
-     * the properties file.
-     */
-    public SimpleMassWindowFinder() {
-        this.stepSize = PropertiesConfigurationHolder.getInstance().getDouble("masswindowfinder.step_size"); // default step size of 0.1 dalton
-        this.coverage = PropertiesConfigurationHolder.getInstance().getDouble("masswindowfinder.coverage"); // 100% coverage (all values have to be covered by the error window)
-        this.centre = PropertiesConfigurationHolder.getInstance().getDouble("masswindowfinder.centre");
-        this.maxWindow = PropertiesConfigurationHolder.getInstance().getDouble("masswindowfinder.max_window");
-    }
-
-    /**
-     * Constructor that allows to configure the algorithm. Note: a further value
-     * can be set to specify the maximum window size.    
-     * (@see getMaxWindow())
-     *
-     * @param stepSize the step size in which to increase the window size while
-     * interating to find the best fitting window.
-     * @param coverage double value between 0 and 1 to specify the required
-     * percentage of values to be included in the window.
-     */
-    public SimpleMassWindowFinder(double stepSize, double coverage) {
-        this();
-        //apply custom values
-        this.stepSize = stepSize;
-        this.coverage = coverage;
-    }
-
     public double getStepSize() {
-        return stepSize;
+        return PropertiesConfigurationHolder.getInstance().getDouble("masswindowfinder.step_size"); // default step size of 0.1 dalton
     }
 
     public void setStepSize(double stepSize) {
-        this.stepSize = stepSize;
+        PropertiesConfigurationHolder.getInstance().setProperty("masswindowfinder.step_size", stepSize);
     }
 
     public double getCoverage() {
-        return coverage;
+        return PropertiesConfigurationHolder.getInstance().getDouble("masswindowfinder.coverage"); // 100% coverage (all values have to be covered by the error window)
     }
 
     public void setCoverage(double coverage) {
-        this.coverage = coverage;
+        PropertiesConfigurationHolder.getInstance().setProperty("masswindowfinder.coverage", coverage);
     }
 
     public double getMaxWindow() {
-        return maxWindow;
+        return PropertiesConfigurationHolder.getInstance().getDouble("masswindowfinder.max_window");
     }
 
     @Override
     public void setMaxWindow(double maxWindow) {
-        this.maxWindow = maxWindow;
+        PropertiesConfigurationHolder.getInstance().setProperty("masswindowfinder.max_window", maxWindow);
     }
 
     public double getCentre() {
-        return centre;
+        return PropertiesConfigurationHolder.getInstance().getDouble("masswindowfinder.centre");
     }
 
     @Override
     public void setCentre(double centre) {
-        this.centre = centre;
+        PropertiesConfigurationHolder.getInstance().setProperty("masswindowfinder.centre", centre);
     }
 
     /**
@@ -105,6 +72,10 @@ public class SimpleMassWindowFinder implements MassWindowFinder {
      */
     @Override
     public double findMassWindow(List<Double> values) {
+        double stepSize = PropertiesConfigurationHolder.getInstance().getDouble("masswindowfinder.step_size");
+        double coverage = PropertiesConfigurationHolder.getInstance().getDouble("masswindowfinder.coverage");
+        double maxWindow = PropertiesConfigurationHolder.getInstance().getDouble("masswindowfinder.max_window");
+        double centre = PropertiesConfigurationHolder.getInstance().getDouble("masswindowfinder.centre");
 
         double percentage = 0D; //percentage of values included in the current window
         int iteration = 0;      //number of times the window has been increased

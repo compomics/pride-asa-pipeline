@@ -17,11 +17,7 @@ import java.util.Set;
 public abstract class AbstractMassRecalibrator implements MassRecalibrator {
 
     protected MassWindowFinder massWindowFinder;
-    protected Set<Integer> consideredChargeStates;
-    //the default systematic error to use if none could be established automatically
-    protected double defaultSystematicMassError = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_systematic_mass_error");
-    //the default error tolerance (one side of a error window) to use if none could be established automatically
-    protected double defaultErrorTolerance = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance");
+    protected Set<Integer> consideredChargeStates;    
 
     @Override
     public void setMassWindowFinder(MassWindowFinder massWindowFinder) {
@@ -40,22 +36,22 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
 
     @Override
     public double getDefaultSystematicMassError() {
-        return defaultSystematicMassError;
+        return PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_systematic_mass_error");
     }
 
     @Override
     public void setDefaultSystematicMassError(double defaultSystematicMassError) {
-        this.defaultSystematicMassError = defaultSystematicMassError;
+        PropertiesConfigurationHolder.getInstance().setProperty("massrecalibrator.default_systematic_mass_error", defaultSystematicMassError);
     }
 
     @Override
     public double getDefaultErrorTolerance() {
-        return defaultErrorTolerance;
+        return PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance");
     }
 
     @Override
     public void setDefaultErrorTolerance(double defaultErrorTolerance) {
-        this.defaultErrorTolerance = defaultErrorTolerance;
+        PropertiesConfigurationHolder.getInstance().setProperty("massrecalibrator.default_error_tolerance", defaultErrorTolerance);
     }
 
     @Override
@@ -85,9 +81,9 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
             throw new IllegalStateException("No charge states defined! Can not initialise calibration result.");
         }
 
-        double errorTolerance = (analyzerData == null) ? defaultErrorTolerance : analyzerData.getPrecursorMassError();
+        double errorTolerance = (analyzerData == null) ? PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance") : analyzerData.getPrecursorMassError();
         for (Integer charge : consideredChargeStates) {
-            result.addMassError(charge, defaultSystematicMassError, (errorTolerance / charge));
+            result.addMassError(charge, PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_systematic_mass_error"), (errorTolerance / charge));
         }
 
         return result;
