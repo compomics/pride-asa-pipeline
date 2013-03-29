@@ -22,7 +22,8 @@
           class="com.compomics.pride_asa_pipeline.CommandLineRunner">
         <property name="prideSpectrumAnnotator" ref="prideSpectrumAnnotator"/>
         <property name="prideXmlSpectrumAnnotator" ref="prideXmlSpectrumAnnotator"/>
-        <property name="resultHandler" ref="dbResultHandler"/>
+        <property name="dbResultHandler" ref="dbResultHandler"/>
+        <property name="prideXmlResultHandler" ref="prideXmlResultHandler"/>
     </bean>
             
     <bean id="prideSpectrumAnnotator"

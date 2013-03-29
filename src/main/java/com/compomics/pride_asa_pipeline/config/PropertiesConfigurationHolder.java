@@ -1,6 +1,5 @@
 package com.compomics.pride_asa_pipeline.config;
 
-import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.io.IOException;
 import org.apache.commons.configuration.ConfigurationException;

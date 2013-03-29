@@ -9,16 +9,7 @@ import com.google.common.primitives.Doubles;
  * @author Florian Reisinger Date: 10-Sep-2009
  * @since 0.1
  */
-public class NoiseThresholdFinderImpl implements NoiseThresholdFinder {
-
-    private double winsorisationConstant = PropertiesConfigurationHolder.getInstance().getDouble("winsorisation.constant");
-    /**
-     * the value to multiply the standard deviation with to define the outlier
-     */
-    private double outlierLimit = PropertiesConfigurationHolder.getInstance().getDouble("winsorisation.outlier_limit");
-    private double convergenceCriterium = PropertiesConfigurationHolder.getInstance().getDouble("winsorisation.convergence_criterion");
-    private double meanRatioThreshold = PropertiesConfigurationHolder.getInstance().getDouble("noisethresholdfinder.mean_ratio_threshold");
-    private double densityThreshold = PropertiesConfigurationHolder.getInstance().getDouble("noisethresholdfinder.density_threshold");
+public class NoiseThresholdFinderImpl implements NoiseThresholdFinder {        
 
     /**
      * There are different 3 spectrum scenarios this noise threshold finder
@@ -31,6 +22,13 @@ public class NoiseThresholdFinderImpl implements NoiseThresholdFinder {
      */
     @Override
     public double findNoiseThreshold(double[] signalValues) {
+        /**
+         * the value to multiply the standard deviation with to define the
+         * outlier
+         */
+        double outlierLimit = PropertiesConfigurationHolder.getInstance().getDouble("winsorisation.outlier_limit");
+        double meanRatioThreshold = PropertiesConfigurationHolder.getInstance().getDouble("noisethresholdfinder.mean_ratio_threshold");
+        double densityThreshold = PropertiesConfigurationHolder.getInstance().getDouble("noisethresholdfinder.density_threshold");
         double noiseThreshold = 0.0;
 
         //calculate mean and standard deviation
@@ -75,6 +73,9 @@ public class NoiseThresholdFinderImpl implements NoiseThresholdFinder {
     ///// ///// ///// ///// ////////// ///// ///// ///// /////
     // private methods
     private double[] winsorise(double[] signalValues) {
+        double winsorisationConstant = PropertiesConfigurationHolder.getInstance().getDouble("winsorisation.constant");
+        double convergenceCriterium = PropertiesConfigurationHolder.getInstance().getDouble("winsorisation.convergence_criterion");
+
         double median = MathUtils.calculateMedian(signalValues);
         double currMAD = calcIntensityMAD(signalValues, median);
         double prevMAD = 3d * currMAD; //initial start value

@@ -4,11 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.service;
 
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
-import com.compomics.pride_asa_pipeline.model.Identifications;
-import java.io.File;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Niels Hulstaert

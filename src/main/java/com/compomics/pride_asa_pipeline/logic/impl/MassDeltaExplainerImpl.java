@@ -14,22 +14,15 @@ import org.apache.log4j.Logger;
 public class MassDeltaExplainerImpl implements MassDeltaExplainer {
 
     private static final Logger LOGGER = Logger.getLogger(MassDeltaExplainerImpl.class);
-    private double convergenceCriterion;
     private ModificationCombinationSolver modificationCombinationSolver;
     private MassRecalibrationResult massRecalibrationResult;
     private AnalyzerData analyzerData;
 
     public MassDeltaExplainerImpl() {
-        //get default value for convergence criterion
-        convergenceCriterion = PropertiesConfigurationHolder.getInstance().getDouble("massdeltaexplainer.mass_delta_convergence_criterion");
     }
 
     public double getConvergenceCriterion() {
-        return convergenceCriterion;
-    }
-
-    public void setConvergenceCriterion(double convergenceCriterion) {
-        this.convergenceCriterion = convergenceCriterion;
+        return PropertiesConfigurationHolder.getInstance().getDouble("massdeltaexplainer.mass_delta_convergence_criterion");
     }
 
     @Override
@@ -74,7 +67,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
         int modificationCombinationSizeLimit = 1;
 
         //and loop until convergence (ratio does no longer change more than the conversionCriterion)
-        while ((currentExplainedRatio - previousExplainedRatio) >= convergenceCriterion) {
+        while ((currentExplainedRatio - previousExplainedRatio) >= PropertiesConfigurationHolder.getInstance().getDouble("massdeltaexplainer.mass_delta_convergence_criterion")) {
             //try to explain all identifications
             for (Identification identification : identifications) {
                 Peptide peptide = identification.getPeptide();

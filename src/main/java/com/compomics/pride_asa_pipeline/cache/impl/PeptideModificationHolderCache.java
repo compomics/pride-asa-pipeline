@@ -16,10 +16,7 @@ import java.util.Map;
  */
 public class PeptideModificationHolderCache extends LinkedHashMap<String, PeptideModificationHolder> implements Cache<String, PeptideModificationHolder> {
     
-    private static final long serialVersionUID = 1L;
-    
-    //set maximum cache size from properties file
-    private static final int MAXIMUM_CACHE_SIZE = PropertiesConfigurationHolder.getInstance().getInt("modification_cache.maximum_cache_size");
+    private static final long serialVersionUID = 1L;   
     
     /**
      * Puts the given PeptideModificationHolder in the cache. If the maximum
@@ -48,7 +45,7 @@ public class PeptideModificationHolderCache extends LinkedHashMap<String, Peptid
 
     @Override
     protected boolean removeEldestEntry(Map.Entry<String, PeptideModificationHolder> eldest) {
-        return this.size() > MAXIMUM_CACHE_SIZE;
+        return this.size() > PropertiesConfigurationHolder.getInstance().getInt("modification_cache.maximum_cache_size");
     }
 
     @Override
