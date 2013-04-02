@@ -5,7 +5,7 @@
 
     <groupId>com.compomics</groupId>
     <artifactId>pride-asa-pipeline</artifactId>
-    <version>1.5.2</version>
+    <version>1.5.3</version>
     <packaging>jar</packaging>
     <name>pride-asa-pipeline</name>
     <url>http://maven.apache.org</url>

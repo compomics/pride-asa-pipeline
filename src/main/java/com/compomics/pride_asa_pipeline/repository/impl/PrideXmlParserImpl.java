@@ -88,7 +88,7 @@ public class PrideXmlParserImpl implements PrideXmlParser {
                 //get precursor CvParams
                 List<CvParam> precursorCvParams = precursor.getIonSelection().getCvParam();
                 double mzRatio = 0.0;
-                int charge = 0;
+                int charge = -1;
                 for (CvParam cvParam : precursorCvParams) {
                     //precursor m/z
                     if (cvParam.getAccession().equalsIgnoreCase("MS:1000744") || cvParam.getAccession().equalsIgnoreCase("PSI:1000040")) {
