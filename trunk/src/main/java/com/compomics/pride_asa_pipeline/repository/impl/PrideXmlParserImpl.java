@@ -183,12 +183,12 @@ public class PrideXmlParserImpl implements PrideXmlParser {
     public HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(String spectrumId) {
         HashMap<Double, Double> peaks = new HashMap<Double, Double>();
 
-        Spectrum spectrum = prideXmlReader.getSpectrumById(spectrumId);
-        Number[] mzRatios = spectrum.getMzNumberArray();
-        Number[] intensities = spectrum.getIntentArray();
+        Spectrum spectrum = prideXmlReader.getSpectrumById(spectrumId);        
+        Number[] mzRatios = spectrum.getMzNumberArray();        
+        Number[] intensities = spectrum.getIntentArray();        
 
         for (int i = 0; i < mzRatios.length; i++) {
-            peaks.put((Double) mzRatios[i], (Double) intensities[i]);
+            peaks.put(mzRatios[i].doubleValue(), intensities[i].doubleValue());            
         }
 
         return peaks;
@@ -229,6 +229,11 @@ public class PrideXmlParserImpl implements PrideXmlParser {
                 AnalyzerData analyzerData = AnalyzerDataMapper.getAnalyzerDataByAnalyzerType(cvParam.getName());
                 analyzerDataList.add(analyzerData);
             }
+        }
+        
+        //if list is empty, return default analyzer
+        if(analyzerDataList.isEmpty()){
+            analyzerDataList.add(AnalyzerDataMapper.getAnalyzerDataByAnalyzerType(null));
         }
 
         return analyzerDataList;
