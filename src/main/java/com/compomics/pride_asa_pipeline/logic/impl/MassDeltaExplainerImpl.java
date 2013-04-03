@@ -94,6 +94,11 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                 //take the error window from the mass recalibration as deviation
                 //ToDo: is it correct to use this value here?
                 Double deviation = massRecalibrationResult.getErrorWindow(peptide.getCharge());
+                //check for unconsidered charge states and take the default systematic mass error
+                if(deviation == null){
+                    double errorTolerance = (analyzerData == null) ? PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance") : analyzerData.getPrecursorMassError();
+                    deviation = errorTolerance / peptide.getCharge();
+                }
 
                 Set<ModificationCombination> combinations = null;
                 //if the mass delta is larger than a possible mass error (deviation) then
