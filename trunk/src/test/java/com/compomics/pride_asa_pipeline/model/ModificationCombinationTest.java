@@ -26,12 +26,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class ModificationCombinationTest {
 
     @Autowired
-    private DbModificationService modificationService;
+    private DbModificationService dbModificationService;
 
     @Test
     public void testEqualsAndHashCode() throws JDOMException {
         Resource modificationsResource = ResourceUtils.getResourceByRelativePath("modifications_equal_mass.xml");
-        Set<Modification> modifications = modificationService.loadPipelineModifications(modificationsResource);
+        Set<Modification> modifications = dbModificationService.loadPipelineModifications(modificationsResource);
 
         //create 2 modification combinations with the same modifications, but in a different order in the modification list
         List<Modification> modificationsList = new ArrayList<Modification>();

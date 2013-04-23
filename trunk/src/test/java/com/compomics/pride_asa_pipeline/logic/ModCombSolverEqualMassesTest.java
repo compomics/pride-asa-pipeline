@@ -30,7 +30,7 @@ public class ModCombSolverEqualMassesTest {
     @Autowired
     private ModificationCombinationSolver modificationCombinationSolver;
     @Autowired
-    private DbModificationService modificationService;
+    private DbModificationService dbModificationService;
 
     @Before
     public void initialize() throws IOException, JDOMException {
@@ -40,7 +40,7 @@ public class ModCombSolverEqualMassesTest {
             //add the pipeline modifications
             ModificationHolder modificationHolder = new ModificationHolder();
             Resource modificationsResource = ResourceUtils.getResourceByRelativePath("modifications_equal_mass.xml");
-            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource));
+            modificationHolder.addModifications(dbModificationService.loadPipelineModifications(modificationsResource));
 
             //set the modification combination holder
             modificationCombinationSolver.setModificationHolder(modificationHolder);
