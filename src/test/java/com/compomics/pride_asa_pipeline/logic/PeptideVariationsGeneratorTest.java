@@ -32,14 +32,14 @@ public class PeptideVariationsGeneratorTest {
     @Autowired
     private PeptideVariationsGenerator peptideVariationsGenerator;
     @Autowired
-    private DbModificationService modificationService;
+    private DbModificationService dbModificationService;
     private Set<Modification> modifications;
 
     @Before
     public void loadModifications() throws IOException, JDOMException {
         if (modifications == null) {
             Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));            
-            modifications = modificationService.loadPipelineModifications(modificationsResource);
+            modifications = dbModificationService.loadPipelineModifications(modificationsResource);
         }
     }
 

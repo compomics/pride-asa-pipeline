@@ -32,7 +32,7 @@ public class ModificationCombinationSolverTest {
     @Autowired
     private ModificationCombinationSolver modificationCombinationSolver;
     @Autowired
-    private DbModificationService modificationService;
+    private DbModificationService dbModificationService;
 
     @Before
     public void initialize() throws IOException, JDOMException {
@@ -42,7 +42,7 @@ public class ModificationCombinationSolverTest {
             //add the pipeline modifications
             ModificationHolder modificationHolder = new ModificationHolder();
             Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
-            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource));
+            modificationHolder.addModifications(dbModificationService.loadPipelineModifications(modificationsResource));
 
             //set the modification combination holder
             modificationCombinationSolver.setModificationHolder(modificationHolder);

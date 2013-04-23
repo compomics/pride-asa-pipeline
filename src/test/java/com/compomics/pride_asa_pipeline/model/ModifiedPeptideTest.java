@@ -28,7 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class ModifiedPeptideTest {
 
     @Autowired
-    private DbModificationService modificationService;
+    private DbModificationService dbModificationService;
 
     /**
      * Test the ion mass ladder with one NT modification
@@ -273,7 +273,7 @@ public class ModifiedPeptideTest {
     @Test
     public void testEquals() throws UnknownAAException, IOException, JDOMException {        
         Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
-        Set<Modification> modifications = modificationService.loadPipelineModifications(modificationsResource);
+        Set<Modification> modifications = dbModificationService.loadPipelineModifications(modificationsResource);
 
         Peptide peptide = new Peptide(1, 1256, new AminoAcidSequence("AAAKENKKNYYY"));
 
