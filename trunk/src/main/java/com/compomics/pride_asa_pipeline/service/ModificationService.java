@@ -6,14 +6,13 @@ package com.compomics.pride_asa_pipeline.service;
 
 import com.compomics.omssa.xsd.UserModCollection;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.jdom2.JDOMException;
 import org.springframework.core.io.Resource;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -64,6 +63,20 @@ public interface ModificationService {
      * @return the used modifications
      */
     Map<Modification, Integer> getUsedModifications(SpectrumAnnotatorResult spectrumAnnotatorResult);
+
+
+    /**
+     * Gets the modifications as a map (key: modification, value: occurence
+     * count) that were actually used in the pipeline; i.e. modifications that
+     * could be combined the explain a certain mass delta for a precursor.
+     *
+     * @param usedModifications map returned by the getUsedModifications method
+     * @param spectrumAnnotatorResult the spectrum annotator result
+     * @return a Map with the used modifications as keys, and Double values that are True when the corresponding Modification.
+     * e.g the rate is 0.95 if 95% of all Identifications that can be targeted by a modification are actually modified
+     */
+    Map<Modification, Double> estimateModificationRate(Map<Modification, Integer> usedModifications, SpectrumAnnotatorResult spectrumAnnotatorResult, double aFixedModificationThreshold) ;
+
 
     /**
      * Gets the modifications that were actually used in the pipeline; i.e.

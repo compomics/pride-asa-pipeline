@@ -7,14 +7,15 @@ package com.compomics.pride_asa_pipeline.service.impl;
 import com.compomics.omssa.xsd.UserModCollection;
 import com.compomics.pride_asa_pipeline.logic.modification.ModificationMarshaller;
 import com.compomics.pride_asa_pipeline.logic.modification.OmssaModificationMarshaller;
-import com.compomics.pride_asa_pipeline.model.Identification;
-import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
-import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.model.*;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
-import java.util.*;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multiset;
 import org.jdom2.JDOMException;
 import org.springframework.core.io.Resource;
+
+import java.util.*;
 
 /**
  *
@@ -92,6 +93,48 @@ public abstract class ModificationServiceImpl implements ModificationService {
         }
 
         return modifications;
+    }
+
+    @Override
+    public Map<Modification, Double> estimateModificationRate(Map<Modification, Integer> usedModifications, SpectrumAnnotatorResult spectrumAnnotatorResult, double aFixedModificationThreshold) {
+
+        // calculate number of peptides that contain
+        HashMultiset<AminoAcid> lAminoAcidHashMultiset = HashMultiset.create();
+        List<Identification> lIdentifications = spectrumAnnotatorResult.getIdentifications();
+        for (Identification lIdentification : lIdentifications) {
+            String lSequenceString = lIdentification.getPeptide().getSequenceString();
+            for (AminoAcid aa : EnumSet.allOf(AminoAcid.class)) {
+                if(lSequenceString.contains("" + aa.letter())){
+                    lAminoAcidHashMultiset.add(aa);
+                }
+            }
+        }
+
+        // convert to aminoacid/integer map
+        HashMap<AminoAcid, Integer> lAminoAcidCounts = Maps.newHashMap();
+        for (Multiset.Entry lEntry : lAminoAcidHashMultiset.entrySet()) {
+            lAminoAcidCounts.put((AminoAcid) lEntry.getElement(), lEntry.getCount());
+        }
+
+
+        // run over used modifications and their frequencies,
+        // verify which Modifications are nearly always present when the
+        // affected amino acid is in the peptide sequence
+        HashMap<Modification, Double> lResult = Maps.newHashMap();
+        for (Modification lUsedModifiation : usedModifications.keySet()) {
+            double lModificationCount = new Double(usedModifications.get(lUsedModifiation));
+            double lAminoAcidCount = 0;
+            for (AminoAcid lAffectedAminoAcid : lUsedModifiation.getAffectedAminoAcids()) {
+                lAminoAcidCount += lAminoAcidCounts.get(lAffectedAminoAcid);
+            }
+
+            // Fix the fixed modification treshold at 95%
+            double lModificationRate =  lModificationCount / lAminoAcidCount;
+            lResult.put(lUsedModifiation, lModificationRate);
+        }
+
+        return lResult;
+
     }
 
     @Override
