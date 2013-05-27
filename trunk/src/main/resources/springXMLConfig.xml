@@ -20,9 +20,13 @@
     <!-- pipeline beans -->
     <bean id="commandLineRunner"
           class="com.compomics.pride_asa_pipeline.CommandLineRunner">
-        <property name="prideSpectrumAnnotator" ref="prideSpectrumAnnotator"/>
-        <property name="prideXmlSpectrumAnnotator" ref="prideXmlSpectrumAnnotator"/>
-        <property name="dbResultHandler" ref="dbResultHandler"/>
+        <property name="prideSpectrumAnnotator" ref="prideSpectrumAnnotator"/>        
+        <property name="dbResultHandler" ref="dbResultHandler"/>        
+    </bean>
+    
+    <bean id="prideXmlCommandLineRunner"
+          class="com.compomics.pride_asa_pipeline.PrideXmlCommandLineRunner">        
+        <property name="prideXmlSpectrumAnnotator" ref="prideXmlSpectrumAnnotator"/>        
         <property name="prideXmlResultHandler" ref="prideXmlResultHandler"/>
     </bean>
             

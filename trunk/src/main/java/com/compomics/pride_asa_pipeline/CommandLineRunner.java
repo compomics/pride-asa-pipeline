@@ -24,10 +24,8 @@ import org.apache.log4j.Logger;
 public class CommandLineRunner {
     
     private static final Logger LOGGER = Logger.getLogger(CommandLineRunner.class);
-    private PrideSpectrumAnnotator prideSpectrumAnnotator;
-    private PrideXmlSpectrumAnnotator prideXmlSpectrumAnnotator;
+    private PrideSpectrumAnnotator prideSpectrumAnnotator;    
     private ResultHandler dbResultHandler;
-    private ResultHandler prideXmlResultHandler;
     
     public PrideSpectrumAnnotator getPrideSpectrumAnnotator() {
         return prideSpectrumAnnotator;
@@ -35,15 +33,7 @@ public class CommandLineRunner {
     
     public void setPrideSpectrumAnnotator(PrideSpectrumAnnotator prideSpectrumAnnotator) {
         this.prideSpectrumAnnotator = prideSpectrumAnnotator;
-    }
-
-    public PrideXmlSpectrumAnnotator getPrideXmlSpectrumAnnotator() {
-        return prideXmlSpectrumAnnotator;
-    }
-
-    public void setPrideXmlSpectrumAnnotator(PrideXmlSpectrumAnnotator prideXmlSpectrumAnnotator) {
-        this.prideXmlSpectrumAnnotator = prideXmlSpectrumAnnotator;
-    }    
+    }       
 
     public ResultHandler getDbResultHandler() {
         return dbResultHandler;
@@ -51,15 +41,7 @@ public class CommandLineRunner {
 
     public void setDbResultHandler(ResultHandler dbResultHandler) {
         this.dbResultHandler = dbResultHandler;
-    }
-
-    public ResultHandler getPrideXmlResultHandler() {
-        return prideXmlResultHandler;
-    }
-
-    public void setPrideXmlResultHandler(ResultHandler prideXmlResultHandler) {
-        this.prideXmlResultHandler = prideXmlResultHandler;
-    }        
+    }            
 
     /**
      * Runs the experiment in command line mode.
@@ -91,41 +73,7 @@ public class CommandLineRunner {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
-    }
-    
-    /**
-     * Runs the pride XML file in command line mode.
-     *
-     * @param prideXmlFile the pride XML file
-     */
-    public void runPrideXmlPipeline(File prideXmlFile) {
-        try {
-            String experimentAccession = prideXmlFile.getName().substring(0, prideXmlFile.getName().indexOf(".xml"));
-            
-            //init the annotiation
-            prideXmlSpectrumAnnotator.initIdentifications(prideXmlFile);
-
-            //check if the experiment has "useful" identifications
-            if (prideXmlSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
-                LOGGER.warn("No useful identifications were found for experiment " + experimentAccession + ". This experiment will be skipped.");
-                prideXmlSpectrumAnnotator.clearTmpResources();
-            } else {
-                //check if the maximum systematic mass error is exceeded
-                if (prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
-                    LOGGER.warn("One or more systematic mass error exceed the maximum value of " + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error") + ", experiment " + experimentAccession + " will be skipped.");
-                    prideXmlSpectrumAnnotator.clearTmpResources();
-                } else {
-                    //continue with the annotiation
-                    prideXmlSpectrumAnnotator.annotate(prideXmlFile);
-                    //write result to file
-                    prideXmlResultHandler.writeResultToFile(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult());
-                    prideXmlResultHandler.writeUsedModificationsToFile(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult());
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
+    }   
 
     /**
      * Runs the experiment in command line mode, for the experiment accessions found in

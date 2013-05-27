@@ -37,6 +37,34 @@ public class JdbcExperimentRepository extends JdbcDaoSupport implements Experime
     //PSI:1000041 is "Charge State"
     //MS:1000744 is "Mass to Charge Ratio" and
     //MS:1000041 is "Charge State"
+//    private static final String SELECT_EXPERIMENT_IDENTIFICATIONS = new StringBuilder()
+//            .append("select main.*, par1.value as mz, par2.value as charge_state from ( ")
+//            .append("select spec.spectrum_identifier, ")
+//            .append("spec.spectrum_id, ")
+//            .append("exp.accession, ")
+//            .append("mzdata.mz_data_id, ")
+//            .append("pep.sequence, ")
+//            .append("pep.peptide_id, ")
+//            .append("prec.precursor_id ")
+//            .append("from ")
+//            .append("pride_experiment exp, ")
+//            .append("mzdata_mz_data mzdata, ")
+//            .append("pride_identification iden, ")
+//            .append("pride_peptide pep, ")
+//            .append("mzdata_spectrum spec, ")
+//            .append("mzdata_precursor prec ")
+//            .append("where ")
+//            .append("exp.accession = ? and ")
+//            .append("exp.mz_data_id = mzdata.mz_data_id and ")
+//            .append("exp.experiment_id = iden.experiment_id and ")
+//            .append("iden.identification_id = pep.identification_id and ")
+//            .append("pep.spectrum_ref = spec.spectrum_identifier and ")
+//            .append("mzdata.mz_data_id = spec.mz_data_id and ")
+//            .append("spec.spectrum_id = prec.spectrum_id ")
+//            .append(") main ")
+//            .append("left join mzdata_ion_selection_param par1 on par1.parent_element_fk = main.precursor_id and par1.accession in ('PSI:1000040', 'MS:1000744') ")
+//            .append("left join mzdata_ion_selection_param par2 on par2.parent_element_fk = main.precursor_id and par2.accession in ('PSI:1000041', 'MS:1000041') ").toString();
+    //this select is with a group by spectrum_identifier
     private static final String SELECT_EXPERIMENT_IDENTIFICATIONS = new StringBuilder()
             .append("select main.*, par1.value as mz, par2.value as charge_state from ( ")
             .append("select spec.spectrum_identifier, ")
@@ -61,11 +89,10 @@ public class JdbcExperimentRepository extends JdbcDaoSupport implements Experime
             .append("pep.spectrum_ref = spec.spectrum_identifier and ")
             .append("mzdata.mz_data_id = spec.mz_data_id and ")
             .append("spec.spectrum_id = prec.spectrum_id ")
+            .append("group by spec.spectrum_identifier ")
             .append(") main ")
             .append("left join mzdata_ion_selection_param par1 on par1.parent_element_fk = main.precursor_id and par1.accession in ('PSI:1000040', 'MS:1000744') ")
             .append("left join mzdata_ion_selection_param par2 on par2.parent_element_fk = main.precursor_id and par2.accession in ('PSI:1000041', 'MS:1000041') ").toString();
-    //this select is with a group by spectrum_identifier
-    //private static final String SELECT_EXPERIMENT_IDENTIFICATIONS = new StringBuilder().append("select main.*, par1.value as mz, par2.value as charge_state from ( ").append("select spec.spectrum_identifier, ").append("spec.spectrum_id, ").append("exp.accession, ").append("mzdata.mz_data_id, ").append("pep.sequence, ").append("pep.peptide_id, ").append("prec.precursor_id ").append("from ").append("pride_experiment exp, ").append("mzdata_mz_data mzdata, ").append("pride_identification iden, ").append("pride_peptide pep, ").append("mzdata_spectrum spec, ").append("mzdata_precursor prec ").append("where ").append("exp.accession = ? and ").append("exp.mz_data_id = mzdata.mz_data_id and ").append("exp.experiment_id = iden.experiment_id and ").append("iden.identification_id = pep.identification_id and ").append("pep.spectrum_ref = spec.spectrum_identifier and ").append("mzdata.mz_data_id = spec.mz_data_id and ").append("spec.spectrum_id = prec.spectrum_id ").append("group by spec.spectrum_identifier ").append(") main ").append("left join mzdata_ion_selection_param par1 on par1.parent_element_fk = main.precursor_id and par1.accession in ('PSI:1000040', 'MS:1000744') ").append("left join mzdata_ion_selection_param par2 on par2.parent_element_fk = main.precursor_id and par2.accession in ('PSI:1000041', 'MS:1000041') ").toString();
     //PSI:1000008 Ionizer Type
     //PSI:1000075 MALDI
     private static final String SELECT_ANALYZER_SOURCE_FOR_MALDI = new StringBuilder()

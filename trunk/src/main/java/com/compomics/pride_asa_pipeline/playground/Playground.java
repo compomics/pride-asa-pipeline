@@ -70,8 +70,12 @@ public class Playground {
 //            LOGGER.error(e.getMessage(), e);
 //        }
         
-        BigDecimal mzDelta = new BigDecimal(0.123456789).setScale(4, BigDecimal.ROUND_HALF_UP);
-        System.out.println("--" +  mzDelta.toPlainString());
+//        BigDecimal mzDelta = new BigDecimal(0.123456789).setScale(4, BigDecimal.ROUND_HALF_UP);
+//        System.out.println("--" +  mzDelta.toPlainString());
+        
+        double d = 3.6;
+        int i = (int) d;
+        System.out.println("------" + i);
     }
 
     public static File filterExperimentAccessions(File experimentAccessionsFile, File resultsDirectory) {

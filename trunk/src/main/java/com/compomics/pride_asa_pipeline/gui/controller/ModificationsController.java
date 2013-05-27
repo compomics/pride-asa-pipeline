@@ -278,9 +278,6 @@ public class ModificationsController {
                 affectedAminoAcids.add(AminoAcid.Ala);
                 modificationsBindingList.add(new Modification("mod" + modificationsBindingList.size(), 0.0, 0.0, Modification.Location.NON_TERMINAL, affectedAminoAcids, "accession", "accessionValue"));
                 modificationsConfigDialog.getModifcationsTable().getSelectionModel().setSelectionInterval(modificationsBindingList.size() - 1, modificationsBindingList.size() - 1);
-
-                //disable remove button if there's only one modification
-                changeRemoveModificationButtonState();
             }
         });
 
@@ -290,9 +287,6 @@ public class ModificationsController {
                 if (modificationsConfigDialog.getModifcationsTable().getSelectedRow() != -1) {
                     modificationsBindingList.remove(modificationsConfigDialog.getModifcationsTable().getSelectedRow());
                     modificationsConfigDialog.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);
-
-                    //disable remove button if there's only one modification
-                    changeRemoveModificationButtonState();
                 }
             }
         });
@@ -313,10 +307,7 @@ public class ModificationsController {
                         modificationsBindingList.addAll(importedModifications);
 
                         //select first modification
-                        modificationsConfigDialog.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);
-
-                        //disable remove button if there's only one modification
-                        changeRemoveModificationButtonState();
+                        modificationsConfigDialog.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);                        
                     } catch (JDOMParseException ex) {
                         LOGGER.error(ex.getMessage(), ex);
                         mainController.showMessageDialog("Import Unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
@@ -384,20 +375,7 @@ public class ModificationsController {
         } else {
             modificationsConfigDialog.getRemoveAminoAcidButton().setEnabled(true);
         }
-    }
-
-    /**
-     * Changes the state of the removeModificationButton (enable or disabled)
-     * depending on the number of pipeline modifications
-     *
-     */
-    private void changeRemoveModificationButtonState() {
-        if (modificationsBindingList.size() == 1) {
-            modificationsConfigDialog.getRemoveModificationButton().setEnabled(Boolean.FALSE);
-        } else {
-            modificationsConfigDialog.getRemoveModificationButton().setEnabled(true);
-        }
-    }
+    }    
 
     /**
      * Converter class used for binding. In case of a NumberFormatException, the
