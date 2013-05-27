@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -18,6 +19,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 
 /**
  *
@@ -78,11 +80,17 @@ public class PrideAsaPipelineStarter {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                //set GUI application context
-                ApplicationContextProvider.getInstance().setApplicationContext(new ClassPathXmlApplicationContext("guiSpringXMLConfig.xml"));
-                ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-                MainController mainController = (MainController) applicationContext.getBean("mainController");
-                mainController.init();
+                try {
+                    //set GUI application context
+                    ApplicationContextProvider.getInstance().setApplicationContext(new ClassPathXmlApplicationContext("guiSpringXMLConfig.xml"));
+                    ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+                    MainController mainController = (MainController) applicationContext.getBean("mainController");
+                    mainController.init();
+                } catch (CannotGetJdbcConnectionException ex) {
+                    JOptionPane.showMessageDialog(null, "Cannot establish a connection to the PRIDE public database, the application will not start."
+                            + "\n" + "Make sure you have an active internet connection and/or check your firewall settings.", "Error", JOptionPane.ERROR_MESSAGE);
+                    System.exit(0);
+                }
             }
         });
     }
@@ -101,8 +109,8 @@ public class PrideAsaPipelineStarter {
 
     public static void launchPrideXmlCommandLineMode(File prideXmlFile) {
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-        CommandLineRunner commandLineRunner = (CommandLineRunner) applicationContext.getBean("commandLineRunner");
-        commandLineRunner.runPrideXmlPipeline(prideXmlFile);
+        PrideXmlCommandLineRunner prideXmlCommandLineRunner = (PrideXmlCommandLineRunner) applicationContext.getBean("prideXmlCommandLineRunner");
+        prideXmlCommandLineRunner.runPrideXmlPipeline(prideXmlFile);
     }
 
     /**
