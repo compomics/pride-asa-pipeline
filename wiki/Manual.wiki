@@ -19,14 +19,14 @@ The pipeline configuration files can be found in the _resources_ folder. These f
 === pride_asa_pipeline.properties ===
 Most of the parameter values in this file should be left to their default values. The settings that the user might need the change are listed below
   * `results_path`: the path on the file system where the pipeline result files will be stored.
-  * `spectrumannotator.include_pride_modifications`: include the modifications in found in PRIDE for a given experiment. Note that setting this parameter to `true` can increase the processing time. The modifications defined in the pipeline ([#modifications.xml modifications.xml]) are always taken into account.  
+  * `spectrumannotator.include_pride_modifications`: include the modifications in found in PRIDE for a given experiment. Note that setting this parameter to `true` can increase the processing time. The modifications defined in the pipeline ([#pride_asap_modifications.xml]) are always taken into account.  
   * `modification.use_monoisotopic_mass`: use the monoisotopic or the average mass for the PTMs.
   * `pipeline.considered_charge_states`: the considered charge states for a precursor.
   * `massrecalibrator.maximum_systematic_mass_error`: the threshold systematic mass error value. The systematic mass errors (per charge state) as result of a recalibration step are checked against this value.
   * `massrecalibrator.mass_delta_threshold`: only identifications with a lower `Δm` are taken into account for the recalibration step.  
   * `massrecalibrator.minimum_peptide_count`: the minimum number of identifications per charge state used for the recalibration. Else the analyzer instrument default values are used.
 
-=== modifications.xml ===
+=== pride_asap_modifications.xml ===
 This XML file contains the modifications used to explain a possible difference between the experimental and theoretical precursor mass. It can be edited or replaced (_Edit_ -> _Modifications_ in GUI mode) by a modifications result file. The accompanying XML schema can be found in the [http://code.google.com/p/pride-asa-pipeline/downloads/list downloads section]. 
 
 As mentioned before, this fixed set of pipeline modifications can be complemented with modifications found in PRIDE for the experiment of interest. In [Manual#GUI_mode GUI mode], a dialog is shown if one or more PRIDE modifications have a similar mass compared to the pipeline PTMs.
