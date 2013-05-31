@@ -4,7 +4,7 @@
 = Manual =
 
 == In a nutshell == 
-For a given experiment, identifications and spectra are retrieved from the PRIDE public MySQL database and processed into three categories, with `Δm` the mass difference between the experimental and theoretical precursor mass:
+For a given experiment, identifications and spectra are retrieved from the PRIDE public MySQL database or a PRIDE xml file and processed into three categories, with `Δm` the mass difference between the experimental and theoretical precursor mass:
   * _unmodified_: `Δm` is smaller than the systematic mass error.
   * _modified_: `Δm` can be fitted to a combination of modification masses, so the precursor carries likely one or more PTMs.   
   * _unexplained_: `Δm` is significant but can’t be explained by a modification combination.  
@@ -31,7 +31,7 @@ This XML file contains the modifications used to explain a possible difference b
 
 As mentioned before, this fixed set of pipeline modifications can be complemented with modifications found in PRIDE for the experiment of interest. In [Manual#GUI_mode GUI mode], a dialog is shown if one or more PRIDE modifications have a similar mass compared to the pipeline PTMs.
 == Output ==
-The pipeline produces two result files. The first one (_<experiment accession>_.txt) contains the fragment ion annotations for each identified spectrum. The second one (_<experiment accession>_`_`mods.txt) contains the subset of modifications that could actually explain a precursor mass deviation. These files can be imported (back) into the GUI for further analysis.
+The pipeline produces two result files. The first one (_<experiment accession>_.txt) contains the fragment ion annotations for each identified spectrum. The second one (_<experiment accession>_`_`mods.txt) contains the subset of modifications that could actually explain a precursor mass deviation. These files can be imported (back) into the GUI for further analysis. Please note that for the moment, result files from processed PRIDE xml experiments can be imported, but the identifications details can't be explored.
 
 In case of an unexpected error, the log file (pride-asa-pipeline.log) can be found in the _user_ root folder.
 
