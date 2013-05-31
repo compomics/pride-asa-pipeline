@@ -329,7 +329,7 @@ public class ModificationsController {
                     modificationService.savePipelineModifications(modificationsResource, modificationsBindingList);
                 } else {
                     mainController.showMessageDialog("Save Unsuccessful", "The modifications could not be saved to file. "
-                            + "\n" + "Please check if a \"modifications.xml\" file exists in the \"resources\" folder. "
+                            + "\n" + "Please check if a \"pride_asap_modifications.xml\" file exists in the \"resources\" folder. "
                             + "\n" + "The modifications will however be used in the pipeline.", JOptionPane.WARNING_MESSAGE);
                 }
             }

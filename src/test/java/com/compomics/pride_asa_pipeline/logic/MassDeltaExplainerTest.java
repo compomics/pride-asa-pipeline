@@ -62,7 +62,7 @@ public class MassDeltaExplainerTest {
 
         //add identifications
         //the experimental mass was chosen so some of the identifications mass delta could be explained with modification(s)
-        //loaded from the modifications.xml in the test resources
+        //loaded from the pride_asap_modifications.xml in the test resources
         AminoAcidSequence aminoAcidSequence = new AminoAcidSequence("AAKENNYLENNART");
         double experimentalMass = aminoAcidSequence.getSequenceMass() + Constants.MASS_H2O + Constants.MASS_H + MASS_ERROR + 42.01056;
         Peptide peptide = new Peptide(1, experimentalMass, aminoAcidSequence);

@@ -346,7 +346,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
     /**
      * Parses the modifications in the result file and adds them to the modified
      * peptide. If the modifications is not found by name in the
-     * modifications.xml file, a default modifications is added.
+     * pride_asap_modifications.xml file, a default modifications is added.
      *
      * @param modifiedPeptide the modified peptide
      * @param modificationsString

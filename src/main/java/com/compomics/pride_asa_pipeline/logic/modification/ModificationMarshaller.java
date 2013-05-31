@@ -28,7 +28,7 @@ public interface ModificationMarshaller {
     Set<Modification> unmarshall(Resource modificationsResource) throws JDOMException;
 
     /**
-     * Marshalls the collection of modifications to the modifications.xml file.
+     * Marshalls the collection of modifications to the pride_asap_modifications.xml file.
      *
      * @param modificationsResource the modifications resource
      * @param modifications the modifications collection

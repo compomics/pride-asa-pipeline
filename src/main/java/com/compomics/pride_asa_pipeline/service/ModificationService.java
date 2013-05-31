@@ -37,7 +37,7 @@ public interface ModificationService {
     Set<Modification> loadPipelineModifications(Resource modificationsResource) throws JDOMException;
 
     /**
-     * Saves the pipeline modifications to the modifications.xml resource.
+     * Saves the pipeline modifications to the pride_asap_modifications.xml resource.
      *
      * @param modificationsResource the modifications XML resource
      * @param pipelineModifications the collections of pipeline modifications
