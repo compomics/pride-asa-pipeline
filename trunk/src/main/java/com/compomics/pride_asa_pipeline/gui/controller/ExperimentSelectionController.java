@@ -461,6 +461,7 @@ public class ExperimentSelectionController {
                 LOGGER.error(ex.getMessage(), ex);
             } catch (ExecutionException ex) {
                 onAnnotationCanceled();
+                LOGGER.error(ex.getMessage(), ex);
                 mainController.showMessageDialog("Unexpected Error", "An expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
             } catch (CancellationException ex) {
                 LOGGER.info("annotation for experiment " + getExperimentAccesion() + " cancelled.");
@@ -513,6 +514,7 @@ public class ExperimentSelectionController {
                 LOGGER.error(ex.getMessage(), ex);
             } catch (ExecutionException ex) {
                 onAnnotationCanceled();
+                LOGGER.error(ex.getMessage(), ex);
                 mainController.showMessageDialog("Unexpected Error", "An expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
             } catch (CancellationException ex) {
                 LOGGER.info("annotation for experiment " + getExperimentAccesion() + " cancelled.");

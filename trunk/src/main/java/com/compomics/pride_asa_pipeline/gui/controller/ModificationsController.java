@@ -204,7 +204,7 @@ public class ModificationsController {
             @Override
             public void valueChanged(ListSelectionEvent lse) {
                 if (!lse.getValueIsAdjusting()) {
-                    if (modificationsConfigDialog.getModifcationsTable().getSelectedRow() != -1) {
+                    if (modificationsConfigDialog.getModifcationsTable().getSelectedRow() != -1 && !modificationsBindingList.isEmpty()) {
                         Modification selectedModification = modificationsBindingList.get(modificationsConfigDialog.getModifcationsTable().getSelectedRow());
                         affectedAminoAcidsBindingList.clear();
                         affectedAminoAcidsBindingList.addAll(selectedModification.getAffectedAminoAcids());
@@ -284,9 +284,11 @@ public class ModificationsController {
         modificationsConfigDialog.getRemoveModificationButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                if (modificationsConfigDialog.getModifcationsTable().getSelectedRow() != -1) {
+                if (!modificationsBindingList.isEmpty() && modificationsConfigDialog.getModifcationsTable().getSelectedRow() != -1) {
                     modificationsBindingList.remove(modificationsConfigDialog.getModifcationsTable().getSelectedRow());
+                    if(!modificationsBindingList.isEmpty()){
                     modificationsConfigDialog.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);
+                    }
                 }
             }
         });

@@ -382,17 +382,22 @@ public class PrideSpectrumAnnotator {
      * value the set of modification combinations)
      */
     private Map<Identification, Set<ModificationCombination>> findModificationCombinations(MassRecalibrationResult massRecalibrationResult, Identifications identifications) {
-        //set MassDeltaExplainer ModificationHolder, MassRecalibrationResult and AnalyzerData
-        massDeltaExplainer.getModificationCombinationSolver().setModificationHolder(modificationHolder);
-        if (massRecalibrationResult != null) {
-            massDeltaExplainer.setMassRecalibrationResult(massRecalibrationResult);
+        Map<Identification, Set<ModificationCombination>> possibleExplanations = new HashMap<Identification, Set<ModificationCombination>>();
+
+        //check if the modification holder contains at least one modification
+        if (!modificationHolder.getAllModifications().isEmpty()) {
+            //set MassDeltaExplainer ModificationHolder, MassRecalibrationResult and AnalyzerData
+            massDeltaExplainer.getModificationCombinationSolver().setModificationHolder(modificationHolder);
+            if (massRecalibrationResult != null) {
+                massDeltaExplainer.setMassRecalibrationResult(massRecalibrationResult);
+            }
+            if (analyzerData != null) {
+                massDeltaExplainer.setAnalyzerData(analyzerData);
+            }
+            //finally calculate the possible explanations
+            possibleExplanations =
+                    massDeltaExplainer.explainCompleteIndentifications(identifications.getCompleteIdentifications());
         }
-        if (analyzerData != null) {
-            massDeltaExplainer.setAnalyzerData(analyzerData);
-        }
-        //finally calculate the possible explanations
-        Map<Identification, Set<ModificationCombination>> possibleExplanations =
-                massDeltaExplainer.explainCompleteIndentifications(identifications.getCompleteIdentifications());
 
         return possibleExplanations;
     }

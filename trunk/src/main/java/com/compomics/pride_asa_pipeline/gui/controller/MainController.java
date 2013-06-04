@@ -174,7 +174,7 @@ public class MainController implements ActionListener {
     }
 
     public void showUnexpectedErrorDialog(String message) {
-        showMessageDialog("Unexpected Error", "An expected error occured: "
+        showMessageDialog("Unexpected Error", "An unexpected error occured: "
                 + "\n" + message
                 + "\n" + "please try to rerun the application.", JOptionPane.ERROR_MESSAGE);
     }
