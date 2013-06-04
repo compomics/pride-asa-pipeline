@@ -131,7 +131,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.compomics.pride_asa_pipeline.PrideAsaPipelineStarter</mainClass>
+                            <mainClass>com.compomics.pride_asa_pipeline.StarterWrapper</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
                         </manifest>
@@ -410,7 +410,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
-            <version>3.13.18</version>
+            <version>3.13.25</version>
             <exclusions>
                 <exclusion>
                     <artifactId>derby</artifactId>

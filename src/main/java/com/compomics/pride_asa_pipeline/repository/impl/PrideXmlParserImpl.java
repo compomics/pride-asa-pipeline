@@ -275,7 +275,7 @@ public class PrideXmlParserImpl implements PrideXmlParser {
             sequenceIndex = 0;
         } else if (modificationLocation == (peptideSequence.length() + 1)) {
             location = Modification.Location.C_TERMINAL;
-            sequenceIndex = peptideSequence.length() + 1;
+            sequenceIndex = peptideSequence.length() - 1;
         } else {
             location = Modification.Location.NON_TERMINAL;
             sequenceIndex = modificationLocation - 1;
@@ -286,9 +286,8 @@ public class PrideXmlParserImpl implements PrideXmlParser {
         double averageMassShift = (modificationItem.getModAvgDelta().isEmpty()) ? monoIsotopicMassShift : Double.parseDouble(modificationItem.getModAvgDelta().get(0));
         String accessionValue = (modificationItem.getAdditional().getCvParamByAcc(modificationItem.getModAccession()) == null) ? modificationItem.getModAccession() : modificationItem.getAdditional().getCvParamByAcc(modificationItem.getModAccession()).getName();
 
-        Modification modification = new Modification(accessionValue, monoIsotopicMassShift, averageMassShift, location, new HashSet<AminoAcid>(), modificationItem.getModAccession(), accessionValue);
-
-        modification.getAffectedAminoAcids().add(AminoAcid.getAA(peptideSequence.substring(sequenceIndex, sequenceIndex + 1)));
+        Modification modification = new Modification(accessionValue, monoIsotopicMassShift, averageMassShift, location, new HashSet<AminoAcid>(), modificationItem.getModAccession(), accessionValue);        
+        modification.getAffectedAminoAcids().add(AminoAcid.getAA(peptideSequence.substring(sequenceIndex, sequenceIndex + 1)));       
         modification.setOrigin(Modification.Origin.PRIDE);
 
         return modification;

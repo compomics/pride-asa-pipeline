@@ -5,7 +5,7 @@
     <xs:element name="modifications">
         <xs:complexType>      
             <xs:sequence>      
-                <xs:element ref="modification" minOccurs="1" maxOccurs="unbounded"/> 
+                <xs:element ref="modification" minOccurs="0" maxOccurs="unbounded"/> 
             </xs:sequence>          
         </xs:complexType>
     </xs:element>

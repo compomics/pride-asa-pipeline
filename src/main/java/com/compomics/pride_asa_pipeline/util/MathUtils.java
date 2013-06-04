@@ -166,7 +166,7 @@ public class MathUtils {
         // check that we have a number we can actually calculate the factorial for.
         if (n < 0 || n > 20) {
             throw new IllegalArgumentException("The factorial can only "
-                    + "be calculated for numbers n with 0 <= n <= 20 .");
+                    + "be calculated for numbers n with 0 <= n <= 20 (currently n = " + n + "). Please try to consider less modifications.");
         }
         // handle the trivial cases
         if (n == 0 || n == 1) {
@@ -225,7 +225,7 @@ public class MathUtils {
 
     /**
      * Rounds a given double to the default number of decimals.
-     * 
+     *
      * @param d the double
      * @return the rounded double
      */
@@ -235,18 +235,19 @@ public class MathUtils {
 
     /**
      * Rounds a given double with the given number of decimals.
-     * 
+     *
      * @param d the double
      * @param numberOfDecimals the number of decimals
      * @return the rounded double
      */
-    public static double roundDouble(double d, int numberOfDecimals) {        
+    public static double roundDouble(double d, int numberOfDecimals) {
         return roundDoubleAsBigDecimal(d, numberOfDecimals).doubleValue();
     }
-    
+
     /**
-     * Rounds a double with the given number of decimals and returns a BigDecimal.
-     * 
+     * Rounds a double with the given number of decimals and returns a
+     * BigDecimal.
+     *
      * @param d the double
      * @param numberOfDecimals the number of decimals
      * @return the rounded BigDecimal
