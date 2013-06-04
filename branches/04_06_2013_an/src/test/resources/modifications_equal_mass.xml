@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modifications xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="modifications.xsd">
+    <modification>
+        <name>N_term_iTRAQ4plex114</name>
+        <monoIsotopicMassShift>144.105919</monoIsotopicMassShift>
+        <averageMassShift>144.105919</averageMassShift>
+        <location>N-terminus</location>
+        <affectedAminoAcids>
+            <affectedAminoAcid>*</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:01485</accession>
+        <accessionValue>N_term_iTRAQ4plex-114 reporter+balance reagent acylated residue</accessionValue>
+    </modification>
+    <modification>
+        <name>iTRAQ4plex114</name>
+        <monoIsotopicMassShift>144.105919</monoIsotopicMassShift>
+        <averageMassShift>144.105919</averageMassShift>
+        <location>any</location>
+        <affectedAminoAcids>
+            <affectedAminoAcid>K</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:01485</accession>
+        <accessionValue>iTRAQ4plex-114 reporter+balance reagent acylated residue</accessionValue>
+    </modification>
+</modifications>
