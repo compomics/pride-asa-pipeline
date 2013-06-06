@@ -107,10 +107,10 @@ public class PrideAsaPipelineStarter {
         commandLineRunner.runPipeline(experimentAccessionsFile);
     }
 
-    public static void launchPrideXmlCommandLineMode(File prideXmlFile) {
+    public static void launchPrideXmlCommandLineMode(File prideXmlFile, boolean singlePrideXml) {
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
         PrideXmlCommandLineRunner prideXmlCommandLineRunner = (PrideXmlCommandLineRunner) applicationContext.getBean("prideXmlCommandLineRunner");
-        prideXmlCommandLineRunner.runPrideXmlPipeline(prideXmlFile);
+        prideXmlCommandLineRunner.runPrideXmlPipeline(prideXmlFile, singlePrideXml);
     }
 
     /**
@@ -150,7 +150,19 @@ public class PrideAsaPipelineStarter {
                 String prideXmlFilePath = commandLine.getOptionValue('p');
                 File prideXmlFile = new File(prideXmlFilePath);
                 if (prideXmlFile.exists()) {
-                    launchPrideXmlCommandLineMode(prideXmlFile);
+                    launchPrideXmlCommandLineMode(prideXmlFile, true);
+                } else {
+                    System.out.println("No file with path \"" + prideXmlFilePath + "\" could be found.");
+                    printHelp(
+                            options, 80, "Help", "End of Help",
+                            5, 3, true, System.out);
+                }
+            }
+            if (commandLine.hasOption('s')) {
+                String prideXmlFilePath = commandLine.getOptionValue('s');
+                File prideXmlPathsFile = new File(prideXmlFilePath);
+                if (prideXmlPathsFile.exists()) {
+                    launchPrideXmlCommandLineMode(prideXmlPathsFile, false);
                 } else {
                     System.out.println("No file with path \"" + prideXmlFilePath + "\" could be found.");
                     printHelp(
@@ -186,11 +198,14 @@ public class PrideAsaPipelineStarter {
         accessionStringOption.setArgName("accession");
         Option prideXmlFileOption = new Option("p", "pride_xml_file", true, "Pride XML file path");
         prideXmlFileOption.setArgName("pride_xml_file_path");
+        Option prideXmlPathFileOption = new Option("s", "pride_xml_paths_file", true, "Pride XML paths file path");
+        prideXmlFileOption.setArgName("pride_xml_paths_file_path");
         Option accessionFileOption = new Option("f", "accessions_file", true, "Experiment accessions file path");
         accessionFileOption.setArgName("file_path");
         OptionGroup commandLineModeOptionGroup = new OptionGroup();
         commandLineModeOptionGroup.addOption(accessionStringOption);
         commandLineModeOptionGroup.addOption(prideXmlFileOption);
+        commandLineModeOptionGroup.addOption(prideXmlPathFileOption);
         commandLineModeOptionGroup.addOption(accessionFileOption);
 
         options.addOptionGroup(commandLineModeOptionGroup);
