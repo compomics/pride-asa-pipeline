@@ -5,7 +5,7 @@
 
     <groupId>com.compomics</groupId>
     <artifactId>pride-asa-pipeline</artifactId>
-    <version>1.5.11-SNAPSHOT</version>
+    <version>1.5.11</version>
     <packaging>jar</packaging>
     <name>pride-asa-pipeline</name>
     <url>http://maven.apache.org</url>
@@ -131,7 +131,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.compomics.pride_asa_pipeline.StarterWrapper</mainClass>
+                            <mainClass>com.compomics.pride_asa_pipeline.PrideAsaPipelineStarter</mainClass>
+                            <!--<mainClass>com.compomics.pride_asa_pipeline.StarterWrapper</mainClass>-->
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
                         </manifest>
