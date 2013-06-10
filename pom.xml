@@ -131,8 +131,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.compomics.pride_asa_pipeline.PrideAsaPipelineStarter</mainClass>
-                            <!--<mainClass>com.compomics.pride_asa_pipeline.StarterWrapper</mainClass>-->
+                            <!--<mainClass>com.compomics.pride_asa_pipeline.PrideAsaPipelineStarter</mainClass>-->
+                            <mainClass>com.compomics.pride_asa_pipeline.StarterWrapper</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
                         </manifest>
