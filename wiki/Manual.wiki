@@ -38,7 +38,7 @@ In case of an unexpected error, the log file (pride-asa-pipeline.log) can be fou
 == Command line mode ==
 Execute the following command in the folder where the pipeline _.jar_ file is located:
 {{{
-java -jar pride-asa-pipeline-<version>.jar [-a <accession> | -f <experiment_accessions_file_path> | -p <pride_xml_file_path>] [-u] [-h]
+java -jar pride-asa-pipeline-<version>.jar [-a <accession> | -f <experiment_accessions_file_path> | -p <pride_xml_file_path> | -s <pride_xml_paths_file_path>] [-u] [-h]
 }}}
 Using argument `-a` followed by a PRIDE experiment accession annotates one experiment, whereas `-f` followed by the path of a _.txt_ file containing one or more experiment accessions (line separated) annotates multiple experiments sequentially. `-p` annotates the PRIDE xml file specified in the following path. Arguments `-h` and `-u` give more information about the available command line parameters.
 
@@ -53,7 +53,7 @@ On the main panel, an experiment can be selected from the publicly available PRI
   * Systematic mass error dialog: one or more systematic mass errors exceed the threshold value. The user can decide to proceed or not.
   * Conflicting modifications dialog: The conflicting PRIDE modifications are shown on the left, the pipeline modifications and non-conflicting PRIDE modifications on the right. The user can include or exclude PRIDE modifications in this dialog. The pipeline modifications can be edited in the [#Modifications_dialog modifications dialog]. Note that the pipeline can handle equal mass modifications, although they increase the processing time significantly. 
 
-A PRIDE xml file (gzipped or not) can be ran through the pipeline in the _PRIDE XML_ tab. 
+A PRIDE xml file can be ran through the pipeline in the _PRIDE XML_ tab. 
 
 In the _Pipeline Result File_ tab, a result file from an already processed experiment can be loaded.
 
