@@ -5,7 +5,7 @@
 
     <groupId>com.compomics</groupId>
     <artifactId>pride-asa-pipeline</artifactId>
-    <version>1.5.11</version>
+    <version>1.5.12-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>pride-asa-pipeline</name>
     <url>http://maven.apache.org</url>
@@ -62,11 +62,35 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.5.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <showDeprecation>true</showDeprecation>
                     <debug>true</debug>
                 </configuration>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+                <version>2.7.5</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
+                            <wsdloptions>
+                                <wsdloption>
+                                    <wsdl>${basedir}/src/main/resources/wsdl/OntologyQuery.wsdl</wsdl>                                    
+                                </wsdloption>
+                            </wsdloptions>
+                        </configuration>
+                       
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>            
             </plugin>
             
             <!-- Surefire plugin -->
@@ -131,8 +155,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <!--<mainClass>com.compomics.pride_asa_pipeline.PrideAsaPipelineStarter</mainClass>-->
-                            <mainClass>com.compomics.pride_asa_pipeline.StarterWrapper</mainClass>
+                            <mainClass>com.compomics.pride_asa_pipeline.PrideAsaPipelineStarter</mainClass>
+                            <!--<mainClass>com.compomics.pride_asa_pipeline.StarterWrapper</mainClass>-->
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
                         </manifest>
@@ -471,14 +495,39 @@
         <dependency>
             <groupId>uk.ac.ebi.pride.jaxb</groupId>
             <artifactId>pride-jaxb</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.8</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jaxb-impl</artifactId>
+                    <groupId>com.sun.xml.bind</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>                      
         
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>PrideXMLValidator</artifactId>
-            <version>0.4.2</version>
+            <version>0.4.4</version>
         </dependency>
+        
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>2.7.5</version>
+        </dependency>
+        
+        <!--        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <version>2.7.5</version>
+        </dependency>            -->
+        
+        <dependency>
+            <groupId>no.uib</groupId>
+            <artifactId>ols-dialog</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+
     </dependencies>
     
     <distributionManagement>        

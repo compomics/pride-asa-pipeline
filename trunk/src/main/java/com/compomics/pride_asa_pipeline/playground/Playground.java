@@ -23,10 +23,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.xml.xml_soap.Map;
+import org.apache.xml.xml_soap.MapItem;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import uk.ac.ebi.ontology_lookup.ontologyquery.Query;
 
 /**
  * @author Niels Hulstaert
@@ -73,9 +77,19 @@ public class Playground {
 //        BigDecimal mzDelta = new BigDecimal(0.123456789).setScale(4, BigDecimal.ROUND_HALF_UP);
 //        System.out.println("--" +  mzDelta.toPlainString());
         
-        double d = 3.6;
-        int i = (int) d;
-        System.out.println("------" + i);
+        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+        Query olsClient = (Query) applicationContext.getBean("olsClient");        
+        
+        Map ontologyNames = olsClient.getOntologyNames();
+        for (MapItem mapItem : ontologyNames.getItem()) {
+            if (mapItem.getKey().equals("MS")) {
+                System.out.println(mapItem.getKey());
+                System.out.println(mapItem.getValue());
+            }
+        }
+        
+        String test = olsClient.getTermById("MOD:00408", "MOD"); 
+        System.out.println(test);
     }
 
     public static File filterExperimentAccessions(File experimentAccessionsFile, File resultsDirectory) {
