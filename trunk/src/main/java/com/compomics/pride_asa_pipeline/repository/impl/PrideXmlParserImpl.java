@@ -54,7 +54,7 @@ public class PrideXmlParserImpl implements PrideXmlParser {
         PrideXMLToMGFConverter.getInstance().init(prideXmlFile);
         prideXmlReader = PrideXMLToMGFConverter.getInstance().getPrideXmlReader();
     }
-    
+
     @Override
     public void clear() {
         PrideXMLToMGFConverter.getInstance().clearTempFiles();
@@ -74,7 +74,7 @@ public class PrideXmlParserImpl implements PrideXmlParser {
 
             //Iterate over each peptide identification
             for (int i = 0; i < numOfPeptides; i++) {
-                PeptideItem peptideItem = prideXmlReader.getPeptide(proteinIdentificationId, i);                
+                PeptideItem peptideItem = prideXmlReader.getPeptide(proteinIdentificationId, i);
 
                 //get modifications
                 List<ModificationItem> modificationItems = peptideItem.getModificationItem();
@@ -183,16 +183,16 @@ public class PrideXmlParserImpl implements PrideXmlParser {
     public HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(String spectrumId) {
         HashMap<Double, Double> peaks = new HashMap<Double, Double>();
 
-        Spectrum spectrum = prideXmlReader.getSpectrumById(spectrumId);        
-        Number[] mzRatios = spectrum.getMzNumberArray();        
-        Number[] intensities = spectrum.getIntentArray();        
+        Spectrum spectrum = prideXmlReader.getSpectrumById(spectrumId);
+        Number[] mzRatios = spectrum.getMzNumberArray();
+        Number[] intensities = spectrum.getIntentArray();
 
         for (int i = 0; i < mzRatios.length; i++) {
-            peaks.put(mzRatios[i].doubleValue(), intensities[i].doubleValue());            
+            peaks.put(mzRatios[i].doubleValue(), intensities[i].doubleValue());
         }
 
         return peaks;
-    }        
+    }
 
     @Override
     public Map<String, String> getAnalyzerSources() {
@@ -230,9 +230,9 @@ public class PrideXmlParserImpl implements PrideXmlParser {
                 analyzerDataList.add(analyzerData);
             }
         }
-        
+
         //if list is empty, return default analyzer
-        if(analyzerDataList.isEmpty()){
+        if (analyzerDataList.isEmpty()) {
             analyzerDataList.add(AnalyzerDataMapper.getAnalyzerDataByAnalyzerType(null));
         }
 
@@ -251,12 +251,12 @@ public class PrideXmlParserImpl implements PrideXmlParser {
         }
         return proteinAccessions;
     }
-    
+
     @Override
     public List<ConversionError> getSpectraAsMgf(File experimentPrideXmlFile, File mgfFile) throws XMLConversionException {
         return PrideXMLToMGFConverter.getInstance().extractMGFFromPrideXML(experimentPrideXmlFile, mgfFile);
     }
-    
+
     /**
      * Map a ModificationItem onto the pipeline Modification
      *
@@ -268,8 +268,12 @@ public class PrideXmlParserImpl implements PrideXmlParser {
         Integer modificationLocation = modificationItem.getModLocation().intValue();
 
         Modification.Location location = null;
-        int sequenceIndex = 0;
+        int sequenceIndex;
 
+//        if (modificationItem.getModAccession().equals("MOD:01486")) {
+//            location = Modification.Location.N_TERMINAL;
+//            sequenceIndex = 0;
+//        } else {
         if (modificationLocation == 0) {
             location = Modification.Location.N_TERMINAL;
             sequenceIndex = 0;
@@ -280,16 +284,17 @@ public class PrideXmlParserImpl implements PrideXmlParser {
             location = Modification.Location.NON_TERMINAL;
             sequenceIndex = modificationLocation - 1;
         }
+        //}
 
         double monoIsotopicMassShift = (modificationItem.getModMonoDelta().isEmpty()) ? 0.0 : Double.parseDouble(modificationItem.getModMonoDelta().get(0));
         //if average mass shift is empty, use the monoisotopic mass.
         double averageMassShift = (modificationItem.getModAvgDelta().isEmpty()) ? monoIsotopicMassShift : Double.parseDouble(modificationItem.getModAvgDelta().get(0));
         String accessionValue = (modificationItem.getAdditional().getCvParamByAcc(modificationItem.getModAccession()) == null) ? modificationItem.getModAccession() : modificationItem.getAdditional().getCvParamByAcc(modificationItem.getModAccession()).getName();
 
-        Modification modification = new Modification(accessionValue, monoIsotopicMassShift, averageMassShift, location, new HashSet<AminoAcid>(), modificationItem.getModAccession(), accessionValue);        
-        modification.getAffectedAminoAcids().add(AminoAcid.getAA(peptideSequence.substring(sequenceIndex, sequenceIndex + 1)));       
+        Modification modification = new Modification(accessionValue, monoIsotopicMassShift, averageMassShift, location, new HashSet<AminoAcid>(), modificationItem.getModAccession(), accessionValue);
+        modification.getAffectedAminoAcids().add(AminoAcid.getAA(peptideSequence.substring(sequenceIndex, sequenceIndex + 1)));
         modification.setOrigin(Modification.Origin.PRIDE);
 
         return modification;
-    }    
+    }
 }
