@@ -72,7 +72,7 @@ public abstract class ModificationServiceImpl implements ModificationService {
 
     @Override
     public Map<Modification, Integer> getUsedModifications(SpectrumAnnotatorResult spectrumAnnotatorResult) {
-        Map<Modification, Integer> modifications = new HashMap<Modification, Integer>();
+        Map<Modification, Integer> modifications = new HashMap<>();
 
         for (Identification identification : spectrumAnnotatorResult.getModifiedPrecursors()) {
             ModifiedPeptide modifiedPeptide = (ModifiedPeptide) identification.getPeptide();
@@ -96,44 +96,43 @@ public abstract class ModificationServiceImpl implements ModificationService {
     }
 
     @Override
-    public Map<Modification, Double> estimateModificationRate(Map<Modification, Integer> usedModifications, SpectrumAnnotatorResult spectrumAnnotatorResult, double aFixedModificationThreshold) {
+    public Map<Modification, Double> estimateModificationRate(Map<Modification, Integer> usedModifications, SpectrumAnnotatorResult spectrumAnnotatorResult, double fixedModificationThreshold) {
 
         // calculate number of peptides that contain
-        HashMultiset<AminoAcid> lAminoAcidHashMultiset = HashMultiset.create();
-        List<Identification> lIdentifications = spectrumAnnotatorResult.getIdentifications();
-        for (Identification lIdentification : lIdentifications) {
-            String lSequenceString = lIdentification.getPeptide().getSequenceString();
+        HashMultiset<AminoAcid> aminoAcidHashMultiset = HashMultiset.create();
+        List<Identification> identifications = spectrumAnnotatorResult.getIdentifications();
+        for (Identification identification : identifications) {
+            String sequenceString = identification.getPeptide().getSequenceString();
             for (AminoAcid aa : EnumSet.allOf(AminoAcid.class)) {
-                if(lSequenceString.contains("" + aa.letter())){
-                    lAminoAcidHashMultiset.add(aa);
+                if(sequenceString.contains("" + aa.letter())){
+                    aminoAcidHashMultiset.add(aa);
                 }
             }
         }
 
         // convert to aminoacid/integer map
-        HashMap<AminoAcid, Integer> lAminoAcidCounts = Maps.newHashMap();
-        for (Multiset.Entry lEntry : lAminoAcidHashMultiset.entrySet()) {
-            lAminoAcidCounts.put((AminoAcid) lEntry.getElement(), lEntry.getCount());
+        Map<AminoAcid, Integer> aminoAcidCounts = Maps.newHashMap();
+        for (Multiset.Entry entry : aminoAcidHashMultiset.entrySet()) {
+            aminoAcidCounts.put((AminoAcid) entry.getElement(), entry.getCount());
         }
-
 
         // run over used modifications and their frequencies,
         // verify which Modifications are nearly always present when the
         // affected amino acid is in the peptide sequence
-        HashMap<Modification, Double> lResult = Maps.newHashMap();
-        for (Modification lUsedModifiation : usedModifications.keySet()) {
-            double lModificationCount = new Double(usedModifications.get(lUsedModifiation));
-            double lAminoAcidCount = 0;
-            for (AminoAcid lAffectedAminoAcid : lUsedModifiation.getAffectedAminoAcids()) {
-                lAminoAcidCount += lAminoAcidCounts.get(lAffectedAminoAcid);
+        Map<Modification, Double> result = Maps.newHashMap();
+        for (Modification usedModifiation : usedModifications.keySet()) {
+            double modificationCount = new Double(usedModifications.get(usedModifiation));
+            double aminoAcidCount = 0;
+            for (AminoAcid affectedAminoAcid : usedModifiation.getAffectedAminoAcids()) {
+                aminoAcidCount += aminoAcidCounts.get(affectedAminoAcid);
             }
 
             // Fix the fixed modification treshold at 95%
-            double lModificationRate =  lModificationCount / lAminoAcidCount;
-            lResult.put(lUsedModifiation, lModificationRate);
+            double modificationRate =  modificationCount / aminoAcidCount;
+            result.put(usedModifiation, modificationRate);
         }
 
-        return lResult;
+        return result;
 
     }
 

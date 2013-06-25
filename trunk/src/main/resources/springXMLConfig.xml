@@ -210,6 +210,11 @@
         <property name="massWindowFinder" ref="massWindowFinder"/>
     </bean>
     
+<!--    <bean id="massRecalibrator"
+          class="com.compomics.pride_asa_pipeline.logic.recalibration.impl.StubMassRecalibrator">
+        <property name="massWindowFinder" ref="massWindowFinder"/>
+    </bean>-->
+    
     <bean id="massWindowFinder"
           class="com.compomics.pride_asa_pipeline.logic.recalibration.impl.SimpleMassWindowFinder">        
     </bean>
