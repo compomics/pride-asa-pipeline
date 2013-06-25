@@ -270,10 +270,6 @@ public class PrideXmlParserImpl implements PrideXmlParser {
         Modification.Location location = null;
         int sequenceIndex;
 
-//        if (modificationItem.getModAccession().equals("MOD:01486")) {
-//            location = Modification.Location.N_TERMINAL;
-//            sequenceIndex = 0;
-//        } else {
         if (modificationLocation == 0) {
             location = Modification.Location.N_TERMINAL;
             sequenceIndex = 0;
@@ -284,7 +280,6 @@ public class PrideXmlParserImpl implements PrideXmlParser {
             location = Modification.Location.NON_TERMINAL;
             sequenceIndex = modificationLocation - 1;
         }
-        //}
 
         double monoIsotopicMassShift = (modificationItem.getModMonoDelta().isEmpty()) ? 0.0 : Double.parseDouble(modificationItem.getModMonoDelta().get(0));
         //if average mass shift is empty, use the monoisotopic mass.

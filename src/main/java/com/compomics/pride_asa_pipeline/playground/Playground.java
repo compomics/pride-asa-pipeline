@@ -4,11 +4,6 @@
  */
 package com.compomics.pride_asa_pipeline.playground;
 
-import com.compomics.pride_asa_pipeline.CommandLineRunner;
-import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.service.ResultHandler;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,7 +13,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -26,10 +20,6 @@ import java.util.logging.Logger;
 import org.apache.xml.xml_soap.Map;
 import org.apache.xml.xml_soap.MapItem;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import uk.ac.ebi.ontology_lookup.ontologyquery.Query;
 
 /**
@@ -76,20 +66,20 @@ public class Playground {
         
 //        BigDecimal mzDelta = new BigDecimal(0.123456789).setScale(4, BigDecimal.ROUND_HALF_UP);
 //        System.out.println("--" +  mzDelta.toPlainString());
-        
-        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-        Query olsClient = (Query) applicationContext.getBean("olsClient");        
-        
-        Map ontologyNames = olsClient.getOntologyNames();
-        for (MapItem mapItem : ontologyNames.getItem()) {
-            if (mapItem.getKey().equals("MS")) {
-                System.out.println(mapItem.getKey());
-                System.out.println(mapItem.getValue());
-            }
-        }
-        
-        String test = olsClient.getTermById("MOD:00408", "MOD"); 
-        System.out.println(test);
+       
+//        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+//        Query olsClient = (Query) applicationContext.getBean("olsClient");        
+//        
+//        Map ontologyNames = olsClient.getOntologyNames();
+//        for (MapItem mapItem : ontologyNames.getItem()) {
+//            if (mapItem.getKey().equals("MS")) {
+//                System.out.println(mapItem.getKey());
+//                System.out.println(mapItem.getValue());
+//            }
+//        }
+//        
+//        String test = olsClient.getTermById("MOD:00408", "MOD"); 
+//        System.out.println(test);
     }
 
     public static File filterExperimentAccessions(File experimentAccessionsFile, File resultsDirectory) {
