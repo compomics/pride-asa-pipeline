@@ -4,7 +4,6 @@
  */
 package com.compomics.pride_asa_pipeline.playground;
 
-import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,10 +16,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.xml.xml_soap.Map;
-import org.apache.xml.xml_soap.MapItem;
-import org.springframework.context.ApplicationContext;
-import uk.ac.ebi.ontology_lookup.ontologyquery.Query;
 
 /**
  * @author Niels Hulstaert
