@@ -496,10 +496,10 @@ public class ExperimentSelectionController {
                         modificationHolder = mainController.getPrideSpectrumAnnotator().getModificationHolder();
                     }
 
-                    //check for equal mass modifications
-                    Set<Modification> conflictingModifications = modificationHolder.filterByEqualMasses(prideModifications);
+                    //filter modifications
+                    Set<Modification> conflictingModifications = modificationService.filterModifications(modificationHolder, prideModifications);
                     if (!conflictingModifications.isEmpty()) {
-                        modificationsMergeController.showDialog(modificationHolder, prideModifications);
+                        modificationsMergeController.showDialog(modificationHolder, prideModifications, conflictingModifications);
                     }//else add all the pride modifications to the pipeline modifications and proceed with the annotation                                      
                     else {
                         modificationHolder.addModifications(prideModifications);
@@ -613,5 +613,5 @@ public class ExperimentSelectionController {
                 resultFileSelectionPanel.getProcessButton().setEnabled(true);
             }
         }
-    }  
+    }
 }

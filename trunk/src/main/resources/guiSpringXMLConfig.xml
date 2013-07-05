@@ -41,7 +41,7 @@
     
     <bean id="modificationsMergeController"
           class="com.compomics.pride_asa_pipeline.gui.controller.ModificationsMergeController">
-        <property name="experimentSelectionController" ref="experimentSelectionController"/>    
+        <property name="experimentSelectionController" ref="experimentSelectionController"/>       
     </bean>  
     
     <bean id="modificationsController"

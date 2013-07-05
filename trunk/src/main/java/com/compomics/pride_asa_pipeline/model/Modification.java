@@ -42,7 +42,7 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         this.averageMassShift = massShift;
         this.accession = accession;
         this.accessionValue = accessionValue;
-        affectedAminoAcids = new HashSet<AminoAcid>();
+        affectedAminoAcids = new HashSet<>();
     }        
 
     public Modification(String name, double monoIsotopicMassShift, double averageMassShift, Location location, Set<AminoAcid> affectedAminoAcids, String accession, String accessionValue) {

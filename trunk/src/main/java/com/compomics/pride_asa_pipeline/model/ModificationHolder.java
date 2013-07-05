@@ -12,17 +12,16 @@ import java.util.*;
  */
 public class ModificationHolder {
 
-    private static final double MASS_DELTA_TOLERANCE = 0.1;
     private Map<AminoAcid, Set<Modification>> nonTerminalMods;
     private Map<AminoAcid, Set<Modification>> nTerminalMods;
     private Map<AminoAcid, Set<Modification>> cTerminalMods;
     private Map<Double, Set<Modification>> massToModification;
 
     public ModificationHolder() {
-        nonTerminalMods = new EnumMap<AminoAcid, Set<Modification>>(AminoAcid.class);
-        nTerminalMods = new EnumMap<AminoAcid, Set<Modification>>(AminoAcid.class);
-        cTerminalMods = new EnumMap<AminoAcid, Set<Modification>>(AminoAcid.class);
-        massToModification = new HashMap<Double, Set<Modification>>();
+        nonTerminalMods = new EnumMap<>(AminoAcid.class);
+        nTerminalMods = new EnumMap<>(AminoAcid.class);
+        cTerminalMods = new EnumMap<>(AminoAcid.class);
+        massToModification = new HashMap<>();
     }
 
     public void addModifications(Collection<Modification> modifications) {
@@ -66,7 +65,7 @@ public class ModificationHolder {
         Double mass = modification.getMassShift();
         //if not entry exists yet for the given mass, add one
         if (massToModification.get(mass) == null) {
-            Set<Modification> mods = new HashSet<Modification>();
+            Set<Modification> mods = new HashSet<>();
             massToModification.put(mass, mods);
         }
         massToModification.get(mass).add(modification);
@@ -84,7 +83,7 @@ public class ModificationHolder {
 
     public Set<Modification> getAllModifications() {
         //ToDo: maybe cache as additional internal set?
-        Set<Modification> all = new HashSet<Modification>();
+        Set<Modification> all = new HashSet<>();
         //combine all modifications for all amino acids for all possible positions
         for (Set<Modification> modifications : nonTerminalMods.values()) {
             all.addAll(modifications);
@@ -98,41 +97,19 @@ public class ModificationHolder {
         return all;
     }
 
-    public Set<Modification> getNonTerminalMods(AminoAcid aa) {
-        return nonTerminalMods.get(aa);
+    public Set<Modification> getNonTerminalMods(AminoAcid aminoAcid) {
+        return nonTerminalMods.get(aminoAcid);
     }
 
-    public Set<Modification> getNterminalMods(AminoAcid aa) {
-        return nTerminalMods.get(aa);
+    public Set<Modification> getNterminalMods(AminoAcid aminoAcid) {
+        return nTerminalMods.get(aminoAcid);
     }
 
-    public Set<Modification> getCterminalMods(AminoAcid aa) {
-        return cTerminalMods.get(aa);
+    public Set<Modification> getCterminalMods(AminoAcid aminoAcid) {
+        return cTerminalMods.get(aminoAcid);
     }
 
     public Set<Modification> mapMassToMod(double mass) {
         return massToModification.get(mass);
-    }
-
-    /**
-     * Finds the modifications from the given set that have a modification in
-     * the modification holder with the same monoisotopic mass (with an error
-     * tolerance MASS_DELTA_TOLERANCE).
-     *
-     * @param modifications the given set of modifications
-     * @return the set of modifications filtered by equal mass
-     */
-    public Set<Modification> filterByEqualMasses(Set<Modification> modifications) {
-        Set<Modification> conflictingModifications = new HashSet<Modification>();
-
-        for (Modification modification : getAllModifications()) {
-            for (Modification modificationToCheck : modifications) {
-                if (!modification.equals(modificationToCheck) && Math.abs(modification.getMonoIsotopicMassShift() - modificationToCheck.getMonoIsotopicMassShift()) < MASS_DELTA_TOLERANCE) {
-                    conflictingModifications.add(modificationToCheck);
-                }
-            }
-        }
-
-        return conflictingModifications;
     }
 }

@@ -76,39 +76,42 @@ public class PrideXmlParserImpl implements PrideXmlParser {
             for (int i = 0; i < numOfPeptides; i++) {
                 PeptideItem peptideItem = prideXmlReader.getPeptide(proteinIdentificationId, i);
 
-                //get modifications
-                List<ModificationItem> modificationItems = peptideItem.getModificationItem();
-                for (ModificationItem modificationItem : modificationItems) {
-                    Modification modification = mapModification(modificationItem, peptideItem.getSequence());
-                }
-
-                //get spectrum precursor for m/z and charge
-                Precursor precursor = peptideItem.getSpectrum().getSpectrumDesc().getPrecursorList().getPrecursor().get(0);
-
-                //get precursor CvParams
-                List<CvParam> precursorCvParams = precursor.getIonSelection().getCvParam();
-                double mzRatio = 0.0;
-                int charge = -1;
-                for (CvParam cvParam : precursorCvParams) {
-                    //precursor m/z
-                    if (cvParam.getAccession().equalsIgnoreCase("MS:1000744") || cvParam.getAccession().equalsIgnoreCase("PSI:1000040")) {
-                        mzRatio = Double.parseDouble(cvParam.getValue());
-                    } //precursor charge 
-                    else if (cvParam.getAccession().equalsIgnoreCase("MS:1000041") || cvParam.getAccession().equalsIgnoreCase("PSI:1000041")) {
-                        charge = Integer.parseInt(cvParam.getValue());
+                //check if the peptide is not null
+                if (peptideItem.getSpectrum() != null) {
+                    //get modifications
+                    List<ModificationItem> modificationItems = peptideItem.getModificationItem();
+                    for (ModificationItem modificationItem : modificationItems) {
+                        Modification modification = mapModification(modificationItem, peptideItem.getSequence());
                     }
-                }
-                try {
-                    //new Peptide instance
-                    Peptide peptide = new Peptide(charge, mzRatio, new AminoAcidSequence(peptideItem.getSequence()));
-                    //new Identification instance
-                    long spectrumId = peptideItem.getSpectrum().getId();
-                    Identification identification = new Identification(peptide, proteinIdentificationId, spectrumId, 0L);
 
-                    //add to identifications
-                    identifications.add(identification);
-                } catch (UnknownAAException ex) {
-                    LOGGER.error(ex.getMessage(), ex);
+                    //get spectrum precursor for m/z and charge
+                    Precursor precursor = peptideItem.getSpectrum().getSpectrumDesc().getPrecursorList().getPrecursor().get(0);
+
+                    //get precursor CvParams
+                    List<CvParam> precursorCvParams = precursor.getIonSelection().getCvParam();
+                    double mzRatio = 0.0;
+                    int charge = -1;
+                    for (CvParam cvParam : precursorCvParams) {
+                        //precursor m/z
+                        if (cvParam.getAccession().equalsIgnoreCase("MS:1000744") || cvParam.getAccession().equalsIgnoreCase("PSI:1000040")) {
+                            mzRatio = Double.parseDouble(cvParam.getValue());
+                        } //precursor charge 
+                        else if (cvParam.getAccession().equalsIgnoreCase("MS:1000041") || cvParam.getAccession().equalsIgnoreCase("PSI:1000041")) {
+                            charge = Integer.parseInt(cvParam.getValue());
+                        }
+                    }
+                    try {
+                        //new Peptide instance
+                        Peptide peptide = new Peptide(charge, mzRatio, new AminoAcidSequence(peptideItem.getSequence()));
+                        //new Identification instance
+                        long spectrumId = peptideItem.getSpectrum().getId();
+                        Identification identification = new Identification(peptide, proteinIdentificationId, spectrumId, 0L);
+
+                        //add to identifications
+                        identifications.add(identification);
+                    } catch (UnknownAAException ex) {
+                        LOGGER.error(ex.getMessage(), ex);
+                    }
                 }
             }
         }

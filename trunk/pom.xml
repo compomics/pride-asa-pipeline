@@ -5,7 +5,7 @@
 
     <groupId>com.compomics</groupId>
     <artifactId>pride-asa-pipeline</artifactId>
-    <version>1.5.12</version>
+    <version>1.5.13-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>pride-asa-pipeline</name>
     <url>http://maven.apache.org</url>
@@ -160,6 +160,9 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
                         </manifest>
+<!--                        <manifestEntries>
+                            <Class-Path>ext/</Class-Path>
+                        </manifestEntries>-->
                     </archive>
                     <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}
                     </outputDirectory>
@@ -190,6 +193,23 @@
                             </resources>
                         </configuration>
                     </execution>
+<!--                    <execution>
+                        <id>copy-ext-folder</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                ${project.build.directory}/${project.artifactId}-${project.version}/ext
+                            </outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/ext</directory>                                    
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>                    -->
                     <execution>
                         <id>copy-package-license</id>
                         <phase>process-resources</phase>
@@ -435,7 +455,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
-            <version>3.13.25</version>
+            <version>3.13.56</version>
             <exclusions>
                 <exclusion>
                     <artifactId>derby</artifactId>

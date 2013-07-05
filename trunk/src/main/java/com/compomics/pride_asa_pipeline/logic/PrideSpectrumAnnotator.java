@@ -225,10 +225,12 @@ public class PrideSpectrumAnnotator {
         if (!areModificationsLoaded) {
             //add the non-conflicting modifications found in pride for the given experiment                        
             Set<Modification> prideModifications = initModifications();
-            Set<Modification> conflictingModifications = modificationHolder.filterByEqualMasses(prideModifications);
-            for (Modification prideModification : prideModifications) {
-                if (!conflictingModifications.contains(prideModification)) {
-                    modificationHolder.addModification(prideModification);
+            if (!prideModifications.isEmpty()) {
+                Set<Modification> conflictingModifications = modificationService.filterModifications(modificationHolder, prideModifications);
+                for (Modification prideModification : prideModifications) {
+                    if (!conflictingModifications.contains(prideModification)) {
+                        modificationHolder.addModification(prideModification);
+                    }
                 }
             }
         }
@@ -322,8 +324,8 @@ public class PrideSpectrumAnnotator {
      */
     public void clearTmpResources() {
 
-        String lPath_tmp = PropertiesConfigurationHolder.getInstance().getString("results_path_tmp");
-        File tempDir = new File(lPath_tmp);
+        String path_tmp = PropertiesConfigurationHolder.getInstance().getString("results_path_tmp");
+        File tempDir = new File(path_tmp);
         try {
             LOGGER.debug(String.format("clearing tmp resources from folder '%s'", tempDir.getAbsolutePath()));
             Files.deleteDirectoryContents(tempDir);
