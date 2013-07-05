@@ -5,6 +5,7 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 import com.compomics.pride_asa_pipeline.gui.view.ModificationsMergeDialog;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ModificationHolder;
+import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.util.GuiUtils;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -56,11 +57,9 @@ public class ModificationsMergeController extends WindowAdapter {
         this.experimentSelectionController = experimentSelectionController;
     }
 
-    public void showDialog(ModificationHolder modificationHolder, Set<Modification> prideModifications) {        
+    public void showDialog(ModificationHolder modificationHolder, Set<Modification> prideModifications, Set<Modification> conflictingModifications) {        
         addedPrideModifications.clear();
-        
-        //check for equal mass modifications
-        Set<Modification> conflictingModifications = modificationHolder.filterByEqualMasses(prideModifications);
+                
         //add the non conflicting pride modifications to the pipeline modifications
         for(Modification prideModification : prideModifications){
             if(!conflictingModifications.contains(prideModification)){

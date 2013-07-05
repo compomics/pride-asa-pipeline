@@ -221,12 +221,12 @@
             
     <!-- other beans -->
     <bean id="spectrumPeaksCache"
-          class="com.compomics.pride_asa_pipeline.cache.impl.SpectrumPeaksCache">        
+          class="com.compomics.pride_asa_pipeline.cache.impl.SpectrumPeaksCache" >        
     </bean>
     
     <!-- ols soap service client -->
-    <jaxws:client id="olsClient"
-                   serviceClass="uk.ac.ebi.ontology_lookup.ontologyquery.Query"
-                   address="http://www.ebi.ac.uk/ontology-lookup/services/OntologyQuery" />
+    <!--    <jaxws:client id="olsClient"
+    serviceClass="uk.ac.ebi.ontology_lookup.ontologyquery.Query"
+    address="http://www.ebi.ac.uk/ontology-lookup/services/OntologyQuery" />-->
                                       
 </beans>

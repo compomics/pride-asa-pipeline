@@ -237,16 +237,15 @@ public class PrideXmlSpectrumAnnotator {
      * @param experimentPrideXmlFile the experiment pride XML file
      */
     public void annotate(File experimentPrideXmlFile) {
-        //@todo get a name take makes sense
-        String experimentAccession = experimentPrideXmlFile.getName();
-
         if (!modificationsLoaded) {
             //add the non-conflicting modifications found in pride for the given experiment                        
             Set<Modification> prideModifications = initModifications();
-            Set<Modification> conflictingModifications = modificationHolder.filterByEqualMasses(prideModifications);
-            for (Modification prideModification : prideModifications) {
-                if (!conflictingModifications.contains(prideModification)) {
-                    modificationHolder.addModification(prideModification);
+            if (!prideModifications.isEmpty()) {
+                Set<Modification> conflictingModifications = modificationService.filterModifications(modificationHolder, prideModifications);
+                for (Modification prideModification : prideModifications) {
+                    if (!conflictingModifications.contains(prideModification)) {
+                        modificationHolder.addModification(prideModification);
+                    }
                 }
             }
         }
@@ -358,7 +357,7 @@ public class PrideXmlSpectrumAnnotator {
         if (!prideXmlLoaded) {
             experimentService.init(experimentPrideXmlFile);
         }
-
+        
         //load the identifications for the given experiment
         identifications = experimentService.loadExperimentIdentifications(experimentPrideXmlFile);
         //update the considered charge states (if necessary)
@@ -415,8 +414,7 @@ public class PrideXmlSpectrumAnnotator {
             //finally calculate the possible explanations
             possibleExplanations =
                     massDeltaExplainer.explainCompleteIndentifications(identifications.getCompleteIdentifications());
-        }
-        else{
+        } else {
             LOGGER.warn("No modifications were found to explain mass deltas!");
         }
 

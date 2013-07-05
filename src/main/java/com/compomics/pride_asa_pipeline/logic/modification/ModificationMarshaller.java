@@ -5,7 +5,6 @@
 package com.compomics.pride_asa_pipeline.logic.modification;
 
 import com.compomics.pride_asa_pipeline.model.Modification;
-import java.io.File;
 import java.util.Collection;
 import java.util.Set;
 import org.jdom2.JDOMException;

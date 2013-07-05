@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 public class Playground {
 
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(Playground.class);
-    
+
     public static void main(String[] args) {
 //        //load application context
 //        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
@@ -58,10 +58,10 @@ public class Playground {
 //        } catch (Exception e) {
 //            LOGGER.error(e.getMessage(), e);
 //        }
-        
+
 //        BigDecimal mzDelta = new BigDecimal(0.123456789).setScale(4, BigDecimal.ROUND_HALF_UP);
 //        System.out.println("--" +  mzDelta.toPlainString());
-       
+
 //        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
 //        Query olsClient = (Query) applicationContext.getBean("olsClient");        
 //        
@@ -75,6 +75,15 @@ public class Playground {
 //        
 //        String test = olsClient.getTermById("MOD:00408", "MOD"); 
 //        System.out.println(test);
+
+        try {
+            Class.forName("com.compomics.spectrawl.Playground");
+            // it exists on the classpath
+            System.out.println("------------------------ found");
+        } catch (ClassNotFoundException e) {
+            // it does not exist on the classpath
+            System.out.println("------------------------ not found");
+        }
     }
 
     public static File filterExperimentAccessions(File experimentAccessionsFile, File resultsDirectory) {

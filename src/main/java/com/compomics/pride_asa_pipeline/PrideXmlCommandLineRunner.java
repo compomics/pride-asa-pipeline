@@ -5,7 +5,6 @@
 package com.compomics.pride_asa_pipeline;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.service.ResultHandler;
 import java.io.BufferedReader;
