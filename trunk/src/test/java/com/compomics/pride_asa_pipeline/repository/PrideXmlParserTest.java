@@ -4,6 +4,7 @@ import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Peak;
+import com.compomics.pride_asa_pipeline.repository.impl.PrideXmlParserImpl;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,44 +12,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import junit.framework.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author Niels Hulstaert
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
 public class PrideXmlParserTest {
 
-    private static boolean fileLoaded = false;
-    @Autowired
-    private PrideXmlParser prideXmlParser;
-    private Resource prideXmlResource = new ClassPathResource("PRIDE_Experiment_11954.xml");
+    private static PrideXmlParser prideXmlParser;
+    private static Resource prideXmlResource = new ClassPathResource("PRIDE_Experiment_11954.xml");
 
-    @Before
-    public void initParser() throws IOException {
-        if (!fileLoaded) {
-            prideXmlParser.init(prideXmlResource.getFile());
-            fileLoaded = true;
-        }
+    @BeforeClass
+    public static void initParser() throws IOException {
+        prideXmlParser = new PrideXmlParserImpl();
+        prideXmlParser.init(prideXmlResource.getFile());
     }
-    
+
     @Test
     public void testGetIdentifications() {
-        List<Identification> identifications = prideXmlParser.getExperimentIdentifications();                
+        List<Identification> identifications = prideXmlParser.getExperimentIdentifications();
 
         //experiment 11954 contains 517 peptide identifications
         Assert.assertEquals(517, identifications.size());
     }
-    
+
     @Test
     public void testGetNumberOfPeptides() {
         long numberOfPeptides = prideXmlParser.getNumberOfPeptides();
@@ -58,50 +49,50 @@ public class PrideXmlParserTest {
     }
 
     @Test
-    public void testLoadModifications(){
+    public void testLoadModifications() {
         List<Modification> modifications = prideXmlParser.getModifications();
-        
-        Set<String> modificationNames = new HashSet<String>();
+
+        Set<String> modificationNames = new HashSet<>();
         //check if there are 4 unique modifications
-        for(Modification modification : modifications){
+        for (Modification modification : modifications) {
             modificationNames.add(modification.getAccession());
         }
-        
+
         Assert.assertEquals(4, modificationNames.size());
     }
-    
+
     @Test
-    public void testGetAnalyzerSources(){
+    public void testGetAnalyzerSources() {
         Map<String, String> analyzerSources = prideXmlParser.getAnalyzerSources();
         Assert.assertTrue(analyzerSources.isEmpty());
     }
-    
+
     @Test
-    public void testGetAnalyzerData(){
+    public void testGetAnalyzerData() {
         List<AnalyzerData> analyzerData = prideXmlParser.getAnalyzerData();
-        
+
         Assert.assertEquals(1, analyzerData.size());
         Assert.assertEquals(AnalyzerData.ANALYZER_FAMILY.FT, analyzerData.get(0).getAnalyzerFamily());
     }
-    
+
     @Test
-    public void testGetProteinAccessions(){
+    public void testGetProteinAccessions() {
         List<String> proteinAccessions = prideXmlParser.getProteinAccessions();
-        
+
         Assert.assertEquals(43, proteinAccessions.size());
     }
-    
+
     @Test
-    public void testGetSpectrumPeaksBySpectrumId(){
+    public void testGetSpectrumPeaksBySpectrumId() {
         List<Peak> spectrumPeaks = prideXmlParser.getSpectrumPeaksBySpectrumId("1");
-        
+
         Assert.assertEquals(292, spectrumPeaks.size());
     }
-    
+
     @Test
-    public void testGetSpectrumMapBySpectrumId(){
+    public void testGetSpectrumMapBySpectrumId() {
         HashMap<Double, Double> spectrumPeaks = prideXmlParser.getSpectrumPeakMapBySpectrumId("1");
-        
+
         Assert.assertEquals(292, spectrumPeaks.size());
     }
 }

@@ -5,6 +5,7 @@
 package com.compomics.pride_asa_pipeline.service;
 
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.repository.PrideXmlParser;
 import java.util.Set;
 
 /**
@@ -19,4 +20,6 @@ public interface PrideXmlModificationService extends ModificationService {
      * @return the list of modifications
      */
     Set<Modification> loadExperimentModifications();
+
+    void setPrideXmlParser(PrideXmlParser prideXmlParser);
 }

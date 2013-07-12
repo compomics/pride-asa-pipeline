@@ -23,13 +23,17 @@ public class PrideXmlExperimentServiceImpl extends ExperimentServiceImpl impleme
     private static final Logger LOGGER = Logger.getLogger(PrideXmlExperimentServiceImpl.class);
     private PrideXmlParser prideXmlParser;
 
+    public PrideXmlExperimentServiceImpl() {
+        System.out.println("----------------------- new PrideXmlExperimentServiceImpl instance created by thread " + Thread.currentThread().getName());
+    }   
+
     public PrideXmlParser getPrideXmlParser() {
         return prideXmlParser;
     }
 
     public void setPrideXmlParser(PrideXmlParser prideXmlParser) {
         this.prideXmlParser = prideXmlParser;
-    }
+    }        
 
     @Override
     public Map<String, String> findAllExperimentAccessions() {
@@ -111,7 +115,7 @@ public class PrideXmlExperimentServiceImpl extends ExperimentServiceImpl impleme
     }    
 
     @Override
-    public void init(File experimentPrideXmlFile) {
+    public void init(File experimentPrideXmlFile) {        
         prideXmlParser.init(experimentPrideXmlFile);
     }
 

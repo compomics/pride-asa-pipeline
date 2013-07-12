@@ -16,18 +16,23 @@ import java.util.Set;
 public class PrideXmlModificationServiceImpl extends ModificationServiceImpl implements PrideXmlModificationService {
 
     private PrideXmlParser prideXmlParser;
-    
+
+    public PrideXmlModificationServiceImpl() {        
+        System.out.println("----------------------- new PrideXmlModificationServiceImpl instance created by thread " + Thread.currentThread().getName());
+    }   
+
     public PrideXmlParser getPrideXmlParser() {
         return prideXmlParser;
     }
 
+    @Override
     public void setPrideXmlParser(PrideXmlParser prideXmlParser) {
         this.prideXmlParser = prideXmlParser;
-    }
+    }        
            
     @Override
     public Set<Modification> loadExperimentModifications() {
-        Map<String, Modification> modificationMap = new HashMap<String, Modification>();
+        Map<String, Modification> modificationMap = new HashMap<>();
 
         //get modifications from parser
         List<Modification> modificationList = prideXmlParser.getModifications();
@@ -36,7 +41,7 @@ public class PrideXmlModificationServiceImpl extends ModificationServiceImpl imp
         }
 
         //add modifications to set
-        Set<Modification> modifications = new HashSet<Modification>();
+        Set<Modification> modifications = new HashSet<>();
         modifications.addAll(modificationMap.values());
 
         return modifications;

@@ -4,26 +4,20 @@
  */
 package com.compomics.pride_asa_pipeline.cache;
 
+import com.compomics.pride_asa_pipeline.cache.impl.PeptideModificationHolderCache;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.PeptideModificationHolder;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import static junit.framework.Assert.*;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author Niels Hulstaert
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
 public class PeptideModificationHolderCacheTest {
 
-    @Autowired
-    private Cache<String, PeptideModificationHolder> peptideModificationHolderCache;
+    private Cache<String, PeptideModificationHolder> peptideModificationHolderCache = new PeptideModificationHolderCache();
 
     @Test
     public void testCache() throws UnknownAAException {

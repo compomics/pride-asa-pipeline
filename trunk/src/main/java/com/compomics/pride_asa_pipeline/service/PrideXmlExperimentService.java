@@ -6,6 +6,7 @@ package com.compomics.pride_asa_pipeline.service;
 
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identifications;
+import com.compomics.pride_asa_pipeline.repository.PrideXmlParser;
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
 import com.compomics.pridexmltomgfconverter.errors.exceptions.XMLConversionException;
 import java.io.File;
@@ -22,8 +23,10 @@ public interface PrideXmlExperimentService extends ExperimentService {
      *
      * @param experimentPrideXmlFile the experiment pride XML file
      */
-    void init(File experimentPrideXmlFile);
+    void init(File experimentPrideXmlFile);    
 
+    void setPrideXmlParser(PrideXmlParser prideXmlParser);
+    
     /**
      * Clears the tmp resources.
      */

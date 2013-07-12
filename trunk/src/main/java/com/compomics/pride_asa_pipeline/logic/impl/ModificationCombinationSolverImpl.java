@@ -1,6 +1,7 @@
 package com.compomics.pride_asa_pipeline.logic.impl;
 
 import com.compomics.pride_asa_pipeline.cache.Cache;
+import com.compomics.pride_asa_pipeline.cache.impl.PeptideModificationHolderCache;
 import com.compomics.pride_asa_pipeline.logic.ModificationCombinationSolver;
 import com.compomics.pride_asa_pipeline.logic.ZenArcher;
 import com.compomics.pride_asa_pipeline.model.*;
@@ -19,38 +20,17 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
     private ModificationHolder modificationHolder;
     private Cache<String, PeptideModificationHolder> peptideModificationHolderCache;
     private ZenArcher zenArcher;
-    
-    @Override
-    public ModificationHolder getModificationHolder() {
-        return modificationHolder;
-    }
 
-    public Cache getPeptideModificationHolderCache() {
-        return peptideModificationHolderCache;
-    }
-
-    public void setPeptideModificationHolderCache(Cache<String, PeptideModificationHolder> peptideModificationHolderCache) {
-        this.peptideModificationHolderCache = peptideModificationHolderCache;
-    }
-
-    public ZenArcher getZenArcher() {
-        return zenArcher;
-    }
-
-    public void setZenArcher(ZenArcher zenArcher) {
-        this.zenArcher = zenArcher;
-    }
-
-    @Override
-    public void setModificationHolder(ModificationHolder modificationHolder) {
+    public ModificationCombinationSolverImpl(ModificationHolder modificationHolder) {
+        System.out.println("----------------------- new ModificationCombinationSolverImpl instance created by thread " + Thread.currentThread().getName());
         if (modificationHolder == null || modificationHolder.getNumberOfModifications() < 1) {
             //no modifications to choose from!
             LOGGER.error("ERROR: no selection for all possible modifications has been provided!");
             throw new IllegalArgumentException("The provided ModificationSelection does not contain any modifications!");
         }
-        //reset cache
-        peptideModificationHolderCache.clearCache();
         this.modificationHolder = modificationHolder;
+        zenArcher = new ZenArcherImpl();
+        peptideModificationHolderCache = new PeptideModificationHolderCache();
     }
 
     @Override
@@ -211,10 +191,10 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
         PeptideModificationHolder peptideModificationHolder = peptideModificationHolderCache.getFromCache(sequence.toString());
 
         if (peptideModificationHolder == null) {
-            List<Set<Modification>> possibleModifications = new ArrayList<Set<Modification>>();
+            List<Set<Modification>> possibleModifications = new ArrayList<>();
 
             //all terminal modifications possible for the N-terminus of the given sequence
-            Set<Modification> ntMods = new HashSet<Modification>();
+            Set<Modification> ntMods = new HashSet<>();
             Collection<Modification> tmpN = modificationHolder.getNterminalMods(sequence.getAA(0));
             if (tmpN != null) {
                 ntMods.addAll(tmpN);
@@ -225,7 +205,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
             //(note: that these can also be present on the terminal amino acids
             //         independent of any terminal modifications)
             for (AminoAcid aa : sequence.getAASequence()) {
-                Set<Modification> nonTMods = new HashSet<Modification>();
+                Set<Modification> nonTMods = new HashSet<>();
                 Collection<Modification> tmpNN = modificationHolder.getNonTerminalMods(aa);
                 if (tmpNN != null) {
                     nonTMods.addAll(tmpNN);
@@ -234,7 +214,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
             }
 
             //all terminal modifications possible for the C-terminus of the given sequence
-            Set<Modification> ctMods = new HashSet<Modification>();
+            Set<Modification> ctMods = new HashSet<>();
             Collection<Modification> tmpC = modificationHolder.getCterminalMods(sequence.getAA(sequence.length() - 1));
             if (tmpC != null) {
                 ctMods.addAll(tmpC);
@@ -285,7 +265,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
             //as provided by allPossibilities
             for (Modification modification : possibleModifications.get(sequenceIndex)) {
 
-                List<Modification> currentCandidateModifications = new ArrayList<Modification>();
+                List<Modification> currentCandidateModifications = new ArrayList<>();
                 currentCandidateModifications.addAll(candidateModifications);
                 currentCandidateModifications.add(modification);
                 //recurse
@@ -326,7 +306,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
      * @param peptideModificationHolder the peptide modification holder
      */
     private void generateCandidateModificationCombinations(PeptideModificationHolder peptideModificationHolder) {
-        HashSet<ModificationCombination> modificationCombinations = new HashSet<ModificationCombination>();
+        HashSet<ModificationCombination> modificationCombinations = new HashSet<>();
         calculateModificationCombinations(0, peptideModificationHolder.getModifications(), modificationCombinations, new ArrayList<Modification>());
 
         //store the possible modification combinations in the peptide modification holder

@@ -1,12 +1,15 @@
 package com.compomics.pride_asa_pipeline.logic;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.logic.impl.MassDeltaExplainerImpl;
 import com.compomics.pride_asa_pipeline.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.logic.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.model.*;
+import com.compomics.pride_asa_pipeline.repository.PrideXmlParser;
+import com.compomics.pride_asa_pipeline.repository.impl.PrideXmlParserImpl2;
 import com.compomics.pride_asa_pipeline.service.PrideXmlExperimentService;
 import com.compomics.pride_asa_pipeline.service.PrideXmlModificationService;
-import com.compomics.pride_asa_pipeline.service.SpectrumService;
+import com.compomics.pride_asa_pipeline.service.PrideXmlSpectrumService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.io.File;
 import java.util.*;
@@ -49,22 +52,25 @@ public class PrideXmlSpectrumAnnotator {
     /**
      * Boolean that keeps track of the init state of the pride XML file
      */
-    private boolean prideXmlLoaded;
+    private boolean prideXmlLoaded;    
     /**
      * Beans
      */
+    private PrideXmlParser prideXmlParser;
     private PrideXmlExperimentService experimentService;
     private PrideXmlModificationService modificationService;
+    private PrideXmlSpectrumService spectrumService;
     private MassRecalibrator massRecalibrator;
-    private SpectrumService spectrumService;
     private SpectrumMatcher spectrumMatcher;
     private MassDeltaExplainer massDeltaExplainer;
     private PeptideVariationsGenerator peptideVariationsGenerator;
 
+    public PrideXmlSpectrumAnnotator() {
+        System.out.println("----------------------- new PrideXmlSpectrumAnnotator instance created by thread " + Thread.currentThread().getName());        
+    }    
+
     /**
      * Getters and setters.
-     *
-     * @return the mass recalibrator
      */
     public MassRecalibrator getMassRecalibrator() {
         return massRecalibrator;
@@ -98,22 +104,6 @@ public class PrideXmlSpectrumAnnotator {
         this.massDeltaExplainer = massDeltaExplainer;
     }
 
-    public PrideXmlExperimentService getExperimentService() {
-        return experimentService;
-    }
-
-    public void setExperimentService(PrideXmlExperimentService experimentService) {
-        this.experimentService = experimentService;
-    }
-
-    public PrideXmlModificationService getModificationService() {
-        return modificationService;
-    }
-
-    public void setModificationService(PrideXmlModificationService modificationService) {
-        this.modificationService = modificationService;
-    }
-
     public Identifications getIdentifications() {
         return identifications;
     }
@@ -138,14 +128,6 @@ public class PrideXmlSpectrumAnnotator {
         this.peptideVariationsGenerator = peptideVariationsGenerator;
     }
 
-    public SpectrumService getSpectrumService() {
-        return spectrumService;
-    }
-
-    public void setSpectrumService(SpectrumService spectrumService) {
-        this.spectrumService = spectrumService;
-    }
-
     public SpectrumAnnotatorResult getSpectrumAnnotatorResult() {
         return spectrumAnnotatorResult;
     }
@@ -154,9 +136,49 @@ public class PrideXmlSpectrumAnnotator {
         this.spectrumAnnotatorResult = spectrumAnnotatorResult;
     }
 
+    public PrideXmlParser getPrideXmlParser() {
+        return prideXmlParser;
+    }
+
+    public void setPrideXmlParser(PrideXmlParser prideXmlParser) {
+        this.prideXmlParser = prideXmlParser;
+    }
+
+    public PrideXmlSpectrumService getSpectrumService() {
+        return spectrumService;
+    }
+
+    public void setSpectrumService(PrideXmlSpectrumService spectrumService) {
+        this.spectrumService = spectrumService;
+    }
+
+    public PrideXmlExperimentService getExperimentService() {
+        return experimentService;
+    }
+
+    public void setExperimentService(PrideXmlExperimentService experimentService) {
+        this.experimentService = experimentService;
+    }
+
+    public PrideXmlModificationService getModificationService() {
+        return modificationService;
+    }
+
+    public void setModificationService(PrideXmlModificationService modificationService) {
+        this.modificationService = modificationService;
+    }
+
     /**
      * Public methods.
      */
+    public void initBean(){
+        System.out.println("----------------------- init PrideXmlSpectrumAnnotator instance created by thread " + Thread.currentThread().getName());               
+        //set PrideXmlParser instance
+        experimentService.setPrideXmlParser(prideXmlParser);
+        spectrumService.setPrideXmlParser(prideXmlParser);
+        modificationService.setPrideXmlParser(prideXmlParser);
+    }
+    
     /**
      * Inits the pride XML file; build the indexes.
      *
@@ -357,7 +379,7 @@ public class PrideXmlSpectrumAnnotator {
         if (!prideXmlLoaded) {
             experimentService.init(experimentPrideXmlFile);
         }
-        
+
         //load the identifications for the given experiment
         identifications = experimentService.loadExperimentIdentifications(experimentPrideXmlFile);
         //update the considered charge states (if necessary)
@@ -403,17 +425,10 @@ public class PrideXmlSpectrumAnnotator {
 
         //check if the modification holder contains at least one modification
         if (!modificationHolder.getAllModifications().isEmpty()) {
-            //set MassDeltaExplainer ModificationHolder, MassRecalibrationResult and AnalyzerData
-            massDeltaExplainer.getModificationCombinationSolver().setModificationHolder(modificationHolder);
-            if (massRecalibrationResult != null) {
-                massDeltaExplainer.setMassRecalibrationResult(massRecalibrationResult);
-            }
-            if (analyzerData != null) {
-                massDeltaExplainer.setAnalyzerData(analyzerData);
-            }
+            massDeltaExplainer = new MassDeltaExplainerImpl(modificationHolder);
             //finally calculate the possible explanations
             possibleExplanations =
-                    massDeltaExplainer.explainCompleteIndentifications(identifications.getCompleteIdentifications());
+                    massDeltaExplainer.explainCompleteIndentifications(identifications.getCompleteIdentifications(), massRecalibrationResult, analyzerData);
         } else {
             LOGGER.warn("No modifications were found to explain mass deltas!");
         }

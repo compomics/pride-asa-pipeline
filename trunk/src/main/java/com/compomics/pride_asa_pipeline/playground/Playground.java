@@ -76,14 +76,11 @@ public class Playground {
 //        String test = olsClient.getTermById("MOD:00408", "MOD"); 
 //        System.out.println(test);
 
-        try {
-            Class.forName("com.compomics.spectrawl.Playground");
-            // it exists on the classpath
-            System.out.println("------------------------ found");
-        } catch (ClassNotFoundException e) {
-            // it does not exist on the classpath
-            System.out.println("------------------------ not found");
-        }
+        Float f = 3F;
+        Double d = 3D;
+        Number n = d;
+//        double d = (double) n;
+        System.out.println("fff " + n.doubleValue());
     }
 
     public static File filterExperimentAccessions(File experimentAccessionsFile, File resultsDirectory) {

@@ -17,6 +17,10 @@ import java.util.Map;
 public class PeptideModificationHolderCache extends LinkedHashMap<String, PeptideModificationHolder> implements Cache<String, PeptideModificationHolder> {
     
     private static final long serialVersionUID = 1L;   
+
+    public PeptideModificationHolderCache() {
+        System.out.println("----------------------- new PeptideModificationHolderCache instance created by thread " + Thread.currentThread().getName());
+    }        
     
     /**
      * Puts the given PeptideModificationHolder in the cache. If the maximum
