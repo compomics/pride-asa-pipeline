@@ -5,6 +5,7 @@
 package com.compomics.pride_asa_pipeline.logic;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.logic.impl.MassDeltaExplainerImpl;
 import com.compomics.pride_asa_pipeline.model.*;
 import com.compomics.pride_asa_pipeline.service.DbModificationService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
@@ -33,12 +34,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class MassDeltaExplainerTest {
 
     private static final double MASS_ERROR = -2;
-    @Autowired
     private MassDeltaExplainer massDeltaExplainer;
     @Autowired
-    private ModificationCombinationSolver modificationCombinationSolver;
-    @Autowired
     private DbModificationService dbModificationService;
+    private MassRecalibrationResult massRecalibrationResult;
 
     @Before
     public void initialize() throws IOException, JDOMException {
@@ -47,18 +46,16 @@ public class MassDeltaExplainerTest {
         Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
         modificationHolder.addModifications(dbModificationService.loadPipelineModifications(modificationsResource));
 
-        //set the modification combination holder
-        modificationCombinationSolver.setModificationHolder(modificationHolder);
+        massDeltaExplainer = new MassDeltaExplainerImpl(modificationHolder);
 
         //init MassRecalibrationResult
-        MassRecalibrationResult massRecalibrationResult = new MassRecalibrationResult();
-        massRecalibrationResult.addMassError(1, MASS_ERROR, 0.5);
-        massDeltaExplainer.setMassRecalibrationResult(massRecalibrationResult);
+        massRecalibrationResult = new MassRecalibrationResult();
+        massRecalibrationResult.addMassError(1, MASS_ERROR, 0.5);        
     }
 
     @Test
     public void testExplainCompleteIndentifications() throws UnknownAAException, AASequenceMassUnknownException {
-        List<Identification> identifications = new ArrayList<Identification>();
+        List<Identification> identifications = new ArrayList<>();
 
         //add identifications
         //the experimental mass was chosen so some of the identifications mass delta could be explained with modification(s)
@@ -89,7 +86,7 @@ public class MassDeltaExplainerTest {
         Identification identification_6 = new Identification(peptide, "6", 0, 0);
         identifications.add(identification_6);
 
-        Map<Identification, Set<ModificationCombination>> explanations = massDeltaExplainer.explainCompleteIndentifications(identifications);
+        Map<Identification, Set<ModificationCombination>> explanations = massDeltaExplainer.explainCompleteIndentifications(identifications, massRecalibrationResult, null);
 
         //the mass deltas of three identifications can be explained,
         //so the the size of the map should be equal to 5

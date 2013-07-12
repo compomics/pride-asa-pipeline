@@ -15,46 +15,19 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
 
     private static final Logger LOGGER = Logger.getLogger(MassDeltaExplainerImpl.class);
     private ModificationCombinationSolver modificationCombinationSolver;
-    private MassRecalibrationResult massRecalibrationResult;
-    private AnalyzerData analyzerData;
 
-    public MassDeltaExplainerImpl() {
+    public MassDeltaExplainerImpl(ModificationHolder modificationHolder) {
+        System.out.println("----------------------- new MassDeltaExplainerImpl instance created by thread " + Thread.currentThread().getName());
+        modificationCombinationSolver = new ModificationCombinationSolverImpl(modificationHolder);
     }
 
     public double getConvergenceCriterion() {
         return PropertiesConfigurationHolder.getInstance().getDouble("massdeltaexplainer.mass_delta_convergence_criterion");
     }
-
+    
     @Override
-    public ModificationCombinationSolver getModificationCombinationSolver() {
-        return modificationCombinationSolver;
-    }
-
-    public void setModificationCombinationSolver(ModificationCombinationSolver modificationCombinationSolver) {
-        this.modificationCombinationSolver = modificationCombinationSolver;
-    }
-
-    public MassRecalibrationResult getMassRecalibrationResult() {
-        return massRecalibrationResult;
-    }
-
-    @Override
-    public void setMassRecalibrationResult(MassRecalibrationResult massRecalibrationResult) {
-        this.massRecalibrationResult = massRecalibrationResult;
-    }
-
-    public AnalyzerData getAnalyzerData() {
-        return analyzerData;
-    }
-
-    @Override
-    public void setAnalyzerData(AnalyzerData analyzerData) {
-        this.analyzerData = analyzerData;
-    }
-
-    @Override
-    public Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> identifications) {
-        Map<Identification, Set<ModificationCombination>> possibleExplainedIdentifications = new HashMap<Identification, Set<ModificationCombination>>();
+    public Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> identifications, MassRecalibrationResult massRecalibrationResult, AnalyzerData analyzerData) {
+        Map<Identification, Set<ModificationCombination>> possibleExplainedIdentifications = new HashMap<>();
 
         //keep track of ratios determining the loop condition
         //initialized negative to the ratio difference will be positive!

@@ -22,36 +22,35 @@
     
     <!-- pipeline beans -->
     <bean id="commandLineRunner"
-          class="com.compomics.pride_asa_pipeline.CommandLineRunner">
+          class="com.compomics.pride_asa_pipeline.CommandLineRunner" lazy-init="true">
         <property name="prideSpectrumAnnotator" ref="prideSpectrumAnnotator"/>        
         <property name="dbResultHandler" ref="dbResultHandler"/>        
     </bean>
     
     <bean id="prideXmlCommandLineRunner"
-          class="com.compomics.pride_asa_pipeline.PrideXmlCommandLineRunner">        
+          class="com.compomics.pride_asa_pipeline.PrideXmlCommandLineRunner" lazy-init="true">        
         <property name="prideXmlSpectrumAnnotator" ref="prideXmlSpectrumAnnotator"/>        
         <property name="prideXmlResultHandler" ref="prideXmlResultHandler"/>
     </bean>
             
     <bean id="prideSpectrumAnnotator"
-          class="com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator">        
+          class="com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator" lazy-init="true">        
         <property name="experimentService" ref="dbExperimentService"/>
         <property name="spectrumService" ref="dbSpectrumService"/>
         <property name="modificationService" ref="dbModificationService"/>
         <property name="massRecalibrator" ref="massRecalibrator"/>
         <property name="spectrumMatcher" ref="spectrumMatcher"/>
-        <property name="massDeltaExplainer" ref="massDeltaExplainer"/>
         <property name="peptideVariationsGenerator" ref="peptideVariationsGenerator"/>
     </bean>
     
     <bean id="prideXmlSpectrumAnnotator"
-          class="com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator">        
+          class="com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator" scope="prototype" init-method="initBean" lazy-init="true">        
+        <property name="prideXmlParser" ref="prideXmlParser"/>
         <property name="experimentService" ref="prideXmlExperimentService"/>
         <property name="spectrumService" ref="prideXmlSpectrumService"/>
-        <property name="modificationService" ref="prideXmlModificationService"/>
+        <property name="modificationService" ref="prideXmlModificationService"/>    
         <property name="massRecalibrator" ref="massRecalibrator"/>
         <property name="spectrumMatcher" ref="spectrumMatcher"/>
-        <property name="massDeltaExplainer" ref="massDeltaExplainer"/>
         <property name="peptideVariationsGenerator" ref="peptideVariationsGenerator"/>
     </bean>
     
@@ -74,10 +73,9 @@
     </bean>
     
     <bean id="prideXmlExperimentService"
-          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlExperimentServiceImpl">
+          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlExperimentServiceImpl" scope="prototype">
         <property name="experimentRepository" ref="experimentRepository"/>
         <property name="resultHandler" ref="prideXmlResultHandler"/>
-        <property name="prideXmlParser" ref="prideXmlParser"/>
     </bean>  
     
     <bean id="dbSpectrumService"
@@ -87,8 +85,7 @@
     </bean>
     
     <bean id="prideXmlSpectrumService"
-          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlSpectrumServiceImpl">
-        <property name="prideXmlParser" ref="prideXmlParser"/>
+          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlSpectrumServiceImpl" scope="prototype">
     </bean>        
     
     <bean id="dbModificationService"
@@ -99,9 +96,8 @@
     </bean> 
     
     <bean id="prideXmlModificationService"
-          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlModificationServiceImpl">
+          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlModificationServiceImpl" scope="prototype">
         <property name="modificationMarshaller" ref="modificationMarshaller"/>
-        <property name="prideXmlParser" ref="prideXmlParser"/>
         <property name="omssaModificationMarshaller" ref="omssaModificationMarshaller"/>
     </bean> 
     
@@ -112,7 +108,7 @@
     </bean>  
     
     <bean id="prideXmlResultHandler"
-          class="com.compomics.pride_asa_pipeline.service.impl.ResultHandlerImpl">
+          class="com.compomics.pride_asa_pipeline.service.impl.ResultHandlerImpl" lazy-init="true">
         <property name="fileResultHandler" ref="fileResultHandler"/>
         <property name="modificationService" ref="prideXmlModificationService"/>
     </bean>                                       
@@ -133,14 +129,14 @@
         <property name="dataSource" ref="prideDataSource"/>
     </bean>
     
+    <bean id="prideXmlParser"
+          class="com.compomics.pride_asa_pipeline.repository.impl.PrideXmlParserImpl2" scope="prototype">
+    </bean>        
+    
     <bean id="fileResultHandler"
           class="com.compomics.pride_asa_pipeline.repository.impl.FileResultHandlerImpl">  
         <property name="modificationService" ref="dbModificationService"/>      
-    </bean>
-    
-    <bean id="prideXmlParser"
-          class="com.compomics.pride_asa_pipeline.repository.impl.PrideXmlParserImpl">
-    </bean>  
+    </bean>    
     
     <!-- encode/decode beans -->
     <bean id="base64DecoderMapper"
@@ -152,33 +148,14 @@
           class="com.compomics.pride_asa_pipeline.logic.spectrum.decode.impl.Base64DataDecoderImpl">        
     </bean>
                                
-    <!-- modification beans -->
-    <bean id="massDeltaExplainer"
-          class="com.compomics.pride_asa_pipeline.logic.impl.MassDeltaExplainerImpl">        
-        <property name="modificationCombinationSolver" ref="modificationCombinationSolver"/>
-    </bean>
-    
-    <bean id="modificationCombinationSolver"
-          class="com.compomics.pride_asa_pipeline.logic.impl.ModificationCombinationSolverImpl">
-        <property name="peptideModificationHolderCache" ref="peptideModificationHolderCache"/>     
-        <property name="zenArcher" ref="zenArcher"/>     
-    </bean>
-    
+    <!-- modification beans -->    
     <bean id="modificationMarshaller"
           class="com.compomics.pride_asa_pipeline.logic.modification.impl.ModificationMarshallerImpl">        
     </bean>
     
     <bean id="peptideVariationsGenerator"
           class="com.compomics.pride_asa_pipeline.logic.impl.PeptideVariationsGeneratorImpl">        
-    </bean>
-    
-    <bean id="peptideModificationHolderCache"
-          class="com.compomics.pride_asa_pipeline.cache.impl.PeptideModificationHolderCache">        
-    </bean>
-            
-    <bean id="zenArcher"
-          class="com.compomics.pride_asa_pipeline.logic.impl.ZenArcherImpl">        
-    </bean>
+    </bean>        
     
     <bean id="omssaModificationMarshaller"
           class="com.compomics.pride_asa_pipeline.logic.modification.impl.OmssaModificationMarshallerImpl">        
@@ -210,7 +187,7 @@
         <property name="massWindowFinder" ref="massWindowFinder"/>
     </bean>
     
-<!--    <bean id="massRecalibrator"
+    <!--    <bean id="massRecalibrator"
           class="com.compomics.pride_asa_pipeline.logic.recalibration.impl.StubMassRecalibrator">
         <property name="massWindowFinder" ref="massWindowFinder"/>
     </bean>-->

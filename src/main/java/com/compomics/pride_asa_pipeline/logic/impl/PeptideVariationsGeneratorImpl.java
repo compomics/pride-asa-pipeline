@@ -18,7 +18,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
 
     @Override
     public Set<ModifiedPeptide> generateVariations(Peptide precursor, Set<ModificationCombination> modifications) {       
-        Set<ModifiedPeptide> result = new HashSet<ModifiedPeptide>();
+        Set<ModifiedPeptide> result = new HashSet<>();
         if (modifications != null) {
             //for each ModificationCombination generate all possible modified peptide variations
             //there may be more than one for each ModificationCombination, since the position of
@@ -34,7 +34,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
     private Set<ModifiedPeptide> generateVariation(Peptide precursor, ModificationCombination modificationCombination) {
         //we calculate the possible distribution combinations for each modification type and
         //store them in a set
-        Set<Set<ModifiedPeptide>> modifiedPeptidesByModifications = new HashSet<Set<ModifiedPeptide>>();
+        Set<Set<ModifiedPeptide>> modifiedPeptidesByModifications = new HashSet<>();
         //we only need to calculate the combinations for each unique modification type
         //(we don't want to do the same work multiple times) so we iterate over the unique set
         for (Modification modification : modificationCombination.getUniqueModifications()) {
@@ -90,7 +90,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         //keep track of the C-terminal modification
         ModificationFacade cTermModification = null;
 
-        Set<ModifiedPeptide> combinedModifiedPeptides = new HashSet<ModifiedPeptide>();
+        Set<ModifiedPeptide> combinedModifiedPeptides = new HashSet<>();
         //loop over first set
         for (ModifiedPeptide modPeptideByModOne : modPeptidesByModOne) {
             int numAA = modPeptideByModOne.length();
@@ -187,7 +187,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         if (precursor == null || modification == null) {
             throw new IllegalStateException("Need precursor peptide and modification to generate peptide variations.");
         }
-        Set<ModifiedPeptide> result = new HashSet<ModifiedPeptide>();
+        Set<ModifiedPeptide> result = new HashSet<>();
         //check if we have terminal modifications (they are easy, as they are either present or not)
         if (modification.getLocation() == Modification.Location.N_TERMINAL) {
             ModifiedPeptide modifiedPeptide = new ModifiedPeptide(precursor);
@@ -227,7 +227,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                 //-------------
                 //k! * (n - k)!
                 //the ChoiceIterable will iterate over the possibilities of above formular
-                ChoiceIterable<Integer> choice = new ChoiceIterable<Integer>(occurances, positionIndexes);
+                ChoiceIterable<Integer> choice = new ChoiceIterable<>(occurances, positionIndexes);
                 for (Integer[] indexArray : choice) {
                     //one possible combination of the modifications
                     //create a new precursor variation with modificatios on all those locations

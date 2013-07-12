@@ -15,6 +15,10 @@ public class ZenArcherImpl implements ZenArcher {
     private double minimalSum;
     private double maximalSum;
 
+    public ZenArcherImpl() {
+        System.out.println("----------------------- new ZenArcherImpl instance created by thread " + Thread.currentThread().getName());
+    }    
+    
     //Wonders of Numbers (Oxford: Oxford University Press, 2001), pp. 275-276
     @Override
     public Set<List<Double>> computeCombinations(double[] values, int sizeCombination) {

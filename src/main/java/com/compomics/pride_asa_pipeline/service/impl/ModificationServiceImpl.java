@@ -28,8 +28,8 @@ public abstract class ModificationServiceImpl implements ModificationService {
     private static final Logger LOGGER = Logger.getLogger(ModificationServiceImpl.class);
     protected ModificationMarshaller modificationMarshaller;
     protected OmssaModificationMarshaller omssaModificationMarshaller;
-    protected Set<Modification> pipelineModifications;
-
+    protected Set<Modification> pipelineModifications;        
+    
     public ModificationMarshaller getModificationMarshaller() {
         return modificationMarshaller;
     }

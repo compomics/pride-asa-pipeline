@@ -13,12 +13,19 @@ import com.compomics.pride_asa_pipeline.repository.PrideXmlParser;
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
 import com.compomics.pridexmltomgfconverter.errors.exceptions.XMLConversionException;
 import com.compomics.pridexmltomgfconverter.tools.PrideXMLToMGFConverter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.jaxb.model.AnalyzerList;
 import uk.ac.ebi.pride.jaxb.model.CvParam;
@@ -31,12 +38,13 @@ import uk.ac.ebi.pride.jaxb.model.Spectrum;
 import uk.ac.ebi.pride.jaxb.xml.PrideXmlReader;
 
 /**
+ * Thread-safe implementation
  *
  * @author Niels Hulstaert
  */
-public class PrideXmlParserImpl implements PrideXmlParser {
+public class PrideXmlParserImpl2 implements PrideXmlParser {
 
-    private static final Logger LOGGER = Logger.getLogger(PrideXmlParserImpl.class);
+    private static final Logger LOGGER = Logger.getLogger(PrideXmlParserImpl2.class);
     private static final String IONIZER_TYPE = "PSI:1000008";
     private static final String MALDI_SOURCE_ACCESSION = "PSI:1000075";
     /**
@@ -48,8 +56,8 @@ public class PrideXmlParserImpl implements PrideXmlParser {
      */
     private List<Modification> modifications = new ArrayList<>();
 
-    public PrideXmlParserImpl() {
-        System.out.println("----------------------- new PrideXmlParserImpl instance created by thread " + Thread.currentThread().getName());
+    public PrideXmlParserImpl2() {
+        System.out.println("----------------------- new PrideXmlParserImpl2 instance created by thread " + Thread.currentThread().getName());
     }
 
     /**
@@ -59,21 +67,34 @@ public class PrideXmlParserImpl implements PrideXmlParser {
      */
     @Override
     public void init(File prideXmlFile) {
-        PrideXMLToMGFConverter.getInstance().init(prideXmlFile);
-        prideXmlReader = PrideXMLToMGFConverter.getInstance().getPrideXmlReader();
+        //check if the file is gzipped
+        if (prideXmlFile.getAbsolutePath().endsWith(".gz")) {
+            File unzippedFile = null;
+            try {
+                unzippedFile = unzip(prideXmlFile);
+            } catch (FileNotFoundException ex) {
+                LOGGER.error(ex);
+            } catch (IOException ex) {
+                LOGGER.error(ex);
+            }
+            prideXmlReader = new PrideXmlReader(unzippedFile);
+        } else {
+            prideXmlReader = new PrideXmlReader(prideXmlFile);
+        }
+
+        //clear modifications
         modifications.clear();
     }
 
     @Override
     public void clear() {
-        PrideXMLToMGFConverter.getInstance().clearTempFiles();
         prideXmlReader = null;
         modifications.clear();
     }
 
     @Override
     public List<Identification> getExperimentIdentifications() {
-        List<Identification> identifications = new ArrayList<Identification>();
+        List<Identification> identifications = new ArrayList<>();
 
         //Iterate over each protein identification
         for (String proteinIdentificationId : prideXmlReader.getIdentIds()) {
@@ -161,14 +182,14 @@ public class PrideXmlParserImpl implements PrideXmlParser {
 
     @Override
     public List<Peak> getSpectrumPeaksBySpectrumId(String spectrumId) {
-        List<Peak> peaks = new ArrayList<Peak>();
+        List<Peak> peaks = new ArrayList<>();
 
         Spectrum spectrum = prideXmlReader.getSpectrumById(spectrumId);
         Number[] mzRatios = spectrum.getMzNumberArray();
         Number[] intensities = spectrum.getIntentArray();
 
-        for (int i = 0; i < mzRatios.length; i++) {
-            Peak peak = new Peak((Double) mzRatios[i], (Double) intensities[i]);
+        for (int i = 0; i < mzRatios.length; i++) {            
+            Peak peak = new Peak(mzRatios[i].doubleValue(), intensities[i].doubleValue());
             peaks.add(peak);
         }
 
@@ -177,7 +198,7 @@ public class PrideXmlParserImpl implements PrideXmlParser {
 
     @Override
     public HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(String spectrumId) {
-        HashMap<Double, Double> peaks = new HashMap<Double, Double>();
+        HashMap<Double, Double> peaks = new HashMap<>();
 
         Spectrum spectrum = prideXmlReader.getSpectrumById(spectrumId);
         Number[] mzRatios = spectrum.getMzNumberArray();
@@ -192,7 +213,7 @@ public class PrideXmlParserImpl implements PrideXmlParser {
 
     @Override
     public Map<String, String> getAnalyzerSources() {
-        Map<String, String> analyzerSources = new HashMap<String, String>();
+        Map<String, String> analyzerSources = new HashMap<>();
 
         //get instrument
         Instrument instrument = prideXmlReader.getDescription().getInstrument();
@@ -212,7 +233,7 @@ public class PrideXmlParserImpl implements PrideXmlParser {
 
     @Override
     public List<AnalyzerData> getAnalyzerData() {
-        List<AnalyzerData> analyzerDataList = new ArrayList<AnalyzerData>();
+        List<AnalyzerData> analyzerDataList = new ArrayList<>();
 
         //get instrument
         Instrument instrument = prideXmlReader.getDescription().getInstrument();
@@ -237,7 +258,7 @@ public class PrideXmlParserImpl implements PrideXmlParser {
 
     @Override
     public List<String> getProteinAccessions() {
-        List<String> proteinAccessions = new ArrayList<String>();
+        List<String> proteinAccessions = new ArrayList<>();
 
         //Iterate over each protein identification
         for (String proteinIdentificationId : prideXmlReader.getIdentIds()) {
@@ -280,15 +301,43 @@ public class PrideXmlParserImpl implements PrideXmlParser {
             return null;
         }
 
+
         double monoIsotopicMassShift = (modificationItem.getModMonoDelta().isEmpty()) ? 0.0 : Double.parseDouble(modificationItem.getModMonoDelta().get(0));
         //if average mass shift is empty, use the monoisotopic mass.
         double averageMassShift = (modificationItem.getModAvgDelta().isEmpty()) ? monoIsotopicMassShift : Double.parseDouble(modificationItem.getModAvgDelta().get(0));
         String accessionValue = (modificationItem.getAdditional().getCvParamByAcc(modificationItem.getModAccession()) == null) ? modificationItem.getModAccession() : modificationItem.getAdditional().getCvParamByAcc(modificationItem.getModAccession()).getName();
 
         Modification modification = new Modification(accessionValue, monoIsotopicMassShift, averageMassShift, location, EnumSet.noneOf(AminoAcid.class), modificationItem.getModAccession(), accessionValue);
+
         modification.getAffectedAminoAcids().add(AminoAcid.getAA(peptideSequence.substring(sequenceIndex, sequenceIndex + 1)));
+
         modification.setOrigin(Modification.Origin.PRIDE);
 
         return modification;
+    }
+
+    /**
+     * Unzip the gzipped PRIDE XML into the directory of the zipped file.
+     *
+     * @param gzippedFile
+     * @return the unzipped file
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    private File unzip(File gzippedFile) throws FileNotFoundException, IOException {
+        LOGGER.info("Starting to unzip file " + gzippedFile);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        //this method uses a buffer internally
+        IOUtils.copy(new GZIPInputStream(new FileInputStream(gzippedFile)), byteArrayOutputStream);
+
+        String filePath = gzippedFile.getAbsolutePath().substring(0, gzippedFile.getAbsolutePath().indexOf(".gz"));
+        File unzippedFile = new File(filePath);
+
+        FileUtils.writeByteArrayToFile(unzippedFile, byteArrayOutputStream.toByteArray());
+
+        LOGGER.info("Finished unzipping file " + gzippedFile);
+
+        return unzippedFile;
     }
 }

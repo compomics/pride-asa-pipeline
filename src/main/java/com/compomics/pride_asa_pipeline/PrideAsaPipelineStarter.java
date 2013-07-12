@@ -96,18 +96,21 @@ public class PrideAsaPipelineStarter {
     }
 
     public static void launchCommandLineMode(String experimentAccession) {
+        ApplicationContextProvider.getInstance().setDefaultApplicationContext();
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
         CommandLineRunner commandLineRunner = (CommandLineRunner) applicationContext.getBean("commandLineRunner");
         commandLineRunner.runPipeline(experimentAccession);
     }
 
     public static void launchCommandLineMode(File experimentAccessionsFile) {
+        ApplicationContextProvider.getInstance().setDefaultApplicationContext();
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
         CommandLineRunner commandLineRunner = (CommandLineRunner) applicationContext.getBean("commandLineRunner");
         commandLineRunner.runPipeline(experimentAccessionsFile);
     }
 
     public static void launchPrideXmlCommandLineMode(File prideXmlFile, boolean singlePrideXml) {
+        ApplicationContextProvider.getInstance().setDefaultApplicationContext();
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
         PrideXmlCommandLineRunner prideXmlCommandLineRunner = (PrideXmlCommandLineRunner) applicationContext.getBean("prideXmlCommandLineRunner");
         prideXmlCommandLineRunner.runPrideXmlPipeline(prideXmlFile, singlePrideXml);
@@ -287,4 +290,5 @@ public class PrideAsaPipelineStarter {
                 displayUsage);
         writer.flush();
     }
+
 }

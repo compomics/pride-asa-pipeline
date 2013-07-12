@@ -33,20 +33,5 @@ public interface ModificationCombinationSolver {
      * massToExplain.
      */
     Set<ModificationCombination> findModificationCombinations(Peptide peptide, int bagSize, double massToExplain, double deviation);
-    
-    /**
-     * Gets the modification holder
-     * 
-     * @return the modification holder
-     */
-    ModificationHolder getModificationHolder();
-      
-        
-    /**
-     * Sets the modification holder.
-     * 
-     * @param modificationHolder the modification holder
-     */
-    void setModificationHolder(ModificationHolder modificationHolder);
             
 }

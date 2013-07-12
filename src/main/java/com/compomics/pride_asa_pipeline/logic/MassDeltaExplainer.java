@@ -17,34 +17,16 @@ import java.util.Set;
  * @author Niels Hulstaert
  */
 public interface MassDeltaExplainer {
-    
+
     /**
-     * Explains the given list of complete identifications with the 
-     * 
+     * Explains the given list of complete identifications. Returns a map (key:
+     * identification, value: the set of modification combinations that can
+     * explain the mass delta)
+     *
      * @param completeIdentifications the complete identifications
-     * @return the 
-     */
-    Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> completeIdentifications);
-    
-    /**
-     * Sets the mass recalibration result
-     * 
      * @param massRecalibrationResult the mass recalibration result
+     * @param analyzerData the analyzer data
+     * @return
      */
-    void setMassRecalibrationResult(MassRecalibrationResult massRecalibrationResult);
-    
-    /**
-     * Gets the ModificationResolver.
-     * 
-     * @return the ModificationResolver.
-     */
-    ModificationCombinationSolver getModificationCombinationSolver();
-    
-    /**
-     * Sets the analyzer data 
-     * 
-     * @param analyzerData the analyzer data 
-     */
-    void setAnalyzerData(AnalyzerData analyzerData);
-    
+    Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> completeIdentifications, MassRecalibrationResult massRecalibrationResult, AnalyzerData analyzerData);    
 }

@@ -1,6 +1,7 @@
 package com.compomics.pride_asa_pipeline.logic;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.logic.impl.MassDeltaExplainerImpl;
 import com.compomics.pride_asa_pipeline.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.logic.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.model.*;
@@ -192,7 +193,7 @@ public class PrideSpectrumAnnotator {
      * @return the modifications found in pride
      */
     public Set<Modification> initModifications() {
-        Set<Modification> prideModifications = new HashSet<Modification>();
+        Set<Modification> prideModifications = new HashSet<>();
 
         //For the solver we need a ModificationHolder (contains all considered modifications)
         modificationHolder = new ModificationHolder();
@@ -264,8 +265,8 @@ public class PrideSpectrumAnnotator {
 
         //create new map with only the precursors that carry a significant mass delta
         //and were we have possible modification combinations
-        List<Identification> unmodifiedPrecursors = new ArrayList<Identification>();
-        Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap = new HashMap<Identification, Set<ModificationCombination>>();
+        List<Identification> unmodifiedPrecursors = new ArrayList<>();
+        Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap = new HashMap<>();
         for (Identification identification : massDeltaExplanationsMap.keySet()) {
             if (massDeltaExplanationsMap.get(identification) != null) {
                 significantMassDeltaExplanationsMap.put(identification, massDeltaExplanationsMap.get(identification));
@@ -384,21 +385,14 @@ public class PrideSpectrumAnnotator {
      * value the set of modification combinations)
      */
     private Map<Identification, Set<ModificationCombination>> findModificationCombinations(MassRecalibrationResult massRecalibrationResult, Identifications identifications) {
-        Map<Identification, Set<ModificationCombination>> possibleExplanations = new HashMap<Identification, Set<ModificationCombination>>();
+        Map<Identification, Set<ModificationCombination>> possibleExplanations = new HashMap<>();
 
         //check if the modification holder contains at least one modification
         if (!modificationHolder.getAllModifications().isEmpty()) {
-            //set MassDeltaExplainer ModificationHolder, MassRecalibrationResult and AnalyzerData
-            massDeltaExplainer.getModificationCombinationSolver().setModificationHolder(modificationHolder);
-            if (massRecalibrationResult != null) {
-                massDeltaExplainer.setMassRecalibrationResult(massRecalibrationResult);
-            }
-            if (analyzerData != null) {
-                massDeltaExplainer.setAnalyzerData(analyzerData);
-            }
+            massDeltaExplainer = new MassDeltaExplainerImpl(modificationHolder);
             //finally calculate the possible explanations
             possibleExplanations =
-                    massDeltaExplainer.explainCompleteIndentifications(identifications.getCompleteIdentifications());
+                    massDeltaExplainer.explainCompleteIndentifications(identifications.getCompleteIdentifications(), massRecalibrationResult, analyzerData);
         }
 
         return possibleExplanations;
@@ -418,7 +412,7 @@ public class PrideSpectrumAnnotator {
         //and all possible modifications) we therefore first create all possible
         //'modified precursors' or 'precursor variations' (e.g. the same peptide sequence,
         //but with different modifications on different locations).
-        Map<Identification, Set<ModifiedPeptide>> precursorVariations = new HashMap<Identification, Set<ModifiedPeptide>>();
+        Map<Identification, Set<ModifiedPeptide>> precursorVariations = new HashMap<>();
         for (Identification identificationSet : possibleExplanations.keySet()) {
             Set<ModificationCombination> modifications = possibleExplanations.get(identificationSet);
             Set<ModifiedPeptide> precursorVariationsSet = peptideVariationsGenerator.generateVariations(identificationSet.getPeptide(), modifications);

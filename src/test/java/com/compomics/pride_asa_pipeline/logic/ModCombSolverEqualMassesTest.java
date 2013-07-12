@@ -4,6 +4,8 @@
  */
 package com.compomics.pride_asa_pipeline.logic;
 
+import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.logic.impl.ModificationCombinationSolverImpl;
 import com.compomics.pride_asa_pipeline.model.*;
 import com.compomics.pride_asa_pipeline.service.DbModificationService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
@@ -27,23 +29,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration("classpath:springXMLConfig.xml")
 public class ModCombSolverEqualMassesTest {
 
-    @Autowired
     private ModificationCombinationSolver modificationCombinationSolver;
     @Autowired
     private DbModificationService dbModificationService;
 
     @Before
     public void initialize() throws IOException, JDOMException {
+        ResourceUtils.getResourceByRelativePath("modifications_equal_mass.xml");
         //Use @Before instead of @BeforeClass because @Autowired doesn't work with static,
         //so check if the modification holder is already set.
-        if (modificationCombinationSolver.getModificationHolder() == null) {
+        if (modificationCombinationSolver == null) {
             //add the pipeline modifications
             ModificationHolder modificationHolder = new ModificationHolder();
             Resource modificationsResource = ResourceUtils.getResourceByRelativePath("modifications_equal_mass.xml");
             modificationHolder.addModifications(dbModificationService.loadPipelineModifications(modificationsResource));
 
-            //set the modification combination holder
-            modificationCombinationSolver.setModificationHolder(modificationHolder);
+            modificationCombinationSolver = new ModificationCombinationSolverImpl(modificationHolder);
         }
     }
 
