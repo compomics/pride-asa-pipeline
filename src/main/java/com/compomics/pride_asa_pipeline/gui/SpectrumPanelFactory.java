@@ -45,21 +45,21 @@ public class SpectrumPanelFactory {
      * Constructs a SpectrumPanel for the given Identification
      *
      * @param identification the identification
-     * @param prideXML is the source a pride XML file or the pride public db
+     * @param isPrideXml is the source a pride XML file or the pride public db
      * instance
      * @return the SpectrumPanel
      */
-    public SpectrumPanel getSpectrumPanel(Identification identification, boolean prideXML) {
+    public SpectrumPanel getSpectrumPanel(Identification identification, boolean isPrideXml) {
 
         //get spectrum peaks for the selected identification
-        List<Peak> peaks = null;
-        if (prideXML) {
+        List<Peak> peaks;
+        if (isPrideXml) {
             peaks = prideXmlSpectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
         } else {
             try {
                 peaks = dbSpectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
             } catch (EmptyResultDataAccessException ex) {
-                peaks = new ArrayList<Peak>();
+                peaks = new ArrayList<>();
             }
         }
 

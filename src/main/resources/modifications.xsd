@@ -16,6 +16,7 @@
                 <xs:element name="monoIsotopicMassShift" type="xs:string"/>
                 <xs:element name="averageMassShift" type="xs:string"/>
                 <xs:element ref="origin" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="type" minOccurs="0" maxOccurs="1"/>
                 <xs:element ref="location"/>                
                 <xs:element name="affectedAminoAcids">
                     <xs:complexType>
@@ -34,6 +35,14 @@
             <xs:restriction base="xs:string">
                 <xs:enumeration value="pipeline"/>
                 <xs:enumeration value="pride"/>
+            </xs:restriction>    
+        </xs:simpleType>    
+    </xs:element> 
+    <xs:element name="type">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:enumeration value="MS1"/>
+                <xs:enumeration value="MS2"/>
             </xs:restriction>    
         </xs:simpleType>    
     </xs:element> 

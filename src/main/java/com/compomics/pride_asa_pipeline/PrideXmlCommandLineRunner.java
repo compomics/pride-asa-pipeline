@@ -46,21 +46,20 @@ public class PrideXmlCommandLineRunner {
      * Runs the pride XML file in command line mode.
      *
      * @param prideXmlFile the pride XML file
-     * @param singlePrideXml is the file a single PRIDE XML or is does it contain PRIDE XML file paths
+     * @param singlePrideXml is the file a single PRIDE XML or is does it
+     * contain PRIDE XML file paths
      */
     public void runPrideXmlPipeline(File prideXmlFile, boolean singlePrideXml) {
         try {
-            if(singlePrideXml){
+            if (singlePrideXml) {
                 runPrideXmlPipeline(prideXmlFile);
-            }
-            else{
+            } else {
                 Set<String> prideXmlPaths = readPrideXmlPaths(prideXmlFile);
-                for(String prideXmlFilePath : prideXmlPaths){
+                for (String prideXmlFilePath : prideXmlPaths) {
                     File prideXml = new File(prideXmlFilePath);
-                    if(prideXml.exists()){
+                    if (prideXml.exists()) {
                         runPrideXmlPipeline(prideXml);
-                    }                  
-                    else{
+                    } else {
                         LOGGER.error("The given PRIDE XML file " + prideXml + " could not be found. This file will be skipped.");
                     }
                 }
@@ -69,7 +68,7 @@ public class PrideXmlCommandLineRunner {
             LOGGER.error(e.getMessage(), e);
         }
     }
-    
+
     /**
      * Runs the pride XML file in command line mode.
      *
@@ -93,7 +92,7 @@ public class PrideXmlCommandLineRunner {
                     prideXmlSpectrumAnnotator.clearTmpResources();
                 } else {
                     //continue with the annotiation
-                    prideXmlSpectrumAnnotator.annotate(prideXmlFile);
+                    prideXmlSpectrumAnnotator.annotate();
                     //write result to file
                     prideXmlResultHandler.writeResultToFile(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult());
                     prideXmlResultHandler.writeUsedModificationsToFile(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult());
@@ -103,25 +102,22 @@ public class PrideXmlCommandLineRunner {
             LOGGER.error(e.getMessage(), e);
         }
     }
-    
+
     private Set<String> readPrideXmlPaths(File experimentAccessionsFile) {
-        Set<String> prideXmlPaths = new HashSet<String>();
+        Set<String> prideXmlPaths = new HashSet<>();
 
         //read the experiment accession from the file
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(experimentAccessionsFile));
-            
-            String line = null;
+        try (BufferedReader br = new BufferedReader(new FileReader(experimentAccessionsFile))) {
+            String line;
             while ((line = br.readLine()) != null) {
                 prideXmlPaths.add(line);
             }
-            br.close();
         } catch (FileNotFoundException e) {
             LOGGER.error(e.getMessage(), e);
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
-        
+
         return prideXmlPaths;
     }
 }

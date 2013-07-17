@@ -55,12 +55,12 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
     }
 
     @Override
-    public AnnotationData matchPrecursor(Peptide unmodifiedPeptide, List<Peak> peaks) {
+    public AnnotationData matchPrecursor(Peptide unmodifiedPeptide, List<Peak> peaks, double fragmentMassError) {
         //filter spectrum
         PeakFilterResult peakFilterResult = filterPeaks(peaks, unmodifiedPeptide.calculateExperimentalMass());
 
         //match the peptide
-        AnnotationData annotationData = matchPeptide(unmodifiedPeptide, peakFilterResult.getFilteredPeaks());
+        AnnotationData annotationData = matchPeptide(unmodifiedPeptide, peakFilterResult.getFilteredPeaks(), fragmentMassError);
         //set noise threshold
         annotationData.setNoiseThreshold(peakFilterResult.getNoiseThreshold());
 
@@ -68,7 +68,7 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
     }
 
     @Override
-    public ModifiedPeptidesMatchResult findBestModifiedPeptideMatch(Peptide peptide, Set<ModifiedPeptide> modifiedPeptides, List<Peak> peaks) {
+    public ModifiedPeptidesMatchResult findBestModifiedPeptideMatch(Peptide peptide, Set<ModifiedPeptide> modifiedPeptides, List<Peak> peaks, double fragmentMassError) {
         ModifiedPeptidesMatchResult modifiedPeptidesMatchResult = null;
 
         //filter spectrum
@@ -84,7 +84,7 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
                 LOGGER.info("null as modified peptide in variations collection for precursor!");
             }
             //score the modified peptide against the spectrum peaks
-            annotationData = this.matchPeptide(modifiedPeptide, peakFilterResult.getFilteredPeaks());
+            annotationData = this.matchPeptide(modifiedPeptide, peakFilterResult.getFilteredPeaks(), fragmentMassError);
             //for the moment, consider the average fragment ion score
             double averageFragmentIonScore = annotationData.getIdentificationScore().getAverageFragmentIonScore();
             if (averageFragmentIonScore > bestScore) {
@@ -136,7 +136,7 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
      * @param peaks the spectrum peaks
      * @return the annotation data (score result + fragment ion annotations)
      */
-    private AnnotationData matchPeptide(Peptide peptide, List<Peak> peaks) {
-        return identificationScorer.score(peptide, peaks);
+    private AnnotationData matchPeptide(Peptide peptide, List<Peak> peaks, double fragmentMassError) {
+        return identificationScorer.score(peptide, peaks, fragmentMassError);
     }
 }

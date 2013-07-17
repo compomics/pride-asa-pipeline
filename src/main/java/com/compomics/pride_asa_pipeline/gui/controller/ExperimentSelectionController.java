@@ -43,7 +43,7 @@ public class ExperimentSelectionController {
     private Integer taxonomyId;
     //keep track of which annotator has to be executed;
     //PrideSpectrumAnnotator or PrideXmlSpectrumAnnotator
-    private boolean prideXml;
+    //private boolean prideXml;
     //hold reference to swingworker for cancelling purposes
     private SwingWorker<?, Void> currentSwingWorker;
     //view
@@ -127,10 +127,6 @@ public class ExperimentSelectionController {
 
     public void setModificationsMergeController(ModificationsMergeController modificationsMergeController) {
         this.modificationsMergeController = modificationsMergeController;
-    }
-
-    public boolean isPrideXml() {
-        return prideXml;
     }
 
     public void init() {
@@ -222,7 +218,7 @@ public class ExperimentSelectionController {
         prideSelectionPanel.getProcessButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                prideXml = false;
+                mainController.setCurrentSpectrumAnnotator(false);
                 //execute worker
                 InitIdentificationsWorker initIdentificationsWorker = new InitIdentificationsWorker();
                 currentSwingWorker = initIdentificationsWorker;
@@ -283,8 +279,7 @@ public class ExperimentSelectionController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (resultFileSelectionPanel.getFileChooser().getSelectedFile() != null) {
-                    prideXml = false;
-
+                    mainController.setCurrentSpectrumAnnotator(false);
                     ImportPipelineResultWorker importPipelineResultWorker = new ImportPipelineResultWorker();
                     importPipelineResultWorker.execute();
                 } else {
@@ -349,7 +344,7 @@ public class ExperimentSelectionController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (prideXmlFileSelectionPanel.getFileChooser().getSelectedFile() != null) {
-                    prideXml = true;
+                    mainController.setCurrentSpectrumAnnotator(true);
                     //execute worker
                     InitIdentificationsWorker initIdentificationsWorker = new InitIdentificationsWorker();
                     currentSwingWorker = initIdentificationsWorker;
@@ -398,7 +393,7 @@ public class ExperimentSelectionController {
 
     private String getExperimentAccesion() {
         String experimentAccession = null;
-        if (prideXml) {
+        if (mainController.isPrideXmlSpectrumAnnotator()) {
             File prideXmlFile = prideXmlFileSelectionPanel.getFileChooser().getSelectedFile();
             experimentAccession = prideXmlFile.getName().substring(0, prideXmlFile.getName().indexOf(".xml"));
         } else {
@@ -418,10 +413,10 @@ public class ExperimentSelectionController {
         protected Void doInBackground() throws Exception {
             //show progress bar
             pipelineProgressController.showProgressBar(NUMBER_OF_PRIDE_PROGRESS_STEPS, "Processing.");
-            if (prideXml) {
+            if (mainController.isPrideXmlSpectrumAnnotator()) {
                 mainController.getPrideXmlSpectrumAnnotator().initIdentifications(prideXmlFileSelectionPanel.getFileChooser().getSelectedFile());
             } else {
-                mainController.getPrideSpectrumAnnotator().initIdentifications(getExperimentAccesion());
+                mainController.getDbSpectrumAnnotator().initIdentifications(getExperimentAccesion());
             }
 
             return null;
@@ -432,15 +427,8 @@ public class ExperimentSelectionController {
             try {
                 get();
 
-                boolean hasCompleteIdentifications;
-                MassRecalibrationResult massRecalibrationResult;
-                if (prideXml) {
-                    hasCompleteIdentifications = mainController.getPrideXmlSpectrumAnnotator().getIdentifications().getCompleteIdentifications().isEmpty();
-                    massRecalibrationResult = mainController.getPrideXmlSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult();
-                } else {
-                    hasCompleteIdentifications = mainController.getPrideSpectrumAnnotator().getIdentifications().getCompleteIdentifications().isEmpty();
-                    massRecalibrationResult = mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult();
-                }
+                boolean hasCompleteIdentifications = mainController.retrieveCurrentSpectrumAnnotator().getIdentifications().getCompleteIdentifications().isEmpty();
+                MassRecalibrationResult massRecalibrationResult = mainController.retrieveCurrentSpectrumAnnotator().getSpectrumAnnotatorResult().getMassRecalibrationResult();                
 
                 //check if the experiment has "useful" identifications
                 if (hasCompleteIdentifications) {
@@ -474,12 +462,8 @@ public class ExperimentSelectionController {
         @Override
         protected Set<Modification> doInBackground() throws Exception {
             //init the modfications considered in the pipeline
-            Set<Modification> prideModifications = null;
-            if (prideXml) {
-                prideModifications = mainController.getPrideXmlSpectrumAnnotator().initModifications();
-            } else {
-                prideModifications = mainController.getPrideSpectrumAnnotator().initModifications();
-            }
+            Set<Modification> prideModifications = mainController.retrieveCurrentSpectrumAnnotator().initModifications();
+
             return prideModifications;
         }
 
@@ -489,12 +473,7 @@ public class ExperimentSelectionController {
                 Set<Modification> prideModifications = get();
                 //check for pride modifications
                 if (!prideModifications.isEmpty()) {
-                    ModificationHolder modificationHolder = null;
-                    if (prideXml) {
-                        modificationHolder = mainController.getPrideXmlSpectrumAnnotator().getModificationHolder();
-                    } else {
-                        modificationHolder = mainController.getPrideSpectrumAnnotator().getModificationHolder();
-                    }
+                    ModificationHolder modificationHolder = mainController.retrieveCurrentSpectrumAnnotator().getModificationHolder();                    
 
                     //filter modifications
                     Set<Modification> conflictingModifications = modificationService.filterModifications(modificationHolder, prideModifications);
@@ -526,15 +505,12 @@ public class ExperimentSelectionController {
 
         @Override
         protected Void doInBackground() throws Exception {
-            SpectrumAnnotatorResult spectrumAnnotatorResult = null;
+            mainController.retrieveCurrentSpectrumAnnotator().annotate();
+            SpectrumAnnotatorResult spectrumAnnotatorResult = mainController.retrieveCurrentSpectrumAnnotator().getSpectrumAnnotatorResult();
             boolean writeResultToFile;
-            if (prideXml) {
-                mainController.getPrideXmlSpectrumAnnotator().annotate(prideXmlFileSelectionPanel.getFileChooser().getSelectedFile());
-                spectrumAnnotatorResult = mainController.getPrideXmlSpectrumAnnotator().getSpectrumAnnotatorResult();
+            if (mainController.isPrideXmlSpectrumAnnotator()) {             
                 writeResultToFile = prideXmlFileSelectionPanel.getWriteResultCheckBox().isSelected();
-            } else {
-                mainController.getPrideSpectrumAnnotator().annotate(getExperimentAccesion());
-                spectrumAnnotatorResult = mainController.getPrideSpectrumAnnotator().getSpectrumAnnotatorResult();
+            } else {                
                 writeResultToFile = prideSelectionPanel.getWriteResultCheckBox().isSelected();
             }
 
@@ -560,11 +536,7 @@ public class ExperimentSelectionController {
                 //enable process buttons
                 prideSelectionPanel.getProcessButton().setEnabled(true);
                 resultFileSelectionPanel.getProcessButton().setEnabled(true);
-            } catch (InterruptedException ex) {
-                onAnnotationCanceled();
-                LOGGER.error(ex.getMessage(), ex);
-                mainController.showUnexpectedErrorDialog(ex.getMessage());
-            } catch (ExecutionException ex) {
+            } catch (InterruptedException | ExecutionException ex) {
                 onAnnotationCanceled();
                 LOGGER.error(ex.getMessage(), ex);
                 mainController.showUnexpectedErrorDialog(ex.getMessage());
@@ -593,18 +565,14 @@ public class ExperimentSelectionController {
         protected void done() {
             try {
                 SpectrumAnnotatorResult spectrumAnnotatorResult = get();
-                mainController.getPrideSpectrumAnnotator().setSpectrumAnnotatorResult(spectrumAnnotatorResult);
+                mainController.retrieveCurrentSpectrumAnnotator().setSpectrumAnnotatorResult(spectrumAnnotatorResult);
                 mainController.onAnnotationFinished();
-            } catch (InterruptedException ex) {
-                LOGGER.error(ex.getMessage(), ex);
-                mainController.showUnexpectedErrorDialog(ex.getMessage());
-                onAnnotationCanceled();
-            } catch (ExecutionException ex) {
+            } catch (InterruptedException | ExecutionException ex) {
                 LOGGER.error(ex.getMessage(), ex);
                 mainController.showUnexpectedErrorDialog(ex.getMessage());
                 onAnnotationCanceled();
             } catch (CancellationException ex) {
-                LOGGER.info("Annotation for experiment " + getExperimentAccesion() + " cancelled.");
+                LOGGER.info("Importing pipeline results for experiment " + getExperimentAccesion() + " cancelled.");
             } finally {
                 //hide progress bar
                 pipelineProgressController.hideProgressDialog();

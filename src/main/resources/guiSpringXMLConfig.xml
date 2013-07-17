@@ -10,8 +10,8 @@
     <!-- controller beans -->
     <bean id="mainController"
           class="com.compomics.pride_asa_pipeline.gui.controller.MainController">
-        <property name="prideSpectrumAnnotator" ref="prideSpectrumAnnotator"/>
         <property name="prideXmlSpectrumAnnotator" ref="prideXmlSpectrumAnnotator"/>
+        <property name="dbSpectrumAnnotator" ref="dbSpectrumAnnotator"/>        
         <property name="experimentSelectionController" ref="experimentSelectionController"/>
         <property name="modificationsController" ref="modificationsController"/>
         <property name="pipelineResultController" ref="pipelineResultController"/>
@@ -47,14 +47,12 @@
     <bean id="modificationsController"
           class="com.compomics.pride_asa_pipeline.gui.controller.ModificationsController"> 
         <property name="mainController" ref="mainController"/>
-        <property name="modificationService" ref="dbModificationService"/>
     </bean>
     
     <bean id="pipelineResultController"
           class="com.compomics.pride_asa_pipeline.gui.controller.PipelineResultController"> 
         <property name="mainController" ref="mainController"/>
-        <property name="spectrumPanelFactory" ref="spectrumPanelFactory"/>        
-        <property name="modificationService" ref="dbModificationService"/>        
+        <property name="spectrumPanelFactory" ref="spectrumPanelFactory"/>               
     </bean>
     
     <bean id="spectrumPanelFactory"

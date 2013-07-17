@@ -32,7 +32,7 @@ public class IdentificationScorerTest {
 
         //make peakList, peak with m/z 690 has 3 matching ion ladder masses
         //the scorer should only score this peak once
-        List<Peak> peakList = new ArrayList<Peak>();
+        List<Peak> peakList = new ArrayList<>();
         Peak peak = new Peak(488, 100);
         peakList.add(peak);
         peak = new Peak(690, 100);
@@ -54,10 +54,8 @@ public class IdentificationScorerTest {
         peak = new Peak(60, 100);
         peakList.add(peak);
 
-        identificationScorer.setFragmentMassError(1.0);
-
         //score the unmodified peptide
-        AnnotationData annotationData = identificationScorer.score(peptide, peakList);
+        AnnotationData annotationData = identificationScorer.score(peptide, peakList, 1.0);
 
         //10 peaks in peak list, 8 match so matching intensity score should be 0.8
         assertNotNull(annotationData);
@@ -84,7 +82,7 @@ public class IdentificationScorerTest {
         ModifiedPeptide modifiedPeptide = new ModifiedPeptide(charge, aminoAcidSequence.getSequenceMass(), aminoAcidSequence, peptideId);
 
         //create modification
-        Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
+        Set<AminoAcid> modifiedAAs = new HashSet<>();
         modifiedAAs.add(AminoAcid.getAA('N'));
         double modMassShift = 20.0;
         Modification modification = new Modification("testModification", modMassShift, modMassShift, Modification.Location.NON_TERMINAL, modifiedAAs, "mod", "mod");
@@ -93,7 +91,7 @@ public class IdentificationScorerTest {
         modifiedPeptide.setNTModification(6, modification);
 
         //make peakList
-        List<Peak> peakList = new ArrayList<Peak>();
+        List<Peak> peakList = new ArrayList<>();
         Peak peak = new Peak(175.05, 100);
         peakList.add(peak);
         peak = new Peak(914.40, 100);
@@ -115,10 +113,8 @@ public class IdentificationScorerTest {
         peak = new Peak(91.54, 100);
         peakList.add(peak);
 
-        identificationScorer.setFragmentMassError(1.0);
-
         //score the modified peptide
-        AnnotationData annotationData = identificationScorer.score(modifiedPeptide, peakList);
+        AnnotationData annotationData = identificationScorer.score(modifiedPeptide, peakList, 1.0);
 
         //all the peaks match
         assertEquals(10, annotationData.getFragmentIonAnnotations().size());

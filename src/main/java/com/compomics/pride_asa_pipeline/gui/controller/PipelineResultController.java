@@ -74,7 +74,6 @@ public class PipelineResultController {
     private MainController mainController;
     //services
     private SpectrumPanelFactory spectrumPanelFactory;
-    private ModificationService modificationService;
 
     public MainController getMainController() {
         return mainController;
@@ -98,19 +97,11 @@ public class PipelineResultController {
 
     public void setSpectrumPanelFactory(SpectrumPanelFactory spectrumPanelFactory) {
         this.spectrumPanelFactory = spectrumPanelFactory;
-    }
-
-    public ModificationService getModificationService() {
-        return modificationService;
-    }
-
-    public void setModificationService(ModificationService modificationService) {
-        this.modificationService = modificationService;
-    }
+    }    
 
     public void init() {
-        usedModifications = new HashMap<Modification, Integer>();
-        modificationColors = new HashMap<String, Color>();
+        usedModifications = new HashMap<>();
+        modificationColors = new HashMap<>();
         initIdentificationsPanel();
         initSummaryPanel();
     }
@@ -118,7 +109,7 @@ public class PipelineResultController {
     public void update(SpectrumAnnotatorResult spectrumAnnotatorResult) {
         this.spectrumAnnotatorResult = spectrumAnnotatorResult;
         //store used modifications        
-        usedModifications = modificationService.getUsedModifications(spectrumAnnotatorResult);
+        usedModifications = mainController.retrieveCurrentSpectrumAnnotator().getModificationService().getUsedModifications(spectrumAnnotatorResult);
         constructModificationColors();
         updateIdentifications();
         updateSummary();
@@ -151,7 +142,7 @@ public class PipelineResultController {
 
     private void updateSummary() {
         double[] precursorMassDeltaValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
-        List<Double> fragmentMassDeltaValues = new ArrayList<Double>();
+        List<Double> fragmentMassDeltaValues = new ArrayList<>();
         double[] b1IonCoverageValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
         double[] b2IonCoverageValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
         double[] y1IonCoverageValues = new double[spectrumAnnotatorResult.getNumberOfIdentifications()];
@@ -188,8 +179,8 @@ public class PipelineResultController {
     private void initIdentificationsPanel() {
         identificationsPanel = new IdentificationsPanel();
 
-        identificationsEventList = new BasicEventList<Identification>();
-        sortedIdentificationsList = new SortedList<Identification>(identificationsEventList, new IdentificationSequenceComparator());
+        identificationsEventList = new BasicEventList<>();
+        sortedIdentificationsList = new SortedList<>(identificationsEventList, new IdentificationSequenceComparator());
         identificationsPanel.getIdentificationsTable().setModel(new EventTableModel(sortedIdentificationsList, new IdentificationsTableFormat()));
         identificationsPanel.getIdentificationsTable().setSelectionModel(new EventSelectionModel(sortedIdentificationsList));
         identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.PEPTIDE).setCellRenderer(new PeptideColumnRenderer());
@@ -218,7 +209,7 @@ public class PipelineResultController {
                     if (identificationsPanel.getIdentificationsTable().getSelectedRow() != -1) {
                         Identification identification = sortedIdentificationsList.get(identificationsPanel.getIdentificationsTable().getSelectedRow());
 
-                        SpectrumPanel spectrumPanel = spectrumPanelFactory.getSpectrumPanel(identification, mainController.getExperimentSelectionController().isPrideXml());
+                        SpectrumPanel spectrumPanel = spectrumPanelFactory.getSpectrumPanel(identification, mainController.isPrideXmlSpectrumAnnotator());
 
                         addSpectrumPanel(spectrumPanel);
                     }
@@ -281,7 +272,7 @@ public class PipelineResultController {
     }
 
     private Map<FragmentIonAnnotation.IonType, double[]> calculateIonCoverages(Identification identification) {
-        Map<FragmentIonAnnotation.IonType, double[]> ionCoverages = new EnumMap<FragmentIonAnnotation.IonType, double[]>(FragmentIonAnnotation.IonType.class);
+        Map<FragmentIonAnnotation.IonType, double[]> ionCoverages = new EnumMap<>(FragmentIonAnnotation.IonType.class);
         if (identification.getAnnotationData() != null && identification.getAnnotationData().getFragmentIonAnnotations() != null) {
             int numberOfB1Ions = 0;
             int numberOfB2Ions = 0;
@@ -316,7 +307,7 @@ public class PipelineResultController {
     }
 
     private List<Double> calculateFragmentIonMassDeltas(Identification identification) {
-        List<Double> fragmentIonMassDeltas = new ArrayList<Double>();
+        List<Double> fragmentIonMassDeltas = new ArrayList<>();
         if (identification.getAnnotationData() != null && identification.getAnnotationData().getFragmentIonAnnotations() != null) {
             for (FragmentIonAnnotation fragmentIonAnnotation : identification.getAnnotationData().getFragmentIonAnnotations()) {
                 if (fragmentIonAnnotation.isBIon()) {

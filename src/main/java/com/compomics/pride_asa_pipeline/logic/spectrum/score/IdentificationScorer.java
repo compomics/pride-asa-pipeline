@@ -18,14 +18,8 @@ public interface IdentificationScorer {
      *
      * @param peptide the peptide to score the spectrum against
      * @param peaks the spectrum peaks
+     * @param fragmentMassError the fragment mass error
      * @return the annotation data (scoring result + fragment ion annotations)
      */
-    AnnotationData score(Peptide peptide, List<Peak> peaks);
-    
-    /**
-     * Sets the fragment mass error
-     * 
-     * @param fragmentMassError the fragment mass error value
-     */
-    void setFragmentMassError(double fragmentMassError);
+    AnnotationData score(Peptide peptide, List<Peak> peaks, double fragmentMassError);
 }

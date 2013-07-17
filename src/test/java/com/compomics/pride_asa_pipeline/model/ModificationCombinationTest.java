@@ -34,22 +34,22 @@ public class ModificationCombinationTest {
         Set<Modification> modifications = dbModificationService.loadPipelineModifications(modificationsResource);
 
         //create 2 modification combinations with the same modifications, but in a different order in the modification list
-        List<Modification> modificationsList = new ArrayList<Modification>();
+        List<Modification> modificationsList = new ArrayList<>();
         modificationsList.addAll(modifications);
-        List<Modification> reversedModificationsList = new ArrayList<Modification>();
+        List<Modification> reversedModificationsList = new ArrayList<>();
         for (int i = modificationsList.size() - 1; i >= 0; i--) {
             reversedModificationsList.add(modificationsList.get(i));
         }
 
-        ModificationCombination modificationCombination1 = new ModificationCombination(modificationsList);
-        ModificationCombination modificationCombination2 = new ModificationCombination(reversedModificationsList);
+        ModificationCombination modificationCombination = new ModificationCombination(modificationsList);
+        ModificationCombination reversedModificationCombination = new ModificationCombination(reversedModificationsList);
 
-        assertTrue(modificationCombination1.equals(modificationCombination2));
+        assertTrue(modificationCombination.equals(reversedModificationCombination));
         
         //now make a set and check if the contains method works
-        Set<ModificationCombination> modificationCombinations = new HashSet<ModificationCombination>();
-        modificationCombinations.add(modificationCombination1);
+        Set<ModificationCombination> modificationCombinations = new HashSet<>();
+        modificationCombinations.add(modificationCombination);
         
-        assertTrue(modificationCombinations.contains(modificationCombination2));                
+        assertTrue(modificationCombinations.contains(reversedModificationCombination));                
     }
 }

@@ -17,7 +17,6 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
     private ModificationCombinationSolver modificationCombinationSolver;
 
     public MassDeltaExplainerImpl(ModificationHolder modificationHolder) {
-        System.out.println("----------------------- new MassDeltaExplainerImpl instance created by thread " + Thread.currentThread().getName());
         modificationCombinationSolver = new ModificationCombinationSolverImpl(modificationHolder);
     }
 

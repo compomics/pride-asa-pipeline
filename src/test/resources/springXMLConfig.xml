@@ -17,10 +17,10 @@
         </property>
     </bean>   
     
-    <!-- pipeline beans -->
-    <bean id="commandLineRunner"
-          class="com.compomics.pride_asa_pipeline.CommandLineRunner" lazy-init="true">
-        <property name="prideSpectrumAnnotator" ref="prideSpectrumAnnotator"/>        
+     <!-- pipeline beans -->
+    <bean id="dbCommandLineRunner"
+          class="com.compomics.pride_asa_pipeline.DbCommandLineRunner" lazy-init="true">
+        <property name="dbSpectrumAnnotator" ref="dbSpectrumAnnotator"/>        
         <property name="dbResultHandler" ref="dbResultHandler"/>        
     </bean>
     
@@ -30,8 +30,8 @@
         <property name="prideXmlResultHandler" ref="prideXmlResultHandler"/>
     </bean>
             
-    <bean id="prideSpectrumAnnotator"
-          class="com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator" lazy-init="true">        
+    <bean id="dbSpectrumAnnotator"
+          class="com.compomics.pride_asa_pipeline.logic.DbSpectrumAnnotator" lazy-init="true">        
         <property name="experimentService" ref="dbExperimentService"/>
         <property name="spectrumService" ref="dbSpectrumService"/>
         <property name="modificationService" ref="dbModificationService"/>
@@ -105,7 +105,7 @@
     </bean>  
     
     <bean id="prideXmlResultHandler"
-          class="com.compomics.pride_asa_pipeline.service.impl.ResultHandlerImpl">
+          class="com.compomics.pride_asa_pipeline.service.impl.ResultHandlerImpl" lazy-init="true">
         <property name="fileResultHandler" ref="fileResultHandler"/>
         <property name="modificationService" ref="prideXmlModificationService"/>
     </bean>                                       

@@ -21,9 +21,10 @@ public interface SpectrumMatcher {
      *
      * @param peptide the peptide
      * @param peaks the spectrum peak list
+     * @param fragmentMassError the fragment mass error
      * @return the annotation data (score result and fragment ion annotations)
      */
-    AnnotationData matchPrecursor(Peptide peptide, List<Peak> peaks);
+    AnnotationData matchPrecursor(Peptide peptide, List<Peak> peaks, double fragmentMassError);
 
     /**
      * Finds the best matching modified peptide against a spectrum the scores
@@ -36,9 +37,10 @@ public interface SpectrumMatcher {
      * @param modifiedPeptides the set of modified peptides
      * @param peptide the identified peptide
      * @param peaks the spectrum peak list
+     * @param fragmentMassError the fragment mass error
      * @return the best matching modified peptides result
      */
-    ModifiedPeptidesMatchResult findBestModifiedPeptideMatch(Peptide peptide, Set<ModifiedPeptide> modifiedPeptides, List<Peak> peaks);
+    ModifiedPeptidesMatchResult findBestModifiedPeptideMatch(Peptide peptide, Set<ModifiedPeptide> modifiedPeptides, List<Peak> peaks, double fragmentMassError);
 
     /**
      * Gets the identification scorer

@@ -69,7 +69,6 @@ public class ModificationHolder {
             massToModification.put(mass, mods);
         }
         massToModification.get(mass).add(modification);
-
     }
 
     public boolean containsModForAA(AminoAcid aa) {

@@ -2,7 +2,8 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.gui.view.MainFrame;
-import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.logic.AbstractSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.logic.DbSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.util.examples.BareBonesBrowserLaunch;
@@ -30,6 +31,11 @@ import org.jdesktop.beansbinding.ELProperty;
 public class MainController implements ActionListener {
 
     private static final Logger LOGGER = Logger.getLogger(MainController.class);
+    //model
+    /**
+     * Keep track of the SpectrumAnnotator (db or prideXml)
+     */
+    private AbstractSpectrumAnnotator currentSpectrumAnnotator;
     //view
     private MainFrame mainFrame;
     //child controllers
@@ -38,7 +44,7 @@ public class MainController implements ActionListener {
     private PipelineResultController pipelineResultController;
     private PipelineParamsController pipelineParamsController;
     //services
-    private PrideSpectrumAnnotator prideSpectrumAnnotator;
+    private DbSpectrumAnnotator dbSpectrumAnnotator;
     private PrideXmlSpectrumAnnotator prideXmlSpectrumAnnotator;
 
     public MainController() {
@@ -58,14 +64,14 @@ public class MainController implements ActionListener {
 
     public void setModificationsController(ModificationsController modificationsController) {
         this.modificationsController = modificationsController;
+    }      
+
+    public DbSpectrumAnnotator getDbSpectrumAnnotator() {
+        return dbSpectrumAnnotator;
     }
 
-    public PrideSpectrumAnnotator getPrideSpectrumAnnotator() {
-        return prideSpectrumAnnotator;
-    }
-
-    public void setPrideSpectrumAnnotator(PrideSpectrumAnnotator prideSpectrumAnnotator) {
-        this.prideSpectrumAnnotator = prideSpectrumAnnotator;
+    public void setDbSpectrumAnnotator(DbSpectrumAnnotator dbSpectrumAnnotator) {
+        this.dbSpectrumAnnotator = dbSpectrumAnnotator;
     }
 
     public PrideXmlSpectrumAnnotator getPrideXmlSpectrumAnnotator() {
@@ -74,7 +80,7 @@ public class MainController implements ActionListener {
 
     public void setPrideXmlSpectrumAnnotator(PrideXmlSpectrumAnnotator prideXmlSpectrumAnnotator) {
         this.prideXmlSpectrumAnnotator = prideXmlSpectrumAnnotator;
-    }
+    }        
 
     public PipelineResultController getPipelineResultController() {
         return pipelineResultController;
@@ -92,6 +98,14 @@ public class MainController implements ActionListener {
         this.pipelineParamsController = pipelineParamsController;
     }
 
+    public AbstractSpectrumAnnotator retrieveCurrentSpectrumAnnotator() {
+        return currentSpectrumAnnotator;
+    }
+
+    public void assignCurrentSpectrumAnnotator(AbstractSpectrumAnnotator currentSpectrumAnnotator) {
+        this.currentSpectrumAnnotator = currentSpectrumAnnotator;
+    }
+
     public MainFrame getMainFrame() {
         return mainFrame;
     }
@@ -106,7 +120,7 @@ public class MainController implements ActionListener {
         }
     }
 
-    public void init() {        
+    public void init() {
         // check for new version
         checkForNewVersion(getVersion());
 
@@ -118,13 +132,16 @@ public class MainController implements ActionListener {
 
         //workaround for better beansbinding logging issue
         org.jdesktop.beansbinding.util.logging.Logger.getLogger(ELProperty.class.getName()).setLevel(Level.SEVERE);
+        
+        //set default currentSpectrumAnnotator
+        currentSpectrumAnnotator = dbSpectrumAnnotator;
 
         //init child controllers
         experimentSelectionController.init();
         modificationsController.init();
         pipelineResultController.init();
         pipelineParamsController.init();
-        
+
         //set uncaught exception handler
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
@@ -158,6 +175,25 @@ public class MainController implements ActionListener {
         mainFrame.setVisible(true);
     }
 
+    /**
+     * Set the current SpectrumAnnotator.
+     *
+     * @param isPrideXml
+     */
+    public void setCurrentSpectrumAnnotator(boolean isPrideXml) {
+        currentSpectrumAnnotator = (isPrideXml) ? prideXmlSpectrumAnnotator : dbSpectrumAnnotator;
+    }
+
+    /**
+     * Get the type of SpectrumAnnotator
+     *
+     * @return
+     */
+    public boolean isPrideXmlSpectrumAnnotator() {
+        boolean isPrideXml = (currentSpectrumAnnotator instanceof PrideXmlSpectrumAnnotator) ? true : false;
+        return isPrideXml;
+    }
+
     public void showMessageDialog(String title, String message, int messageType) {
         if (messageType == JOptionPane.ERROR_MESSAGE) {
             //add message to JTextArea
@@ -184,25 +220,14 @@ public class MainController implements ActionListener {
     }
 
     public void onAnnotationFinished() {
-        SpectrumAnnotatorResult spectrumAnnotatorResult = null;
-        if(experimentSelectionController.isPrideXml()){
-            spectrumAnnotatorResult = prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult();
-        }
-        else{
-            spectrumAnnotatorResult = prideSpectrumAnnotator.getSpectrumAnnotatorResult();
-        }
+        SpectrumAnnotatorResult spectrumAnnotatorResult = currentSpectrumAnnotator.getSpectrumAnnotatorResult();
         pipelineResultController.update(spectrumAnnotatorResult);
     }
 
     public void onAnnotationCanceled() {
         LOGGER.info("Annotation canceled.");
-        if (experimentSelectionController.isPrideXml()) {
-            prideXmlSpectrumAnnotator.clearTmpResources();
-            pipelineResultController.clear();
-        } else {
-            prideSpectrumAnnotator.clearPipeline();
-            pipelineResultController.clear();
-        }
+        currentSpectrumAnnotator.clearPipeline();
+        currentSpectrumAnnotator.clearTmpResources();
     }
 
     /**
@@ -210,8 +235,8 @@ public class MainController implements ActionListener {
      *
      * @return the version number of PeptideShaker
      */
-    public String getVersion() {        
-        return PropertiesConfigurationHolder.getInstance().getString("pride-asap.version", "UNKNOWN");        
+    public String getVersion() {
+        return PropertiesConfigurationHolder.getInstance().getString("pride-asap.version", "UNKNOWN");
     }
 
     /**

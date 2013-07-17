@@ -15,10 +15,9 @@ import java.util.Set;
  */
 public class PrideXmlModificationServiceImpl extends ModificationServiceImpl implements PrideXmlModificationService {
 
-    private PrideXmlParser prideXmlParser;
+    private PrideXmlParser prideXmlParser;    
 
     public PrideXmlModificationServiceImpl() {        
-        System.out.println("----------------------- new PrideXmlModificationServiceImpl instance created by thread " + Thread.currentThread().getName());
     }   
 
     public PrideXmlParser getPrideXmlParser() {
@@ -36,16 +35,15 @@ public class PrideXmlModificationServiceImpl extends ModificationServiceImpl imp
 
         //get modifications from parser
         List<Modification> modificationList = prideXmlParser.getModifications();
-        for (Modification modification : modificationList) {
+        for (Modification modification : modificationList) {            
             addModificationToModifications(modification, modificationMap);
         }
 
         //add modifications to set
         Set<Modification> modifications = new HashSet<>();
-        modifications.addAll(modificationMap.values());
+        modifications.addAll(modificationMap.values());          
 
         return modifications;
     }    
-    
-   
+       
 }

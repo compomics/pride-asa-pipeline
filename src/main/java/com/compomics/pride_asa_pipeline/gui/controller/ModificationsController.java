@@ -46,8 +46,6 @@ public class ModificationsController {
     private ModificationConfigDialog modificationsConfigDialog;
     //parent controller
     private MainController mainController;
-    //services
-    private ModificationService modificationService;
 
     public ModificationsController() {
         modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
@@ -65,20 +63,16 @@ public class ModificationsController {
         return modificationsConfigDialog;
     }
 
-    public ModificationService getModificationService() {
-        return modificationService;
-    }
-
-    public void setModificationService(ModificationService modificationService) {
-        this.modificationService = modificationService;
-    }
-
     public void init() {
         modificationsConfigDialog = new ModificationConfigDialog(mainController.getMainFrame(), true);
 
         //fill location combobox
         for (Modification.Location location : Modification.Location.values()) {
             modificationsConfigDialog.getModLocationComboBox().addItem(location);
+        }
+        //fill type combobox
+        for (Modification.Type type : Modification.Type.values()) {
+            modificationsConfigDialog.getModTypeComboBox().addItem(type);
         }
 
         //init filechooser
@@ -116,7 +110,7 @@ public class ModificationsController {
         //table binding
         try {
             modificationsBindingList = ObservableCollections.observableList(getModificationsAsList(
-                    modificationService.loadPipelineModifications(modificationsResource)));
+                    mainController.retrieveCurrentSpectrumAnnotator().getModificationService().loadPipelineModifications(modificationsResource)));
         } catch (JDOMParseException ex) {
             LOGGER.error(ex.getMessage(), ex);
             mainController.showMessageDialog("Import Unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
@@ -160,6 +154,11 @@ public class ModificationsController {
         columnBinding.setEditable(Boolean.FALSE);
         columnBinding.setColumnClass(Modification.Location.class);
 
+        columnBinding = modificationsTableBinding.addColumnBinding(ELProperty.create("${type}"));
+        columnBinding.setColumnName("Type");
+        columnBinding.setEditable(Boolean.FALSE);
+        columnBinding.setColumnClass(Modification.Type.class);
+
         bindingGroup.addBinding(modificationsTableBinding);
 
         //selected modication in table bindings
@@ -185,6 +184,9 @@ public class ModificationsController {
 
         Binding locationBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsConfigDialog.getModifcationsTable(), ELProperty.create("${selectedElement.location}"), modificationsConfigDialog.getModLocationComboBox(), BeanProperty.create("selectedItem"), "location");
         bindingGroup.addBinding(locationBinding);
+
+        Binding typeBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, modificationsConfigDialog.getModifcationsTable(), ELProperty.create("${selectedElement.type}"), modificationsConfigDialog.getModTypeComboBox(), BeanProperty.create("selectedItem"), "type");
+        bindingGroup.addBinding(typeBinding);
 
         //amino acid list bindings
         aminoAcidsBindingList = ObservableCollections.observableList(getAminoAcidsAsList());
@@ -274,7 +276,7 @@ public class ModificationsController {
         modificationsConfigDialog.getAddModificationButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                Set<AminoAcid> affectedAminoAcids = new HashSet<AminoAcid>();
+                Set<AminoAcid> affectedAminoAcids = new HashSet<>();
                 affectedAminoAcids.add(AminoAcid.Ala);
                 modificationsBindingList.add(new Modification("mod" + modificationsBindingList.size(), 0.0, 0.0, Modification.Location.NON_TERMINAL, affectedAminoAcids, "accession", "accessionValue"));
                 modificationsConfigDialog.getModifcationsTable().getSelectionModel().setSelectionInterval(modificationsBindingList.size() - 1, modificationsBindingList.size() - 1);
@@ -286,8 +288,8 @@ public class ModificationsController {
             public void actionPerformed(ActionEvent ae) {
                 if (!modificationsBindingList.isEmpty() && modificationsConfigDialog.getModifcationsTable().getSelectedRow() != -1) {
                     modificationsBindingList.remove(modificationsConfigDialog.getModifcationsTable().getSelectedRow());
-                    if(!modificationsBindingList.isEmpty()){
-                    modificationsConfigDialog.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);
+                    if (!modificationsBindingList.isEmpty()) {
+                        modificationsConfigDialog.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);
                     }
                 }
             }
@@ -303,13 +305,13 @@ public class ModificationsController {
 
                     //import modifications and refill the binding list
                     try {
-                        Set<Modification> importedModifications = modificationService.importPipelineModifications(modificationsImportResource);
+                        Set<Modification> importedModifications = mainController.retrieveCurrentSpectrumAnnotator().getModificationService().importPipelineModifications(modificationsImportResource);
 
                         modificationsBindingList.clear();
                         modificationsBindingList.addAll(importedModifications);
 
                         //select first modification
-                        modificationsConfigDialog.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);                        
+                        modificationsConfigDialog.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);
                     } catch (JDOMParseException ex) {
                         LOGGER.error(ex.getMessage(), ex);
                         mainController.showMessageDialog("Import Unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
@@ -328,7 +330,7 @@ public class ModificationsController {
             public void actionPerformed(ActionEvent e) {
                 //check if modifications file in resources folder can be found
                 if (ResourceUtils.isExistingFile(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"))) {
-                    modificationService.savePipelineModifications(modificationsResource, modificationsBindingList);
+                    mainController.retrieveCurrentSpectrumAnnotator().getModificationService().savePipelineModifications(modificationsResource, modificationsBindingList);
                 } else {
                     mainController.showMessageDialog("Save Unsuccessful", "The modifications could not be saved to file. "
                             + "\n" + "Please check if a \"pride_asap_modifications.xml\" file exists in the \"resources\" folder. "
@@ -345,7 +347,7 @@ public class ModificationsController {
      * @return the list of modifications
      */
     private List<Modification> getModificationsAsList(Set<Modification> modificationSet) {
-        List<Modification> modifications = new ArrayList<Modification>();
+        List<Modification> modifications = new ArrayList<>();
         modifications.addAll(modificationSet);
 
         return modifications;
@@ -358,7 +360,7 @@ public class ModificationsController {
      * @return the list of amino acids
      */
     private List<AminoAcid> getAminoAcidsAsList() {
-        List<AminoAcid> aminoAcids = new ArrayList<AminoAcid>();
+        List<AminoAcid> aminoAcids = new ArrayList<>();
         aminoAcids.addAll(Arrays.asList(AminoAcid.values()));
 
         return aminoAcids;
@@ -377,7 +379,7 @@ public class ModificationsController {
         } else {
             modificationsConfigDialog.getRemoveAminoAcidButton().setEnabled(true);
         }
-    }    
+    }
 
     /**
      * Converter class used for binding. In case of a NumberFormatException, the

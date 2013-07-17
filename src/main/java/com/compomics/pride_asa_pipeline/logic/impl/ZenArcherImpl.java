@@ -16,7 +16,6 @@ public class ZenArcherImpl implements ZenArcher {
     private double maximalSum;
 
     public ZenArcherImpl() {
-        System.out.println("----------------------- new ZenArcherImpl instance created by thread " + Thread.currentThread().getName());
     }    
     
     //Wonders of Numbers (Oxford: Oxford University Press, 2001), pp. 275-276
