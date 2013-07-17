@@ -5,7 +5,6 @@
 package com.compomics.pride_asa_pipeline.logic;
 
 import com.compomics.pride_asa_pipeline.model.ModificationCombination;
-import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import java.util.Set;
 

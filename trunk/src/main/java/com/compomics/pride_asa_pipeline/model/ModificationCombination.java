@@ -14,7 +14,7 @@ public class ModificationCombination {
     private double mass;
 
     public ModificationCombination() {
-        modifications = new ArrayList<Modification>();
+        modifications = new ArrayList<>();
     }
 
     public ModificationCombination(List<Modification> modifications) {
@@ -37,7 +37,7 @@ public class ModificationCombination {
     }
 
     public Set<Modification> getUniqueModifications() {
-        return new HashSet<Modification>(modifications);
+        return new HashSet<>(modifications);
     }
 
     public double[] getModificationMasses() {
@@ -61,7 +61,7 @@ public class ModificationCombination {
     }
 
     public Set<Modification> getModificationByMass(double mass) {
-        Set<Modification> retVal = new HashSet<Modification>();
+        Set<Modification> retVal = new HashSet<>();
         for (Modification modification : modifications) {
             if (modification.getMassShift() == mass) {
                 retVal.add(modification);
@@ -109,10 +109,10 @@ public class ModificationCombination {
 
         // we don't want to take the order of the modifications into account,
         // so we perform the comparison on sorted lists
-        List<Modification> thisMods = new ArrayList<Modification>();
+        List<Modification> thisMods = new ArrayList<>();
         thisMods.addAll(this.modifications);
         Collections.sort(thisMods);
-        List<Modification> thatMods = new ArrayList<Modification>();
+        List<Modification> thatMods = new ArrayList<>();
         thatMods.addAll(that.modifications);
         Collections.sort(thatMods);
         if (thisMods != null ? !thisMods.equals(thatMods) : thatMods != null) {

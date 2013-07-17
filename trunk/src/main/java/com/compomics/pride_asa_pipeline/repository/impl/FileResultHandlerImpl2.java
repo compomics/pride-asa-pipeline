@@ -38,7 +38,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 
@@ -47,7 +46,7 @@ import org.jdom2.JDOMException;
  * @author Niels Hulstaert
  */
 public class FileResultHandlerImpl2 implements FileResultHandler {
-    
+
     private static final Logger LOGGER = Logger.getLogger(FileResultHandlerImpl2.class);
     private static final String COLUMN_DELIMITER = "\t";
     private static final String SCORE_OPEN = "(";
@@ -84,21 +83,18 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
     private static final int MODIFICATIONS = 11;
     private ModificationService modificationService;
     private Map<String, Modification> modifications;
-    
+
     public ModificationService getModificationService() {
         return modificationService;
     }
-    
+
     public void setModificationService(ModificationService modificationService) {
         this.modificationService = modificationService;
     }
-    
+
     @Override
     public void writeResult(File resultFile, List<Identification> identifications) {
-        try {
-            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(resultFile)));
-
-            //print identification header
+        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(resultFile)))) {
             pw.println("experiment_accession" + COLUMN_DELIMITER
                     + "spectrum_id" + COLUMN_DELIMITER
                     + "peptide_id" + COLUMN_DELIMITER
@@ -135,7 +131,7 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
                 }
                 try {
                     BigDecimal mzDelta = new BigDecimal(identification.getPeptide().calculateMassDelta() / identification.getPeptide().getCharge()).setScale(5, BigDecimal.ROUND_HALF_UP);
-                    
+
                     pw.print(resultFile.getName().substring(0, resultFile.getName().indexOf(".txt"))
                             + COLUMN_DELIMITER + identification.getSpectrumId()
                             + COLUMN_DELIMITER + identification.getPeptide().getPeptideId()
@@ -151,21 +147,18 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
                     pw.println();
                 } catch (AASequenceMassUnknownException ex) {
                     LOGGER.error(ex.getMessage(), ex);
-                }                                
+                }
             }
-            
-            pw.close();
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
     }
-    
+
     @Override
     public SpectrumAnnotatorResult readResult(File resultFile) {
         SpectrumAnnotatorResult spectrumAnnotatorResult = null;
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(resultFile));
-            
+
+        try (BufferedReader br = new BufferedReader(new FileReader(resultFile))) {
             String experimentAccession = resultFile.getName().substring(0, resultFile.getName().lastIndexOf(".txt"));
             LOGGER.info("Start reading pipeline result file for experiment " + experimentAccession);
             spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
@@ -173,19 +166,19 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
             if (modifications == null) {
                 loadModifications();
             }
-            
+
             String line = null;
             while ((line = br.readLine()) != null) {
                 if (!line.startsWith("spectrum_id")) {
                     String[] splits = line.split(COLUMN_DELIMITER);
-                    
+
                     long spectrumId = Long.parseLong(splits[SPECTRUM_ID]);
                     long peptide_id = Long.parseLong(splits[PEPTIDE_ID]);
                     String sequence = splits[PEPTIDE_SEQUENCE];
                     double precursorMass = Double.parseDouble(splits[PRECURSOR_MZ]);
                     int precursorCharge = Integer.parseInt(splits[PRECURSOR_CHARGE]);
                     PipelineExplanationType pipelineExplanationType = PipelineExplanationType.valueOf(splits[EXPLANATION]);
-                    
+
                     Peptide peptide = null;
                     //check for modifications
                     if (splits[MODIFICATIONS].equals(NOT_AVAILABLE)) {
@@ -195,7 +188,7 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
                         //add the modifications to the modified peptide                        
                         parseModifications((ModifiedPeptide) peptide, splits[MODIFICATIONS]);
                     }
-                    
+
                     Identification identification = new Identification(peptide, "", spectrumId, 0L);
                     identification.setPipelineExplanationType(pipelineExplanationType);
 
@@ -210,7 +203,7 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
                             List<FragmentIonAnnotation> fragmentIonAnnotations = parseFragmentIonAnnotations(splits[FRAGMENT_IONS]);
                             annotationData.setFragmentIonAnnotations(fragmentIonAnnotations);
                         }
-                        
+
                         identification.setAnnotationData(annotationData);
                     }
                     //add identification to SpectrumAnnotatorResult
@@ -218,7 +211,6 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
                 }
             }
             LOGGER.info("Finished reading " + spectrumAnnotatorResult.getNumberOfIdentifications() + " identifications for experiment " + experimentAccession);
-            br.close();
         } catch (UnknownAAException e) {
             LOGGER.error(e.getMessage(), e);
         } catch (FileNotFoundException e) {
@@ -226,7 +218,7 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
-        
+
         return spectrumAnnotatorResult;
     }
 
@@ -238,7 +230,7 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
      */
     private String constructModifications(ModifiedPeptide modifiedPeptide) {
         Joiner modificationsJoiner = Joiner.on(MODIFICATIONS_DELIMITER);
-        List<String> modifications = new ArrayList<String>();
+        List<String> modifications = new ArrayList<>();
         if (modifiedPeptide.getNTermMod() != null) {
             modifications.add("NT_" + modifiedPeptide.getNTermMod().getName());
         }
@@ -253,31 +245,31 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
         if (modifiedPeptide.getCTermMod() != null) {
             modifications.add("CT_" + modifiedPeptide.getCTermMod().getName());
         }
-        
+
         return "mods[" + modificationsJoiner.join(modifications) + "]";
     }
-    
+
     private String constructScore(IdentificationScore identificationScore) {
         String score = "" + MathUtils.roundDouble(identificationScore.getAverageFragmentIonScore()) + SCORE_OPEN
                 + identificationScore.getMatchingPeaks() + SCORE_DELIMITER
                 + identificationScore.getTotalPeaks() + SCORE_DELIMITER
                 + identificationScore.getMatchingIntensity() + SCORE_DELIMITER
                 + identificationScore.getTotalIntensity() + SCORE_CLOSE;
-        
-        
+
+
         return score;
     }
-    
+
     private String constructFragmentIons(List<FragmentIonAnnotation> fragmentIonAnnotations) {
         //first sort the fragment ion annotations before iterating over them
         Collections.sort(fragmentIonAnnotations, new FragmentIonAnnotationComparator());
-        
-        List<String> fragmentIonsByIonType = new ArrayList<String>();
-        List<String> fragmentIonNumbersByIonType = new ArrayList<String>();
+
+        List<String> fragmentIonsByIonType = new ArrayList<>();
+        List<String> fragmentIonNumbersByIonType = new ArrayList<>();
         Joiner fragmentIonTypeJoiner = Joiner.on(FRAGMENT_ION_TYPE_DELIMITER);
         Joiner fragmentIonNumberJoiner = Joiner.on(FRAGMENT_ION_NUMBER_DELIMITER);
         String currentIonType = constructIonType(fragmentIonAnnotations.get(0));
-        
+
         for (int i = 0; i < fragmentIonAnnotations.size(); i++) {
             //check if the ion type is still the same
             if (currentIonType.equals(constructIonType(fragmentIonAnnotations.get(i)))) {
@@ -295,23 +287,23 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
         }
         //add the last fragment ion type        
         fragmentIonsByIonType.add(currentIonType + FRAGMENT_ION_NUMBERS_OPEN + fragmentIonNumberJoiner.join(fragmentIonNumbersByIonType) + FRAGMENT_ION_NUMBERS_CLOSE);
-        
+
         return FRAGMENT_IONS_OPEN + fragmentIonTypeJoiner.join(fragmentIonsByIonType) + FRAGMENT_IONS_CLOSE;
     }
-    
+
     private String constructFragmentIonPeakValues(FragmentIonAnnotation fragmentIonAnnotation) {
         String fragmentIonNumberValue = "" + fragmentIonAnnotation.getFragment_ion_number() + FRAGMENT_ION_PEAK_VALUES_OPEN
                 + fragmentIonAnnotation.getMz() + FRAGMENT_ION_PEAK_VALUES_DELIMITER
                 + fragmentIonAnnotation.getIntensity()
                 + FRAGMENT_ION_PEAK_VALUES_CLOSE;
-        
+
         return fragmentIonNumberValue;
     }
-    
+
     private String constructIonType(FragmentIonAnnotation fragmentIonAnnotation) {
         return fragmentIonAnnotation.getIon_type_name() + "_" + fragmentIonAnnotation.getIon_charge() + "+";
     }
-    
+
     private IdentificationScore parseScore(String score, int peptideLength) {
         String scoreValues = score.substring(score.indexOf(SCORE_OPEN) + 1, score.indexOf(SCORE_CLOSE));
         //split into score values: 
@@ -320,20 +312,20 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
         //3. matching intensity
         //4. total intensity        
         String[] splits = scoreValues.split(SCORE_DELIMITER);
-        
+
         return new IdentificationScore(Integer.parseInt(splits[0]), Integer.parseInt(splits[1]), Long.parseLong(splits[2]), Long.parseLong(splits[3]), peptideLength);
     }
-    
+
     private List<FragmentIonAnnotation> parseFragmentIonAnnotations(String fragmentIonAnnotationString) {
-        List<FragmentIonAnnotation> fragmentIonAnnotations = new ArrayList<FragmentIonAnnotation>();
-        
+        List<FragmentIonAnnotation> fragmentIonAnnotations = new ArrayList<>();
+
         String fragmentIons = fragmentIonAnnotationString.substring(fragmentIonAnnotationString.indexOf(FRAGMENT_IONS_OPEN) + FRAGMENT_IONS_OPEN.length(), fragmentIonAnnotationString.indexOf(FRAGMENT_IONS_CLOSE));
         //split the fragments by ion types
         String[] fragmentsByIonType = fragmentIons.split(FRAGMENT_ION_TYPE_DELIMITER);
         for (String fragmentByIonType : fragmentsByIonType) {
             String ionType = fragmentByIonType.substring(0, fragmentByIonType.indexOf(FRAGMENT_ION_TYPE_CHARGE_DELIMITER));
             int charge = Integer.parseInt(fragmentByIonType.substring(fragmentByIonType.indexOf(FRAGMENT_ION_TYPE_CHARGE_DELIMITER) + 1, fragmentByIonType.indexOf(FRAGMENT_ION_NUMBERS_OPEN) - 1));
-            
+
             String fragmentIonNumbers = fragmentByIonType.substring(fragmentByIonType.indexOf(FRAGMENT_ION_NUMBERS_OPEN) + 1, fragmentByIonType.indexOf(FRAGMENT_ION_NUMBERS_CLOSE));
             //split by ion number
             String[] fragments = fragmentIonNumbers.split("\\" + FRAGMENT_ION_NUMBER_DELIMITER);
@@ -344,15 +336,15 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
                 fragmentIonAnnotations.add(fragmentIonAnnotation);
             }
         }
-        
+
         return fragmentIonAnnotations;
     }
-    
+
     private double[] parseFragmentIonPeakValues(String fragment) {
         double[] peakValues = new double[2];
         peakValues[0] = Double.parseDouble(fragment.substring(fragment.indexOf(FRAGMENT_ION_PEAK_VALUES_OPEN) + 1, fragment.indexOf(FRAGMENT_ION_PEAK_VALUES_DELIMITER)));
         peakValues[1] = Double.parseDouble(fragment.substring(fragment.indexOf(FRAGMENT_ION_PEAK_VALUES_DELIMITER) + 1, fragment.indexOf(FRAGMENT_ION_PEAK_VALUES_CLOSE)));
-        
+
         return peakValues;
     }
 
@@ -388,7 +380,7 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
      * the result file to the right modification
      */
     private void loadModifications() {
-        modifications = new HashMap<String, Modification>();
+        modifications = new HashMap<>();
         try {
             for (Modification modification : modificationService.loadPipelineModifications(ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file")))) {
                 modifications.put(modification.getName(), modification);

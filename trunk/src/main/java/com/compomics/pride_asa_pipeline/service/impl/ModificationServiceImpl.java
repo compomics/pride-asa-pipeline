@@ -26,10 +26,11 @@ import org.apache.log4j.Logger;
 public abstract class ModificationServiceImpl implements ModificationService {
 
     private static final Logger LOGGER = Logger.getLogger(ModificationServiceImpl.class);
+    private static final String[] ms1ModificationNames = {"itraq", "tmt"};
     protected ModificationMarshaller modificationMarshaller;
     protected OmssaModificationMarshaller omssaModificationMarshaller;
-    protected Set<Modification> pipelineModifications;        
-    
+    protected Set<Modification> pipelineModifications;
+
     public ModificationMarshaller getModificationMarshaller() {
         return modificationMarshaller;
     }
@@ -208,8 +209,9 @@ public abstract class ModificationServiceImpl implements ModificationService {
      * Adds a modification to the modifications. If the modification is already
      * present, check if the location needs to be updated.
      *
-     * @param modification
-     * @param modifications
+     * @param modification the modification
+     * @param modifications the map of modifications (key: modification name;
+     * value: modification)
      */
     protected void addModificationToModifications(Modification modification, Map<String, Modification> modifications) {
         if (modifications.containsKey(modification.getName())) {
@@ -222,6 +224,12 @@ public abstract class ModificationServiceImpl implements ModificationService {
                 presentModification.setLocation(Modification.Location.NON_TERMINAL);
             }
         } else {
+            //check for a MS1 modification       
+            for (String ms1ModName : ms1ModificationNames) {
+                if (modification.getName().toLowerCase().contains(ms1ModName)) {
+                    modification.setType(Modification.Type.MS1);
+                }
+            }
             modifications.put(modification.getName(), modification);
         }
     }
@@ -248,7 +256,7 @@ public abstract class ModificationServiceImpl implements ModificationService {
      * @param modificationFileName the modifications file name
      */
     private void loadPipelineModificationsFromResource(Resource modificationsResource) throws JDOMException {
-        pipelineModifications = new HashSet<Modification>();
+        pipelineModifications = new HashSet<>();
         pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationsResource));
     }
 }

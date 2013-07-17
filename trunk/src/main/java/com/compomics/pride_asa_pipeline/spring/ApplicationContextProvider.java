@@ -25,14 +25,21 @@ public class ApplicationContextProvider {
     }
 
     public ApplicationContext getApplicationContext() {
+        if (applicationContext == null) {
+            throw new IllegalStateException("The application context is not set yet.");
+        }
         return applicationContext;
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
-    
-    public void setDefaultApplicationContext(){
+
+    public void setDefaultApplicationContext() {
         this.applicationContext = new ClassPathXmlApplicationContext("springXMLConfig.xml");
+    }
+    
+    public <T> T getBean(String beanName) {
+        return (T) applicationContext.getBean(beanName);
     }
 }

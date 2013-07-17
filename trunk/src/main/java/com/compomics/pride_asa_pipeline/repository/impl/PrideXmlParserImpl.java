@@ -49,7 +49,6 @@ public class PrideXmlParserImpl implements PrideXmlParser {
     private List<Modification> modifications = new ArrayList<>();
 
     public PrideXmlParserImpl() {
-        System.out.println("----------------------- new PrideXmlParserImpl instance created by thread " + Thread.currentThread().getName());
     }
 
     /**
@@ -73,7 +72,7 @@ public class PrideXmlParserImpl implements PrideXmlParser {
 
     @Override
     public List<Identification> getExperimentIdentifications() {
-        List<Identification> identifications = new ArrayList<Identification>();
+        List<Identification> identifications = new ArrayList<>();
 
         //Iterate over each protein identification
         for (String proteinIdentificationId : prideXmlReader.getIdentIds()) {

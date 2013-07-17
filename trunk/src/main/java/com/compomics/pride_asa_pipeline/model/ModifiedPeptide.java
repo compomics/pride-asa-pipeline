@@ -150,16 +150,16 @@ public class ModifiedPeptide extends Peptide {
     private double cumulativeModMass(int startIndex, int stopIndex) {
         double modMass = 0;
         for (int i = startIndex; i < stopIndex; i++) {
-            if (modifications[i] != null) {
+            if (modifications[i] != null && modifications[i].getType().equals(Modification.Type.MS2)) {
                 modMass += modifications[i].getMassShift();
             }
         }
-        if (startIndex == 0 && this.getNTermMod() != null) {
+        if (startIndex == 0 && this.getNTermMod() != null && this.getNTermMod().getType().equals(Modification.Type.MS2)) {
             //the current fragment includes the N-terminus and
             //has a N-terminal modification, so we add its mass
             modMass += getNTermMod().getMassShift();
         }
-        if (stopIndex == length() && this.getCTermMod() != null) {
+        if (stopIndex == length() && this.getCTermMod() != null && this.getCTermMod().getType().equals(Modification.Type.MS2)) {
             //the current fragment includes the C-terminus and
             //has a C-terminal modification, so we add its mass
             modMass += getCTermMod().getMassShift();

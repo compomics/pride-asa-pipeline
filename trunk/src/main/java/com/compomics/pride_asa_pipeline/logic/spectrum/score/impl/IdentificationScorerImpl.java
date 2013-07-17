@@ -10,25 +10,14 @@ import java.util.*;
  * this template use File | Settings | File Templates.
  */
 public class IdentificationScorerImpl implements IdentificationScorer {
-
-    private double fragmentMassError;
-
+    
     public IdentificationScorerImpl() {
-    }
-
-    public double getFragmentMassError() {
-        return fragmentMassError;
-    }
+    }    
 
     @Override
-    public void setFragmentMassError(double fragmentMassError) {
-        this.fragmentMassError = fragmentMassError;
-    }
-
-    @Override
-    public AnnotationData score(Peptide peptide, List<Peak> peaks) {
+    public AnnotationData score(Peptide peptide, List<Peak> peaks, double fragmentMassError) {
         //check the Y- and B-ions
-        Map<FragmentIonAnnotation.IonType, double[][]> ionLadderMasses = new EnumMap<FragmentIonAnnotation.IonType, double[][]>(FragmentIonAnnotation.IonType.class);
+        Map<FragmentIonAnnotation.IonType, double[][]> ionLadderMasses = new EnumMap<>(FragmentIonAnnotation.IonType.class);
         //add charge ladders
         double[][] yMasses = {peptide.getYIonLadderMasses(1), peptide.getYIonLadderMasses(2)};
         double[][] bMasses = {peptide.getBIonLadderMasses(1), peptide.getBIonLadderMasses(2)};
@@ -41,13 +30,13 @@ public class IdentificationScorerImpl implements IdentificationScorer {
         //total peak count of the spectrum
         int totalPeakCount = peaks.size();
 
-        List<FragmentIonAnnotation> fragmentIonAnnotations = new ArrayList<FragmentIonAnnotation>();
+        List<FragmentIonAnnotation> fragmentIonAnnotations = new ArrayList<>();
         int matchingPeakCount = 0;
         long matchingIntensity = 0;
 
         //keep track of all the matched peaks in a set
         //to be sure that a peak is scored only once
-        Set<Peak> matchedPeakSet = new HashSet<Peak>();
+        Set<Peak> matchedPeakSet = new HashSet<>();
 
         //iterate over all fragment ion types
         for (FragmentIonAnnotation.IonType ionType : ionLadderMasses.keySet()) {
@@ -57,7 +46,7 @@ public class IdentificationScorerImpl implements IdentificationScorer {
                 //iterate over all ion ladder masses for one charge state
                 for (int j = 0; j < ionLadderMassMatrix[i].length; j++) {
                     double ionLadderMass = ionLadderMassMatrix[i][j];
-                    Peak matchingPeak = findMatchingPeak(ionLadderMass, peaks);
+                    Peak matchingPeak = findMatchingPeak(ionLadderMass, peaks, fragmentMassError);
                     if (matchingPeak != null && !matchedPeakSet.contains(matchingPeak)) {
                         //add peak to matchedPeakSet
                         matchedPeakSet.add(matchingPeak);
@@ -93,7 +82,7 @@ public class IdentificationScorerImpl implements IdentificationScorer {
      * ion.
      * @see this#isHit(double, double)
      */
-    private Peak findMatchingPeak(double fragmentMz, List<Peak> signalPeaks) {
+    private Peak findMatchingPeak(double fragmentMz, List<Peak> signalPeaks, double fragmentMassError) {
         Peak bestMatch = null;
         double highestIntensity = -1;
 
@@ -117,7 +106,7 @@ public class IdentificationScorerImpl implements IdentificationScorer {
      * @param signalPeaks the list of peaks
      * @return the total intensity
      */
-    public long getTotalIntensity(List<Peak> signalPeaks) {
+    private long getTotalIntensity(List<Peak> signalPeaks) {
         long totalIntensity = 0;
         for (Peak peak : signalPeaks) {
             totalIntensity += peak.getIntensity();

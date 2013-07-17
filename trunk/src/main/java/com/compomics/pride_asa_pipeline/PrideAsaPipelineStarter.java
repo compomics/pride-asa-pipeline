@@ -98,14 +98,14 @@ public class PrideAsaPipelineStarter {
     public static void launchCommandLineMode(String experimentAccession) {
         ApplicationContextProvider.getInstance().setDefaultApplicationContext();
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-        CommandLineRunner commandLineRunner = (CommandLineRunner) applicationContext.getBean("commandLineRunner");
+        DbCommandLineRunner commandLineRunner = (DbCommandLineRunner) applicationContext.getBean("dbCommandLineRunner");
         commandLineRunner.runPipeline(experimentAccession);
     }
 
     public static void launchCommandLineMode(File experimentAccessionsFile) {
         ApplicationContextProvider.getInstance().setDefaultApplicationContext();
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-        CommandLineRunner commandLineRunner = (CommandLineRunner) applicationContext.getBean("commandLineRunner");
+        DbCommandLineRunner commandLineRunner = (DbCommandLineRunner) applicationContext.getBean("dbCommandLineRunner");
         commandLineRunner.runPipeline(experimentAccessionsFile);
     }
 

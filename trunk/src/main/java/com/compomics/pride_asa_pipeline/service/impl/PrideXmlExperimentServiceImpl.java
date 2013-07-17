@@ -24,7 +24,6 @@ public class PrideXmlExperimentServiceImpl extends ExperimentServiceImpl impleme
     private PrideXmlParser prideXmlParser;
 
     public PrideXmlExperimentServiceImpl() {
-        System.out.println("----------------------- new PrideXmlExperimentServiceImpl instance created by thread " + Thread.currentThread().getName());
     }   
 
     public PrideXmlParser getPrideXmlParser() {

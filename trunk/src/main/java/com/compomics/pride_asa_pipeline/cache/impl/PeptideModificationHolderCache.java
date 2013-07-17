@@ -19,7 +19,6 @@ public class PeptideModificationHolderCache extends LinkedHashMap<String, Peptid
     private static final long serialVersionUID = 1L;   
 
     public PeptideModificationHolderCache() {
-        System.out.println("----------------------- new PeptideModificationHolderCache instance created by thread " + Thread.currentThread().getName());
     }        
     
     /**

@@ -73,6 +73,28 @@
         <accession>MOD:00420</accession>
         <accessionValue>2-pyrrolidone-5-carboxylic acid (Glu)</accessionValue>
     </modification>
+    <modification>
+        <name>iTRAQ4plex-114 N-terminus</name>
+        <monoIsotopicMassShift>144.105919</monoIsotopicMassShift>
+        <averageMassShift>144.11</averageMassShift>
+        <location>N-terminus</location>
+        <affectedAminoAcids>
+            <affectedAminoAcid>*</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:01485</accession>
+        <accessionValue>iTRAQ4plex-114 reporter+balance reagent acylated residue</accessionValue>
+    </modification>
+    <modification>
+        <name>iTRAQ4plex-114 Lysine</name>
+        <monoIsotopicMassShift>144.105919</monoIsotopicMassShift>
+        <averageMassShift>144.11</averageMassShift>
+        <location>any</location>
+        <affectedAminoAcids>
+            <affectedAminoAcid>K</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:01485</accession>
+        <accessionValue>iTRAQ4plex-114 reporter+balance reagent acylated residue</accessionValue>
+    </modification>
 
 
     <!-- modifications for experiment 9777 (prod)

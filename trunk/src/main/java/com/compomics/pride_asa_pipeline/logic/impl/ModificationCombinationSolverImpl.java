@@ -22,7 +22,6 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
     private ZenArcher zenArcher;
 
     public ModificationCombinationSolverImpl(ModificationHolder modificationHolder) {
-        System.out.println("----------------------- new ModificationCombinationSolverImpl instance created by thread " + Thread.currentThread().getName());
         if (modificationHolder == null || modificationHolder.getNumberOfModifications() < 1) {
             //no modifications to choose from!
             LOGGER.error("ERROR: no selection for all possible modifications has been provided!");
@@ -152,7 +151,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
                 addToModificationCombinations(modificationCombinations, mappedModifications.iterator().next());
             } else {
                 //report that and then try to compensate
-                LOGGER.warn("WARNING: more than one modifications map to the mass '" + combinationMass + "'. Trying to take all possibilities into account.");
+                LOGGER.debug("WARNING: more than one modifications map to the mass '" + combinationMass + "'. Trying to take all possibilities into account.");
                 //whenever we have more than one possible modification for the mass,
                 //we have to create a duplicate of the current ModComb(s) for each of the
                 //possibilities and add one of the mapped mods each

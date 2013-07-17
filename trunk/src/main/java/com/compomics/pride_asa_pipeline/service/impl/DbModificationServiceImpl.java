@@ -32,10 +32,10 @@ public class DbModificationServiceImpl extends ModificationServiceImpl implement
 
     @Override
     public Set<Modification> loadExperimentModifications(List<Peptide> completePeptides) {
-        Map<String, Modification> modificationMap = new HashMap<String, Modification>();
+        Map<String, Modification> modificationMap = new HashMap<>();
 
         //iterate over the complete peptides and retrieve for each peptide the modifications stored in pride
-        List<Modification> modificationList = null;
+        List<Modification> modificationList;
         for (Peptide peptide : completePeptides) {
             modificationList = modificationRepository.getModificationsByPeptideId(peptide.getPeptideId());
             //add the peptide modifications to the modifications
@@ -45,7 +45,7 @@ public class DbModificationServiceImpl extends ModificationServiceImpl implement
         }
 
         //add modifications to set
-        Set<Modification> modifications = new HashSet<Modification>();
+        Set<Modification> modifications = new HashSet<>();
         modifications.addAll(modificationMap.values());
 
         return modifications;

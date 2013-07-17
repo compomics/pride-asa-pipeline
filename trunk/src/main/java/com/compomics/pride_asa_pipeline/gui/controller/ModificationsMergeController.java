@@ -5,7 +5,6 @@ package com.compomics.pride_asa_pipeline.gui.controller;
 import com.compomics.pride_asa_pipeline.gui.view.ModificationsMergeDialog;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ModificationHolder;
-import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.util.GuiUtils;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -87,7 +86,7 @@ public class ModificationsMergeController extends WindowAdapter {
         modificationsMergeDialog = new ModificationsMergeDialog(experimentSelectionController.getMainController().getMainFrame());
         modificationsMergeDialog.addWindowListener(this);
 
-        addedPrideModifications = new HashSet<Modification>();
+        addedPrideModifications = new HashSet<>();
 
         //set list cell renderer
         modificationsMergeDialog.getPipelineModificationsList().setCellRenderer(new PipelineModificationsRenderer());
@@ -171,12 +170,7 @@ public class ModificationsMergeController extends WindowAdapter {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //add "added" pride modifications to the ModificationHolder
-                if(experimentSelectionController.isPrideXml()){
-                    experimentSelectionController.getMainController().getPrideXmlSpectrumAnnotator().getModificationHolder().addModifications(addedPrideModifications);
-                }
-                else{
-                    experimentSelectionController.getMainController().getPrideSpectrumAnnotator().getModificationHolder().addModifications(addedPrideModifications);
-                }
+                experimentSelectionController.getMainController().retrieveCurrentSpectrumAnnotator().getModificationHolder().addModifications(addedPrideModifications);                
                 
                 modificationsMergeDialog.setVisible(Boolean.FALSE);
                 experimentSelectionController.onModificationsLoaded();

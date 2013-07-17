@@ -20,6 +20,13 @@ public interface ModificationFacade {
      * @return the modification name
      */
     public String getName();
+    
+    /**
+     * Gets the modification type enum (MS1 or MS2)
+     * 
+     * @return the modification type
+     */
+    public Modification.Type getType();
 
 
 }

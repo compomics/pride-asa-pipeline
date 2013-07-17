@@ -32,9 +32,6 @@ import org.springframework.core.io.Resource;
 public class ModificationMarshallerImpl implements ModificationMarshaller {
 
     private static final Logger LOGGER = Logger.getLogger(ModificationMarshallerImpl.class);
-    private static final String N_TERMINAL_LOCATION_STRING = "N-terminus";
-    private static final String NON_TERMINAL_LOCATION_STRING = "any";
-    private static final String C_TERMINAL_LOCATION_STRING = "C-terminus";
     private Document document;
     private URL modificationsSchemaURL;
 
@@ -58,11 +55,10 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
             LOGGER.error(e.getMessage(), e);
         }
 
-        Set<Modification> result = new HashSet<Modification>();
+        Set<Modification> result = new HashSet<>();
 
         if (document != null) {
             Element eRoot = document.getRootElement();
-
 
             Filter modFilter = new ElementFilter("modification");
             Iterator<Element> modIter = eRoot.getDescendants(modFilter);
@@ -70,7 +66,7 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
                 Element modificationElement = modIter.next();
                 Modification.Location location = readLocation(modificationElement);
                 List<Element> affectedAAsElements = modificationElement.getChild("affectedAminoAcids").getChildren("affectedAminoAcid");
-                Set<AminoAcid> affectedAminoAcids = new HashSet<AminoAcid>();
+                Set<AminoAcid> affectedAminoAcids = new HashSet<>();
                 for (Element eAffectedAA : affectedAAsElements) {
                     String letter = eAffectedAA.getValue();
                     if (letter.equals("*")) { // * is wildcard for all amino acids
@@ -85,17 +81,16 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
                 double monoIsotopicMassShift = Double.parseDouble(modificationElement.getChild("monoIsotopicMassShift").getValue());
                 double averageMassShift = Double.parseDouble(modificationElement.getChild("averageMassShift").getValue());
                 Element accessionElement = modificationElement.getChild("accession");
-                String modAccession = null;
-                if (accessionElement != null) {
-                    modAccession = accessionElement.getValue();
-                }
+                String modAccession = accessionElement.getValue();
                 Element accessionValueElement = modificationElement.getChild("accessionValue");
-                String modAccessionValue = null;
-                if (accessionValueElement != null) {
-                    modAccessionValue = accessionValueElement.getValue();
-                }
+                String modAccessionValue = accessionValueElement.getValue();
 
                 Modification modification = new Modification(name, monoIsotopicMassShift, averageMassShift, location, affectedAminoAcids, modAccession, modAccessionValue);
+                Modification.Type type = readType(modificationElement);
+                if (type != null) {
+                    modification.setType(type);
+                }
+
                 result.add(modification);
             }
         }
@@ -129,8 +124,12 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
                 modificationElement.addContent(originElement);
 
                 Element locationElement = new Element("location");
-                locationElement.setText(getPositionAsString(modification.getLocation()));
+                locationElement.setText(modification.getLocation().getUserFriendlyValue());
                 modificationElement.addContent(locationElement);
+
+                Element typeElement = new Element("type");
+                typeElement.setText(modification.getType().toString());
+                modificationElement.addContent(typeElement);
 
                 Element affectedAminoAcidsElement = new Element("affectedAminoAcids");
 
@@ -171,31 +170,26 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
     }
 
     private Modification.Location readLocation(Element eModification) {
-        Modification.Location position;
+        Modification.Location position = null;
         String txtPosition = eModification.getChild("location").getValue();
-        if (txtPosition.equals(NON_TERMINAL_LOCATION_STRING)) {
-            position = Modification.Location.NON_TERMINAL;
-        } else if (txtPosition.equals(N_TERMINAL_LOCATION_STRING)) {
-            position = Modification.Location.N_TERMINAL;
-        } else if (txtPosition.equals(C_TERMINAL_LOCATION_STRING)) {
-            position = Modification.Location.C_TERMINAL;
-        } else {
-            throw new IllegalArgumentException("Modification position '"
-                    + txtPosition + "' is not recognised.");
+        for (Modification.Location location : Modification.Location.values()) {
+            if (txtPosition.equals(location.getUserFriendlyValue())) {
+                position = location;
+                break;
+            }
         }
+
         return position;
     }
 
-    private String getPositionAsString(Modification.Location location) {
-        String locationString = "";
-        if (location.equals(Modification.Location.N_TERMINAL)) {
-            locationString = N_TERMINAL_LOCATION_STRING;
-        } else if (location.equals(Modification.Location.NON_TERMINAL)) {
-            locationString = NON_TERMINAL_LOCATION_STRING;
-        } else {
-            locationString = C_TERMINAL_LOCATION_STRING;
+    private Modification.Type readType(Element modification) {
+        Modification.Type type = null;
+        if (modification.getChild("type") != null) {
+            String txtType = modification.getChild("type").getValue();
+
+            type = Modification.Type.valueOf(txtType);
         }
 
-        return locationString;
+        return type;
     }
 }

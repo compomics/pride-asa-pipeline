@@ -57,7 +57,6 @@ public class PrideXmlParserImpl2 implements PrideXmlParser {
     private List<Modification> modifications = new ArrayList<>();
 
     public PrideXmlParserImpl2() {
-        System.out.println("----------------------- new PrideXmlParserImpl2 instance created by thread " + Thread.currentThread().getName());
     }
 
     /**

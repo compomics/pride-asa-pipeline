@@ -20,7 +20,6 @@ public class PrideXmlSpectrumServiceImpl implements PrideXmlSpectrumService {
     private PrideXmlParser prideXmlParser;
 
     public PrideXmlSpectrumServiceImpl() {
-        System.out.println("----------------------- new PrideXmlSpectrumServiceImpl instance created by thread " + Thread.currentThread().getName());
     }           
 
     public PrideXmlParser getPrideXmlParser() {

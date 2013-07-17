@@ -15,15 +15,31 @@ public class Modification implements Comparable<Modification>, ModificationFacad
 
     public static enum Location {
 
-        N_TERMINAL,
-        C_TERMINAL,
-        NON_TERMINAL
+        N_TERMINAL("N-terminus"),
+        C_TERMINAL("C-terminus"),
+        NON_TERMINAL("any");
+        
+        private final String userFriendlyValue;
+
+        private Location(String userFriendlyValue) {
+            this.userFriendlyValue = userFriendlyValue;
+        }
+
+        public String getUserFriendlyValue() {
+            return userFriendlyValue;
+        }
     }
 
     public static enum Origin {
 
         PIPELINE,
         PRIDE
+    }
+
+    public static enum Type {
+
+        MS1,
+        MS2
     }
     private String name;
     private double monoIsotopicMassShift;
@@ -32,9 +48,10 @@ public class Modification implements Comparable<Modification>, ModificationFacad
     private Set<AminoAcid> affectedAminoAcids;
     private String accession;
     private String accessionValue;
-    private Origin origin;
-    private final SwingPropertyChangeSupport propertyChangeSupport = new SwingPropertyChangeSupport(this);        
-    
+    private Origin origin = Origin.PIPELINE;
+    private Type type = Type.MS2;
+    private final SwingPropertyChangeSupport propertyChangeSupport = new SwingPropertyChangeSupport(this);
+
     public Modification(double massShift, Location location, String accession, String accessionValue) {
         this.name = accessionValue;
         this.location = location;
@@ -43,7 +60,7 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         this.accession = accession;
         this.accessionValue = accessionValue;
         affectedAminoAcids = new HashSet<>();
-    }        
+    }
 
     public Modification(String name, double monoIsotopicMassShift, double averageMassShift, Location location, Set<AminoAcid> affectedAminoAcids, String accession, String accessionValue) {
         this.name = name;
@@ -53,7 +70,6 @@ public class Modification implements Comparable<Modification>, ModificationFacad
         this.affectedAminoAcids = affectedAminoAcids;
         this.accession = accession;
         this.accessionValue = accessionValue;
-        origin = Origin.PIPELINE;
     }
 
     public double getAverageMassShift() {
@@ -141,7 +157,18 @@ public class Modification implements Comparable<Modification>, ModificationFacad
     }
 
     public void setOrigin(Origin origin) {
+        Origin oldOrigin = this.origin;
         this.origin = origin;
+        propertyChangeSupport.firePropertyChange("type", oldOrigin, origin);
+    }
+
+    @Override
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     @Override
