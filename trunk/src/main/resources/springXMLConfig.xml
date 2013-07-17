@@ -44,7 +44,7 @@
     </bean>
     
     <bean id="prideXmlSpectrumAnnotator"
-          class="com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator" init-method="initBean">        
+          class="com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator" scope="prototype" init-method="initBean">        
         <property name="prideXmlParser" ref="prideXmlParser"/>
         <property name="experimentService" ref="prideXmlExperimentService"/>
         <property name="spectrumService" ref="prideXmlSpectrumService"/>
@@ -73,7 +73,7 @@
     </bean>
     
     <bean id="prideXmlExperimentService"
-          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlExperimentServiceImpl">
+          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlExperimentServiceImpl" scope="prototype">
         <property name="experimentRepository" ref="experimentRepository"/>
         <property name="resultHandler" ref="prideXmlResultHandler"/>
     </bean>  
@@ -85,7 +85,7 @@
     </bean>
     
     <bean id="prideXmlSpectrumService"
-          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlSpectrumServiceImpl">
+          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlSpectrumServiceImpl" scope="prototype">
     </bean>        
     
     <bean id="dbModificationService"
@@ -96,7 +96,7 @@
     </bean> 
     
     <bean id="prideXmlModificationService"
-          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlModificationServiceImpl">
+          class="com.compomics.pride_asa_pipeline.service.impl.PrideXmlModificationServiceImpl" scope="prototype">
         <property name="modificationMarshaller" ref="modificationMarshaller"/>
         <property name="omssaModificationMarshaller" ref="omssaModificationMarshaller"/>
     </bean> 
@@ -130,7 +130,7 @@
     </bean>
     
     <bean id="prideXmlParser"
-          class="com.compomics.pride_asa_pipeline.repository.impl.PrideXmlParserImpl2">
+          class="com.compomics.pride_asa_pipeline.repository.impl.PrideXmlParserImpl2" scope="prototype">
     </bean>        
     
     <bean id="fileResultHandler"
