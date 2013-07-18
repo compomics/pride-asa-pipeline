@@ -34,7 +34,7 @@
     </bean>
             
     <bean id="dbSpectrumAnnotator"
-          class="com.compomics.pride_asa_pipeline.logic.DbSpectrumAnnotator">        
+          class="com.compomics.pride_asa_pipeline.logic.DbSpectrumAnnotator" lazy-init="true">        
         <property name="experimentService" ref="dbExperimentService"/>
         <property name="spectrumService" ref="dbSpectrumService"/>
         <property name="modificationService" ref="dbModificationService"/>
@@ -43,8 +43,8 @@
         <property name="peptideVariationsGenerator" ref="peptideVariationsGenerator"/>
     </bean>
     
-    <bean id="prideXmlSpectrumAnnotator"
-          class="com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator" scope="prototype" init-method="initBean">        
+    <bean id="prideXmlSpectrumAnnotator"          
+          class="com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator" scope="prototype" init-method="initBean" lazy-init="true">        
         <property name="prideXmlParser" ref="prideXmlParser"/>
         <property name="experimentService" ref="prideXmlExperimentService"/>
         <property name="spectrumService" ref="prideXmlSpectrumService"/>
@@ -130,7 +130,7 @@
     </bean>
     
     <bean id="prideXmlParser"
-          class="com.compomics.pride_asa_pipeline.repository.impl.PrideXmlParserImpl2" scope="prototype">
+          class="com.compomics.pride_asa_pipeline.repository.impl.PrideXmlParserImpl" scope="prototype">
     </bean>        
     
     <bean id="fileResultHandler"

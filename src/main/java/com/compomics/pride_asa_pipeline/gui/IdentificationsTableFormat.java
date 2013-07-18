@@ -30,7 +30,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
     private static final String UNMOD_MASS_DELTA_OPEN = "[";
     private static final String UNMOD_MASS_DELTA_CLOSE = "]";
     private static final String[] columnNames = {"ID", "Peptide", "Modifications", "Charge", "Mass Delta", "M/Z Delta", "Precursor m/z", "Noise Threshold", "Score"};    
-    public static final int PEPTIDE_ID = 0;
+    public static final int SPECTRUM_REF = 0;
     public static final int PEPTIDE = 1;
     public static final int MODIFICATIONS = 2;
     public static final int CHARGE = 3;
@@ -44,7 +44,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
     @Override
     public Class getColumnClass(int column) {
         switch (column) {
-            case PEPTIDE_ID:
+            case SPECTRUM_REF:
                 return Long.class;
             case PEPTIDE:
                 return String.class;
@@ -86,8 +86,8 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
     public Object getColumnValue(Object baseObject, int column) {
         Identification identification = (Identification) baseObject;
         switch (column) {
-            case PEPTIDE_ID:
-                return identification.getPeptide().getPeptideId();
+            case SPECTRUM_REF:
+                return identification.getSpectrumRef();
             case PEPTIDE:
                 return identification.getPeptide().getSequenceString();
             case MODIFICATIONS:
@@ -112,7 +112,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
     private String constructModificationsString(Peptide peptide) {
         String modificationsInfoString = "0";
         if (peptide instanceof ModifiedPeptide) {
-            List<String> modifications = new ArrayList<String>();
+            List<String> modifications = new ArrayList<>();
 
             ModifiedPeptide modifiedPeptide = (ModifiedPeptide) peptide;
             if (modifiedPeptide.getNTermMod() != null) {

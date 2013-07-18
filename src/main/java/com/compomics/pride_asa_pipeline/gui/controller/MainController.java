@@ -47,9 +47,6 @@ public class MainController implements ActionListener {
     private DbSpectrumAnnotator dbSpectrumAnnotator;
     private PrideXmlSpectrumAnnotator prideXmlSpectrumAnnotator;
 
-    public MainController() {
-    }
-
     public ExperimentSelectionController getExperimentSelectionController() {
         return experimentSelectionController;
     }
@@ -98,13 +95,9 @@ public class MainController implements ActionListener {
         this.pipelineParamsController = pipelineParamsController;
     }
 
-    public AbstractSpectrumAnnotator retrieveCurrentSpectrumAnnotator() {
+    public AbstractSpectrumAnnotator getCurrentSpectrumAnnotator() {
         return currentSpectrumAnnotator;
-    }
-
-    public void assignCurrentSpectrumAnnotator(AbstractSpectrumAnnotator currentSpectrumAnnotator) {
-        this.currentSpectrumAnnotator = currentSpectrumAnnotator;
-    }
+    }    
 
     public MainFrame getMainFrame() {
         return mainFrame;
@@ -178,22 +171,12 @@ public class MainController implements ActionListener {
     /**
      * Set the current SpectrumAnnotator.
      *
-     * @param isPrideXml
+     * @param clazz the AbstractSpectrumAnnotator subclass
      */
-    public void setCurrentSpectrumAnnotator(boolean isPrideXml) {
-        currentSpectrumAnnotator = (isPrideXml) ? prideXmlSpectrumAnnotator : dbSpectrumAnnotator;
+    public void setCurrentSpectrumAnnotator(Class clazz) {
+        currentSpectrumAnnotator = (clazz == DbSpectrumAnnotator.class) ? dbSpectrumAnnotator : prideXmlSpectrumAnnotator;
     }
-
-    /**
-     * Get the type of SpectrumAnnotator
-     *
-     * @return
-     */
-    public boolean isPrideXmlSpectrumAnnotator() {
-        boolean isPrideXml = (currentSpectrumAnnotator instanceof PrideXmlSpectrumAnnotator) ? true : false;
-        return isPrideXml;
-    }
-
+    
     public void showMessageDialog(String title, String message, int messageType) {
         if (messageType == JOptionPane.ERROR_MESSAGE) {
             //add message to JTextArea

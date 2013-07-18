@@ -11,6 +11,7 @@ import com.compomics.pride_asa_pipeline.gui.IdentificationsTableFormat;
 import com.compomics.pride_asa_pipeline.gui.SpectrumPanelFactory;
 import com.compomics.pride_asa_pipeline.gui.view.IdentificationsPanel;
 import com.compomics.pride_asa_pipeline.gui.view.SummaryPanel;
+import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
 import com.compomics.pride_asa_pipeline.model.Identification;
@@ -20,7 +21,6 @@ import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.model.comparator.IdentificationSequenceComparator;
-import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import java.awt.Color;
 import java.awt.Component;
@@ -102,6 +102,10 @@ public class PipelineResultController {
     public void init() {
         usedModifications = new HashMap<>();
         modificationColors = new HashMap<>();
+        
+        //set PrideXmlSpectrumService
+        spectrumPanelFactory.setPrideXmlSpectrumService(mainController.getPrideXmlSpectrumAnnotator().getSpectrumService());
+        
         initIdentificationsPanel();
         initSummaryPanel();
     }
@@ -109,7 +113,7 @@ public class PipelineResultController {
     public void update(SpectrumAnnotatorResult spectrumAnnotatorResult) {
         this.spectrumAnnotatorResult = spectrumAnnotatorResult;
         //store used modifications        
-        usedModifications = mainController.retrieveCurrentSpectrumAnnotator().getModificationService().getUsedModifications(spectrumAnnotatorResult);
+        usedModifications = mainController.getCurrentSpectrumAnnotator().getModificationService().getUsedModifications(spectrumAnnotatorResult);
         constructModificationColors();
         updateIdentifications();
         updateSummary();
@@ -187,7 +191,7 @@ public class PipelineResultController {
         identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.MODIFICATIONS).setCellRenderer(new ModificationColumnRenderer());
 
         //set column widths
-        identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.PEPTIDE_ID).setPreferredWidth(5);
+        identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.SPECTRUM_REF).setPreferredWidth(5);
         identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.PEPTIDE).setPreferredWidth(200);
         identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.MODIFICATIONS).setPreferredWidth(200);
         identificationsPanel.getIdentificationsTable().getColumnModel().getColumn(IdentificationsTableFormat.CHARGE).setPreferredWidth(10);
@@ -209,7 +213,7 @@ public class PipelineResultController {
                     if (identificationsPanel.getIdentificationsTable().getSelectedRow() != -1) {
                         Identification identification = sortedIdentificationsList.get(identificationsPanel.getIdentificationsTable().getSelectedRow());
 
-                        SpectrumPanel spectrumPanel = spectrumPanelFactory.getSpectrumPanel(identification, mainController.isPrideXmlSpectrumAnnotator());
+                        SpectrumPanel spectrumPanel = spectrumPanelFactory.getSpectrumPanel(identification, mainController.getCurrentSpectrumAnnotator() instanceof PrideXmlSpectrumAnnotator);
 
                         addSpectrumPanel(spectrumPanel);
                     }

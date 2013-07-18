@@ -21,7 +21,7 @@ import org.springframework.core.io.Resource;
  *
  * @author Niels Hulstaert
  */
-public class PrideXmlSpectrumAnnotator extends AbstractSpectrumAnnotator {
+public class PrideXmlSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
 
     private static final Logger LOGGER = Logger.getLogger(PrideXmlSpectrumAnnotator.class);
     /**
@@ -33,7 +33,7 @@ public class PrideXmlSpectrumAnnotator extends AbstractSpectrumAnnotator {
      */
     private PrideXmlParser prideXmlParser;
     private PrideXmlExperimentService experimentService;
-
+    
     /**
      * Getters and setters
      */
@@ -63,6 +63,7 @@ public class PrideXmlSpectrumAnnotator extends AbstractSpectrumAnnotator {
         ((PrideXmlModificationService) modificationService).setPrideXmlParser(prideXmlParser);
     }
 
+    @Override
     public void initIdentifications(File experimentPrideXmlFile) {
         //@todo get a name take makes sense
         String experimentAccession = experimentPrideXmlFile.getName().substring(0, experimentPrideXmlFile.getName().indexOf(".xml"));

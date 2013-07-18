@@ -17,10 +17,7 @@ import org.apache.log4j.Logger;
 public class PrideXmlSpectrumServiceImpl implements PrideXmlSpectrumService {
 
     private static final Logger LOGGER = Logger.getLogger(PrideXmlSpectrumServiceImpl.class);
-    private PrideXmlParser prideXmlParser;
-
-    public PrideXmlSpectrumServiceImpl() {
-    }           
+    private PrideXmlParser prideXmlParser;        
 
     public PrideXmlParser getPrideXmlParser() {
         return prideXmlParser;

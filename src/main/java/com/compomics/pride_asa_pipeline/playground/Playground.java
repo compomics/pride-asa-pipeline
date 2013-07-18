@@ -4,6 +4,8 @@
  */
 package com.compomics.pride_asa_pipeline.playground;
 
+import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,6 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.context.ApplicationContext;
 
 /**
  * @author Niels Hulstaert
@@ -25,10 +28,11 @@ public class Playground {
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(Playground.class);
 
     public static void main(String[] args) {
-//        //load application context
-//        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-//
-//        PrideXmlSpectrumAnnotator prideSpectrumAnnotator = (PrideXmlSpectrumAnnotator) applicationContext.getBean("prideXmlSpectrumAnnotator");
+        //load application context
+        ApplicationContextProvider.getInstance().setDefaultApplicationContext();
+        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();        
+
+        PrideXmlSpectrumAnnotator prideSpectrumAnnotator = (PrideXmlSpectrumAnnotator) applicationContext.getBean("prideXmlSpectrumAnnotator");
 //        ResultHandler resultHandler = (ResultHandler) applicationContext.getBean("prideXmlResultHandler");
 //        Resource prideXmlResource = new FileSystemResource("C:\\Users\\niels\\Desktop\\PRIDE_Experiment_11954.xml");
 //        
