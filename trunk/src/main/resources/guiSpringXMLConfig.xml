@@ -25,7 +25,6 @@
         <property name="systematicMassErrorsController" ref="systematicMassErrorsController"/>
         <property name="modificationsMergeController" ref="modificationsMergeController"/>
         <property name="experimentService" ref="dbExperimentService"/>
-        <property name="modificationService" ref="dbModificationService"/>
         <property name="resultHandler" ref="dbResultHandler"/>
     </bean>
     
@@ -57,8 +56,7 @@
     
     <bean id="spectrumPanelFactory"
           class="com.compomics.pride_asa_pipeline.gui.SpectrumPanelFactory"> 
-        <property name="dbSpectrumService" ref="dbSpectrumService"/>
-        <property name="prideXmlSpectrumService" ref="prideXmlSpectrumService"/>
+        <property name="dbSpectrumService" ref="dbSpectrumService"/>        
     </bean>
     
     <bean id="pipelineParamsController"

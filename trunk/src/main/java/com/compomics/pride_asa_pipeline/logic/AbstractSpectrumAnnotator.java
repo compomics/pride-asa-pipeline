@@ -33,9 +33,10 @@ import org.apache.log4j.Logger;
  *
  * @author Niels Hulstaert
  */
-public abstract class AbstractSpectrumAnnotator {
+public abstract class AbstractSpectrumAnnotator<T> {
 
     private static final Logger LOGGER = Logger.getLogger(AbstractSpectrumAnnotator.class);
+    
     /**
      * The considered charge states
      */
@@ -142,6 +143,15 @@ public abstract class AbstractSpectrumAnnotator {
      * Abstract methods.
      */
 
+    
+    /**
+     * Loads the experiment identifications and calculates the systematic mass
+     * errors per charge state.
+     *
+     * @param t the experiment identifier
+     */
+    public abstract void initIdentifications(T t);
+    
     /**
      * Adds the pipeline modifications to the ModificationHolder and returns the
      * pride modifications as a set. If the pride modifications are not taken

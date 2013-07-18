@@ -5,9 +5,6 @@ import com.compomics.pride_asa_pipeline.model.*;
 import com.compomics.pride_asa_pipeline.service.DbExperimentService;
 import com.compomics.pride_asa_pipeline.service.DbModificationService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
-import com.google.common.io.Files;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
@@ -17,7 +14,7 @@ import org.springframework.core.io.Resource;
  * Created by IntelliJ IDEA. User: niels Date: 9/11/11 Time: 13:22 To change
  * this template use File | Settings | File Templates.
  */
-public class DbSpectrumAnnotator extends AbstractSpectrumAnnotator {
+public class DbSpectrumAnnotator extends AbstractSpectrumAnnotator<String> {
 
     private static final Logger LOGGER = Logger.getLogger(DbSpectrumAnnotator.class);
     /**
@@ -45,6 +42,7 @@ public class DbSpectrumAnnotator extends AbstractSpectrumAnnotator {
      *
      * @param experimentAccession the experiment accession number
      */
+    @Override
     public void initIdentifications(String experimentAccession) {
         areModificationsLoaded = false;
 

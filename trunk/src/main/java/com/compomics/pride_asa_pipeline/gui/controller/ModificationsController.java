@@ -110,7 +110,7 @@ public class ModificationsController {
         //table binding
         try {
             modificationsBindingList = ObservableCollections.observableList(getModificationsAsList(
-                    mainController.retrieveCurrentSpectrumAnnotator().getModificationService().loadPipelineModifications(modificationsResource)));
+                    mainController.getCurrentSpectrumAnnotator().getModificationService().loadPipelineModifications(modificationsResource)));
         } catch (JDOMParseException ex) {
             LOGGER.error(ex.getMessage(), ex);
             mainController.showMessageDialog("Import Unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
@@ -305,7 +305,7 @@ public class ModificationsController {
 
                     //import modifications and refill the binding list
                     try {
-                        Set<Modification> importedModifications = mainController.retrieveCurrentSpectrumAnnotator().getModificationService().importPipelineModifications(modificationsImportResource);
+                        Set<Modification> importedModifications = mainController.getCurrentSpectrumAnnotator().getModificationService().importPipelineModifications(modificationsImportResource);
 
                         modificationsBindingList.clear();
                         modificationsBindingList.addAll(importedModifications);
@@ -330,7 +330,7 @@ public class ModificationsController {
             public void actionPerformed(ActionEvent e) {
                 //check if modifications file in resources folder can be found
                 if (ResourceUtils.isExistingFile(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"))) {
-                    mainController.retrieveCurrentSpectrumAnnotator().getModificationService().savePipelineModifications(modificationsResource, modificationsBindingList);
+                    mainController.getCurrentSpectrumAnnotator().getModificationService().savePipelineModifications(modificationsResource, modificationsBindingList);
                 } else {
                     mainController.showMessageDialog("Save Unsuccessful", "The modifications could not be saved to file. "
                             + "\n" + "Please check if a \"pride_asap_modifications.xml\" file exists in the \"resources\" folder. "

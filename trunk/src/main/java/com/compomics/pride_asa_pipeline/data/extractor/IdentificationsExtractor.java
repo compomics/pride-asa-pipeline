@@ -24,7 +24,7 @@ public class IdentificationsExtractor implements ResultSetExtractor<List<Identif
 
     @Override
     public List<Identification> extractData(ResultSet rs) throws SQLException, DataAccessException {
-        List<Identification> identifications = new ArrayList<Identification>();
+        List<Identification> identifications = new ArrayList<>();
         while (rs.next()) {
             try {
                 //sequence

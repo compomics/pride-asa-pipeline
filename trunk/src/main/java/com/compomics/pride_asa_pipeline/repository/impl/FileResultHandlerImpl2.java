@@ -133,7 +133,7 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
                     BigDecimal mzDelta = new BigDecimal(identification.getPeptide().calculateMassDelta() / identification.getPeptide().getCharge()).setScale(5, BigDecimal.ROUND_HALF_UP);
 
                     pw.print(resultFile.getName().substring(0, resultFile.getName().indexOf(".txt"))
-                            + COLUMN_DELIMITER + identification.getSpectrumId()
+                            + COLUMN_DELIMITER + identification.getSpectrumRef()
                             + COLUMN_DELIMITER + identification.getPeptide().getPeptideId()
                             + COLUMN_DELIMITER + identification.getPeptide().getSequenceString()
                             + COLUMN_DELIMITER + MathUtils.roundDouble(identification.getPeptide().getMzRatio())

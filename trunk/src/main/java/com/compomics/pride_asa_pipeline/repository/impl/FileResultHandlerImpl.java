@@ -124,7 +124,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
                     modificationsString = constructModifications((ModifiedPeptide) identification.getPeptide());
                 }
 
-                pw.print(identification.getSpectrumId()
+                pw.print(identification.getSpectrumRef()
                         + COLUMN_DELIMITER + identification.getPeptide().getPeptideId()
                         + COLUMN_DELIMITER + identification.getPeptide().getSequenceString()
                         + COLUMN_DELIMITER + MathUtils.roundDouble(identification.getPeptide().getMzRatio())
