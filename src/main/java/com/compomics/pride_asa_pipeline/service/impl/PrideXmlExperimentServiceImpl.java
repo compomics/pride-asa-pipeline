@@ -30,6 +30,7 @@ public class PrideXmlExperimentServiceImpl extends ExperimentServiceImpl impleme
         return prideXmlParser;
     }
 
+    @Override
     public void setPrideXmlParser(PrideXmlParser prideXmlParser) {
         this.prideXmlParser = prideXmlParser;
     }        
@@ -100,7 +101,7 @@ public class PrideXmlExperimentServiceImpl extends ExperimentServiceImpl impleme
 
     @Override
     public Set<String> getProteinAccessions() {
-        Set<String> proteinAccessions = new HashSet<String>();
+        Set<String> proteinAccessions = new HashSet<>();
         List<String> proteinAccessionList = prideXmlParser.getProteinAccessions();
         for (String proteinAccession : proteinAccessionList) {
             proteinAccessions.add(proteinAccession);

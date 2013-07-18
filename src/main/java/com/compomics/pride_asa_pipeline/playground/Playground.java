@@ -4,7 +4,12 @@
  */
 package com.compomics.pride_asa_pipeline.playground;
 
+import com.compomics.pride_asa_pipeline.PrideXmlCommandLineRunner;
 import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.service.ModificationService;
+import com.compomics.pride_asa_pipeline.service.PrideXmlModificationService;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,59 +38,15 @@ public class Playground {
         ApplicationContextProvider.getInstance().setDefaultApplicationContext();
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();        
 
-        PrideXmlSpectrumAnnotator prideSpectrumAnnotator = (PrideXmlSpectrumAnnotator) applicationContext.getBean("prideXmlSpectrumAnnotator");
-//        ResultHandler resultHandler = (ResultHandler) applicationContext.getBean("prideXmlResultHandler");
-//        Resource prideXmlResource = new FileSystemResource("C:\\Users\\niels\\Desktop\\PRIDE_Experiment_11954.xml");
-//        
-//        try {
-//            prideSpectrumAnnotator.initPrideXmlFile(prideXmlResource.getFile());
-//            
-//            //init the annotiation
-//            prideSpectrumAnnotator.initIdentifications(prideXmlResource.getFile());
-//
-//            //check if the experiment has "useful" identifications
-//            if (prideSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
-//                //LOGGER.warn("No useful identifications were found for experiment " + experimentAccession + ". This experiment will be skipped.");
-//                prideSpectrumAnnotator.clearPipeline();
-//            } else {
-//                //check if the maximum systematic mass error is exceeded
-//                if (prideSpectrumAnnotator.getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
-//                    LOGGER.warn("One or more systematic mass error exceed the maximum value of " + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error") + ", experiment " + prideXmlResource.getFilename() + " will be skipped.");
-//                    prideSpectrumAnnotator.clearPipeline();
-//                } else {
-//                    //continue with the annotiation
-//                    prideSpectrumAnnotator.annotate(prideXmlResource.getFile());
-//                    //write result to file
-//                    resultHandler.writeResultToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
-//                    resultHandler.writeUsedModificationsToFile(prideSpectrumAnnotator.getSpectrumAnnotatorResult());
-//                }
-//            }
-//        } catch (Exception e) {
-//            LOGGER.error(e.getMessage(), e);
-//        }
-
-//        BigDecimal mzDelta = new BigDecimal(0.123456789).setScale(4, BigDecimal.ROUND_HALF_UP);
-//        System.out.println("--" +  mzDelta.toPlainString());
-
-//        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-//        Query olsClient = (Query) applicationContext.getBean("olsClient");        
-//        
-//        Map ontologyNames = olsClient.getOntologyNames();
-//        for (MapItem mapItem : ontologyNames.getItem()) {
-//            if (mapItem.getKey().equals("MS")) {
-//                System.out.println(mapItem.getKey());
-//                System.out.println(mapItem.getValue());
-//            }
-//        }
-//        
-//        String test = olsClient.getTermById("MOD:00408", "MOD"); 
-//        System.out.println(test);
-
-        Float f = 3F;
-        Double d = 3D;
-        Number n = d;
-//        double d = (double) n;
-        System.out.println("fff " + n.doubleValue());
+        PrideXmlCommandLineRunner prideXmlCommandLineRunner = applicationContext.getBean("prideXmlCommandLineRunner", PrideXmlCommandLineRunner.class);
+        prideXmlCommandLineRunner.runPrideXmlPipeline(new File("C:\\Users\\niels\\Desktop\\PRIDE_Exp_Complete_Ac_10886.xml"), true);
+        
+        SpectrumAnnotatorResult spectrumAnnotatorResult = prideXmlCommandLineRunner.getPrideXmlSpectrumAnnotator().getSpectrumAnnotatorResult();
+        ModificationService modificationService = prideXmlCommandLineRunner.getPrideXmlSpectrumAnnotator().getModificationService();
+        Map<Modification, Integer> usedModifications = modificationService.getUsedModifications(spectrumAnnotatorResult);
+        Map<Modification, Double> estimateModificationRate = modificationService.estimateModificationRate(usedModifications, spectrumAnnotatorResult, 0.05);  
+        
+        System.out.println("test");
     }
 
     public static File filterExperimentAccessions(File experimentAccessionsFile, File resultsDirectory) {

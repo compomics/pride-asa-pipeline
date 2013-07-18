@@ -66,7 +66,7 @@ public class DbCommandLineRunner {
                     dbSpectrumAnnotator.annotate();
                     //write result to file
                     dbResultHandler.writeResultToFile(dbSpectrumAnnotator.getSpectrumAnnotatorResult());
-                    dbResultHandler.writeUsedModificationsToFile(dbSpectrumAnnotator.getSpectrumAnnotatorResult());
+                    dbResultHandler.writeUsedModificationsToFile(experimentAccession, dbSpectrumAnnotator.getModificationService().getUsedModifications(dbSpectrumAnnotator.getSpectrumAnnotatorResult()).keySet());
                 }
             }
         } catch (Exception e) {

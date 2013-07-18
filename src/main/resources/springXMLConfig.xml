@@ -104,13 +104,13 @@
     <bean id="dbResultHandler"
           class="com.compomics.pride_asa_pipeline.service.impl.ResultHandlerImpl">
         <property name="fileResultHandler" ref="fileResultHandler"/>
-        <property name="modificationService" ref="dbModificationService"/>
+        <property name="modificationMarshaller" ref="modificationMarshaller"/>
     </bean>  
     
     <bean id="prideXmlResultHandler"
           class="com.compomics.pride_asa_pipeline.service.impl.ResultHandlerImpl" lazy-init="true">
         <property name="fileResultHandler" ref="fileResultHandler"/>
-        <property name="modificationService" ref="prideXmlModificationService"/>
+        <property name="modificationMarshaller" ref="modificationMarshaller"/>
     </bean>                                       
     
     <!-- repository beans -->

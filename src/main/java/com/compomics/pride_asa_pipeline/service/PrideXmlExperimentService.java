@@ -27,6 +27,8 @@ public interface PrideXmlExperimentService extends ExperimentService {
 
     void setPrideXmlParser(PrideXmlParser prideXmlParser);
     
+    ResultHandler getResultHandler();
+    
     /**
      * Clears the tmp resources.
      */

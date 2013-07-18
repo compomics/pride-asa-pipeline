@@ -95,7 +95,7 @@ public class PrideXmlCommandLineRunner {
                     prideXmlSpectrumAnnotator.annotate();
                     //write result to file
                     prideXmlResultHandler.writeResultToFile(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult());
-                    prideXmlResultHandler.writeUsedModificationsToFile(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult());
+                    prideXmlResultHandler.writeUsedModificationsToFile(experimentAccession, prideXmlSpectrumAnnotator.getModificationService().getUsedModifications(prideXmlSpectrumAnnotator.getSpectrumAnnotatorResult()).keySet());
                 }
             }
         } catch (Exception e) {
