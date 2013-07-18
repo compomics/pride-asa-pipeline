@@ -32,13 +32,13 @@ import org.springframework.core.io.Resource;
 public class ModificationMarshallerImpl implements ModificationMarshaller {
 
     private static final Logger LOGGER = Logger.getLogger(ModificationMarshallerImpl.class);
-    private Document document;
-    private URL modificationsSchemaURL;
+    private XMLReaderXSDFactory schemaFactory;
 
-    public ModificationMarshallerImpl() {
-        Resource resource = new ClassPathResource(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_schema_name"));
+    public ModificationMarshallerImpl() throws JDOMException {
         try {
-            modificationsSchemaURL = resource.getURL();
+            Resource resource = new ClassPathResource(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_schema_name"));
+            URL modificationsSchemaURL = resource.getURL();
+            schemaFactory = new XMLReaderXSDFactory(modificationsSchemaURL);
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage(), ex);
         }
@@ -46,9 +46,9 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
 
     @Override
     public Set<Modification> unmarshall(Resource modificationsResource) throws JDOMException {
-        XMLReaderJDOMFactory schemaFactory = new XMLReaderXSDFactory(modificationsSchemaURL);
         SAXBuilder builder = new SAXBuilder(schemaFactory);
 
+        Document document = null;
         try {
             document = builder.build(modificationsResource.getInputStream());
         } catch (IOException e) {

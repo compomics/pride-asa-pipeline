@@ -5,6 +5,7 @@
 package com.compomics.pride_asa_pipeline.service.impl;
 
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.logic.modification.ModificationMarshaller;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
@@ -26,7 +27,7 @@ import org.springframework.core.io.Resource;
 public class ResultHandlerImpl implements ResultHandler {
 
     private FileResultHandler fileResultHandler;
-    private ModificationService modificationService;
+    private ModificationMarshaller modificationMarshaller;
 
     public FileResultHandler getFileResultHandler() {
         return fileResultHandler;
@@ -36,13 +37,13 @@ public class ResultHandlerImpl implements ResultHandler {
         this.fileResultHandler = fileResultHandler;
     }
 
-    public ModificationService getModificationService() {
-        return modificationService;
+    public ModificationMarshaller getModificationMarshaller() {
+        return modificationMarshaller;
     }
 
-    public void setModificationService(ModificationService modificationService) {
-        this.modificationService = modificationService;
-    }
+    public void setModificationMarshaller(ModificationMarshaller modificationMarshaller) {
+        this.modificationMarshaller = modificationMarshaller;
+    }    
 
     @Override
     public void writeResultToFile(SpectrumAnnotatorResult spectrumAnnotatorResult) {
@@ -61,16 +62,9 @@ public class ResultHandlerImpl implements ResultHandler {
     }
 
     @Override
-    public void writeUsedModificationsToFile(SpectrumAnnotatorResult spectrumAnnotatorResult) {        
-        //get used modifications
-        Set<Modification> usedModifications = modificationService.getUsedModifications(spectrumAnnotatorResult).keySet();
-        writeUsedModificationsToFile(spectrumAnnotatorResult.getExperimentAccession(), usedModifications);        
-    }
-
-    @Override
     public void writeUsedModificationsToFile(String experimentAccession, Set<Modification> usedModifications) {
-        Resource usedModificationsResource = new FileSystemResource(PropertiesConfigurationHolder.getInstance().getString("results_path") + File.separator + experimentAccession + "_mods.xml");        
-        modificationService.savePipelineModifications(usedModificationsResource, usedModifications);
+        Resource usedModificationsResource = new FileSystemResource(PropertiesConfigurationHolder.getInstance().getString("results_path") + File.separator + experimentAccession + "_mods.xml");                
+        modificationMarshaller.marshall(usedModificationsResource, usedModifications);
     }
         
 }

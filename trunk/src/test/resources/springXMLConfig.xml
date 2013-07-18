@@ -40,7 +40,7 @@
         <property name="peptideVariationsGenerator" ref="peptideVariationsGenerator"/>
     </bean>
     
-    <bean id="prideXmlSpectrumAnnotator"
+    <bean id="prideXmlSpectrumAnnotator"          
           class="com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator" scope="prototype" init-method="initBean" lazy-init="true">        
         <property name="prideXmlParser" ref="prideXmlParser"/>
         <property name="experimentService" ref="prideXmlExperimentService"/>
@@ -101,13 +101,13 @@
     <bean id="dbResultHandler"
           class="com.compomics.pride_asa_pipeline.service.impl.ResultHandlerImpl">
         <property name="fileResultHandler" ref="fileResultHandler"/>
-        <property name="modificationService" ref="dbModificationService"/>
+        <property name="modificationMarshaller" ref="modificationMarshaller"/>
     </bean>  
     
     <bean id="prideXmlResultHandler"
           class="com.compomics.pride_asa_pipeline.service.impl.ResultHandlerImpl" lazy-init="true">
         <property name="fileResultHandler" ref="fileResultHandler"/>
-        <property name="modificationService" ref="prideXmlModificationService"/>
+        <property name="modificationMarshaller" ref="modificationMarshaller"/>
     </bean>                                       
     
     <!-- repository beans -->
