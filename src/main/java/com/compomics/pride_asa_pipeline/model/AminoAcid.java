@@ -45,8 +45,8 @@ public enum AminoAcid {
     private final String name;
     private final char letter;
     private final double mass;
-    private static final HashMap<Character, AminoAcid> letterMap = new HashMap<Character, AminoAcid>();
-    private static final HashMap<String, AminoAcid> nameMap = new HashMap<String, AminoAcid>();
+    private static final HashMap<Character, AminoAcid> letterMap = new HashMap<>();
+    private static final HashMap<String, AminoAcid> nameMap = new HashMap<>();
 
     static {
         for (AminoAcid aa : EnumSet.allOf(AminoAcid.class)) {

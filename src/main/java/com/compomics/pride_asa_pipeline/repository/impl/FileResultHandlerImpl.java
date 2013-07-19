@@ -154,7 +154,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
                 loadModifications();
             }
 
-            String line = null;
+            String line;
             while ((line = br.readLine()) != null) {
                 if (!line.startsWith("spectrum_id")) {
                     String[] splits = line.split(COLUMN_DELIMITER);
@@ -217,23 +217,23 @@ public class FileResultHandlerImpl implements FileResultHandler {
      */
     private String constructModifications(ModifiedPeptide modifiedPeptide) {
         Joiner modificationsJoiner = Joiner.on(MODIFICATIONS_DELIMITER);
-        List<String> modifications = new ArrayList<>();
+        List<String> modificationNames = new ArrayList<>();
         if (modifiedPeptide.getNTermMod() != null) {
-            modifications.add("NT_" + modifiedPeptide.getNTermMod().getName());
+            modificationNames.add("NT_" + modifiedPeptide.getNTermMod().getName());
         }
         if (modifiedPeptide.getNTModifications() != null) {
             for (int i = 0; i < modifiedPeptide.getNTModifications().length; i++) {
                 ModificationFacade modificationFacade = modifiedPeptide.getNTModifications()[i];
                 if (modificationFacade != null) {
-                    modifications.add((i + 1) + "_" + modificationFacade.getName());
+                    modificationNames.add((i + 1) + "_" + modificationFacade.getName());
                 }
             }
         }
         if (modifiedPeptide.getCTermMod() != null) {
-            modifications.add("CT_" + modifiedPeptide.getCTermMod().getName());
+            modificationNames.add("CT_" + modifiedPeptide.getCTermMod().getName());
         }
 
-        return "mods[" + modificationsJoiner.join(modifications) + "]";
+        return "mods[" + modificationsJoiner.join(modificationNames) + "]";
     }
 
     private String constructScore(IdentificationScore identificationScore) {
