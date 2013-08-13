@@ -56,7 +56,7 @@ public class FileResultHandlerTest {
         File tempResultFile = temporaryFolder.newFile("tempResultFile.txt");
 
         //add identifications
-        List<Identification> identifications = new ArrayList<Identification>();
+        List<Identification> identifications = new ArrayList<>();
 
         //create identification with annotation data
         Peptide peptide = new Peptide(1, 1649.8D, new AminoAcidSequence("AAKENNYLENNART"), 123L);
@@ -64,7 +64,7 @@ public class FileResultHandlerTest {
         identification_1.setPipelineExplanationType(PipelineExplanationType.UNMODIFIED);
         identifications.add(identification_1);
 
-        List<FragmentIonAnnotation> fragmentIonAnnotations = new ArrayList<FragmentIonAnnotation>();
+        List<FragmentIonAnnotation> fragmentIonAnnotations = new ArrayList<>();
         FragmentIonAnnotation fragmentIonAnnotation_1 = new FragmentIonAnnotation(1L, FragmentIonAnnotation.IonType.Y_ION, 2, 100.5, 100, 1);
         fragmentIonAnnotations.add(fragmentIonAnnotation_1);
 
@@ -87,7 +87,7 @@ public class FileResultHandlerTest {
         identification_1.setAnnotationData(annotationData);
 
         //create identification with modified peptide
-        Set<AminoAcid> modifiedAAs = new HashSet<AminoAcid>();
+        Set<AminoAcid> modifiedAAs = new HashSet<>();
         ModifiedPeptide modifiedPeptide = new ModifiedPeptide(1, new AminoAcidSequence("AAKENNYLENNART").getSequenceMass(), new AminoAcidSequence("AAKENNYLENNART"), 456L);
         modifiedPeptide.setNTModification(3, new Modification("testModification_1", 0.0, 0.0, Modification.Location.NON_TERMINAL, modifiedAAs, "mod_1", "mod_1"));
         modifiedPeptide.setNTModification(6, new Modification("testModification_2", 0.0, 0.0, Modification.Location.NON_TERMINAL, modifiedAAs, "mod_2", "mod_2"));

@@ -103,6 +103,30 @@
         <accession>MOD:01485</accession>
         <accessionValue>iTRAQ4plex-114 reporter+balance reagent acylated residue</accessionValue>
     </modification>
+    <modification>
+        <name>TMT6plex-131 N-terminus</name>
+        <monoIsotopicMassShift>229.162932</monoIsotopicMassShift>
+        <averageMassShift>229.16</averageMassShift>
+        <type>MS1</type>
+        <location>N-terminus</location>        
+        <affectedAminoAcids>
+            <affectedAminoAcid>*</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:01762</accession>
+        <accessionValue>TMT6plex-131 reporter+balance reagent acylated residue</accessionValue>
+    </modification>
+    <modification>
+        <name>TMT6plex-131 Lysine</name>
+        <monoIsotopicMassShift>229.162932</monoIsotopicMassShift>
+        <averageMassShift>229.16</averageMassShift>
+        <type>MS1</type>
+        <location>any</location>        
+        <affectedAminoAcids>
+            <affectedAminoAcid>K</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:01762</accession>
+        <accessionValue>TMT6plex-131 reporter+balance reagent acylated residue</accessionValue>
+    </modification>
 
 
     <!-- modifications for experiment 9777 (prod)
