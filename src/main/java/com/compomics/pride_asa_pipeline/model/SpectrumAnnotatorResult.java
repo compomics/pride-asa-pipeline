@@ -27,7 +27,7 @@ public class SpectrumAnnotatorResult {
     private Map<PipelineExplanationType, List<Identification>> identifications;
 
     public SpectrumAnnotatorResult() {
-        identifications = new EnumMap<PipelineExplanationType, List<Identification>>(PipelineExplanationType.class);
+        identifications = new EnumMap<>(PipelineExplanationType.class);
         identifications.put(PipelineExplanationType.UNEXPLAINED, new ArrayList<Identification>());
         identifications.put(PipelineExplanationType.UNMODIFIED, new ArrayList<Identification>());
         identifications.put(PipelineExplanationType.MODIFIED, new ArrayList<Identification>());
@@ -80,7 +80,7 @@ public class SpectrumAnnotatorResult {
      * @return the list of experiment identifications
      */
     public List<Identification> getIdentifications() {
-        List<Identification> allIdentifications = new ArrayList<Identification>();
+        List<Identification> allIdentifications = new ArrayList<>();
         allIdentifications.addAll(getUnexplainedIdentifications());
         allIdentifications.addAll(getUnmodifiedPrecursors());
         allIdentifications.addAll(getModifiedPrecursors());

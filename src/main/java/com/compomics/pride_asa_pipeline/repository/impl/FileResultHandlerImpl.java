@@ -168,7 +168,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
 
                     Peptide peptide = null;
                     //check for modifications
-                    if (splits[MODIFICATIONS].equals(NOT_AVAILABLE)) {
+                    if (splits[MODIFICATIONS].equals(NOT_AVAILABLE)) {                        
                         peptide = new Peptide(precursorCharge, precursorMass, new AminoAcidSequence(sequence), peptide_id);
                     } else {
                         peptide = new ModifiedPeptide(precursorCharge, precursorMass, new AminoAcidSequence(sequence), peptide_id);
