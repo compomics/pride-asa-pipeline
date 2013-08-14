@@ -101,10 +101,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 
+//set the default application context
+ApplicationContextProvider.getInstance().setDefaultApplicationContext();
 ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-PrideSpectrumAnnotator prideSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator"); 
+
+DbSpectrumAnnotator dbSpectrumAnnotator = applicationContext.getBean("dbSpectrumAnnotator", DbSpectrumAnnotator.class);
 //annotate the first PRIDE experiment
-prideSpectrumAnnotator.annotate("1"); 
+dbSpectrumAnnotator.annotate("1"); 
 }}}
 
 The two _Spring_ configuration files (`springXMLConfig.xml` and `guiSpringXMLConfig.xml`) can be found in the `scr\main\resources` folder.
