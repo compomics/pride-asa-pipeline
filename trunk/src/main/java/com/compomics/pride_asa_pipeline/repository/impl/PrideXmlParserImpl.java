@@ -85,8 +85,8 @@ public class PrideXmlParserImpl implements PrideXmlParser {
             for (int i = 0; i < numOfPeptides; i++) {
                 PeptideItem peptideItem = prideXmlReader.getPeptide(proteinIdentificationId, i);
 
-                //check if the peptide is not null
-                if (peptideItem.getSpectrum() != null) {
+                //check for possible null pointers
+                if (peptideItem.getSpectrum() != null && peptideItem.getSpectrum().getSpectrumDesc().getPrecursorList() != null) {
                     //get modifications
                     List<ModificationItem> modificationItems = peptideItem.getModificationItem();
                     for (ModificationItem modificationItem : modificationItems) {
@@ -95,10 +95,10 @@ public class PrideXmlParserImpl implements PrideXmlParser {
                             modifications.add(modification);
                         }
                     }
-
-                    //get spectrum precursor for m/z and charge
+                    
+                    //get spectrum precursor for m/z and charge                    
                     Precursor precursor = peptideItem.getSpectrum().getSpectrumDesc().getPrecursorList().getPrecursor().get(0);
-
+                    
                     //get precursor CvParams
                     List<CvParam> precursorCvParams = precursor.getIonSelection().getCvParam();
                     double mzRatio = 0.0;
