@@ -28,6 +28,7 @@ import uk.ac.ebi.pride.jaxb.model.Param;
 import uk.ac.ebi.pride.jaxb.model.PeptideItem;
 import uk.ac.ebi.pride.jaxb.model.Precursor;
 import uk.ac.ebi.pride.jaxb.model.Spectrum;
+import uk.ac.ebi.pride.jaxb.utils.CvTermReference;
 import uk.ac.ebi.pride.jaxb.xml.PrideXmlReader;
 
 /**
@@ -95,10 +96,10 @@ public class PrideXmlParserImpl implements PrideXmlParser {
                             modifications.add(modification);
                         }
                     }
-                    
+
                     //get spectrum precursor for m/z and charge                    
                     Precursor precursor = peptideItem.getSpectrum().getSpectrumDesc().getPrecursorList().getPrecursor().get(0);
-                    
+
                     //get precursor CvParams
                     List<CvParam> precursorCvParams = precursor.getIonSelection().getCvParam();
                     double mzRatio = 0.0;
@@ -160,14 +161,25 @@ public class PrideXmlParserImpl implements PrideXmlParser {
 
     @Override
     public List<Peak> getSpectrumPeaksBySpectrumId(String spectrumId) {
-        List<Peak> peaks = new ArrayList<Peak>();
+        List<Peak> peaks = new ArrayList<>();
 
         Spectrum spectrum = prideXmlReader.getSpectrumById(spectrumId);
         Number[] mzRatios = spectrum.getMzNumberArray();
         Number[] intensities = spectrum.getIntentArray();
 
+        //check precision
+        CvTermReference dataType = "32".equals(spectrum.getMzArrayBinary().getData().getPrecision())
+                ? CvTermReference.FLOAT_32_BIT : CvTermReference.FLOAT_64_BIT;
+
         for (int i = 0; i < mzRatios.length; i++) {
-            Peak peak = new Peak((Double) mzRatios[i], (Double) intensities[i]);
+            Peak peak;
+
+            if (dataType.equals(CvTermReference.FLOAT_32_BIT)) {
+                peak = new Peak((Float) mzRatios[i], (Float) intensities[i]);
+            } else {
+                peak = new Peak((Double) mzRatios[i], (Double) intensities[i]);
+            }
+
             peaks.add(peak);
         }
 
