@@ -5,7 +5,6 @@ import com.compomics.pride_asa_pipeline.gui.LoggingBindingListener;
 import com.compomics.pride_asa_pipeline.gui.view.ModificationConfigDialog;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
