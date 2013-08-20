@@ -106,8 +106,8 @@ public class PrideXmlParserImpl2 implements PrideXmlParser {
             for (int i = 0; i < numOfPeptides; i++) {
                 PeptideItem peptideItem = prideXmlReader.getPeptide(proteinIdentificationId, i);
 
-                //check if the peptide is not null
-                if (peptideItem.getSpectrum() != null) {
+                //check for possible null pointers
+                if (peptideItem.getSpectrum() != null && peptideItem.getSpectrum().getSpectrumDesc().getPrecursorList() != null) {
                     //get modifications
                     List<ModificationItem> modificationItems = peptideItem.getModificationItem();
                     for (ModificationItem modificationItem : modificationItems) {

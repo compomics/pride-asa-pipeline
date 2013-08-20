@@ -159,6 +159,33 @@ public class PrideXmlParserImpl implements PrideXmlParser {
         return modifications;
     }
 
+//    @Override
+//    public List<Peak> getSpectrumPeaksBySpectrumId(String spectrumId) {
+//        List<Peak> peaks = new ArrayList<>();
+//
+//        Spectrum spectrum = prideXmlReader.getSpectrumById(spectrumId);
+//        Number[] mzRatios = spectrum.getMzNumberArray();
+//        Number[] intensities = spectrum.getIntentArray();
+//
+//        //check precision
+//        CvTermReference dataType = "32".equals(spectrum.getMzArrayBinary().getData().getPrecision())
+//                ? CvTermReference.FLOAT_32_BIT : CvTermReference.FLOAT_64_BIT;
+//
+//        for (int i = 0; i < mzRatios.length; i++) {
+//            Peak peak;
+//
+//            if (dataType.equals(CvTermReference.FLOAT_32_BIT)) {
+//                peak = new Peak((Float) mzRatios[i], (Float) intensities[i]);
+//            } else {
+//                peak = new Peak((Double) mzRatios[i], (Double) intensities[i]);
+//            }
+//
+//            peaks.add(peak);
+//        }
+//
+//        return peaks;
+//    }
+    
     @Override
     public List<Peak> getSpectrumPeaksBySpectrumId(String spectrumId) {
         List<Peak> peaks = new ArrayList<>();
@@ -167,19 +194,8 @@ public class PrideXmlParserImpl implements PrideXmlParser {
         Number[] mzRatios = spectrum.getMzNumberArray();
         Number[] intensities = spectrum.getIntentArray();
 
-        //check precision
-        CvTermReference dataType = "32".equals(spectrum.getMzArrayBinary().getData().getPrecision())
-                ? CvTermReference.FLOAT_32_BIT : CvTermReference.FLOAT_64_BIT;
-
-        for (int i = 0; i < mzRatios.length; i++) {
-            Peak peak;
-
-            if (dataType.equals(CvTermReference.FLOAT_32_BIT)) {
-                peak = new Peak((Float) mzRatios[i], (Float) intensities[i]);
-            } else {
-                peak = new Peak((Double) mzRatios[i], (Double) intensities[i]);
-            }
-
+        for (int i = 0; i < mzRatios.length; i++) {            
+            Peak peak = new Peak(mzRatios[i].doubleValue(), intensities[i].doubleValue());
             peaks.add(peak);
         }
 
