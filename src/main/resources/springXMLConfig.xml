@@ -130,7 +130,7 @@
     </bean>
     
     <bean id="prideXmlParser"
-          class="com.compomics.pride_asa_pipeline.repository.impl.PrideXmlParserImpl2" scope="prototype">
+          class="com.compomics.pride_asa_pipeline.repository.impl.PrideXmlParserImpl" scope="prototype">
     </bean>        
     
     <bean id="fileResultHandler"

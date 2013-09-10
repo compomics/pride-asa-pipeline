@@ -113,7 +113,7 @@ public class ModificationsMergeController extends WindowAdapter {
         Binding prideModAverageMassShiftBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ, modificationsMergeDialog.getPrideModificationsList(), ELProperty.create("${selectedElement.averageMassShift}"), modificationsMergeDialog.getPrideModAverageModMassShiftTextField(), BeanProperty.create("text"), "prideModAverageMassShift");
         bindingGroup.addBinding(prideModAverageMassShiftBinding);
 
-        //pipelin modification binding        
+        //pipeline modification binding        
         Binding modAccessionBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ, modificationsMergeDialog.getPipelineModificationsList(), ELProperty.create("${selectedElement.accession}"), modificationsMergeDialog.getModAccessionTextField(), BeanProperty.create("text"), "modAccession");
         bindingGroup.addBinding(modAccessionBinding);
         Binding modAccessionValueBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ, modificationsMergeDialog.getPipelineModificationsList(), ELProperty.create("${selectedElement.accessionValue}"), modificationsMergeDialog.getModAccessionValueTextField(), BeanProperty.create("text"), "modAccessionValue");
