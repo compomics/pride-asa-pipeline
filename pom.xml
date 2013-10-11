@@ -5,7 +5,7 @@
 
     <groupId>com.compomics</groupId>
     <artifactId>pride-asa-pipeline</artifactId>
-    <version>1.6.4</version>
+    <version>1.6.5</version>
     <packaging>jar</packaging>
     <name>pride-asa-pipeline</name>
     <url>http://maven.apache.org</url>
@@ -527,7 +527,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>PrideXMLValidator</artifactId>
-            <version>0.4.4</version>
+            <version>0.4.5</version>
         </dependency>
         
         <dependency>
