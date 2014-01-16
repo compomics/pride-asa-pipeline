@@ -24,7 +24,12 @@ public interface PrideXmlExperimentService extends ExperimentService {
      * @param experimentPrideXmlFile the experiment pride XML file
      */
     void init(File experimentPrideXmlFile);    
-
+    
+    /**
+     * Set the PrideXmlParser
+     * 
+     * @param prideXmlParser 
+     */
     void setPrideXmlParser(PrideXmlParser prideXmlParser);
     
     ResultHandler getResultHandler();

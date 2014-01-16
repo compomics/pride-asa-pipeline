@@ -12,6 +12,11 @@ import com.compomics.pride_asa_pipeline.repository.PrideXmlParser;
  */
 public interface PrideXmlSpectrumService extends SpectrumService {
     
+     /**
+     * Set the PrideXmlParser
+     * 
+     * @param prideXmlParser 
+     */
     void setPrideXmlParser(PrideXmlParser prideXmlParser);
 
 }

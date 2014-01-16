@@ -16,7 +16,7 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
-        this.getContentPane().setBackground(new Color(255, 255, 255));
+        this.getContentPane().setBackground(Color.WHITE);
     }
 
     public JPanel getPrideSelectionParentPanel() {
