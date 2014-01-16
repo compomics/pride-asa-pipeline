@@ -6,7 +6,7 @@ package com.compomics.pride_asa_pipeline.service.impl;
 
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.repository.PrideXmlParser;
-import com.compomics.pride_asa_pipeline.service.PrideXmlSpectrumService;
+import com.compomics.pride_asa_pipeline.service.SpectrumService;
 import java.util.*;
 import org.apache.log4j.Logger;
 
@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  *
  * @author Niels Hulstaert
  */
-public class PrideXmlSpectrumServiceImpl implements PrideXmlSpectrumService {
+public class PrideXmlSpectrumServiceImpl implements SpectrumService {
 
     private static final Logger LOGGER = Logger.getLogger(PrideXmlSpectrumServiceImpl.class);
     private PrideXmlParser prideXmlParser;        
@@ -23,7 +23,6 @@ public class PrideXmlSpectrumServiceImpl implements PrideXmlSpectrumService {
         return prideXmlParser;
     }
 
-    @Override
     public void setPrideXmlParser(PrideXmlParser prideXmlParser) {
         this.prideXmlParser = prideXmlParser;
     }        
