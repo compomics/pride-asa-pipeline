@@ -41,7 +41,7 @@ public class Playground {
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();        
 
         PrideXmlCommandLineRunner prideXmlCommandLineRunner = applicationContext.getBean("prideXmlCommandLineRunner", PrideXmlCommandLineRunner.class);
-        prideXmlCommandLineRunner.runPrideXmlPipeline(new File("C:\\Users\\niels\\Desktop\\ExampleDataSets\\PRIDE_Exp_Complete_Ac_11954.xml"), true);
+        prideXmlCommandLineRunner.runPrideXmlPipeline(new File("W:\\PRIDE-DATA\\PRIDE-FTP-DOWNLOAD\\PRIDE_Exp_Complete_Ac_3659.xml"), true);
         
         SpectrumAnnotatorResult spectrumAnnotatorResult = prideXmlCommandLineRunner.getPrideXmlSpectrumAnnotator().getSpectrumAnnotatorResult();
         ModificationService modificationService = prideXmlCommandLineRunner.getPrideXmlSpectrumAnnotator().getModificationService();

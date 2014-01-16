@@ -28,7 +28,6 @@ import uk.ac.ebi.pride.jaxb.model.Param;
 import uk.ac.ebi.pride.jaxb.model.PeptideItem;
 import uk.ac.ebi.pride.jaxb.model.Precursor;
 import uk.ac.ebi.pride.jaxb.model.Spectrum;
-import uk.ac.ebi.pride.jaxb.utils.CvTermReference;
 import uk.ac.ebi.pride.jaxb.xml.PrideXmlReader;
 
 /**
