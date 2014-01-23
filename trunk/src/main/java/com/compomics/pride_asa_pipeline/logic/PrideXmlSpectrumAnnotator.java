@@ -5,8 +5,10 @@ import com.compomics.pride_asa_pipeline.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.repository.PrideXmlParser;
 import com.compomics.pride_asa_pipeline.service.PrideXmlExperimentService;
 import com.compomics.pride_asa_pipeline.service.PrideXmlModificationService;
+import com.compomics.pride_asa_pipeline.service.PrideXmlSpectrumService;
 import com.compomics.pride_asa_pipeline.util.ResourceUtils;
 import java.io.File;
 import java.util.HashSet;
@@ -29,6 +31,7 @@ public class PrideXmlSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
     /**
      * Beans
      */
+    private PrideXmlParser prideXmlParser;
     private PrideXmlExperimentService experimentService;
     
     /**
@@ -42,9 +45,24 @@ public class PrideXmlSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
         this.experimentService = experimentService;
     }    
 
+    public PrideXmlParser getPrideXmlParser() {
+        return prideXmlParser;
+    }
+
+    public void setPrideXmlParser(PrideXmlParser prideXmlParser) {
+        this.prideXmlParser = prideXmlParser;
+    }
+
     /**
      * Public methods
      */
+    public void initBean() {
+        //set PrideXmlParser instance
+        experimentService.setPrideXmlParser(prideXmlParser);
+        ((PrideXmlSpectrumService) spectrumService).setPrideXmlParser(prideXmlParser);
+        ((PrideXmlModificationService) modificationService).setPrideXmlParser(prideXmlParser);
+    }
+
     @Override
     public void initIdentifications(File experimentPrideXmlFile) {
         //@todo get a name take makes sense

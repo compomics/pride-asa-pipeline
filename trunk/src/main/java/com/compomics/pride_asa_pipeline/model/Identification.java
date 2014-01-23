@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.model;
 
+import java.util.Objects;
 import org.apache.log4j.Logger;
 
 /**
@@ -20,11 +21,11 @@ public class Identification {
     /**
      * The pride spectrum ID
      */
-    private long spectrumId;
+    private String spectrumId;
     /**
      * The pride spectrum reference
      */
-    private long spectrumRef;
+    private String spectrumRef;
     /**
      * The annotation data
      */
@@ -36,7 +37,7 @@ public class Identification {
 
     public Identification(){}
     
-    public Identification(Peptide peptide, String mzAccession, long spectrumId, long spectrumRef) {
+    public Identification(Peptide peptide, String mzAccession, String spectrumId, String spectrumRef) {
         this.peptide = peptide;
         this.mzAccession = mzAccession;
         this.spectrumId = spectrumId;
@@ -51,11 +52,11 @@ public class Identification {
         return mzAccession;
     }
 
-    public long getSpectrumId() {
+    public String getSpectrumId() {
         return spectrumId;
     }
 
-    public long getSpectrumRef() {
+    public String getSpectrumRef() {
         return spectrumRef;
     }
 
@@ -94,35 +95,32 @@ public class Identification {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Identification that = (Identification) o;
-
-        if (spectrumId != that.spectrumId) {
-            return false;
-        }
-        if (spectrumRef != that.spectrumRef) {
-            return false;
-        }
-        if (mzAccession != null ? !mzAccession.equals(that.mzAccession) : that.mzAccession != null) {
-            return false;
-        }
-
-        return true;
+    public int hashCode() {
+        int hash = 7;
+        hash = 17 * hash + Objects.hashCode(this.mzAccession);
+        hash = 17 * hash + Objects.hashCode(this.spectrumId);
+        hash = 17 * hash + Objects.hashCode(this.spectrumRef);
+        return hash;
     }
 
     @Override
-    public int hashCode() {
-        int result = peptide != null ? peptide.hashCode() : 0;
-        result = 31 * result + (mzAccession != null ? mzAccession.hashCode() : 0);
-        result = 31 * result + (int) (spectrumId ^ (spectrumId >>> 32));
-        result = 31 * result + (int) (spectrumRef ^ (spectrumRef >>> 32));
-        return result;
-    }
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Identification other = (Identification) obj;
+        if (!Objects.equals(this.mzAccession, other.mzAccession)) {
+            return false;
+        }
+        if (!Objects.equals(this.spectrumId, other.spectrumId)) {
+            return false;
+        }
+        if (!Objects.equals(this.spectrumRef, other.spectrumRef)) {
+            return false;
+        }
+        return true;
+    }    
 }

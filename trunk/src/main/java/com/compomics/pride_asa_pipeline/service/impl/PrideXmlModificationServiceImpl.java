@@ -24,6 +24,7 @@ public class PrideXmlModificationServiceImpl extends ModificationServiceImpl imp
         return prideXmlParser;
     }
 
+    @Override
     public void setPrideXmlParser(PrideXmlParser prideXmlParser) {
         this.prideXmlParser = prideXmlParser;
     }        

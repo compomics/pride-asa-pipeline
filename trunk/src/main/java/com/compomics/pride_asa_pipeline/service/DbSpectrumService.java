@@ -16,7 +16,7 @@ public interface DbSpectrumService extends SpectrumService {
      * Fill the spectrum cache with the specified spectrumids
      * @param aSpectrumidCacheList
      */
-    void cacheSpectra(List<Long> aSpectrumidCacheList);
+    void cacheSpectra(List<String> aSpectrumidCacheList);
 
     /**
      * Clear the current cache.

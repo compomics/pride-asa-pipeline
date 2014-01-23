@@ -21,7 +21,7 @@ public interface SpectrumService {
      * @param spectrumId the spectrum ID
      * @return the spectrum peaks
      */
-    List<Peak> getSpectrumPeaksBySpectrumId(long spectrumId);
+    List<Peak> getSpectrumPeaksBySpectrumId(String spectrumId);
 
     /**
      * Gets the spectrum peak map (key: mz value, value: intensity value) by
@@ -30,6 +30,6 @@ public interface SpectrumService {
      * @param spectrumId the spectrum ID
      * @return the spectrum peaks
      */
-    HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(long spectrumId);    
+    HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(String spectrumId);    
 
 }

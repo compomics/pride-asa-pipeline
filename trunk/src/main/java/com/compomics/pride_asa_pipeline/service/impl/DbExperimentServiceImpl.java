@@ -139,16 +139,16 @@ public class DbExperimentServiceImpl extends ExperimentServiceImpl implements Db
         List<Map<String, Object>> spectraMetadata = experimentRepository.getSpectraMetadata(experimentAccession);
 
 
-        HashMap<Long, Map> spectrumIdMap = new HashMap<Long, Map>();
+        HashMap<String, Map> spectrumIdMap = new HashMap<String, Map>();
         for (Map<String, Object> spectrumMetadata : spectraMetadata) {
-            spectrumIdMap.put((Long) spectrumMetadata.get("spectrum_id"), spectrumMetadata);
+            spectrumIdMap.put((String) spectrumMetadata.get("spectrum_id"), spectrumMetadata);
         }
 
-        Iterator<Long> lSpectrumIdIterator = spectrumIdMap.keySet().iterator();
-        ArrayList<Long> lSpectrumidCacheList = Lists.newArrayList();
+        Iterator<String> lSpectrumIdIterator = spectrumIdMap.keySet().iterator();
+        ArrayList<String> lSpectrumidCacheList = Lists.newArrayList();
 
         while (lSpectrumIdIterator.hasNext()) {
-            Long spectrumId = lSpectrumIdIterator.next();
+            String spectrumId = lSpectrumIdIterator.next();
             lSpectrumidCacheList.add(spectrumId);
         }
 
@@ -167,12 +167,12 @@ public class DbExperimentServiceImpl extends ExperimentServiceImpl implements Db
         List<Map<String, Object>> spectraMetadata = experimentRepository.getSpectraMetadata(experimentAccession);
 
 
-        HashMap<Long, Map> spectrumIdMap = new HashMap<Long, Map>();
+        HashMap<String, Map> spectrumIdMap = new HashMap<String, Map>();
         for (Map<String, Object> spectrumMetadata : spectraMetadata) {
-            spectrumIdMap.put((Long) spectrumMetadata.get("spectrum_id"), spectrumMetadata);
+            spectrumIdMap.put((String) spectrumMetadata.get("spectrum_id"), spectrumMetadata);
         }
 
-        for (Long cachedSpectrumId : spectrumIdMap.keySet()) {
+        for (String cachedSpectrumId : spectrumIdMap.keySet()) {
             Map spectrumMetadata = spectrumIdMap.get(cachedSpectrumId);
 
 

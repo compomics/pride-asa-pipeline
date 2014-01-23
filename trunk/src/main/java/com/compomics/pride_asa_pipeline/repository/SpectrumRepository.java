@@ -20,7 +20,7 @@ public interface SpectrumRepository {
      * @param spectrumId the spectrum ID
      * @return the mz values double array
      */
-    double[] getMzValuesBySpectrumId(long spectrumId);    
+    double[] getMzValuesBySpectrumId(String spectrumId);    
     
     /**
      * Gets the spectrum intensities array as double array
@@ -28,7 +28,7 @@ public interface SpectrumRepository {
      * @param spectrumId the spectrum ID
      * @return the intensities double array
      */
-    double[] getIntensitiesBySpectrumId(long spectrumId);
+    double[] getIntensitiesBySpectrumId(String spectrumId);
 
     /**
      * Gets Maps with spectrumid:peakMap structure
@@ -36,7 +36,7 @@ public interface SpectrumRepository {
      * @param spectrumIds the spectrum IDs
      * @return the Map with spectrumIds as keys, and Maps (mass:intensity) as values
      */
-    Map<Long, List<Peak>> getPeakMapsBySpectrumIdList(List<Long> spectrumIds);
+    Map<String, List<Peak>> getPeakMapsBySpectrumIdList(List<String> spectrumIds);
 
     
 }

@@ -159,7 +159,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
                 if (!line.startsWith("spectrum_id")) {
                     String[] splits = line.split(COLUMN_DELIMITER);
 
-                    long spectrumId = Long.parseLong(splits[SPECTRUM_ID]);
+                    String spectrumId = splits[SPECTRUM_ID];
                     long peptide_id = Long.parseLong(splits[PEPTIDE_ID]);
                     String sequence = splits[PEPTIDE_SEQUENCE];
                     double precursorMass = Double.parseDouble(splits[PRECURSOR_MZ]);
@@ -176,7 +176,7 @@ public class FileResultHandlerImpl implements FileResultHandler {
                         parseModifications((ModifiedPeptide) peptide, splits[MODIFICATIONS]);
                     }
 
-                    Identification identification = new Identification(peptide, "", spectrumId, 0L);
+                    Identification identification = new Identification(peptide, "", spectrumId, "0");
                     identification.setPipelineExplanationType(pipelineExplanationType);
 
                     //check for noise threshold and score
