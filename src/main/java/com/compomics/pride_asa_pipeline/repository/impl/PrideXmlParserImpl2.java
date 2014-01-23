@@ -137,8 +137,8 @@ public class PrideXmlParserImpl2 implements PrideXmlParser {
                         //new Peptide instance
                         Peptide peptide = new Peptide(charge, mzRatio, new AminoAcidSequence(peptideItem.getSequence()));
                         //new Identification instance
-                        long spectrumId = peptideItem.getSpectrum().getId();
-                        Identification identification = new Identification(peptide, proteinIdentificationId, spectrumId, 0L);
+                        String spectrumId = Integer.toString(peptideItem.getSpectrum().getId());
+                        Identification identification = new Identification(peptide, proteinIdentificationId, spectrumId, spectrumId);
 
                         //add to identifications
                         identifications.add(identification);

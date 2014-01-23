@@ -39,9 +39,9 @@ public class IdentificationsExtractor implements ResultSetExtractor<List<Identif
                 //accession
                 String accession = rs.getString("accession");
                 //spectrum ID
-                long spectrumId = rs.getLong("spectrum_id");
+                String spectrumId = rs.getString("spectrum_id");
                 //spectrum ref
-                long spectrumRef = rs.getLong("spectrum_identifier");
+                String spectrumRef = rs.getString("spectrum_identifier");
                 //peptide ID
                 long peptideId = rs.getLong("peptide_id");
 

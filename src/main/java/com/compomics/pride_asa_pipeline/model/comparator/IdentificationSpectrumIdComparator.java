@@ -15,7 +15,7 @@ public class IdentificationSpectrumIdComparator implements Comparator<Identifica
     
     @Override
     public int compare(Identification identification1, Identification identification2) {
-        return Double.compare(identification1.getSpectrumId(), identification2.getSpectrumId());
+        return identification1.getSpectrumId().compareTo(identification2.getSpectrumId());
     }
         
 }

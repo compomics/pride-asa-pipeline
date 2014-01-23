@@ -20,4 +20,6 @@ public interface PrideXmlModificationService extends ModificationService {
      * @return the list of modifications
      */
     Set<Modification> loadExperimentModifications();
+
+    void setPrideXmlParser(PrideXmlParser prideXmlParser);
 }

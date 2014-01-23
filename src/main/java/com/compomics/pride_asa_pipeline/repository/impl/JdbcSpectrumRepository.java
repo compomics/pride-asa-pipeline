@@ -50,40 +50,40 @@ public class JdbcSpectrumRepository extends JdbcDaoSupport implements SpectrumRe
             .append("and spec.spectrum_id IN (%s)").toString();
 
     @Override
-    public double[] getMzValuesBySpectrumId(long spectrumId) {
+    public double[] getMzValuesBySpectrumId(String spectrumId) {
         LOGGER.debug("Loading mz values for spectrum " + spectrumId);
         double[] mzValues = getJdbcTemplate().queryForObject(SELECT_SPECTRUM_MZVALUES_BY_SPECTRUM_ID, new Base64DecoderMapper(), spectrumId);
         return mzValues;
     }
 
     @Override
-    public double[] getIntensitiesBySpectrumId(long spectrumId) {
+    public double[] getIntensitiesBySpectrumId(String spectrumId) {
         LOGGER.debug("Loading intensities for spectrum " + spectrumId);
         double[] intensities = getJdbcTemplate().queryForObject(SELECT_SPECTRUM_INTENSITIES_BY_SPECTRUM_ID, new Base64DecoderMapper(), spectrumId);
         return intensities;
     }
 
     @Override
-    public Map<Long, List<Peak>> getPeakMapsBySpectrumIdList(List<Long> spectrumIds) {
+    public Map<String, List<Peak>> getPeakMapsBySpectrumIdList(List<String> spectrumIds) {
         LOGGER.debug("Loading peaks for spectrum list with size " + spectrumIds.size());
 
         String spectrumIdString = Joiner.on(",").join(spectrumIds);
 
         List<Base64DecoderListMapper.PartialSpectrumContent> lIntensitiesRS = getJdbcTemplate().query(String.format(SELECT_SPECTRUM_INTENSITIES_BY_SPECTRUM_ID_LIST, spectrumIdString), new Base64DecoderListMapper());
-        Map<Long, double[]> lIntensityMap = Maps.newHashMap();
+        Map<String, double[]> lIntensityMap = Maps.newHashMap();
         for (Base64DecoderListMapper.PartialSpectrumContent lIntensity : lIntensitiesRS) {
-            lIntensityMap.put(lIntensity.getSpectrumId(), lIntensity.getDecodedDataArray());
+            lIntensityMap.put(Long.toString(lIntensity.getSpectrumId()), lIntensity.getDecodedDataArray());
         }
 
         List<Base64DecoderListMapper.PartialSpectrumContent> lMassesRS = getJdbcTemplate().query(String.format(SELECT_SPECTRUM_MZVALUES_BY_SPECTRUM_ID_LIST, spectrumIdString), new Base64DecoderListMapper());
-        Map<Long, double[]> lMZMap = Maps.newHashMap();
+        Map<String, double[]> lMZMap = Maps.newHashMap();
         for (Base64DecoderListMapper.PartialSpectrumContent lMass : lMassesRS) {
-            lMZMap.put(lMass.getSpectrumId(), lMass.getDecodedDataArray());
+            lMZMap.put(Long.toString(lMass.getSpectrumId()), lMass.getDecodedDataArray());
         }
 
-        HashMap<Long, List<Peak>> result = Maps.newHashMap();
+        HashMap<String, List<Peak>> result = Maps.newHashMap();
 
-        for (Long spectrumId : spectrumIds) {
+        for (String spectrumId : spectrumIds) {
             double[] intensities = lIntensityMap.get(spectrumId);
             double[] mzs = lMZMap.get(spectrumId);
 

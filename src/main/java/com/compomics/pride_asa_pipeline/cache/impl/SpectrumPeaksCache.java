@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * @author Niels Hulstaert
  */
-public class SpectrumPeaksCache extends LinkedHashMap<Long, List<Peak>> implements Cache<Long, List<Peak>> {
+public class SpectrumPeaksCache extends LinkedHashMap<String, List<Peak>> implements Cache<String, List<Peak>> {
     
     private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class SpectrumPeaksCache extends LinkedHashMap<Long, List<Peak>> implemen
      * @param peaks the spectrum peak list
      */
     @Override
-    public void putInCache(Long spectrumId, List<Peak> peaks) {
+    public void putInCache(String spectrumId, List<Peak> peaks) {
         this.put(spectrumId, peaks);
     }
 
@@ -41,12 +41,12 @@ public class SpectrumPeaksCache extends LinkedHashMap<Long, List<Peak>> implemen
      * @return the spectrum peak list
      */
     @Override
-    public List<Peak> getFromCache(Long spectrumId) {
+    public List<Peak> getFromCache(String spectrumId) {
         return this.get(spectrumId);
     }
 
     @Override
-    protected boolean removeEldestEntry(Map.Entry<Long, List<Peak>> eldest) {
+    protected boolean removeEldestEntry(Map.Entry<String, List<Peak>> eldest) {
         return this.size() > PropertiesConfigurationHolder.getInstance().getInt("spectrum_peaks_cache.maximum_cache_size");
     }
 

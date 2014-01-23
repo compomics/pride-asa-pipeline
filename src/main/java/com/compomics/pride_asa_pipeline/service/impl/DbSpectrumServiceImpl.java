@@ -20,7 +20,7 @@ public class DbSpectrumServiceImpl implements DbSpectrumService {
     private static final Logger LOGGER = Logger.getLogger(DbSpectrumServiceImpl.class);
     
     private SpectrumRepository spectrumRepository;
-    private Cache<Long, List<Peak>> spectrumPeaksCache;
+    private Cache<String, List<Peak>> spectrumPeaksCache;
 
     public SpectrumRepository getSpectrumRepository() {
         return spectrumRepository;
@@ -30,16 +30,16 @@ public class DbSpectrumServiceImpl implements DbSpectrumService {
         this.spectrumRepository = spectrumRepository;
     }
 
-    public Cache<Long, List<Peak>> getSpectrumPeaksCache() {
+    public Cache<String, List<Peak>> getSpectrumPeaksCache() {
         return spectrumPeaksCache;
     }
 
-    public void setSpectrumPeaksCache(Cache<Long, List<Peak>> spectrumPeaksCache) {
+    public void setSpectrumPeaksCache(Cache<String, List<Peak>> spectrumPeaksCache) {
         this.spectrumPeaksCache = spectrumPeaksCache;
     }
 
     @Override
-    public List<Peak> getSpectrumPeaksBySpectrumId(long spectrumId) {
+    public List<Peak> getSpectrumPeaksBySpectrumId(String spectrumId) {
         //check if the spectrum peaks can be found in the cache
         List<Peak> peaks = spectrumPeaksCache.getFromCache(spectrumId);
 
@@ -63,7 +63,7 @@ public class DbSpectrumServiceImpl implements DbSpectrumService {
     }
 
     @Override
-    public HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(long spectrumId) {
+    public HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(String spectrumId) {
         HashMap<Double, Double> peaks = new HashMap<Double, Double>();
 
         double[] mzValues = spectrumRepository.getMzValuesBySpectrumId(spectrumId);
@@ -77,10 +77,10 @@ public class DbSpectrumServiceImpl implements DbSpectrumService {
     }
 
     @Override
-    public void cacheSpectra(List<Long> aSpectrumidCacheList) {
-        Map<Long, List<Peak>> lPeakMapsBySpectrumIdList = spectrumRepository.getPeakMapsBySpectrumIdList(aSpectrumidCacheList);
-        Set<Long> lSpectrumids = lPeakMapsBySpectrumIdList.keySet();
-        for (Long lSpectrumid : lSpectrumids) {
+    public void cacheSpectra(List<String> aSpectrumidCacheList) {
+        Map<String, List<Peak>> lPeakMapsBySpectrumIdList = spectrumRepository.getPeakMapsBySpectrumIdList(aSpectrumidCacheList);
+        Set<String> lSpectrumids = lPeakMapsBySpectrumIdList.keySet();
+        for (String lSpectrumid : lSpectrumids) {
             spectrumPeaksCache.putInCache(lSpectrumid, lPeakMapsBySpectrumIdList.get(lSpectrumid));
         }
     }

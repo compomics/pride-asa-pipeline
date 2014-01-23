@@ -60,7 +60,7 @@ public class FileResultHandlerTest {
 
         //create identification with annotation data
         Peptide peptide = new Peptide(1, 1649.8D, new AminoAcidSequence("AAKENNYLENNART"), 123L);
-        Identification identification_1 = new Identification(peptide, "mzAccession_1", 1L, 1L);
+        Identification identification_1 = new Identification(peptide, "mzAccession_1", "1", "1");
         identification_1.setPipelineExplanationType(PipelineExplanationType.UNMODIFIED);
         identifications.add(identification_1);
 
@@ -94,7 +94,7 @@ public class FileResultHandlerTest {
         modifiedPeptide.setNTModification(0, new Modification("testModification_3", 0.0, 0.0, Modification.Location.NON_TERMINAL, modifiedAAs, "mod_3", "mod_3"));
         modifiedPeptide.setNTermMod(new Modification("testModification_4", 0.0, 0.0, Modification.Location.N_TERMINAL, modifiedAAs, "mod_4", "mod_4"));
 
-        Identification identification_2 = new Identification(modifiedPeptide, "mzAccession_1", 2L, 2L);
+        Identification identification_2 = new Identification(modifiedPeptide, "mzAccession_1", "2", "2");
         identification_2.setPipelineExplanationType(PipelineExplanationType.MODIFIED);
         identifications.add(identification_2);
 
@@ -109,7 +109,7 @@ public class FileResultHandlerTest {
             String[] splitArray = line.split("\t");
 
             if (line.startsWith("1")) {
-                assertEquals(Long.toString(identification_1.getSpectrumId()), splitArray[0]);
+                assertEquals(identification_1.getSpectrumId(), splitArray[0]);
                 assertEquals(identification_1.getPeptide().getPeptideId(), Long.parseLong(splitArray[1]));
                 assertEquals(identification_1.getPeptide().getSequenceString(), splitArray[2]);
                 assertEquals(peptide.getMzRatio(), Double.parseDouble(splitArray[3]), 0.01);
@@ -125,7 +125,7 @@ public class FileResultHandlerTest {
                 assertEquals("ions[b ion_1+(2{400.8:80.0}|4{500.0:300.0});y ion_1+(2{100.5:100.0});y ion_2+(5{200.3:50.0})]", splitArray[8]);
                 assertEquals("N/A", splitArray[9]);
             } else if (line.startsWith("2")) {
-                assertEquals(Long.toString(identification_2.getSpectrumId()), splitArray[0]);
+                assertEquals(identification_2.getSpectrumId(), splitArray[0]);
                 assertEquals(identification_2.getPeptide().getPeptideId(), Long.parseLong(splitArray[1]));
                 assertEquals(identification_2.getPeptide().getSequenceString(), splitArray[2]);
                 assertEquals(modifiedPeptide.getMzRatio(), Double.parseDouble(splitArray[3]), 0.01);
