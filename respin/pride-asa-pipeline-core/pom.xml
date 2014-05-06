@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>pride-asa-pipeline-core</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>com.compomics.pride-asa-pipeline</groupId>
         <artifactId>pride-asa-pipeline</artifactId>
-        <version>1.7.0</version>
+        <version>1.7.1</version>
     </parent>
 
     <name>pride-asa-pipeline-core</name>   
@@ -147,7 +147,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.compomics.pride_asa_pipeline.PrideAsaPipelineStarter</mainClass>
+                            <mainClass>com.compomics.pride_asa_pipeline.core.PrideAsaPipelineStarter</mainClass>
                             <!--<mainClass>com.compomics.pride_asa_pipeline.StarterWrapper</mainClass>-->
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
@@ -323,14 +323,17 @@
     </repositories>
 
     <dependencies>
+        
         <dependency>
             <groupId>com.compomics.pride-asa-pipeline</groupId>
-            <artifactId>pride-asa-pipeline-model</artifactId>         
+            <artifactId>pride-asa-pipeline-model</artifactId>     
+            <version>1.7.1</version>
         </dependency>
         
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+              <version>4.11</version>
         </dependency>
 
         <dependency>
@@ -446,12 +449,7 @@
                 </exclusion>
             </exclusions>
         </dependency>                      
-        
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>PrideXMLValidator</artifactId>
-        </dependency>
-        
+               
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
@@ -467,12 +465,72 @@
             <groupId>no.uib</groupId>
             <artifactId>ols-dialog</artifactId>
         </dependency>
-        
         <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>RespinDataExtractor</artifactId>
+            <groupId>uk.ac.ebi.pride.tools</groupId>
+            <artifactId>jmzreader</artifactId>
+            <version>1.2.0</version>
+            <type>jar</type>
         </dependency>
-
+        <dependency>
+            <groupId>uk.ac.ebi.pride.tools</groupId>
+            <artifactId>pkl-parser</artifactId>
+            <version>1.2.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.pride.tools</groupId>
+            <artifactId>dta-parser</artifactId>
+            <version>1.2.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.pride.tools</groupId>
+            <artifactId>ms2-parser</artifactId>
+            <version>1.2.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.pride.tools</groupId>
+            <artifactId>mgf-parser</artifactId>
+            <version>1.2.2</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.pride.tools</groupId>
+            <artifactId>mzxml-parser</artifactId>
+            <version>1.3.3</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.pride.tools</groupId>
+            <artifactId>mzdata-parser</artifactId>
+            <version>1.2.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.pride.tools</groupId>
+            <artifactId>mzml-wrapper</artifactId>
+            <version>1.2</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.pride.tools</groupId>
+            <artifactId>pride-wrapper</artifactId>
+            <version>1.2.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.jmzidml</groupId>
+            <artifactId>jmzidentml</artifactId>
+            <type>jar</type>
+            <version>1.1.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geneontology</groupId>
+            <artifactId>oboedit</artifactId>
+            <version>beta8</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     
     <distributionManagement>        
