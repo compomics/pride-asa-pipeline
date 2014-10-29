@@ -69,13 +69,14 @@ public class PTMMapper {
         return ptmMapper;
     }
 
-    private static void loadSearchGUImodificationFile() throws IOException {
+    private static void loadSearchGUImodificationFile() throws IOException, XmlPullParserException {
         if (tempSearchGuiModFile == null) {
             tempSearchGuiModFile = File.createTempFile("searchGUI_mods", ".xml");
             InputStream inputStream = new ClassPathResource("searchGUI_mods.xml").getInputStream();
             OutputStream outputStream = new FileOutputStream(tempSearchGuiModFile);
             IOUtils.copy(inputStream, outputStream);
             tempSearchGuiModFile.deleteOnExit();
+            factory.importModifications(tempSearchGuiModFile, false, true);
         }
     }
 
@@ -133,26 +134,38 @@ public class PTMMapper {
      *
      * @param modificationMap hashmap containing modification names and their
      * fixed/variable status
-     * @param modProfile the modification profile to add the PTmMs to
      * @param unknownPtms the list of unknown PTMS, updated during this method
      * @return the filled up modification profile
      */
     public ModificationProfile buildTotalModProfile(HashMap<String, Boolean> modificationMap, ArrayList<String> unknownPtms) {
         ModificationProfile modProfile = new ModificationProfile();
         for (String aModificationName : modificationMap.keySet()) {
-            if (factory.containsPTM(aModificationName)) {
-                PTM loadedCorrespondingPtm = factory.getPTM(aModificationName);
-                if (modificationMap.get(aModificationName)) {
-                    modProfile.addFixedModification(loadedCorrespondingPtm);
-                } else {
-                    modProfile.addVariableModification(loadedCorrespondingPtm);
-                }
-            } else {
-                convertPridePtm(aModificationName, modProfile, unknownPtms, modificationMap.get(aModificationName));
-
+            if (!addPTMToProfile(modProfile, modificationMap, aModificationName)) {
+                factory.convertPridePtm(aModificationName, modProfile, unknownPtms, modificationMap.get(aModificationName));
+            }
+            //check if the unknowns have an alternative and retry them...
+            for (String anUnknownPTM : unknownPtms) {
+                String temp = lookupRealModName(anUnknownPTM);
+                if (addPTMToProfile(modProfile, modificationMap, temp)) {
+                    unknownPtms.remove(anUnknownPTM);
+                };
             }
         }
         return modProfile;
+    }
+
+    private boolean addPTMToProfile(ModificationProfile modProfile, HashMap<String, Boolean> modificationMap, String aModificationName) {
+        if (factory.containsPTM(aModificationName)) {
+            PTM loadedCorrespondingPtm = factory.getPTM(aModificationName);
+            if (modificationMap.get(aModificationName)) {
+                modProfile.addFixedModification(loadedCorrespondingPtm);
+            } else {
+                modProfile.addVariableModification(loadedCorrespondingPtm);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -170,134 +183,6 @@ public class PTMMapper {
      */
     public ModificationProfile buildUniqueMassModProfile(HashMap<String, Boolean> modificationMap, ArrayList<String> unknownPtms, double precursorAcc) {
         return removeDuplicateMasses(buildTotalModProfile(modificationMap, unknownPtms), precursorAcc);
-    }
-
-    /**
-     * Tries to convert a PRIDE PTM to utilities PTM name, and add it to the
-     * modification profile. Unknown PTMs are added to the unknown PTMs
-     * arraylist.
-     *
-     * @param pridePtmName the PRIDE PTM name
-     * @param modProfile the modification profile to add the PTmMs to
-     * @param unknownPtms the list of unknown PTMS, updated during this method
-     * @param isFixed if true, the PTM will be added as a fixed modification
-     */
-    private void convertPridePtm(String pridePtmName, ModificationProfile modProfile, ArrayList<String> unknownPtms, boolean isFixed) {
-
-        // special cases for when multiple ptms are needed
-        if (pridePtmName.toLowerCase().indexOf("itraq") != -1) {
-            if (pridePtmName.indexOf("8") != -1) {
-                modProfile.addFixedModification(factory.getPTM("itraq8plex:13c(6)15n(2) on k"));
-                modProfile.addFixedModification(factory.getPTM("itraq8plex:13c(6)15n(2) on nterm"));
-                modProfile.addVariableModification(factory.getPTM("itraq8plex:13c(6)15n(2) on y"));
-            } else {
-                //this is itraq4
-                modProfile.addFixedModification(factory.getPTM("itraq114 on k"));
-                modProfile.addFixedModification(factory.getPTM("itraq114 on nterm"));
-                modProfile.addVariableModification(factory.getPTM("itraq114 on y"));
-            }
-        } else if (pridePtmName.toLowerCase().indexOf("tmt") != -1) {
-            if (pridePtmName.indexOf("6") != -1) {
-                modProfile.addFixedModification(factory.getPTM("tmt 6-plex on k"));
-                modProfile.addFixedModification(factory.getPTM("tmt 6-plex on n-term peptide"));
-            } else {
-                modProfile.addFixedModification(factory.getPTM("tmt duplex on k"));
-                modProfile.addFixedModification(factory.getPTM("tmt duplex on n-term peptide"));
-            }
-        } else if (pridePtmName.toLowerCase().indexOf("phospho") != -1) {
-            modProfile.addVariableModification(factory.getPTM("phosphorylation of s"));
-            modProfile.addVariableModification(factory.getPTM("phosphorylation of t"));
-            modProfile.addVariableModification(factory.getPTM("phosphorylation of y"));
-        } else if (pridePtmName.toLowerCase().indexOf("palmitoylation") != -1) {
-            modProfile.addVariableModification(factory.getPTM("palmitoylation of c"));
-            modProfile.addVariableModification(factory.getPTM("palmitoylation of k"));
-            modProfile.addVariableModification(factory.getPTM("palmitoylation of s"));
-            modProfile.addVariableModification(factory.getPTM("palmitoylation of t"));
-        } else if (pridePtmName.toLowerCase().indexOf("formylation") != -1) {
-            modProfile.addVariableModification(factory.getPTM("formylation of k"));
-            modProfile.addVariableModification(factory.getPTM("formylation of peptide n-term"));
-            modProfile.addVariableModification(factory.getPTM("formylation of protein c-term"));
-        } else if (pridePtmName.toLowerCase().indexOf("carbamylation") != -1) {
-            modProfile.addVariableModification(factory.getPTM("carbamylation of k"));
-            modProfile.addVariableModification(factory.getPTM("carbamylation of n-term peptide"));
-        } else {
-            // single ptm mapping
-            String utilitiesPtmName = convertPridePtmToUtilitiesPtm(pridePtmName);
-            if (utilitiesPtmName.equalsIgnoreCase("unknown")) {
-                utilitiesPtmName = convertPridePtmToUtilitiesPtm(lookupRealModName(pridePtmName));
-            }
-            if (utilitiesPtmName.equalsIgnoreCase("unknown")) {
-                unknownPtms.add(pridePtmName);
-            }
-            if (!modProfile.contains(utilitiesPtmName)) {
-                if (isFixed) {
-                    modProfile.addFixedModification(factory.getPTM(utilitiesPtmName));
-                } else {
-                    modProfile.addVariableModification(factory.getPTM(utilitiesPtmName));
-                }
-            }
-        }
-    }
-
-    /**
-     * Tries to convert a PRIDE PTM name to utilities PTM name.
-     *
-     * @param pridePtmName the PRIDE PTM name
-     * @return the utilities PTM name, or null if there is no mapping
-     */
-    private String convertPridePtmToUtilitiesPtm(String pridePtmName) {
-
-        if (pridePtmName.toLowerCase().indexOf("carbamidomethyl") != -1
-                || pridePtmName.toLowerCase().indexOf("iodoacetamide") != -1) {
-            return "carbamidomethyl c";
-        } else if (pridePtmName.equalsIgnoreCase("oxidation")) {
-            return "oxidation of m";
-        } else if (pridePtmName.toLowerCase().indexOf("acetylation") != -1) {
-            return "acetylation of k";
-        } else if (pridePtmName.toLowerCase().indexOf("amidation") != -1) {
-            return "amidation of peptide c-term";
-        } else if (pridePtmName.toLowerCase().indexOf("carboxymethyl") != -1) {
-            return "carboxymethyl c";
-        } else if (pridePtmName.toLowerCase().indexOf("farnesylation") != -1) {
-            return "farnesylation of c";
-        } else if (pridePtmName.toLowerCase().indexOf("geranyl-geranyl") != -1) {
-            return "geranyl-geranyl";
-        } else if (pridePtmName.toLowerCase().indexOf("guanidination") != -1) {
-            return "guanidination of k";
-        } else if (pridePtmName.toLowerCase().indexOf("homoserine") != -1) {
-            if (pridePtmName.toLowerCase().indexOf("lacton") != -1) {
-                return "homoserine lactone";
-            } else {
-                return "homoserine";
-            }
-            //TODO ---> CHECK THE ICAT
-        } else if (pridePtmName.equalsIgnoreCase("ICAT-C")) {
-            return "icat light";
-        } else if (pridePtmName.equalsIgnoreCase("ICAT-C:13C(9)")) {
-            return "icat heavy";
-        } else if (pridePtmName.toLowerCase().indexOf("lipoyl") != -1) {
-            return "lipoyl k";
-        } else if (pridePtmName.toLowerCase().indexOf("methylthio") != -1) {
-            return "beta-methylthiolation of d (duplicate of 13)";
-        } else if (pridePtmName.toLowerCase().indexOf("nipcam") != -1) {
-            return "nipcam";
-        } else if (pridePtmName.toLowerCase().indexOf("phosphopantetheine") != -1) {
-            return "phosphopantetheine s";
-        } else if (pridePtmName.toLowerCase().indexOf("propionamide") != -1) {
-            return "propionamide c";
-        } else if (pridePtmName.toLowerCase().indexOf("pyridylethyl") != -1) {
-            return "s-pyridylethylation of c";
-        } else if (pridePtmName.toLowerCase().indexOf("sulfo") != -1) {
-            return "sulfation of y"; // not completely sure about this one...
-        } else if (pridePtmName.toLowerCase().indexOf("dehydratation") != -1) {
-            return "dehydro of s and t";
-        } else if (pridePtmName.toLowerCase().indexOf("deamination") != -1) {
-            return "deamidation of n and q"; // not that this does not separate between deamidation on only n and deamidation on n and q
-        } else if (pridePtmName.toLowerCase().indexOf("dioxidation") != -1) {
-            return "sulphone of m";
-        } else {
-            return "unknown";
-        }
     }
 
     /**

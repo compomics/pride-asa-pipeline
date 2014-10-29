@@ -193,7 +193,7 @@ public class EnzymePredictorTest extends TestCase {
             }
         }
         EnzymePredictor predictor = new EnzymePredictor();
-        int estimatedMissedCleavages = predictor.estimateMissedCleavages(testingEnzyme, peptides);
+        int estimatedMissedCleavages = predictor.estimateMissedCleavages(testingEnzyme);
         System.out.println("Outcome = " + estimatedMissedCleavages);
         assertEquals(1, estimatedMissedCleavages);
     }
@@ -210,7 +210,7 @@ public class EnzymePredictorTest extends TestCase {
             }
         }
         EnzymePredictor predictor = new EnzymePredictor();
-        int estimatedMissedCleavages = predictor.estimateMissedCleavages(testingEnzyme, peptides);
+        int estimatedMissedCleavages = predictor.estimateMissedCleavages(testingEnzyme);
         System.out.println("Outcome = " + estimatedMissedCleavages);
         assertEquals(1, estimatedMissedCleavages);
     }
@@ -226,7 +226,7 @@ public class EnzymePredictorTest extends TestCase {
             }
         }
         EnzymePredictor predictor = new EnzymePredictor();
-        int estimatedMissedCleavages = predictor.estimateMissedCleavages(testingEnzyme, peptides);
+        int estimatedMissedCleavages = predictor.estimateMissedCleavages(testingEnzyme);
         System.out.println("Outcome = " + estimatedMissedCleavages);
         assertEquals(1, estimatedMissedCleavages);
     }
@@ -242,7 +242,7 @@ public class EnzymePredictorTest extends TestCase {
             }
         }
         EnzymePredictor predictor = new EnzymePredictor();
-        int estimatedMissedCleavages = predictor.estimateMissedCleavages(testingEnzyme, peptides);
+        int estimatedMissedCleavages = predictor.estimateMissedCleavages(testingEnzyme);
         System.out.println("Outcome = " + estimatedMissedCleavages);
         assertEquals(1, estimatedMissedCleavages);
     }

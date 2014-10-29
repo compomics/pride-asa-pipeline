@@ -5,6 +5,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic.enzyme;
 
+import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;
 import java.io.File;
@@ -14,15 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
@@ -69,6 +64,18 @@ public class EnzymePredictor {
         this.peptideSequences = peptideSequences;
     }
 
+    public void addPeptideObjects(List<Peptide> peptides) throws IOException, FileNotFoundException, ClassNotFoundException, XmlPullParserException {
+        for (Peptide aPeptide : peptides) {
+            peptideSequences.add(aPeptide.getSequenceString());
+        }
+    }
+
+    public void addPeptides(List<String> peptides) throws IOException, FileNotFoundException, ClassNotFoundException, XmlPullParserException {
+        for (String aPeptide : peptides) {
+            peptideSequences.add(aPeptide);
+        }
+    }
+
     private void loadEnzymeFactory() throws IOException, XmlPullParserException {
         if (tempEnzymeFile == null) {
             tempEnzymeFile = File.createTempFile("searchGUI_enzymes", ".xml");
@@ -85,7 +92,7 @@ public class EnzymePredictor {
         return peptideSequences;
     }
 
-    private Enzyme getMainEnzyme(LinkedHashMap<Enzyme, Integer> enzymecounts) {
+    public Enzyme getMainEnzyme(LinkedHashMap<Enzyme, Integer> enzymecounts) {
         int chymoTrypsin;
         int argC;
         int lysC;
@@ -181,7 +188,7 @@ public class EnzymePredictor {
         return highestCount;
     }
 
-    private LinkedHashMap<Enzyme, Integer> getEnzymeCounts(List<String> peptideSequences) {
+    public LinkedHashMap<Enzyme, Integer> getEnzymeCounts() {
         LOGGER.info("Counting enzyme occurences");
         bestGuess = enzymeFactory.getEnzyme("Trypsin");
         HashMap<Character, Integer> AAbeforeMap = new HashMap<>();
@@ -219,11 +226,11 @@ public class EnzymePredictor {
     }
 
     public Enzyme estimateEnzyme(List<String> peptideSequences) {
-        LinkedHashMap<Enzyme, Integer> enzymeCounts = getEnzymeCounts(peptideSequences);
+        LinkedHashMap<Enzyme, Integer> enzymeCounts = getEnzymeCounts();
         return getMainEnzyme(enzymeCounts);
     }
 
-    public int estimateMissedCleavages(Enzyme enzyme, List<String> peptideSequences) {
+    public int estimateMissedCleavages(Enzyme enzyme) {
         int averageMissedCleavage = 2;
         for (String aSequence : peptideSequences) {
             averageMissedCleavage += enzyme.getNmissedCleavages(aSequence);
@@ -231,4 +238,5 @@ public class EnzymePredictor {
         averageMissedCleavage = (int) Math.max(1, Math.ceil(averageMissedCleavage / peptideSequences.size()));
         return averageMissedCleavage;
     }
+
 }

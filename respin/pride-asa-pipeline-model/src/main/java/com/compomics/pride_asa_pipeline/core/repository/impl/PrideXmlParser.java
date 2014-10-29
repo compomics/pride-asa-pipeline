@@ -141,7 +141,7 @@ public class PrideXmlParser implements FileParser {
                         //add to identifications
                         identifications.add(identification);
                     } catch (UnknownAAException ex) {
-                        LOGGER.error(ex.getMessage(), ex);
+                        LOGGER.error(ex);
                     }
                 } else {
                     LOGGER.warn("Could not find precursor for " + proteinIdentificationId);

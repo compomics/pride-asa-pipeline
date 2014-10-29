@@ -3,7 +3,6 @@ package com.compomics.pride_asa_pipeline.core.logic;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
-import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.repository.FileParser;
@@ -13,6 +12,7 @@ import com.compomics.pride_asa_pipeline.core.service.FileModificationService;
 import com.compomics.pride_asa_pipeline.core.service.FileSpectrumService;
 import com.compomics.pride_asa_pipeline.core.util.IOUtils;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
+import com.compomics.pride_asa_pipeline.model.Modification;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -43,6 +43,7 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
 
     /**
      * Getters and setters
+     * @return the experiment service
      */
     public FileExperimentService getExperimentService() {
         return experimentService;

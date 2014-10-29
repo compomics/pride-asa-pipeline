@@ -2,11 +2,11 @@ package com.compomics.pride_asa_pipeline.core.logic.recalibration.impl;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.recalibration.AbstractMassRecalibrator;
+import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
+import com.compomics.pride_asa_pipeline.core.util.MathUtils;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
-import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.Peptide;
-import com.compomics.pride_asa_pipeline.core.util.MathUtils;
 import java.util.Collection;
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
  * @since 0.1
  */
 public class MassRecalibratorImpl extends AbstractMassRecalibrator {
-            
+
     //ToDo: update, so modified peptides are taken into account (not just skipped)
     @Override
     public MassRecalibrationResult recalibrate(AnalyzerData analyzerData, Collection<Peptide> peptides) throws AASequenceMassUnknownException {
@@ -66,7 +66,6 @@ public class MassRecalibratorImpl extends AbstractMassRecalibrator {
             //store the results
             result.addMassError(charge, systematicError, systematicErrorWindow);
         }
-
         return result;
     }
 }

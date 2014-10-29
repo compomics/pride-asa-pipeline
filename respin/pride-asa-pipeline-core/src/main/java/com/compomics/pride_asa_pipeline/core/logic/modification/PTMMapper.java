@@ -149,7 +149,6 @@ public class PTMMapper {
                 }
             } else {
                 convertPridePtm(aModificationName, modProfile, unknownPtms, modificationMap.get(aModificationName));
-
             }
         }
         return modProfile;

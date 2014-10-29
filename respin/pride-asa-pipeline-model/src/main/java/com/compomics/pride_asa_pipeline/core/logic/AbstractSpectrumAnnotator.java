@@ -4,24 +4,24 @@ import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolde
 import com.compomics.pride_asa_pipeline.core.logic.impl.MassDeltaExplainerImpl;
 import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.match.SpectrumMatcher;
+import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
+import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
+import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
+import com.compomics.pride_asa_pipeline.core.model.ModifiedPeptidesMatchResult;
+import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.core.service.ModificationService;
+import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
+import com.compomics.pride_asa_pipeline.core.service.SpectrumService;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.AnnotationData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Identifications;
-import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
-import com.compomics.pride_asa_pipeline.core.model.ModifiedPeptidesMatchResult;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
-import com.compomics.pride_asa_pipeline.core.service.ModificationService;
-import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
-import com.compomics.pride_asa_pipeline.core.service.SpectrumService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -283,7 +283,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
      * @return the mass recalibration result (systemic mass error) per charge
      * state
      */
-    protected MassRecalibrationResult findSystematicMassError(List<Peptide> completePeptides) {
+    public MassRecalibrationResult findSystematicMassError(List<Peptide> completePeptides) {
         //set considered charge states
         massRecalibrator.setConsideredChargeStates(consideredChargeStates);
 
@@ -298,7 +298,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         }
         return massRecalibrationResult;
     }
-
+   
     protected void initChargeStates() {
         //load default values for considered charge states
         consideredChargeStates = new HashSet<>();

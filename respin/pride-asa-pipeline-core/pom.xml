@@ -30,8 +30,7 @@
 
     <!-- Build -->
     <build>
-        
-        <!-- Copy the resources required during building -->
+                <!-- Copy the resources required during building -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

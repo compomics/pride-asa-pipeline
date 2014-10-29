@@ -14,15 +14,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
@@ -85,7 +79,7 @@ public class EnzymePredictor {
         return peptideSequences;
     }
 
-    private Enzyme getMainEnzyme(LinkedHashMap<Enzyme, Integer> enzymecounts) {
+    public Enzyme getMainEnzyme(LinkedHashMap<Enzyme, Integer> enzymecounts) {
         int chymoTrypsin;
         int argC;
         int lysC;
@@ -181,7 +175,7 @@ public class EnzymePredictor {
         return highestCount;
     }
 
-    private LinkedHashMap<Enzyme, Integer> getEnzymeCounts(List<String> peptideSequences) {
+    public LinkedHashMap<Enzyme, Integer> getEnzymeCounts(List<String> peptideSequences) {
         LOGGER.info("Counting enzyme occurences");
         bestGuess = enzymeFactory.getEnzyme("Trypsin");
         HashMap<Character, Integer> AAbeforeMap = new HashMap<>();
