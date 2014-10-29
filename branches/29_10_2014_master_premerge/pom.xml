@@ -1,0 +1,405 @@
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.compomics.pride-asa-pipeline</groupId>
+    <artifactId>pride-asa-pipeline</artifactId>
+    <version>1.7.1</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>pride-asa-pipeline-model</module>
+        <module>pride-asa-pipeline-core</module>            
+    </modules>
+    <name>pride-asa-pipeline</name>
+    <url>https://code.google.com/p/pride-asa-pipeline/</url>
+	
+    <issueManagement>
+        <url>https://code.google.com/p/pride-asa-pipeline/issues/list</url>
+        <system>Google Code</system>
+    </issueManagement>
+	
+    <scm>
+        <url>https://code.google.com/p/pride-asa-pipeline/source/browse/</url>
+    </scm>
+	
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <org.springframework.version>3.1.4.RELEASE</org.springframework.version>
+    </properties>
+	
+    <build>
+        <pluginManagement>
+            <!-- Plugins -->
+            <plugins>
+                <!-- Compiler plugin -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.5.1</version>
+                    <inherited>true</inherited>
+                    <configuration>
+                        <source>1.7</source>
+                        <target>1.7</target>
+                        <showDeprecation>true</showDeprecation>
+                        <debug>true</debug>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.1</version>                    
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>2.10</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.5.7.201204190339</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin> 
+                <!-- Pack sources on build -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.2</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Create javadoc on build -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.9</version>
+                    <configuration>
+                        <failOnError>false</failOnError>
+                    </configuration>    
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>                
+            </plugins>
+        </pluginManagement>
+        
+        <!-- Plugins -->
+        <plugins>
+            <!-- Compiler plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <!-- sources plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <!-- javadoc plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+	
+    <repositories>
+        <repository>
+            <id>ebi-repo</id>
+            <name>The EBI Maven 2 repository</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>genesis-maven-repo</id>
+            <name>Genesis maven repository</name>
+            <url>http://genesis.UGent.be/maven</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>genesis-maven2-repository</id>
+            <name>Genesis maven2 repository</name>
+            <url>http://genesis.UGent.be/maven2</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+	
+    <distributionManagement>        
+        <repository>
+            <id>genesis-maven2-repo</id>
+            <name>Genesis Maven Repository</name>
+            <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
+        </repository>
+    </distributionManagement>
+	
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.compomics.pride-asa-pipeline</groupId>
+                <artifactId>pride-asa-pipeline-model</artifactId>
+                <version>1.7.0</version>                
+            </dependency>
+            
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.7</version>
+                <scope>test</scope>
+            </dependency>                       
+
+            <dependency>
+                <groupId>commons-configuration</groupId>
+                <artifactId>commons-configuration</artifactId>
+                <version>1.7</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
+        
+            <dependency>
+                <groupId>commons-dbcp</groupId>
+                <artifactId>commons-dbcp</artifactId>
+                <version>1.4</version>
+            </dependency>
+
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>5.1.18</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.6</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.compomics</groupId>
+                <artifactId>omssa-xsd</artifactId>
+                <version>0.3.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jdom</groupId>
+                <artifactId>jdom</artifactId>
+                <version>2.0.1</version>
+            </dependency>       
+        
+            <dependency>
+                <groupId>com.compomics</groupId>
+                <artifactId>utilities</artifactId>
+                <version>3.13.56</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>derby</artifactId>
+                        <groupId>org.apache.derby</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>ols-dialog</artifactId>
+                        <groupId>no.uib</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>braf</artifactId>
+                        <groupId>uk.ac.ebi.pride.tools</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>batik-all</artifactId>
+                        <groupId>batik</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>r09</version>
+            </dependency>
+
+            <dependency>
+                <groupId>it.tidalwave.betterbeansbinding</groupId>
+                <artifactId>betterbeansbinding-core</artifactId>
+                <version>1.3.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>it.tidalwave.betterbeansbinding</groupId>
+                <artifactId>betterbeansbinding-swingbinding</artifactId>
+                <version>1.3.0</version>
+            </dependency>
+        
+            <dependency>
+                <groupId>org.jfree</groupId>
+                <artifactId>jfreechart</artifactId>
+                <version>1.0.14</version>
+            </dependency>
+        
+            <dependency>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli</artifactId>
+                <version>1.2</version>
+            </dependency>
+        
+            <dependency>
+                <groupId>net.java.dev.glazedlists</groupId>
+                <artifactId>glazedlists_java15</artifactId>
+                <version>1.8.0</version>
+            </dependency>     
+        
+            <dependency>
+                <groupId>uk.ac.ebi.pride.jaxb</groupId>
+                <artifactId>pride-jaxb</artifactId>
+                <version>1.0.8</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>jaxb-impl</artifactId>
+                        <groupId>com.sun.xml.bind</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>                      
+        
+            <dependency>
+                <groupId>com.compomics</groupId>
+                <artifactId>PrideXMLValidator</artifactId>
+                <version>0.4.5</version>
+            </dependency>
+        
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-frontend-jaxws</artifactId>
+                <version>2.7.5</version>
+            </dependency>
+		
+            <!--        <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-transports-http-jetty</artifactId>
+                <version>2.7.5</version>
+            </dependency>            -->
+        
+            <dependency>
+                <groupId>no.uib</groupId>
+                <artifactId>ols-dialog</artifactId>
+                <version>3.4.0</version>
+            </dependency>
+        
+            <dependency>
+                <groupId>com.compomics</groupId>
+                <artifactId>RespinDataExtractor</artifactId>
+                <version>0.0.2</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+	
+    <dependencies>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+    </dependencies>
+	
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.5.2</version>
+                <configuration>
+                    <xmlOutput>true</xmlOutput>
+                    <xmlOutputDirectory>target/site</xmlOutputDirectory>
+                    <!-- <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile> -->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <targetJdk>1.7</targetJdk>
+                    <ignoreAnnotations>false</ignoreAnnotations>
+                    <excludes>
+                        <exclude>**/view/*.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                    <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+	
+    <profiles>
+        <profile>
+            <id>development</id>
+            <properties>
+                <property_file.source>classpath</property_file.source>    
+            </properties>
+        </profile>
+        <profile>
+            <id>production</id>
+            <properties>
+                <property_file.source>file</property_file.source> 
+            </properties>   
+        </profile>
+    </profiles>
+</project>

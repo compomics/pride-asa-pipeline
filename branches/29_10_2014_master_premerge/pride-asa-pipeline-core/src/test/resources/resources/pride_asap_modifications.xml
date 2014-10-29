@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modifications xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="modifications.xsd">
+    <modification>
+        <name>Acetylation</name>
+        <monoIsotopicMassShift>42.01056</monoIsotopicMassShift>
+        <averageMassShift>42.0367</averageMassShift>
+        <location>any</location>
+        <affectedAminoAcids>
+            <affectedAminoAcid>K</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:00064</accession>
+        <accessionValue>N6-acetyl-L-lysine</accessionValue>
+    </modification>
+    <modification>
+        <name>Terminal Acetylation</name>
+        <!-- <monoIsotopicMassShift>42.010565</monoIsotopicMassShift> --> <!-- mass different at last comma. program currently can't cope with modifications which have exactly same mass -->
+        <monoIsotopicMassShift>42.01057</monoIsotopicMassShift>
+        <averageMassShift>42.0368</averageMassShift>
+        <location>N-terminus</location>
+        <affectedAminoAcids>
+            <!--<affectedAminoAcid>*</affectedAminoAcid>--> <!-- * is wildcard for all amino acids -->
+            <affectedAminoAcid>A</affectedAminoAcid>
+            <affectedAminoAcid>M</affectedAminoAcid>
+            <affectedAminoAcid>S</affectedAminoAcid>
+            <affectedAminoAcid>K</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:00408</accession>
+        <accessionValue>N-acetylated residue</accessionValue>
+    </modification>
+    <modification>
+        <name>Carboxyamidomethylation</name>
+        <monoIsotopicMassShift>57.02146</monoIsotopicMassShift>
+        <averageMassShift>57.0513</averageMassShift>
+        <location>any</location>
+        <affectedAminoAcids>
+            <affectedAminoAcid>Y</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:01060</accession>
+        <accessionValue>Carboxyamidomethyl Cystenyl</accessionValue>
+    </modification>
+    <modification>
+        <name>Oxidation</name>
+        <monoIsotopicMassShift>15.994915</monoIsotopicMassShift>
+        <averageMassShift>15.9994</averageMassShift>
+        <location>any</location>
+        <affectedAminoAcids>
+            <affectedAminoAcid>K</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:00719</accession>
+        <accessionValue>oxidation to L-methionine sulfoxide</accessionValue>
+    </modification>
+    <modification>
+        <name>Terminal Oxidation</name>
+        <monoIsotopicMassShift>15.994915</monoIsotopicMassShift>
+        <averageMassShift>15.9994</averageMassShift>
+        <location>C-terminus</location>
+        <affectedAminoAcids>
+            <affectedAminoAcid>A</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:00719</accession>
+        <accessionValue>oxidation to L-methionine sulfoxide</accessionValue>
+    </modification>
+    <modification>
+        <name>Negative modification</name>
+        <monoIsotopicMassShift>-35.0</monoIsotopicMassShift>
+        <averageMassShift>-35.0</averageMassShift>
+        <location>any</location>
+        <affectedAminoAcids>
+            <affectedAminoAcid>Y</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:00412</accession>
+        <accessionValue>non-exisitent test modification</accessionValue>
+    </modification>
+</modifications>
