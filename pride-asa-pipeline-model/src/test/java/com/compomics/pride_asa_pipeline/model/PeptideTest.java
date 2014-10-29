@@ -14,11 +14,10 @@ import org.junit.Test;
 public class PeptideTest {
 
     /**
-     * Test the ion mass ladder.
-     *
+     * Test the ion mass ladder
+     * 
      * @throws com.compomics.pride_asa_pipeline.model.UnknownAAException
-     * @throws
-     * com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException
+     * @throws com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException
      */
     @Test
     public void testIonMassLadder_1() throws UnknownAAException, AASequenceMassUnknownException {
@@ -94,5 +93,4 @@ public class PeptideTest {
         assertEquals(668.29289, yIonLadder[10], 0.001);
 
     }
-
 }

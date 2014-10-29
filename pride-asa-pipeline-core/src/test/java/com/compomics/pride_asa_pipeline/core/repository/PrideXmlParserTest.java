@@ -1,10 +1,10 @@
 package com.compomics.pride_asa_pipeline.core.repository;
 
+import com.compomics.pride_asa_pipeline.core.repository.impl.PrideXmlParser;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Peak;
-import com.compomics.pride_asa_pipeline.core.repository.impl.PrideXmlParserImpl;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
+import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
 /**
  *
@@ -23,12 +25,12 @@ import org.springframework.core.io.Resource;
  */
 public class PrideXmlParserTest {
 
-    private static PrideXmlParser prideXmlParser;
+    private static FileParser prideXmlParser;
     private static Resource prideXmlResource = new ClassPathResource("PRIDE_Experiment_11954.xml");
 
     @BeforeClass
-    public static void initParser() throws IOException {
-        prideXmlParser = new PrideXmlParserImpl();
+    public static void initParser() throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException {
+        prideXmlParser = (FileParser) new PrideXmlParser();
         prideXmlParser.init(prideXmlResource.getFile());
     }
 

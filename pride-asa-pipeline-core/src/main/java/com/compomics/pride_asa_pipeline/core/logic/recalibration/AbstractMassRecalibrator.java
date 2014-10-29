@@ -1,9 +1,9 @@
 package com.compomics.pride_asa_pipeline.core.logic.recalibration;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
-import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,7 +96,7 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
      * @param charge the charge value
      * @return the list of peptides
      */
-    protected List<Peptide> findPrecursorsWithCharge(Collection<Peptide> peptides, int charge) {
+    public List<Peptide> findPrecursorsWithCharge(Collection<Peptide> peptides, int charge) {
         List<Peptide> precs = new ArrayList<Peptide>();
         for (Peptide peptide : peptides) {
             if (peptide.getCharge() == charge) {
@@ -112,7 +112,7 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
      * @param peptidesByCharge the peptides with a specific charge
      * @return the usable peptide with a specific charge
      */
-    protected List<Peptide> findUsablePeptides(List<Peptide> peptidesByCharge) {
+    public List<Peptide> findUsablePeptides(List<Peptide> peptidesByCharge) {
         List<Peptide> peptides = new ArrayList<Peptide>();
         //get threshold value from configuration file
         double threshold = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.mass_delta_threshold");
@@ -138,7 +138,7 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
      * @return the mass errors
      * @throws AASequenceMassUnknownException
      */
-    protected List<Double> getMassErrors(List<Peptide> peptides) throws AASequenceMassUnknownException {
+    public List<Double> getMassErrors(List<Peptide> peptides) throws AASequenceMassUnknownException {
         List<Double> errors = new ArrayList<Double>();
         for (Peptide peptide : peptides) {
             errors.add(peptide.calculateMassDelta());

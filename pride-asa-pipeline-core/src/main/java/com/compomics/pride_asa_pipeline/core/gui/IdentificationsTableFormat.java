@@ -29,7 +29,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
     public static final String MODS_DELIMITER = ", ";
     private static final String UNMOD_MASS_DELTA_OPEN = "[";
     private static final String UNMOD_MASS_DELTA_CLOSE = "]";
-    private static final String[] columnNames = {"ID", "Peptide", "Modifications", "Charge", "Mass Delta", "M/Z Delta", "Precursor m/z", "Noise Threshold", "Score"};
+    private static final String[] columnNames = {"ID", "Peptide", "Modifications", "Charge", "Mass Delta", "M/Z Delta", "Precursor m/z", "Noise Threshold", "Score"};    
     public static final int SPECTRUM_REF = 0;
     public static final int PEPTIDE = 1;
     public static final int MODIFICATIONS = 2;
@@ -39,6 +39,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
     public static final int PRECURSOR_MZ = 6;
     public static final int NOISE_THRESHOLD = 7;
     public static final int SCORE = 8;
+    
 
     @Override
     public Class getColumnClass(int column) {
@@ -73,7 +74,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
 
     @Override
     public int getColumnCount() {
-        return columnNames.length;
+        return 9;
     }
 
     @Override

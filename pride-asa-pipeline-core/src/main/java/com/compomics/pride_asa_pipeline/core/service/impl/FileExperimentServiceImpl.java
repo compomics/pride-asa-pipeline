@@ -1,16 +1,19 @@
 package com.compomics.pride_asa_pipeline.core.service.impl;
 
+import com.compomics.pride_asa_pipeline.core.repository.FileParser;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Identifications;
-import com.compomics.respindataextractor.dataextraction.extractors.parameters.FileParser;
 import com.compomics.pride_asa_pipeline.core.service.FileExperimentService;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
+import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
+import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
 /**
  *
@@ -27,6 +30,10 @@ public class FileExperimentServiceImpl extends ExperimentServiceImpl implements 
     @Override
     public void setFileParser(FileParser fileParser) {
         this.fileParser = fileParser;
+    }
+
+    public FileParser getFileParser() {
+        return fileParser;
     }
 
     @Override
@@ -110,7 +117,11 @@ public class FileExperimentServiceImpl extends ExperimentServiceImpl implements 
 
     @Override
     public void init(File identificationsFile) {
-        fileParser.init(identificationsFile);
+        try {
+            fileParser.init(identificationsFile);
+        } catch (ClassNotFoundException | MzXMLParsingException | JMzReaderException ex) {
+           LOGGER.error(ex);
+        }
     }
 
     @Override

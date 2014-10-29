@@ -1,18 +1,18 @@
 package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.core.repository.FileParser;
+import com.compomics.pride_asa_pipeline.core.repository.factory.FileParserFactory;
 import com.compomics.pride_asa_pipeline.core.service.FileExperimentService;
 import com.compomics.pride_asa_pipeline.core.service.FileModificationService;
 import com.compomics.pride_asa_pipeline.core.service.FileSpectrumService;
 import com.compomics.pride_asa_pipeline.core.util.IOUtils;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
-import com.compomics.respindataextractor.dataextraction.extractors.parameters.FileParser;
-import com.compomics.respindataextractor.dataextraction.factories.FileParserFactory;
-import com.compomics.respindataextractor.exception.ExtractionException;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -25,20 +25,24 @@ import org.springframework.core.io.Resource;
  *
  * @author Niels Hulstaert
  */
+/**
+ *
+ * @author Kenneth Verheggen
+ */
 public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
 
     private static final Logger LOGGER = Logger.getLogger(FileSpectrumAnnotator.class);
     /**
-     * Boolean that keeps track of the init state of the identifications file.
+     * Boolean that keeps track of the init state of the identifications file
      */
     private boolean fileLoaded;
     /**
-     * Beans.
+     * Beans
      */
     private FileExperimentService experimentService;
 
     /**
-     * Getters and setters.
+     * Getters and setters
      */
     public FileExperimentService getExperimentService() {
         return experimentService;
@@ -52,8 +56,8 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
     public void initIdentifications(File identificationsFile) {
         try {
             initFileParser(identificationsFile);
-        } catch (IOException | ExtractionException ex) {
-            LOGGER.error(ex.getMessage(), ex);
+        } catch (IOException | MGFExtractionException ex) {
+            LOGGER.error(ex);
         }
 
         //@todo get a name take makes sense
@@ -133,7 +137,7 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
      *
      * @param identificationsFile the identifications file
      */
-    private void initFileParser(File identificationsFile) throws IOException, ExtractionException {
+    private void initFileParser(File identificationsFile) throws IOException, MGFExtractionException {
         //check if the file is gzipped
         //if so, unzip it in the same directory
         if (identificationsFile.getName().endsWith(".gz")) {

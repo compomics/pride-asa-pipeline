@@ -12,6 +12,11 @@ import java.util.Map;
  *
  * @author Niels Hulstaert
  */
+
+/**
+ *
+ * @author Kenneth Verheggen
+ */
 public interface SpectrumRepository {
     
     /**

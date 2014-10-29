@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.compomics.pride-asa-pipeline</groupId>
     <artifactId>pride-asa-pipeline</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>pride-asa-pipeline-model</module>
@@ -95,9 +95,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.9</version>
-                    <configuration>
-                        <failOnError>false</failOnError>
-                    </configuration>    
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>

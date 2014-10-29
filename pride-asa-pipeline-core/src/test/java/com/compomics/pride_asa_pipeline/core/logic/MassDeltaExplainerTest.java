@@ -58,7 +58,7 @@ public class MassDeltaExplainerTest {
 
         //init MassRecalibrationResult
         massRecalibrationResult = new MassRecalibrationResult();
-        massRecalibrationResult.addMassError(1, MASS_ERROR, 0.5);
+        massRecalibrationResult.addMassError(1, MASS_ERROR, 0.5);        
     }
 
     @Test
@@ -93,20 +93,12 @@ public class MassDeltaExplainerTest {
         peptide = new Peptide(1, experimentalMass, aminoAcidSequence);
         Identification identification_6 = new Identification(peptide, "6", "0", "0");
         identifications.add(identification_6);
-        experimentalMass = aminoAcidSequence.getSequenceMass() + Constants.MASS_H2O + Constants.MASS_H + MASS_ERROR - 35.0;
-        peptide = new Peptide(1, experimentalMass, aminoAcidSequence);
-        Identification identification_7 = new Identification(peptide, "7", "0", "0");
-        identifications.add(identification_7);
-        experimentalMass = aminoAcidSequence.getSequenceMass() + Constants.MASS_H2O + Constants.MASS_H + MASS_ERROR - 48.0;
-        peptide = new Peptide(1, experimentalMass, aminoAcidSequence);
-        Identification identification_8 = new Identification(peptide, "8", "0", "0");
-        identifications.add(identification_8);
 
         Map<Identification, Set<ModificationCombination>> explanations = massDeltaExplainer.explainCompleteIndentifications(identifications, massRecalibrationResult, null);
 
-        //the mass deltas of 6 identifications can be explained,
-        //so the the size of the map should be equal to 6
-        assertEquals(6, explanations.size());
+        //the mass deltas of three identifications can be explained,
+        //so the the size of the map should be equal to 5
+        assertEquals(5, explanations.size());
         //check if the modification combination sets are not empty
         assertFalse(explanations.get(identification_1).isEmpty());
         assertFalse(explanations.get(identification_2).isEmpty());
@@ -114,12 +106,10 @@ public class MassDeltaExplainerTest {
         assertFalse(explanations.get(identification_4).isEmpty());
         assertNull(explanations.get(identification_5));
         assertTrue(explanations.containsKey(identification_6));
-        assertFalse(explanations.get(identification_7).isEmpty());
-        assertNull(explanations.get(identification_8));
 
         //the first explanation should contain 2 modification combinations, with 1 modification each
         assertEquals(2, explanations.get(identification_1).size());
-        Iterator<ModificationCombination> iterator = explanations.get(identification_1).iterator();
+        Iterator<ModificationCombination> iterator = explanations.get(identification_1).iterator(); 
         assertEquals(1, iterator.next().getSize());
         assertEquals(1, iterator.next().getSize());
         //the second explanation should contain 1 modification combination, with 1 modification
@@ -131,8 +121,5 @@ public class MassDeltaExplainerTest {
         //the fourth explanation should contain 1 modification combination, with 2 modifications
         assertEquals(1, explanations.get(identification_4).size());
         assertEquals(2, explanations.get(identification_4).iterator().next().getSize());
-        //the seventh explanation should contain 1 modification combination, with 1 modification
-        assertEquals(1, explanations.get(identification_7).size());
-        assertEquals(1, explanations.get(identification_7).iterator().next().getSize());
     }
 }
