@@ -33,16 +33,16 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
 
     private static final Logger LOGGER = Logger.getLogger(FileSpectrumAnnotator.class);
     /**
-     * Boolean that keeps track of the init state of the identifications file
+     * Boolean that keeps track of the init state of the identifications file.
      */
     private boolean fileLoaded;
     /**
-     * Beans
+     * Beans.
      */
     private FileExperimentService experimentService;
 
     /**
-     * Getters and setters
+     * Getters and setters.
      */
     public FileExperimentService getExperimentService() {
         return experimentService;

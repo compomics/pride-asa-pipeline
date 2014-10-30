@@ -61,4 +61,15 @@
         <accession>MOD:00719</accession>
         <accessionValue>oxidation to L-methionine sulfoxide</accessionValue>
     </modification>
+    <modification>
+        <name>Negative modification</name>
+        <monoIsotopicMassShift>-35.0</monoIsotopicMassShift>
+        <averageMassShift>-35.0</averageMassShift>
+        <location>any</location>
+        <affectedAminoAcids>
+            <affectedAminoAcid>Y</affectedAminoAcid>
+        </affectedAminoAcids>
+        <accession>MOD:00412</accession>
+        <accessionValue>non-exisitent test modification</accessionValue>
+    </modification>
 </modifications>

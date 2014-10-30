@@ -29,7 +29,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
     public double getConvergenceCriterion() {
         return PropertiesConfigurationHolder.getInstance().getDouble("massdeltaexplainer.mass_delta_convergence_criterion");
     }
-    
+
     @Override
     public Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> identifications, MassRecalibrationResult massRecalibrationResult, AnalyzerData analyzerData) {
         Map<Identification, Set<ModificationCombination>> possibleExplainedIdentifications = new HashMap<>();
@@ -73,7 +73,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                 //ToDo: is it correct to use this value here?
                 Double deviation = massRecalibrationResult.getErrorWindow(peptide.getCharge());
                 //check for unconsidered charge states and take the default systematic mass error
-                if(deviation == null){
+                if (deviation == null) {
                     double errorTolerance = (analyzerData == null) ? PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance") : analyzerData.getPrecursorMassError();
                     deviation = errorTolerance / peptide.getCharge();
                 }
@@ -81,7 +81,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                 Set<ModificationCombination> combinations = null;
                 //if the mass delta is larger than a possible mass error (deviation) then
                 //we might have modifications we need to explain (or at least try to)
-                if (precursorMassDelta > deviation) {
+                if (Math.abs(precursorMassDelta) > deviation) {
                     combinations = modificationCombinationSolver.findModificationCombinations(peptide, modificationCombinationSizeLimit, precursorMassDelta, deviation);
 
                     //add all newly found combinations (if any) to the set of all modifications for this peptide
