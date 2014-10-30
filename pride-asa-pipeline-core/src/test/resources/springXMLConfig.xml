@@ -35,6 +35,7 @@
         <property name="experimentService" ref="dbExperimentService"/>
         <property name="spectrumService" ref="dbSpectrumService"/>
         <property name="modificationService" ref="dbModificationService"/>
+        <property name="pipelineModificationService" ref="pipelineModificationService"/>
         <property name="massRecalibrator" ref="massRecalibrator"/>
         <property name="spectrumMatcher" ref="spectrumMatcher"/>
         <property name="peptideVariationsGenerator" ref="peptideVariationsGenerator"/>
@@ -44,7 +45,8 @@
           class="com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator" lazy-init="true">        
         <property name="experimentService" ref="fileExperimentService"/>
         <property name="spectrumService" ref="fileSpectrumService"/>
-        <property name="modificationService" ref="fileModificationService"/>    
+        <property name="modificationService" ref="fileModificationService"/> 
+        <property name="pipelineModificationService" ref="pipelineModificationService"/>   
         <property name="massRecalibrator" ref="massRecalibrator"/>
         <property name="spectrumMatcher" ref="spectrumMatcher"/>
         <property name="peptideVariationsGenerator" ref="peptideVariationsGenerator"/>
