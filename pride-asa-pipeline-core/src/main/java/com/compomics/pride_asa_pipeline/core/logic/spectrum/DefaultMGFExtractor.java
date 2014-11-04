@@ -6,7 +6,10 @@
 package com.compomics.pride_asa_pipeline.core.logic.spectrum;
 
 import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
-import com.compomics.util.experiment.massspectrometry.*;
+import com.compomics.util.experiment.massspectrometry.Charge;
+import com.compomics.util.experiment.massspectrometry.MSnSpectrum;
+import com.compomics.util.experiment.massspectrometry.Peak;
+import com.compomics.util.experiment.massspectrometry.Precursor;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -229,6 +232,6 @@ public class DefaultMGFExtractor {
             }
         }
         return scavengedCharge;
-    }
-
+    }   
+    
 }

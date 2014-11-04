@@ -329,24 +329,25 @@ public class PTMMapper {
         for (String aModName : modProfile.getAllModifications()) {
             massToModMap.put(modProfile.getPtm(aModName).getMass(), aModName);
         }
-        double previousMass = massToModMap.firstKey() - precursorMassAcc;
-        for (Double aModMass : massToModMap.keySet()) {
-            if (Math.abs(aModMass - previousMass) < precursorMassAcc) {
-                String originalModification = massToModMap.get(previousMass);
-                String duplicateModification = massToModMap.get(aModMass);
-                if (originalModification != null) {
-                    System.out.println("Duplicate masses found : " + originalModification + "(" + previousMass + ")"
-                            + " vs " + duplicateModification + "(" + aModMass + ")");
-                    if (modProfile.getFixedModifications().contains(duplicateModification)) {
-                        modProfile.removeFixedModification(duplicateModification);
-                    } else {
-                        modProfile.removeVariableModification(duplicateModification);
+        if (!massToModMap.isEmpty()) {
+            double previousMass = massToModMap.firstKey() - precursorMassAcc;
+            for (Double aModMass : massToModMap.keySet()) {
+                if (Math.abs(aModMass - previousMass) < precursorMassAcc) {
+                    String originalModification = massToModMap.get(previousMass);
+                    String duplicateModification = massToModMap.get(aModMass);
+                    if (originalModification != null) {
+                        System.out.println("Duplicate masses found : " + originalModification + "(" + previousMass + ")"
+                                + " vs " + duplicateModification + "(" + aModMass + ")");
+                        if (modProfile.getFixedModifications().contains(duplicateModification)) {
+                            modProfile.removeFixedModification(duplicateModification);
+                        } else {
+                            modProfile.removeVariableModification(duplicateModification);
+                        }
                     }
                 }
+                previousMass = aModMass;
             }
-            previousMass = aModMass;
         }
-
         return modProfile;
     }
 
