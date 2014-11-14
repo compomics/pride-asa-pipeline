@@ -235,7 +235,9 @@ public class EnzymePredictor {
         for (String aSequence : peptideSequences) {
             averageMissedCleavage += enzyme.getNmissedCleavages(aSequence);
         }
-        averageMissedCleavage = (int) Math.max(1, Math.ceil(averageMissedCleavage / peptideSequences.size()));
+        if (!peptideSequences.isEmpty()) {
+            averageMissedCleavage = (int) Math.max(1, Math.ceil(averageMissedCleavage / peptideSequences.size()));
+        }
         return averageMissedCleavage;
     }
 
