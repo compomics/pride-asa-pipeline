@@ -4,9 +4,7 @@ import com.compomics.pride_asa_pipeline.core.repository.impl.PrideXmlParser;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.model.Peak;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -84,17 +82,4 @@ public class PrideXmlParserTest {
         Assert.assertEquals(43, proteinAccessions.size());
     }
 
-    @Test
-    public void testGetSpectrumPeaksBySpectrumId() {
-        List<Peak> spectrumPeaks = prideXmlParser.getSpectrumPeaksBySpectrumId("1");
-
-        Assert.assertEquals(292, spectrumPeaks.size());
-    }
-
-    @Test
-    public void testGetSpectrumMapBySpectrumId() {
-        HashMap<Double, Double> spectrumPeaks = prideXmlParser.getSpectrumPeakMapBySpectrumId("1");
-
-        Assert.assertEquals(292, spectrumPeaks.size());
-    }
 }
