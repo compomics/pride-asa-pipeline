@@ -33,8 +33,8 @@ public class PrideWebProjectFinder {
 
     public static void main(String[] args) throws IOException, ParseException {
 
-        //String projectAccession = "PXD001423";
-        String projectAccession = "PRD000214";
+        String projectAccession = "PXD001423";
+        //String projectAccession = "PRD000214";
         PrideWebUtils prideService = new PrideWebUtils();
         LOGGER.info("Getting metadata for " + projectAccession);
         PrideProject aProject = prideService.getPrideProject(projectAccession);
