@@ -112,7 +112,7 @@ public class DefaultMGFExtractor {
     public Spectrum getSpectrumBySpectrumId(String spectrumId) {
         Spectrum spectrum = null;
         try {
-            spectrum = jMzReader.getSpectrumById(spectrumId);
+            spectrum = jMzReader.getSpectrumById(spectrumId.substring(spectrumId.lastIndexOf("=")+1));
         } catch (JMzReaderException ex) {
             LOGGER.error(ex);
         }

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>pride-asa-pipeline-core</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
     <packaging>jar</packaging>
 
     <parent>
@@ -522,12 +522,18 @@
             <groupId>uk.ac.ebi.jmzidml</groupId>
             <artifactId>jmzidentml</artifactId>
             <type>jar</type>
-            <version>1.1.7</version>
+            <version>1.1.9</version>
         </dependency>
         <dependency>
             <groupId>org.geneontology</groupId>
             <artifactId>oboedit</artifactId>
             <version>beta8</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
             <type>jar</type>
         </dependency>
     </dependencies>

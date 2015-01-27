@@ -15,12 +15,13 @@ import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
  *
  * @author Niels Hulstaert
  */
-
 /**
  *
  * @author Kenneth Verheggen
  */
 public interface FileParser {
+
+    void attachSpectra(File peakFile) throws Exception;
 
     /**
      * Inits the parser with the given Pride XML file
@@ -30,7 +31,7 @@ public interface FileParser {
      * @throws uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException
      * @throws uk.ac.ebi.pride.tools.jmzreader.JMzReaderException
      */
-    void init(File prideXmlFile)throws ClassNotFoundException, MzXMLParsingException, JMzReaderException;
+    void init(File prideXmlFile) throws ClassNotFoundException, MzXMLParsingException, JMzReaderException;
 
     /**
      * Clears the parser resources

@@ -5,14 +5,10 @@
 package com.compomics.pride_asa_pipeline.core.playground;
 
 import com.compomics.pride_asa_pipeline.core.FileCommandLineRunner;
-import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
-import com.compomics.pride_asa_pipeline.core.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
-import com.compomics.pride_asa_pipeline.core.service.FileExperimentService;
-import com.compomics.pride_asa_pipeline.core.service.FileModificationService;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
+import com.compomics.pride_asa_pipeline.model.Modification;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;

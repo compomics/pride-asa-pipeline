@@ -1,7 +1,5 @@
 package com.compomics.pride_asa_pipeline.core.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,7 +17,7 @@ public class IOUtils {
      *
      * @param inputFile the input file
      * @param outputFile the output file
-     * 
+     *
      * @throws java.io.IOException
      */
     public static void unzip(File inputFile, File outputFile) throws IOException {
@@ -27,7 +25,7 @@ public class IOUtils {
                 GZIPInputStream gZIPInputStream = new GZIPInputStream(new FileInputStream(inputFile))) {
             //unzip
             //this method uses a buffer internally
-            org.apache.commons.io.IOUtils.copy(gZIPInputStream, fileOutputStream);            
+            org.apache.commons.io.IOUtils.copy(gZIPInputStream, fileOutputStream);
         }
     }
 

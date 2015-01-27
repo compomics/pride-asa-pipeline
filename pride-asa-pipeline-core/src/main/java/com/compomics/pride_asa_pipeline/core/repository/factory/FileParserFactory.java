@@ -12,7 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
-
+import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
+import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
 /**
  *
@@ -24,20 +25,10 @@ public class FileParserFactory {
     private static File currentInputFile;
     private static FileParserType currentType;
 
-    public static FileParser getFileParser(File inputFile) throws IOException {
+    public static FileParser getFileParser(File inputFile) throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException {
         currentInputFile = inputFile;
         FileParser parser = null;
         String extension = FilenameUtils.getExtension(inputFile.getAbsolutePath()).toLowerCase();
-        //TODO if extension =.gz ---> unzip ---> new extension
-        if (extension.equalsIgnoreCase("zip")) {
-
-        } else if (extension.equalsIgnoreCase("gz")) {
-
-        } else if (extension.equalsIgnoreCase("rar")) {
-
-        } else if (extension.equalsIgnoreCase("tar")) {
-
-        }
         switch (extension.toLowerCase()) {
             case "mzid":
                 LOGGER.info("Detected mzml file extension.");
@@ -50,6 +41,7 @@ public class FileParserFactory {
             default:
                 throw new IOException("Unsupported filetype for parameter-extraction : ." + extension);
         }
+        parser.init(inputFile);
         return parser;
     }
 
