@@ -5,18 +5,13 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic.spectrum;
 
-import com.compomics.util.experiment.massspectrometry.Peak;
 import com.compomics.util.experiment.massspectrometry.SpectrumFactory;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import junit.framework.TestCase;
 import org.springframework.core.io.ClassPathResource;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
-import uk.ac.ebi.pride.tools.jmzreader.model.Spectrum;
 import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
 /**
@@ -73,19 +68,6 @@ public class DefaultMGFExtractorTest extends TestCase {
     }
 
     /**
-     * Test of getSpectrumPeaksBySpectrumId method, of class
-     * DefaultMGFExtractor2.
-     */
-    public void testGetSpectrumPeaksBySpectrumId() throws IOException {
-        System.out.println("getSpectrumPeaksBySpectrumId");
-        String spectrumId = "25";
-        List<Peak> result = DefaultMGFExtractorTest.instance3.getSpectrumPeaksBySpectrumId(spectrumId);
-        assertEquals(result.size(), 210);
-        assertEquals(result.get(0).getMz(), 962.4208);
-        assertEquals(result.get(17).getIntensity(), 10.7642);
-    }
-
-    /**
      * Test of getSpectrumPeakMapBySpectrumId method, of class
      * DefaultMGFExtractor2.
      */
@@ -130,50 +112,6 @@ public class DefaultMGFExtractorTest extends TestCase {
             assertTrue(true);
         }
         assertFalse(false);
-    }
-
-    /**
-     * Test if the content of the generated MGF matches the prideXML
-     */
-    public void testMGFContent() throws Exception {
-        System.out.println("Content comparision");
-
-        File outputFile = new File("pride_project_3.mgf");
-        outputFile.deleteOnExit();
-        File result = DefaultMGFExtractorTest.instance3.extractMGF(outputFile);
-        SpectrumFactory factory = SpectrumFactory.getInstance();
-        factory.clearFactory();
-        factory.addSpectra(result, null);
-        //load the peaklist from the prideXmlReader
-        Map<Double, Double> prideXmlPeakList = DefaultMGFExtractorTest.instance3.getJMzReader().getSpectrumById("25").getPeakList();
-        Collection<Peak> mgfPeakList = factory.getSpectrum(outputFile.getName(), "25").getPeakList();
-        assertEquals(mgfPeakList.size(), prideXmlPeakList.size());
-        for (Peak aPeak : mgfPeakList) {
-            double mgfIntensity = aPeak.getIntensity();
-            double mgfMz = aPeak.getMz();
-            assertEquals(mgfIntensity, prideXmlPeakList.get(mgfMz));
-        }
-        System.out.println("The content of both files matches");
-    }
-
-    /**
-     * Test of scavengePrecursorMZ method, of class DefaultMGFExtractor2.
-     */
-    public void testScavengePrecursorMZ() throws JMzReaderException, IOException {
-        System.out.println("scavengePrecursorMZ");
-        Spectrum spectrum = DefaultMGFExtractorTest.instance3.getJMzReader().getSpectrumById("25");
-        double result = DefaultMGFExtractorTest.instance3.scavengePrecursorMZ(spectrum);
-        assertEquals(994.444, result);
-    }
-
-    /**
-     * Test of scavengeCharge method, of class DefaultMGFExtractor2.
-     */
-    public void testScavengeCharge() throws JMzReaderException, IOException {
-        System.out.println("scavengeCharge");
-        Spectrum spectrum = DefaultMGFExtractorTest.instance3.getJMzReader().getSpectrumById("25");
-        double result = DefaultMGFExtractorTest.instance3.scavengeCharge(spectrum);
-        assertEquals(2.0, result);
     }
 
 }

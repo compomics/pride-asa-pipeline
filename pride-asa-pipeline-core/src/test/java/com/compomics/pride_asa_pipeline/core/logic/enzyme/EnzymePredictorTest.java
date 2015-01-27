@@ -195,7 +195,7 @@ public class EnzymePredictorTest extends TestCase {
         EnzymePredictor predictor = new EnzymePredictor();
         int estimatedMissedCleavages = predictor.estimateMissedCleavages(testingEnzyme);
         System.out.println("Outcome = " + estimatedMissedCleavages);
-        assertEquals(1, estimatedMissedCleavages);
+        assertEquals(2, estimatedMissedCleavages);
     }
 
     public void testMissedCleavagePredictorExperiment11954() throws Exception {
@@ -212,7 +212,7 @@ public class EnzymePredictorTest extends TestCase {
         EnzymePredictor predictor = new EnzymePredictor();
         int estimatedMissedCleavages = predictor.estimateMissedCleavages(testingEnzyme);
         System.out.println("Outcome = " + estimatedMissedCleavages);
-        assertEquals(1, estimatedMissedCleavages);
+        assertEquals(2, estimatedMissedCleavages);
     }
 
     public void testMissedCleavagePredictorExperiment3() throws Exception {
@@ -228,7 +228,7 @@ public class EnzymePredictorTest extends TestCase {
         EnzymePredictor predictor = new EnzymePredictor();
         int estimatedMissedCleavages = predictor.estimateMissedCleavages(testingEnzyme);
         System.out.println("Outcome = " + estimatedMissedCleavages);
-        assertEquals(1, estimatedMissedCleavages);
+        assertEquals(2, estimatedMissedCleavages);
     }
 
     public void testMissedCleavagePredictorPeptideShakerExample() throws Exception {
@@ -244,7 +244,7 @@ public class EnzymePredictorTest extends TestCase {
         EnzymePredictor predictor = new EnzymePredictor();
         int estimatedMissedCleavages = predictor.estimateMissedCleavages(testingEnzyme);
         System.out.println("Outcome = " + estimatedMissedCleavages);
-        assertEquals(1, estimatedMissedCleavages);
+        assertEquals(2, estimatedMissedCleavages);
     }
 
     @Override
