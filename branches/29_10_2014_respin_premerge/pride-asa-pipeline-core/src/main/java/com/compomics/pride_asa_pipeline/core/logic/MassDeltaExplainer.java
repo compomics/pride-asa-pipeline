@@ -4,10 +4,10 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic;
 
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
-import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
+import com.compomics.pride_asa_pipeline.model.Identification;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

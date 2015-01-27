@@ -414,13 +414,13 @@ public class PTMMapper {
             return null;
         }
 
-        double monoIsotopicMassShift = (modificationItem.getMonoisotopicMassDelta());
+        double monoIsotopicMassShift = modificationItem.getMonoisotopicMassDelta();
         //if average mass shift is empty, use the monoisotopic mass.
         double averageMassShift;
         try {
             averageMassShift = modificationItem.getAvgMassDelta();
         } catch (NullPointerException e) {
-            LOGGER.error("Average mass shift not found, setting to mono isotopic mass shift");
+            LOGGER.warn("Average mass shift not found, setting to mono isotopic mass shift");
             averageMassShift = monoIsotopicMassShift;
         }
         String accession = modificationItem.getCvParam().get(0).getAccession();

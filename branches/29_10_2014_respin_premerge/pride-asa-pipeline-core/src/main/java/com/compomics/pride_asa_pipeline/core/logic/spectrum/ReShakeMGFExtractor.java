@@ -38,7 +38,7 @@ public class ReShakeMGFExtractor extends DefaultMGFExtractor {
     }
 
     public File extractMGF() throws MGFExtractionException {
-        File mgfFile = new File(inputFile.getAbsolutePath().replace(".xml", ".mgf"));
+        File mgfFile = new File(inputFile.getAbsolutePath().replace(".xml", ".mgf").replace(".gz",""));
         return extractMGF(mgfFile);
     }
 

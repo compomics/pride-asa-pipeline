@@ -241,4 +241,15 @@ public class EnzymePredictor {
         return averageMissedCleavage;
     }
 
+    public int estimateMaxMissedCleavages(Enzyme enzyme) {
+        int maxMissedCleavages = 2;
+        for (String aSequence : peptideSequences) {
+            int missCleavages = enzyme.getNmissedCleavages(aSequence);
+            if (missCleavages > maxMissedCleavages) {
+                maxMissedCleavages = missCleavages;
+            }
+        }
+        return maxMissedCleavages;
+    }
+
 }

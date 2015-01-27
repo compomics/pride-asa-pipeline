@@ -10,9 +10,6 @@ import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import java.io.File;
 import java.util.ArrayList;
-import uk.ac.ebi.jmzidml.model.mzidml.*;
-import uk.ac.ebi.jmzidml.xml.io.MzIdentMLUnmarshaller;
-import uk.ac.ebi.jmzidml.MzIdentMLElement;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,18 +17,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import uk.ac.ebi.pride.jaxb.model.Spectrum;
-import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
-import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
+import uk.ac.ebi.jmzidml.MzIdentMLElement;
+import uk.ac.ebi.jmzidml.model.mzidml.DBSequence;
+import uk.ac.ebi.jmzidml.model.mzidml.Modification;
+import uk.ac.ebi.jmzidml.model.mzidml.Peptide;
+import uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationItem;
+import uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationList;
+import uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationResult;
+import uk.ac.ebi.jmzidml.xml.io.MzIdentMLUnmarshaller;
 
 /**
  *
- * @author Kenneth Verheggen
- * WARNING : THIS CLASS IS A PROTOTYPE AND IS NOT FINISHED !!!!!
+ * @author Kenneth Verheggen WARNING : THIS CLASS IS A PROTOTYPE AND IS NOT
+ * FINISHED !!!!!
  */
 public class MzIdentMlParser implements FileParser {
 
-    private File peakFile;
     private MzIdentMLUnmarshaller unmarshaller;
     private final Map<String, Peptide> peptideMap = new HashMap<>();
     private final List<String> proteinAccessions = new ArrayList<>();
@@ -42,16 +43,9 @@ public class MzIdentMlParser implements FileParser {
     private DefaultMGFExtractor extractor;
     private static final Logger LOGGER = Logger.getLogger(MzIdentMlParser.class);
 
-    public void setPeakFile(File peakFile)  throws ClassNotFoundException, MzXMLParsingException, JMzReaderException{
-        this.peakFile = peakFile;
-        this.extractor = new DefaultMGFExtractor(peakFile);
-    }
-
     @Override
     public void init(File mzIdentMlFile) {
-        boolean aUseSpectrumCache = true;
         unmarshaller = new MzIdentMLUnmarshaller(mzIdentMlFile);
-
         // any reference on the fly.
         Iterator<DBSequence> testEvdIter = unmarshaller.unmarshalCollectionFromXpath(MzIdentMLElement.DBSequence);
         // Retrieve information for each PeptideEvidence in the list
@@ -97,29 +91,34 @@ public class MzIdentMlParser implements FileParser {
         for (SpectrumIdentificationList anIdentification : specEvidenceList) {
             for (SpectrumIdentificationResult anIdentificationResult : anIdentification.getSpectrumIdentificationResult()) {
                 for (SpectrumIdentificationItem anIdentificationItem : anIdentificationResult.getSpectrumIdentificationItem()) {
-                    try {
-                        com.compomics.pride_asa_pipeline.model.Peptide peptide = new com.compomics.pride_asa_pipeline.model.Peptide();
-                        peptide.setCharge(anIdentificationItem.getChargeState());
-                        peptide.setMzRatio(anIdentificationItem.getExperimentalMassToCharge());
-                        String sequence = peptideMap.get(anIdentificationItem.getPeptideRef()).getPeptideSequence();
-                        peptide.setSequence(new AminoAcidSequence(AminoAcidSequence.toAASequence(sequence)));
-                        String spectrumID = anIdentificationResult.getSpectrumID();
-                        //TODO FIX THIS PART
-                        Identification ident = new Identification(peptide, null, spectrumID, "0");
-                        ident.setPeptide(peptide);
-                        identificationsList.add(ident);
-                        List<Modification> modificationsInFile = peptideMap.get(anIdentificationItem.getPeptideRef()).getModification();
-                        if (!modificationsInFile.isEmpty()) {
-                            for (Modification aMod : modificationsInFile) {
-                                modificationsList.add(PTMMapper.mapModificationWithParameters(aMod, sequence));
+                    //only allow rank 1 peptides
+                    if (anIdentificationItem.getRank() == 1) {
+                        try {
+                            //make a pride asap peptide
+                            com.compomics.pride_asa_pipeline.model.Peptide peptide = new com.compomics.pride_asa_pipeline.model.Peptide();
+                            //set charge state 
+                            peptide.setCharge(anIdentificationItem.getChargeState());
+                            //set the experimental measured MZ
+                            peptide.setMzRatio(anIdentificationItem.getExperimentalMassToCharge());
+                            //set the peptide sequence
+                            String sequence = peptideMap.get(anIdentificationItem.getPeptideRef()).getPeptideSequence();
+                            peptide.setSequence(new AminoAcidSequence(AminoAcidSequence.toAASequence(sequence)));
+                            //Verify the spectrum information in the identification part
+                            Identification ident = new Identification(peptide, anIdentificationResult.getSpectraDataRef(), anIdentificationResult.getSpectrumID(), anIdentificationResult.getSpectrumID());
+                            ident.setPeptide(peptide);
+                            identificationsList.add(ident);
+                            List<Modification> modificationsInFile = peptideMap.get(anIdentificationItem.getPeptideRef()).getModification();
+                            if (!modificationsInFile.isEmpty()) {
+                                for (Modification aMod : modificationsInFile) {
+                                    modificationsList.add(PTMMapper.mapModificationWithParameters(aMod, sequence));
+                                }
                             }
+                        } catch (UnknownAAException | NullPointerException ex) {
+                            ex.printStackTrace();
+                            LOGGER.error(ex);
                         }
-                    } catch (UnknownAAException | NullPointerException ex) {
-                        ex.printStackTrace();
-                        LOGGER.error(ex);
                     }
                 }
-
             }
 
         }
@@ -166,7 +165,8 @@ public class MzIdentMlParser implements FileParser {
 
     @Override
     public Map<String, String> getAnalyzerSources() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //TODO CHECK IF THIS IS STILL NEEDED WHEN USING RECALIBRATION
+        return new HashMap<>();
     }
 
     @Override
@@ -184,13 +184,17 @@ public class MzIdentMlParser implements FileParser {
     }
 
     @Override
+    public void attachSpectra(File peakFile) throws Exception {
+        extractor = new DefaultMGFExtractor(peakFile);
+    }
+
+    @Override
     public List<Peak> getSpectrumPeaksBySpectrumId(String spectrumId) {
         List<Peak> peaks = new ArrayList<>();
-        Spectrum spectrum = (Spectrum) extractor.getSpectrumBySpectrumId(spectrumId);
-        Number[] mzRatios = spectrum.getMzNumberArray();
-        Number[] intensities = spectrum.getIntentArray();
-        for (int i = 0; i < mzRatios.length; i++) {
-            Peak peak = new Peak(mzRatios[i].doubleValue(), intensities[i].doubleValue());
+        uk.ac.ebi.pride.tools.jmzreader.model.Spectrum aSpectrum = extractor.getSpectrumBySpectrumId(spectrumId);
+        Map<Double, Double> peakValues = aSpectrum.getPeakList();
+        for (Map.Entry<Double, Double> peakValue : peakValues.entrySet()) {
+            Peak peak = new Peak(peakValue.getKey(), peakValue.getValue());
             peaks.add(peak);
         }
 

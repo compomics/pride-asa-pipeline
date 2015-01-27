@@ -76,7 +76,6 @@ public class PrideXmlParser implements FileParser {
         prideXmlReader = new PrideXmlReader(prideXmlFile);
         //Load standard mods in factory : 
         modifications.clear();
-        mgfExtractor = new DefaultMGFExtractor(prideXmlFile);
     }
 
     @Override
@@ -382,6 +381,11 @@ public class PrideXmlParser implements FileParser {
 
     public int getIdentifiedSpectraInPrideXml() {
         return prideXmlIdentifiedSpectraCount;
+    }
+
+    @Override
+    public void attachSpectra(File peakFile) throws Exception {
+        mgfExtractor = new DefaultMGFExtractor(peakFile);
     }
 
 }
