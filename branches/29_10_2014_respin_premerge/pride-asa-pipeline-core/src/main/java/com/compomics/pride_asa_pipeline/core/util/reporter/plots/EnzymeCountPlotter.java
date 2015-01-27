@@ -38,7 +38,7 @@ public class EnzymeCountPlotter {
                 false // URLs?
         );
         //Save chart as PNG
-        ChartUtilities.saveChartAsPNG(new File(outputfolder, chartTitle + ".png"), chart, 400, 300);
+        ChartUtilities.saveChartAsPNG(new File(outputfolder, chartTitle + ".png"), chart, 800, 600);
     }
 
     private static DefaultCategoryDataset createDataset(PrideAsapInterpreter interpreter) {

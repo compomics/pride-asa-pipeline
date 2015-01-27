@@ -6,17 +6,13 @@
 package com.compomics.pride_asa_pipeline.core.logic.spectrum;
 
 import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
-import com.compomics.util.experiment.massspectrometry.Charge;
-import com.compomics.util.experiment.massspectrometry.MSnSpectrum;
 import com.compomics.util.experiment.massspectrometry.Peak;
-import com.compomics.util.experiment.massspectrometry.Precursor;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -37,6 +33,8 @@ public class DefaultMGFExtractor {
     JMzReader jMzReader;
     private final static Logger LOGGER = Logger.getLogger(DefaultMGFExtractor.class);
     public File inputFile;
+    private Integer maxPrecursorCharge = 5;
+    private Integer minPrecursorCharge = 1;
 
     public DefaultMGFExtractor() {
 
@@ -112,126 +110,122 @@ public class DefaultMGFExtractor {
     public Spectrum getSpectrumBySpectrumId(String spectrumId) {
         Spectrum spectrum = null;
         try {
-            spectrum = jMzReader.getSpectrumById(spectrumId.substring(spectrumId.lastIndexOf("=")+1));
+            spectrum = jMzReader.getSpectrumById(spectrumId.substring(spectrumId.lastIndexOf("=") + 1));
         } catch (JMzReaderException ex) {
             LOGGER.error(ex);
         }
         return spectrum;
     }
 
-    public File extractMGF(File outputFile) throws MGFExtractionException, IOException {
-        if (jMzReader.getMsNIndexes(2).isEmpty() || jMzReader.getSpectraIds().isEmpty()) {
-            throw new MGFExtractionException("There are no MS2 spectra in this project...");
-        } else {
-            LOGGER.info(jMzReader.getClass() + " found spectra...Extracting can commence");
-            if (!outputFile.exists()) {
-                outputFile.createNewFile();
-            }
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
-                double precursorMZ;
-                double precursorCharge = 0;
-                double precursorIntensity = 0;
-                HashMap<Double, Double> peakList;
-
-                Iterator<Spectrum> spectrumIterator = jMzReader.getSpectrumIterator();
-
-                if (!spectrumIterator.hasNext()) {
-                    throw new MGFExtractionException(jMzReader.getClass() + " could not read spectra from the inputfile");
-                } else {
-                    LOGGER.info(jMzReader.getClass() + " filled spectrum iterator");
+    /**
+     * Convert the peakfile to mgf.
+     *
+     * @param outputFile
+     * @return
+     * @throws
+     * com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException
+     * @throws uk.ac.ebi.pride.tools.jmzreader.JMzReaderException
+     */
+    public File extractMGF(File outputFile) throws MGFExtractionException, JMzReaderException {
+        try {
+            try (FileWriter w = new FileWriter(outputFile); BufferedWriter bw = new BufferedWriter(w)) {
+                List<String> spectra = jMzReader.getSpectraIds();
+                int spectraCount = spectra.size();
+                if (spectraCount == 0) {
+                    bw.close();
+                    w.close();
+                    throw new MGFExtractionException("No spectra present");
                 }
-
-                while (spectrumIterator.hasNext()) {
-                    try {
-                        try {
-                            Spectrum spectrum;
-                            spectrum = spectrumIterator.next();
-                            if (spectrum.getMsLevel() == 2) {
-                                //FIGURE OUT PEAKLIST           
-                                try {
-                                    peakList = (HashMap<Double, Double>) spectrum.getPeakList();
-                                } catch (NullPointerException e) {
-                                    throw new NullPointerException("No peaklist found for spectrum " + spectrum.getId());
-                                }
-//FIGURE OUT MZ
-                                try {
-                                    precursorMZ = spectrum.getPrecursorMZ();
-                                } catch (NullPointerException e) {
-                                    //try to find it in the spectrum description?
-                                    precursorMZ = scavengePrecursorMZ(spectrum);
-                                    if (precursorMZ == 0.0) {
-                                        throw new NullPointerException("No precursor m/z for spectrum " + spectrum.getId());
-                                    }
-                                }
-// FIGURE OUT INTENSITY
-                                try {
-                                    precursorIntensity = spectrum.getPrecursorIntensity();
-                                } catch (NullPointerException e) {
-                                    LOGGER.warn("No precursor intensity for spectrum " + spectrum.getId());
-                                }
-// FIGURE OUT CHARGES
-                                try {
-                                    precursorCharge = spectrum.getPrecursorCharge();
-                                } catch (NullPointerException e) {
-                                    precursorCharge = scavengeCharge(spectrum);
-                                    if (precursorCharge == 0.0) {
-                                        LOGGER.warn("No precursor charge for spectrum " + spectrum.getId());
-                                    }
-                                }
-                                ArrayList<Charge> possibleCharges = new ArrayList<>();
-
-// FIGURE OUT RT
-                                //            Precursor precursor = new Precursor(0.0, precursorMZ, precursorIntensity, possibleCharges);
-                                Precursor precursor = new Precursor(precursorMZ, precursorIntensity, possibleCharges, 0.0, 0.0);
-                                MSnSpectrum msNspectrum = new MSnSpectrum(2, precursor, spectrum.getId(), outputFile.getAbsolutePath());
-
-                                for (double anMz : peakList.keySet()) {
-                                    msNspectrum.addPeak(new Peak(anMz, peakList.get(anMz)));
-                                }
-                                msNspectrum.writeMgf(writer);
-                                //  mgfEntries.add(new MGFentry(spectrumId, precursorMZ, precursorIntensity, (int) precursorCharge, peakList));
-                            }
-                        } catch (NullPointerException | IndexOutOfBoundsException e) {
-                            throw new MGFExtractionException(jMzReader.getClass() + " could not read precursors from the inputfile");
-                        }
-                    } catch (IOException e) {
-                        LOGGER.error(e);
+                int validSpectrumCount = 0;
+                for (String spectrumId : spectra) {
+                    Spectrum spectrum = jMzReader.getSpectrumById(spectrumId);
+                    boolean valid = asMgf(spectrum, bw);
+                    if (valid) {
+                        validSpectrumCount++;
                     }
                 }
-            } catch (IOException e) {
-                LOGGER.error(e);
-            }
-            return outputFile;
-        }
-    }
-
-    public double scavengePrecursorMZ(Spectrum spectrum) {
-        double scavengedPrecursorMz = 0.0;
-        try {
-            scavengedPrecursorMz = spectrum.getPrecursorMZ();
-        } catch (Exception e) {
-            for (CvParam aParameter : spectrum.getAdditional().getCvParams()) {
-                if (aParameter.getAccession().equalsIgnoreCase("MS:1000744")
-                        || aParameter.getAccession().equalsIgnoreCase("PSI:1000040")) {
-                    scavengedPrecursorMz = Double.parseDouble(aParameter.getValue());
+                if (validSpectrumCount == 0) {
+                    throw new MGFExtractionException("The file (" + inputFile.getName() + ") contains no valid spectra!");
                 }
             }
+        } catch (IOException ex) {
+            LOGGER.error(ex);
         }
-        return scavengedPrecursorMz;
+        return outputFile;
     }
 
-    public double scavengeCharge(Spectrum spectrum) {
-        double scavengedCharge = 0.0;
-        try {
-            scavengedCharge = spectrum.getPrecursorCharge();
-        } catch (Exception e) {
-            for (CvParam aParameter : spectrum.getAdditional().getCvParams()) {
-                if (aParameter.getAccession().equalsIgnoreCase("MS:1000041")) {
-                    scavengedCharge = Double.parseDouble(aParameter.getValue());
+    /**
+     * Writes the given spectrum to the buffered writer.
+     *
+     * @param spectrum
+     * @param bw
+     * @return true of the spectrum could be converted to mgf
+     * @throws IOException
+     */
+    public boolean asMgf(Spectrum spectrum, BufferedWriter bw) throws IOException {
+        boolean valid = true;
+        int msLevel = spectrum.getMsLevel();
+        // ignore ms levels other than 2
+        if (msLevel == 2) {
+            // add precursor details
+            if (spectrum.getPrecursorMZ() > 0) {
+                bw.write("BEGIN IONS" + System.getProperty("line.separator"));
+                bw.write("TITLE=" + spectrum.getId() + System.getProperty("line.separator"));
+
+                Double precursorMz = spectrum.getPrecursorMZ();
+                Double precursorIntensity = spectrum.getPrecursorIntensity();
+                Integer precursorCharge = spectrum.getPrecursorCharge();
+
+                //TODO SEE WHERE TO GET RT
+                Double precursorRt = null;
+
+                if (precursorMz != null) {
+                    bw.write("PEPMASS=" + precursorMz);
+                } else {
+                    valid = false; // @TODO: cancel conversion??
                 }
+
+                if (precursorIntensity != null) {
+                    bw.write("\t" + precursorIntensity);
+                }
+
+                bw.write(System.getProperty("line.separator"));
+
+                if (precursorRt != null) {
+                    bw.write("RTINSECONDS=" + precursorRt + System.getProperty("line.separator")); // @TODO: improve the retention time mapping, e.g., support rt windows
+                }
+
+                if (precursorCharge != null) {
+                    bw.write("CHARGE=" + precursorCharge + System.getProperty("line.separator"));
+
+                    if (maxPrecursorCharge == null || precursorCharge > maxPrecursorCharge) {
+                        maxPrecursorCharge = precursorCharge;
+                    }
+                    if (minPrecursorCharge == null || precursorCharge < minPrecursorCharge) {
+                        minPrecursorCharge = precursorCharge;
+                    }
+                } else {
+                    //valid = false; // @TODO: can we use spectra without precursor charge??
+                }
+
+                // process all peaks by iterating over the m/z values
+ 
+                for (Map.Entry<Double, Double> mzEntry:spectrum.getPeakList().entrySet()) {
+                    bw.write(mzEntry.getKey().toString());
+                    bw.write(" ");
+                    bw.write(mzEntry.getValue().toString());
+                }
+
+                bw.write("END IONS" + System.getProperty("line.separator") + System.getProperty("line.separator"));
+
+            } else {
+                valid = false;
             }
+        } else {
+            valid = false;
         }
-        return scavengedCharge;
-    }   
-    
+
+        return valid;
+    }
+
 }
