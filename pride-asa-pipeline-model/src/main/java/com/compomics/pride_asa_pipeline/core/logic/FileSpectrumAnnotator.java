@@ -56,7 +56,7 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
     @Override
     public void initIdentifications(File identificationsFile) {
         try {
-            initFileParser(identificationsFile);
+            setFileParser(identificationsFile);
         } catch (IOException | MGFExtractionException ex) {
             LOGGER.error(ex);
         }
@@ -138,7 +138,7 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
      *
      * @param identificationsFile the identifications file
      */
-    private void initFileParser(File identificationsFile) throws IOException, MGFExtractionException {
+    private void setFileParser(File identificationsFile) throws IOException, MGFExtractionException {
         //check if the file is gzipped
         //if so, unzip it in the same directory
         if (identificationsFile.getName().endsWith(".gz")) {
