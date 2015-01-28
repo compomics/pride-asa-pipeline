@@ -114,7 +114,7 @@ public class PrideWebUtils {
     }
 
     public List<PrideAssayFile> getAllAssayFiles(String assayID) throws MalformedURLException, IOException, ParseException {
-        JSONObject jsonObject = getObjectFromURL(new URL("http://www.ebi.ac.uk:80/pride/ws/archive/file/list/assay/"+assayID));
+        JSONObject jsonObject = getObjectFromURL(new URL("http://www.ebi.ac.uk:80/pride/ws/archive/file/list/assay/" + assayID));
         List<JSONObject> list = (ArrayList<JSONObject>) jsonObject.get("list");
         List<PrideAssayFile> files = new ArrayList<>();
         for (JSONObject assayFileJSON : list) {
@@ -132,12 +132,13 @@ public class PrideWebUtils {
 
     public List<PrideAssayFile> getAllAssayFiles(String assayID, PrideFileType fileType) throws MalformedURLException, IOException, ParseException {
         List<PrideAssayFile> files = getAllAssayFiles(assayID);
+        List<PrideAssayFile> filteredFiles = new ArrayList<>();
         for (PrideAssayFile assayFile : files) {
             if (assayFile.getFileType().equals(fileType)) {
-                files.add(assayFile);
+                filteredFiles.add(assayFile);
             }
         }
-        return files;
+        return filteredFiles;
     }
 
     public List<PrideProject> getProjects(Collection<PrideFilter> filters, boolean quickLoad) throws MalformedURLException, IOException, ParseException {
@@ -160,5 +161,4 @@ public class PrideWebUtils {
         return projects;
     }
 
-    
 }

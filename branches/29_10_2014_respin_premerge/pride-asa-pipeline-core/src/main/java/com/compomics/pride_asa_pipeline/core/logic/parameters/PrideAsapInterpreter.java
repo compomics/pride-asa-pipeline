@@ -64,7 +64,7 @@ public abstract class PrideAsapInterpreter {
     private double fixedThreshold = 0.8;
 
     private final double modificationConsiderationConfidence = 2.5;
-  
+
     private Map<Modification, Double> modificationRates;
     private HashMap<String, Boolean> asapMods;
     protected ModificationProfile modProfile;
@@ -113,6 +113,10 @@ public abstract class PrideAsapInterpreter {
         //   PTMFactory.getInstance().clearFactory();
     }
 
+    /**
+     *
+     * @return the analyzerdata for the input file.
+     */
     public Set<AnalyzerData> getInstrumentsForProject() {
         LOGGER.info("Getting instrument parameters");
         AnalyzerData lAnalyzerData;
@@ -199,9 +203,13 @@ public abstract class PrideAsapInterpreter {
 
     private void inferEnzyme() throws IOException, FileNotFoundException, ClassNotFoundException, XmlPullParserException {
         List<Peptide> completePeptides = fileSpectrumAnnotator.getExperimentService().loadExperimentIdentifications().getCompletePeptides();
+        List<String> completePeptideSequences = new ArrayList<>();
         EnzymePredictor predictor = new EnzymePredictor();
         predictor.addPeptideObjects(completePeptides);
-        enzymeCounts = predictor.getEnzymeCounts();
+        for (Peptide aPeptide : completePeptides) {
+            completePeptideSequences.add(aPeptide.getSequenceString());
+        }
+        enzymeCounts = predictor.getEnzymeCounts(completePeptideSequences);
         mainEnzyme = predictor.getMainEnzyme(enzymeCounts);
         missedCleavages = predictor.estimateMaxMissedCleavages(mainEnzyme);
     }
