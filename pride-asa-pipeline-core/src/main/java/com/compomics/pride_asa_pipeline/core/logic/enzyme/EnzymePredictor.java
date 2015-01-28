@@ -5,6 +5,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic.enzyme;
 
+import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapStats;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -64,12 +66,29 @@ public class EnzymePredictor {
         this.peptideSequences = peptideSequences;
     }
 
+    /**
+     * This method adds peptide objects to the predictor
+     * @param peptides
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws ClassNotFoundException
+     * @throws XmlPullParserException
+     */
     public void addPeptideObjects(List<Peptide> peptides) throws IOException, FileNotFoundException, ClassNotFoundException, XmlPullParserException {
         for (Peptide aPeptide : peptides) {
             peptideSequences.add(aPeptide.getSequenceString());
         }
     }
 
+    
+    /**
+     * This method adds peptide sequences to the predictor
+     * @param peptides
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws ClassNotFoundException
+     * @throws XmlPullParserException
+     */
     public void addPeptides(List<String> peptides) throws IOException, FileNotFoundException, ClassNotFoundException, XmlPullParserException {
         for (String aPeptide : peptides) {
             peptideSequences.add(aPeptide);
@@ -92,6 +111,11 @@ public class EnzymePredictor {
         return peptideSequences;
     }
 
+    /**
+     *
+     * @param enzymecounts
+     * @return the best suited enzyme given the enzyme counts
+     */
     public Enzyme getMainEnzyme(LinkedHashMap<Enzyme, Integer> enzymecounts) {
         int chymoTrypsin;
         int argC;
@@ -188,7 +212,12 @@ public class EnzymePredictor {
         return highestCount;
     }
 
-    public LinkedHashMap<Enzyme, Integer> getEnzymeCounts() {
+    /**
+     *
+     * @param peptideSequences collection of sequences to analyze
+     * @return a hashmap with N-terminal counts of all enzymes
+     */
+    public LinkedHashMap<Enzyme, Integer> getEnzymeCounts(Collection<String> peptideSequences) {
         LOGGER.info("Counting enzyme occurences");
         bestGuess = enzymeFactory.getEnzyme("Trypsin");
         HashMap<Character, Integer> AAbeforeMap = new HashMap<>();
@@ -225,24 +254,23 @@ public class EnzymePredictor {
         return enzymeHits;
     }
 
-    public Enzyme estimateEnzyme(List<String> peptideSequences) {
-        LinkedHashMap<Enzyme, Integer> enzymeCounts = getEnzymeCounts();
+    /**
+     *
+     * @param peptideSequences a collection of peptide sequences
+     * @return the most probably enzyme
+     */
+    public Enzyme estimateEnzyme(Collection<String> peptideSequences) {
+        LinkedHashMap<Enzyme, Integer> enzymeCounts = getEnzymeCounts(peptideSequences);
         return getMainEnzyme(enzymeCounts);
     }
 
-    public int estimateMissedCleavages(Enzyme enzyme) {
-        int averageMissedCleavage = 2;
-        for (String aSequence : peptideSequences) {
-            averageMissedCleavage += enzyme.getNmissedCleavages(aSequence);
-        }
-        if (!peptideSequences.isEmpty()) {
-            averageMissedCleavage = (int) Math.max(1, Math.ceil(averageMissedCleavage / peptideSequences.size()));
-        }
-        return averageMissedCleavage;
-    }
-
+    /**
+     *
+     * @param enzyme the used enzyme
+     * @return the maximum amount of misscleavages found in a peptidesequence
+     */
     public int estimateMaxMissedCleavages(Enzyme enzyme) {
-        int maxMissedCleavages = 2;
+        int maxMissedCleavages = 0;
         for (String aSequence : peptideSequences) {
             int missCleavages = enzyme.getNmissedCleavages(aSequence);
             if (missCleavages > maxMissedCleavages) {
@@ -250,6 +278,19 @@ public class EnzymePredictor {
             }
         }
         return maxMissedCleavages;
+    }
+
+    /**
+     *
+     * @param enzyme the used enzyme
+     * @return the miss cleavage ratio (# Misscleavages / #Sequences)
+     */
+    public double getMissedCleavageRatio(Enzyme enzyme) {
+        int totalMissed = 0;
+        for (String aSequence : peptideSequences) {
+            totalMissed += enzyme.getNmissedCleavages(aSequence);
+        }
+        return PrideAsapStats.round((double) totalMissed / (double) peptideSequences.size());
     }
 
 }
