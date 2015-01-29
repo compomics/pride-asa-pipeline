@@ -4,13 +4,10 @@
  */
 package com.compomics.pride_asa_pipeline.core.service;
 
+import com.compomics.pride_asa_pipeline.core.repository.FileParser;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identifications;
-import com.compomics.respindataextractor.dataextraction.extractors.parameters.FileParser;
-import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
-import com.compomics.pridexmltomgfconverter.errors.exceptions.XMLConversionException;
 import java.io.File;
-import java.util.List;
 import java.util.Set;
 
 /**

@@ -4,7 +4,9 @@
  */
 package com.compomics.pride_asa_pipeline.core.service;
 
-import com.compomics.respindataextractor.dataextraction.extractors.parameters.FileParser;
+import com.compomics.pride_asa_pipeline.core.repository.FileParser;
+
+
 
 /**
  *

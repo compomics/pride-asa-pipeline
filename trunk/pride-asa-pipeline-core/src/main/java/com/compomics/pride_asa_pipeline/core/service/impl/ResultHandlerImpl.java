@@ -42,10 +42,10 @@ public class ResultHandlerImpl implements ResultHandler {
 
     public void setModificationMarshaller(ModificationMarshaller modificationMarshaller) {
         this.modificationMarshaller = modificationMarshaller;
-    }    
+    }
 
     @Override
-    public void writeResultToFile(SpectrumAnnotatorResult spectrumAnnotatorResult) {
+    public File writeResultToFile(SpectrumAnnotatorResult spectrumAnnotatorResult) {
         File resultFile = new File(PropertiesConfigurationHolder.getInstance().getString("results_path"), spectrumAnnotatorResult.getExperimentAccession() + ".txt");
 
         List<Identification> identifications = spectrumAnnotatorResult.getIdentifications();
@@ -53,6 +53,7 @@ public class ResultHandlerImpl implements ResultHandler {
         Collections.sort(identifications, new IdentificationSpectrumIdComparator());
 
         fileResultHandler.writeResult(resultFile, spectrumAnnotatorResult.getIdentifications());
+        return resultFile;
     }
 
     @Override
@@ -62,8 +63,8 @@ public class ResultHandlerImpl implements ResultHandler {
 
     @Override
     public void writeUsedModificationsToFile(String experimentAccession, Set<Modification> usedModifications) {
-        Resource usedModificationsResource = new FileSystemResource(PropertiesConfigurationHolder.getInstance().getString("results_path") + File.separator + experimentAccession + "_mods.xml");                
+        Resource usedModificationsResource = new FileSystemResource(PropertiesConfigurationHolder.getInstance().getString("results_path") + File.separator + experimentAccession + "_mods.xml");
         modificationMarshaller.marshall(usedModificationsResource, usedModifications);
     }
-        
+
 }

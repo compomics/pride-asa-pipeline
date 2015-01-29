@@ -6,6 +6,8 @@ package com.compomics.pride_asa_pipeline.core;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.core.repository.FileParser;
+import com.compomics.pride_asa_pipeline.core.repository.factory.FileParserFactory;
 import com.compomics.pride_asa_pipeline.core.service.ResultHandler;
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,15 +25,15 @@ import org.apache.log4j.Logger;
 public class FileCommandLineRunner {
 
     private static final Logger LOGGER = Logger.getLogger(FileCommandLineRunner.class);
-    private FileSpectrumAnnotator FileSpectrumAnnotator;
+    private FileSpectrumAnnotator fileSpectrumAnnotator;
     private ResultHandler fileResultHandler;
 
     public FileSpectrumAnnotator getFileSpectrumAnnotator() {
-        return FileSpectrumAnnotator;
+        return fileSpectrumAnnotator;
     }
 
     public void setFileSpectrumAnnotator(FileSpectrumAnnotator fileSpectrumAnnotator) {
-        this.FileSpectrumAnnotator = fileSpectrumAnnotator;
+        this.fileSpectrumAnnotator = fileSpectrumAnnotator;
     }
 
     public ResultHandler getFileResultHandler() {
@@ -77,25 +79,26 @@ public class FileCommandLineRunner {
     private void runFilePipeline(File identificationsFile) {
         try {
             String experimentAccession = identificationsFile.getName().substring(0, identificationsFile.getName().indexOf(".xml"));
-
+            FileParser parser = FileParserFactory.getFileParser(identificationsFile);
             //init the annotiation
-            FileSpectrumAnnotator.initIdentifications(identificationsFile);
+            fileSpectrumAnnotator.setFileParser(parser);
+            fileSpectrumAnnotator.initIdentifications(identificationsFile);
 
             //check if the experiment has "useful" identifications
-            if (FileSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
+            if (fileSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
                 LOGGER.warn("No useful identifications were found for experiment " + experimentAccession + ". This experiment will be skipped.");
-                FileSpectrumAnnotator.clearTmpResources();
+                fileSpectrumAnnotator.clearTmpResources();
             } else {
                 //check if the maximum systematic mass error is exceeded
-                if (FileSpectrumAnnotator.getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
+                if (fileSpectrumAnnotator.getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
                     LOGGER.warn("One or more systematic mass error exceed the maximum value of " + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error") + ", experiment " + experimentAccession + " will be skipped.");
-                    FileSpectrumAnnotator.clearTmpResources();
+                    fileSpectrumAnnotator.clearTmpResources();
                 } else {
                     //continue with the annotiation
-                    FileSpectrumAnnotator.annotate();
+                    fileSpectrumAnnotator.annotate();
                     //write result to file
-                    fileResultHandler.writeResultToFile(FileSpectrumAnnotator.getSpectrumAnnotatorResult());
-                    fileResultHandler.writeUsedModificationsToFile(experimentAccession, FileSpectrumAnnotator.getModificationService().getUsedModifications(FileSpectrumAnnotator.getSpectrumAnnotatorResult()).keySet());
+                    fileResultHandler.writeResultToFile(fileSpectrumAnnotator.getSpectrumAnnotatorResult());
+                    fileResultHandler.writeUsedModificationsToFile(experimentAccession, fileSpectrumAnnotator.getModificationService().getUsedModifications(fileSpectrumAnnotator.getSpectrumAnnotatorResult()).keySet());
                 }
             }
         } catch (Exception e) {

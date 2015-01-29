@@ -7,7 +7,12 @@ import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
 import com.compomics.pride_asa_pipeline.model.IdentificationScore;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.model.Peptide;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA. User: niels Date: 27/10/11 Time: 17:03 To change
@@ -59,7 +64,7 @@ public class IdentificationScorerImpl implements IdentificationScorer {
                         //add matched peak intensity
                         matchingIntensity += matchingPeak.getIntensity();
                         //add fragment ion annotation to list
-                        FragmentIonAnnotation fragmentIonAnnotation = new FragmentIonAnnotation(peptide.getPeptideId(), ionType, j + 1, matchingPeak.getMzRatio(), matchingPeak.getIntensity(), fragmentMassError, i + 1);
+                        FragmentIonAnnotation fragmentIonAnnotation = new FragmentIonAnnotation(peptide.getPeptideId(), ionType, j + 1, matchingPeak.getMzRatio(), matchingPeak.getIntensity(), Math.abs(ionLadderMass-matchingPeak.getMzRatio()), i + 1);
                         fragmentIonAnnotations.add(fragmentIonAnnotation);
                     }
                 }
