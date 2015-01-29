@@ -2,19 +2,17 @@ package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
-import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.core.repository.FileParser;
+import com.compomics.pride_asa_pipeline.core.repository.factory.FileParserFactory;
 import com.compomics.pride_asa_pipeline.core.service.FileExperimentService;
 import com.compomics.pride_asa_pipeline.core.service.FileModificationService;
 import com.compomics.pride_asa_pipeline.core.service.FileSpectrumService;
 import com.compomics.pride_asa_pipeline.core.util.IOUtils;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
-import com.compomics.respindataextractor.dataextraction.extractors.parameters.FileParser;
-import com.compomics.respindataextractor.dataextraction.factories.FileParserFactory;
-import com.compomics.respindataextractor.exception.ExtractionException;
+import com.compomics.pride_asa_pipeline.model.Modification;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.log4j.Logger;
@@ -24,6 +22,10 @@ import org.springframework.core.io.Resource;
 /**
  *
  * @author Niels Hulstaert
+ */
+/**
+ *
+ * @author Kenneth Verheggen
  */
 public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
 
@@ -36,6 +38,7 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
      * Beans.
      */
     private FileExperimentService experimentService;
+    private FileParser fileParser;
 
     /**
      * Getters and setters.
@@ -50,14 +53,10 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
 
     @Override
     public void initIdentifications(File identificationsFile) {
-        try {
-            initFileParser(identificationsFile);
-        } catch (IOException | ExtractionException ex) {
-            LOGGER.error(ex.getMessage(), ex);
-        }
 
         //@todo get a name take makes sense
-        String experimentAccession = identificationsFile.getName().substring(0, identificationsFile.getName().indexOf(".xml"));
+        String fileName = identificationsFile.getName();
+        String experimentAccession = fileName.substring(0, fileName.lastIndexOf("."));
 
         areModificationsLoaded = false;
 
@@ -97,10 +96,9 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
         }
 
         //add the modifications found in pride for the given experiment
-        if (PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_xml_modifications")) {
-            prideModifications = ((FileModificationService) modificationService).loadExperimentModifications();
-        }
-
+        //   if (PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_xml_modifications")) {
+        //       prideModifications = ((FileModificationService) modificationService).loadExperimentModifications();
+        //   }
         //update the initialization status
         areModificationsLoaded = true;
 
@@ -133,7 +131,7 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
      *
      * @param identificationsFile the identifications file
      */
-    private void initFileParser(File identificationsFile) throws IOException, ExtractionException {
+    public void setFileParser(File identificationsFile, File peakFile) throws Exception {
         //check if the file is gzipped
         //if so, unzip it in the same directory
         if (identificationsFile.getName().endsWith(".gz")) {
@@ -143,10 +141,23 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
             identificationsFile = unzippedIdentificationsFile;
         }
         //init the parser
-        FileParser fileParser = FileParserFactory.getFileParser(identificationsFile);
+        fileParser = FileParserFactory.getFileParser(identificationsFile);
+        fileParser.attachSpectra(peakFile);
 
         //set the file parser
         //set PrideXmlParser instance
+        experimentService.setFileParser(fileParser);
+        ((FileSpectrumService) spectrumService).setFileParser(fileParser);
+        ((FileModificationService) modificationService).setFileParser(fileParser);
+    }
+
+    /**
+     * Init the file parser.
+     *
+     * @param identificationsFile the identifications file
+     */
+    public void setFileParser(FileParser existingFileParser) throws Exception {
+        this.fileParser = existingFileParser;
         experimentService.setFileParser(fileParser);
         ((FileSpectrumService) spectrumService).setFileParser(fileParser);
         ((FileModificationService) modificationService).setFileParser(fileParser);
@@ -168,4 +179,5 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
         //update the considered charge states (if necessary)
         experimentService.updateChargeStates(consideredChargeStates);
     }
+
 }
