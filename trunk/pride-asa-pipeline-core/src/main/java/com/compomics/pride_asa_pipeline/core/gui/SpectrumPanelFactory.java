@@ -1,18 +1,18 @@
 package com.compomics.pride_asa_pipeline.core.gui;
 
-import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
-import com.compomics.pride_asa_pipeline.model.Identification;
-import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.core.service.DbSpectrumService;
 import com.compomics.pride_asa_pipeline.core.service.SpectrumService;
 import com.compomics.pride_asa_pipeline.core.util.PeakUtils;
+import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
+import com.compomics.pride_asa_pipeline.model.Identification;
+import com.compomics.pride_asa_pipeline.model.Peak;
+import com.compomics.util.gui.interfaces.SpectrumAnnotation;
 import com.compomics.util.gui.spectrum.DefaultSpectrumAnnotation;
 import com.compomics.util.gui.spectrum.ReferenceArea;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 /**
@@ -44,8 +44,8 @@ public class SpectrumPanelFactory {
      * Constructs a SpectrumPanel for the given Identification
      *
      * @param identification the identification
-     * @param isIdentificationsFile is the source an identifications file or the pride public db
-     * instance
+     * @param isIdentificationsFile is the source an identifications file or the
+     * pride public db instance
      * @return the SpectrumPanel
      */
     public SpectrumPanel getSpectrumPanel(Identification identification, boolean isIdentificationsFile) {
@@ -94,8 +94,8 @@ public class SpectrumPanelFactory {
      * @param identification the identification
      * @return the vector of peak annotations
      */
-    private Vector<DefaultSpectrumAnnotation> getPeakAnnotations(Identification identification) {
-        Vector<DefaultSpectrumAnnotation> peakAnnotations = new Vector();
+    private List<SpectrumAnnotation> getPeakAnnotations(Identification identification) {
+        List<SpectrumAnnotation> peakAnnotations = new ArrayList();
 
         for (FragmentIonAnnotation fragmentIonAnnotation : identification.getAnnotationData().getFragmentIonAnnotations()) {
             String label = fragmentIonAnnotation.getIon_type_name().substring(0, 1);
@@ -122,7 +122,8 @@ public class SpectrumPanelFactory {
                 Color.blue, // color of area
                 0.1f, // transparency level
                 true, // drawn on top of or behind the data
-                Boolean.FALSE);
+                false, 
+                false);
     }
 
     private String getIonChargeString(int ionCharge) {

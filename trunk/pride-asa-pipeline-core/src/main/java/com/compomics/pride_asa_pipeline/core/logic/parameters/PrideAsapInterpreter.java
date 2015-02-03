@@ -72,6 +72,7 @@ public abstract class PrideAsapInterpreter {
     private HashMap<String, Boolean> asapMods;
     protected ModificationProfile modProfile;
     private ArrayList<String> unknownMods;
+    double missedCleavageRatio;
 
     public PrideAsapInterpreter(File identificationsFile, File peakFile) throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException, Exception {
         init(identificationsFile, peakFile);
@@ -221,6 +222,7 @@ public abstract class PrideAsapInterpreter {
         enzymeCounts = predictor.getEnzymeCounts(completePeptideSequences);
         mainEnzyme = predictor.getMainEnzyme(enzymeCounts);
         missedCleavages = predictor.estimateMaxMissedCleavages(mainEnzyme);
+        missedCleavageRatio = predictor.getMissedCleavageRatio(mainEnzyme);
     }
 
     private double calculateConsiderationThreshold() {

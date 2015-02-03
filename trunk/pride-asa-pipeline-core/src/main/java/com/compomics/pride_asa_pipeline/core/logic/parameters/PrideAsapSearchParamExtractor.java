@@ -26,18 +26,18 @@ public class PrideAsapSearchParamExtractor extends PrideAsapInterpreter {
     private SearchParameters parameters;
     private File fastaFile;
 
-    public PrideAsapSearchParamExtractor(File identificationsFile,File peakFile) throws Exception, IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException, XmlPullParserException, Exception {
-        super(identificationsFile,peakFile);
+    public PrideAsapSearchParamExtractor(File identificationsFile, File peakFile) throws Exception, IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException, XmlPullParserException, Exception {
+        super(identificationsFile, peakFile);
         String ext = FilenameUtils.getExtension(identificationsFile.getAbsolutePath());
-        String fileName = identificationsFile.getName().substring(0,identificationsFile.getName().lastIndexOf(ext));
-        searchparametersfile = new File(identificationsFile.getParentFile(), fileName+"parameters");
+        String fileName = identificationsFile.getName().substring(0, identificationsFile.getName().lastIndexOf(ext));
+        searchparametersfile = new File(identificationsFile.getParentFile(), fileName + "parameters");
         LOGGER.info("Spectrumannotator delivered was initialized");
     }
 
-    public SearchParameters getParameters(){
+    public SearchParameters getParameters() {
         return parameters;
     }
-    
+
     private void initialize() throws XmlPullParserException, IOException, GOBOParseException {
         //INITIATE THE required FACTORIES
         parameters = new SearchParameters();
@@ -63,7 +63,7 @@ public class PrideAsapSearchParamExtractor extends PrideAsapInterpreter {
 
     private void setMachineParameters() {
         LOGGER.info("Retrieving machine parameters ");
-        parameters.setPrecursorAccuracyType(SearchParameters.PrecursorAccuracyType.DA);
+        parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
         parameters.setPrecursorAccuracy(getPrecursorAccuraccy());
         parameters.setFragmentIonAccuracy(getFragmentIonAccuraccy());
     }
@@ -96,17 +96,28 @@ public class PrideAsapSearchParamExtractor extends PrideAsapInterpreter {
             LOGGER.error(ex);
         }
         try {
+            System.out.print("Determining mass error settings...");
             setMachineParameters();
+            System.out.println("--Done");
         } catch (Exception ex) {
+            System.out.println("--Failed");
             LOGGER.error(ex);
         }
+
         //set enzyme AND misscleavage
+        System.out.print("Determining cleaving settings...");
         setEnzyme();
+        System.out.println("--Done");
+        System.out.print("Determining charge settings...");
         setConsideredCharges();
+        System.out.println("--Done");
         setFasta();
         try {
+            System.out.print("Determining Modification profile settings...");
             setModifications();
+            System.out.println("--Done");
         } catch (Exception ex) {
+            System.out.println("--Failed");
             LOGGER.error(ex);
             LOGGER.error("Could not find modifications, searching modless");
         }
@@ -132,5 +143,9 @@ public class PrideAsapSearchParamExtractor extends PrideAsapInterpreter {
         } catch (IOException | ClassNotFoundException ex) {
             LOGGER.error(ex);
         }
+    }
+
+    public double getMostLikelyMissedCleavageRate() {
+        return missedCleavageRatio;
     }
 }

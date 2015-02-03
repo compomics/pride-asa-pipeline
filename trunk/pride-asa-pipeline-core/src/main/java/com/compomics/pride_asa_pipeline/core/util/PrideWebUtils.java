@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -34,9 +35,10 @@ public class PrideWebUtils {
 
     private final JSONParser jsonParser = new JSONParser();
     private static final int BUFFER_SIZE = 4096;
+    private static final Logger LOGGER = Logger.getLogger(PrideWebUtils.class);
 
     public PrideProject getProjectField(String projectAccession, ProjectField aField) throws IOException, ParseException {
-        System.out.println("Loading " + projectAccession);
+        LOGGER.info("Loading " + projectAccession);
         URL projectURL = new URL("http://www.ebi.ac.uk:80/pride/ws/archive/project/" + projectAccession);
         JSONObject projectObject = getObjectFromURL(projectURL);
         PrideProject prideProject = new PrideProject();
@@ -46,7 +48,9 @@ public class PrideWebUtils {
     }
 
     public PrideProject getPrideProject(String projectAccession) throws IOException, ParseException {
-        URL projectURL = new URL("http://www.ebi.ac.uk:80/pride/ws/archive/project/" + projectAccession);
+        String query = "http://www.ebi.ac.uk/pride/ws/archive/project/" + projectAccession;
+        System.out.println(query);
+        URL projectURL = new URL(query);
         JSONObject projectObject = getObjectFromURL(projectURL);
         PrideProject prideProject = getProject(projectObject);
         //submitter
@@ -59,10 +63,12 @@ public class PrideWebUtils {
             prideProject.addLabHead(getContact(anObject));
         }
 
-        URL assayURL = new URL("http://www.ebi.ac.uk:80/pride/ws/archive/assay/list/project/" + projectAccession);
+        URL assayURL = new URL("http://www.ebi.ac.uk/pride/ws/archive/assay/list/project/" + projectAccession);
         JSONObject assayObject = getObjectFromURL(assayURL);
+     //   System.out.println(assayObject);
         //assays
         List<JSONObject> list = (ArrayList<JSONObject>) assayObject.get("list");
+
         for (JSONObject anObject : list) {
             PrideAssay assay = getAssay(anObject);
             prideProject.put(assay.getAssayAccession(), assay);

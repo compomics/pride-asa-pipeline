@@ -209,11 +209,11 @@ public class DefaultMGFExtractor {
                 }
 
                 // process all peaks by iterating over the m/z values
- 
-                for (Map.Entry<Double, Double> mzEntry:spectrum.getPeakList().entrySet()) {
+                for (Map.Entry<Double, Double> mzEntry : spectrum.getPeakList().entrySet()) {
                     bw.write(mzEntry.getKey().toString());
                     bw.write(" ");
                     bw.write(mzEntry.getValue().toString());
+                    bw.write(System.getProperty("line.separator"));
                 }
 
                 bw.write("END IONS" + System.getProperty("line.separator") + System.getProperty("line.separator"));
