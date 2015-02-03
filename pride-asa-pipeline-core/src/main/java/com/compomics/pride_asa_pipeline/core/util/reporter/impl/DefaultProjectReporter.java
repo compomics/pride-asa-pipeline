@@ -29,7 +29,7 @@ public class DefaultProjectReporter extends ProjectReporter {
     public DefaultProjectReporter(PrideAsapSearchParamExtractor extractor, File outputFolder) {
         super(extractor);
         this.outputFolder = outputFolder;
-        if(!outputFolder.exists()){
+        if (!outputFolder.exists()) {
             outputFolder.mkdirs();
         }
     }
@@ -37,11 +37,11 @@ public class DefaultProjectReporter extends ProjectReporter {
     private void generateModReport() {
         File modReport = new File(outputFolder, "modification_report.tsv");
         try (FileWriter modWriter = new FileWriter(modReport)) {
-            modWriter.append("Modification\tRate\tConsidered").flush();
+            modWriter.append("Modification\tRate\tConsidered" + System.lineSeparator()).flush();
             for (Map.Entry<Modification, Double> entry : extractor.getModificationRates().entrySet()) {
                 modWriter.append(entry.getKey().getName() + "\t"
                         + 100 * entry.getValue() + "\t"
-                        + (entry.getValue() >= extractor.getConsiderationThreshold())).flush();
+                        + (entry.getValue() >= extractor.getConsiderationThreshold()) + System.lineSeparator()).flush();
             }
         } catch (IOException ex) {
             LOGGER.error(ex);
@@ -51,9 +51,10 @@ public class DefaultProjectReporter extends ProjectReporter {
     private void generateEnzReport() {
         File enzymeReport = new File(outputFolder, "enzyme_report.tsv");
         try (FileWriter enzWriter = new FileWriter(enzymeReport)) {
-            enzWriter.append("Enzyme N-Terminus Count").flush();
+            enzWriter.append("MC_RATIO=" + extractor.getMostLikelyMissedCleavageRate()+System.lineSeparator()).flush();
+            enzWriter.append("Enzyme\tN-Terminus Count" + System.lineSeparator()).flush();
             for (Map.Entry<Enzyme, Integer> enzymeCount : extractor.getEnzymeCounts().entrySet()) {
-                enzWriter.append(("\t\t" + enzymeCount.getKey().getName() + "\t" + enzymeCount.getValue())).flush();
+                enzWriter.append(("\t\t" + enzymeCount.getKey().getName() + "\t" + enzymeCount.getValue() + System.lineSeparator())).flush();
             }
         } catch (IOException ex) {
             LOGGER.error(ex);
@@ -63,22 +64,22 @@ public class DefaultProjectReporter extends ProjectReporter {
     private void generatePrecursorAccReport() {
         File precAccReport = new File(outputFolder, "prec_acc_report.tsv");
         try (FileWriter precAccWriter = new FileWriter(precAccReport)) {
-            precAccWriter.append("Mass Delta (da)\tValue").flush();
-            precAccWriter.append("Mean\t" + extractor.getPrecursorStats().getMean()).flush();
-            precAccWriter.append("Variance\t" + extractor.getPrecursorStats().getVariance()).flush();
-            precAccWriter.append("").flush();
-            precAccWriter.append("Minimum\t" + extractor.getPrecursorStats().getMin()).flush();
-            precAccWriter.append("1st Quartile\t" + extractor.getPrecursorStats().getPercentile(25)).flush();
-            precAccWriter.append("Median delta\t" + extractor.getPrecursorStats().getPercentile(50)).flush();
-            precAccWriter.append("3rd Quartile\t" + extractor.getPrecursorStats().getPercentile(75)).flush();
-            precAccWriter.append("Maximum\t" + extractor.getPrecursorStats().getMax()).flush();
-            precAccWriter.append("").flush();
-            precAccWriter.append("Post Drop-Off Cut").flush();
-            precAccWriter.append("Mean\t" + extractor.getPrecursorStats().getPostDropStatistic(1)).flush();
-            precAccWriter.append("Variance\t" + extractor.getPrecursorStats().getPostDropStatistic(2)).flush();
-            precAccWriter.append("Max\t" + extractor.getPrecursorStats().getPostDropStatistic(3)).flush();
-            precAccWriter.append("").flush();
-            precAccWriter.append("Consensus\t" + extractor.getPrecursorAccuraccy()).flush();
+            precAccWriter.append("Mass Delta (da)\tValue" + System.lineSeparator()).flush();
+            precAccWriter.append("Mean\t" + extractor.getPrecursorStats().getMean() + System.lineSeparator()).flush();
+            precAccWriter.append("Variance\t" + extractor.getPrecursorStats().getVariance() + System.lineSeparator()).flush();
+            precAccWriter.append("" + System.lineSeparator()).flush();
+            precAccWriter.append("Minimum\t" + extractor.getPrecursorStats().getMin() + System.lineSeparator()).flush();
+            precAccWriter.append("1st Quartile\t" + extractor.getPrecursorStats().getPercentile(25) + System.lineSeparator()).flush();
+            precAccWriter.append("Median delta\t" + extractor.getPrecursorStats().getPercentile(50) + System.lineSeparator()).flush();
+            precAccWriter.append("3rd Quartile\t" + extractor.getPrecursorStats().getPercentile(75) + System.lineSeparator()).flush();
+            precAccWriter.append("Maximum\t" + extractor.getPrecursorStats().getMax() + System.lineSeparator()).flush();
+            precAccWriter.append(System.lineSeparator()).flush();
+            precAccWriter.append("Post Drop-Off Cut" + System.lineSeparator()).flush();
+            precAccWriter.append("Mean\t" + extractor.getPrecursorStats().getPostDropStatistic(1) + System.lineSeparator()).flush();
+            precAccWriter.append("Variance\t" + extractor.getPrecursorStats().getPostDropStatistic(2) + System.lineSeparator()).flush();
+            precAccWriter.append("Max\t" + extractor.getPrecursorStats().getPostDropStatistic(3) + System.lineSeparator()).flush();
+            precAccWriter.append(System.lineSeparator()).flush();
+            precAccWriter.append("Consensus\t" + extractor.getPrecursorAccuraccy() + System.lineSeparator()).flush();
         } catch (IOException ex) {
             LOGGER.error(ex);
         }
@@ -87,17 +88,17 @@ public class DefaultProjectReporter extends ProjectReporter {
     private void generateFragmentIonReport() {
         File fragAccReport = new File(outputFolder, "frag_acc_report.tsv");
         try (FileWriter fragAccWriter = new FileWriter(fragAccReport)) {
-            fragAccWriter.append("Mass Delta (da)\tValue").flush();
-            fragAccWriter.append("Mean\t" + extractor.getFragmentIonStats().getMean()).flush();
-            fragAccWriter.append("Variance\t" + extractor.getFragmentIonStats().getVariance()).flush();
-            fragAccWriter.append("").flush();
-            fragAccWriter.append("Minimum\t" + extractor.getFragmentIonStats().getMin()).flush();
-            fragAccWriter.append("1st Quartile\t" + extractor.getFragmentIonStats().getPercentile(25)).flush();
-            fragAccWriter.append("Median delta\t" + extractor.getFragmentIonStats().getPercentile(50)).flush();
-            fragAccWriter.append("3rd Quartile\t" + extractor.getFragmentIonStats().getPercentile(75)).flush();
-            fragAccWriter.append("Maximum\t" + extractor.getFragmentIonStats().getMax()).flush();
-            fragAccWriter.append("").flush();
-            fragAccWriter.append("Consensus\t" + extractor.getFragmentIonAccuraccy()).flush();
+            fragAccWriter.append("Mass Delta (da)\tValue" + System.lineSeparator()).flush();
+            fragAccWriter.append("Mean\t" + extractor.getFragmentIonStats().getMean() + System.lineSeparator()).flush();
+            fragAccWriter.append("Variance\t" + extractor.getFragmentIonStats().getVariance() + System.lineSeparator()).flush();
+            fragAccWriter.append("" + System.lineSeparator()).flush();
+            fragAccWriter.append("Minimum\t" + extractor.getFragmentIonStats().getMin() + System.lineSeparator()).flush();
+            fragAccWriter.append("1st Quartile\t" + extractor.getFragmentIonStats().getPercentile(25) + System.lineSeparator()).flush();
+            fragAccWriter.append("Median delta\t" + extractor.getFragmentIonStats().getPercentile(50) + System.lineSeparator()).flush();
+            fragAccWriter.append("3rd Quartile\t" + extractor.getFragmentIonStats().getPercentile(75) + System.lineSeparator()).flush();
+            fragAccWriter.append("Maximum\t" + extractor.getFragmentIonStats().getMax() + System.lineSeparator()).flush();
+            fragAccWriter.append(System.lineSeparator()).flush();
+            fragAccWriter.append("Consensus\t" + extractor.getFragmentIonAccuraccy() + System.lineSeparator()).flush();
         } catch (IOException ex) {
             LOGGER.error(ex);
         }

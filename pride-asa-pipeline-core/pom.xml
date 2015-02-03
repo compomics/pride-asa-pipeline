@@ -330,6 +330,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>4.11</version>
         </dependency>
 
         <dependency>
@@ -385,6 +386,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
+            <version>3.45.24</version>
             <exclusions>
                 <exclusion>
                     <artifactId>derby</artifactId>
@@ -446,11 +448,7 @@
             </exclusions>
         </dependency>                      
         
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>PrideXMLValidator</artifactId>
-        </dependency>
-        
+         
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>

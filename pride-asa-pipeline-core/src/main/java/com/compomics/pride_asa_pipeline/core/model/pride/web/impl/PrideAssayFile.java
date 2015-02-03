@@ -129,7 +129,7 @@ public class PrideAssayFile {
         outputFile.createNewFile();
         try (InputStream inputStream = conn.getInputStream(); FileOutputStream outputStream = new FileOutputStream(outputFile)) {
             long filesize = conn.getContentLength();
-            System.out.println("Size of the file to download in mb is: " + Math.ceil((double) filesize / 1024 / 1024));
+            LOGGER.info("Size of the file to download in mb is: " + Math.ceil((double) filesize / 1024 / 1024));
             byte[] buffer = new byte[4096];
             int bytesRead;
             while ((bytesRead = inputStream.read(buffer)) != -1) {

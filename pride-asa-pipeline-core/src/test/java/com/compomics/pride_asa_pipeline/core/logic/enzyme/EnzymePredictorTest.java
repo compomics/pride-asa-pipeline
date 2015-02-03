@@ -69,7 +69,7 @@ public class EnzymePredictorTest extends TestCase {
         testingEnzyme5 = enzymeFactory.getEnzyme("Chymotrypsin (FYWL)");
     }
 
-    /*  public void testTrypsin() throws Exception {
+      public void testTrypsin() throws Exception {
      System.out.println("Test Trypsin");
      List<String> peptides = mockUpPeptideDigestion(testingEnzyme, 300);
      EnzymePredictor predictor = new EnzymePredictor(peptides);
@@ -165,39 +165,6 @@ public class EnzymePredictorTest extends TestCase {
      assertTrue(bestGuess.getName().toUpperCase().contains("TRYP"));
      }
 
-     public void testProjectPeptideShaker() throws Exception {
-     System.out.println("Test PeptideShaker Example");
-     File testingFile = new ClassPathResource("PeptideShaker_Example.xml").getFile();
-     PrideXmlReader reader = new PrideXmlReader(testingFile);
-     List<String> peptides = new ArrayList<>();
-     for (String anID : reader.getIdentIds()) {
-     for (PeptideItem anItem : reader.getPeptides(anID)) {
-     peptides.add(anItem.getSequence());
-     }
-     }
-
-     EnzymePredictor predictor = new EnzymePredictor();
-     Enzyme bestGuess = predictor.estimateEnzyme(peptides);
-     System.out.println("Outcome = " + bestGuess.getName());
-     assertTrue(bestGuess.getName().toUpperCase().contains("TRYP"));
-     }
-
-     public void testMissedCleavagePredictorExperiment1644() throws Exception {
-     System.out.println("Test Missed Cleavage Project 1644");
-     File testingFile = new ClassPathResource("PRIDE_Exp_Complete_Ac_1644.xml").getFile();
-     PrideXmlReader reader = new PrideXmlReader(testingFile);
-     List<String> peptides = new ArrayList<>();
-     for (String anID : reader.getIdentIds()) {
-     for (PeptideItem anItem : reader.getPeptides(anID)) {
-     peptides.add(anItem.getSequence());
-     }
-     }
-     EnzymePredictor predictor = new EnzymePredictor();
-     int estimatedMissedCleavages = predictor.estimateMaxMissedCleavages(testingEnzyme);
-     System.out.println("Outcome = " + estimatedMissedCleavages);
-     assertEquals(2, estimatedMissedCleavages);
-     }
-
      public void testMissedCleavagePredictorExperiment11954() throws Exception {
      System.out.println("Test Missed Cleavage Project 1644");
      File testingFile = new ClassPathResource("PRIDE_Exp_Complete_Ac_11954.xml").getFile();
@@ -229,7 +196,8 @@ public class EnzymePredictorTest extends TestCase {
      int estimatedMissedCleavages = predictor.estimateMaxMissedCleavages(testingEnzyme);
      System.out.println("Outcome = " + estimatedMissedCleavages);
      assertEquals(2, estimatedMissedCleavages);
-     }*/
+     }
+     
     public void testMissedCleavagePredictorPeptideShakerExample() throws Exception {
         System.out.println("Test Missed Cleavage PeptideShaker Example");
         File testingFile = new ClassPathResource("PeptideShaker_Example.xml").getFile();
