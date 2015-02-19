@@ -19,7 +19,7 @@ The pipeline configuration files can be found in the _resources_ folder. These f
 === pride_asa_pipeline.properties ===
 Most of the parameter values in this file should be left to their default values. The settings that the user might need the change are listed below
   * `results_path`: the path on the file system where the pipeline result files will be stored.
-  * `spectrumannotator.include_pride_modifications`: include the modifications in found in PRIDE for a given experiment. Note that setting this parameter to `true` can increase the processing time. The modifications defined in the pipeline ([#pride_asap_modifications.xml]) are always taken into account.  
+  * `spectrumannotator.include_pride_modifications`: include the modifications in found in PRIDE for a given experiment. Note that setting this parameter to `true` can increase the processing time. The modifications defined in the pipeline ([pride_asap_modifications.xml]) are always taken into account.  
   * `modification.use_monoisotopic_mass`: use the monoisotopic or the average mass for the PTMs.
   * `pipeline.considered_charge_states`: the considered charge states for a precursor.
   * `massrecalibrator.maximum_systematic_mass_error`: the threshold systematic mass error value. The systematic mass errors (per charge state) as result of a recalibration step are checked against this value.
