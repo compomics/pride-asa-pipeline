@@ -68,7 +68,7 @@ The pipeline settings described in the [Manual#Configuration Configuration secti
 In this dialog, the user can add, modify and delete modifications. As mentioned before, a modifications XML file can be imported as well. In case of validation error against the schema, an error dialog will be shown.
 
 == Use pride-asap as Maven dependency ==
-Include the following dependecy
+Include the following dependency
 {{{
     <dependency>
         <groupId>com.compomics</groupId>
