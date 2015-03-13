@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl;
 
+import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.logic.modification.PTMMapper;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.DefaultMGFExtractor;
 import com.compomics.pride_asa_pipeline.core.repository.FileParser;
@@ -13,6 +14,7 @@ import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import com.compomics.util.experiment.biology.PTM;
 import com.compomics.util.experiment.biology.PTMFactory;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +60,7 @@ public class PrideXmlParser implements FileParser {
     private List<Identification> identifications;
     private PTMFactory factory;
     private PTMMapper pridePtmMapper;
+    private final long timeout = 30000;
     private int prideXmlIdentifiedSpectraCount;
 
     /**
@@ -135,7 +138,7 @@ public class PrideXmlParser implements FileParser {
                         if (prideXmlReader.isIdentifiedSpectrum(spectrumId)) {
                             prideXmlIdentifiedSpectraCount++;
                         }
-                        Identification identification = new Identification(peptide, proteinIdentificationId, spectrumId, "0");
+                        Identification identification = new Identification(peptide, proteinIdentificationId, spectrumId, spectrumId);
 
                         //add to identifications
                         identifications.add(identification);
@@ -366,16 +369,18 @@ public class PrideXmlParser implements FileParser {
                 LOGGER.error(ex);
             }
         }
-        String aUnifiedModName = pridePtmMapper.lookupRealModName(aModName.toLowerCase());
-        if (aUnifiedModName == null) {
-            aUnifiedModName = aModName.toLowerCase();
-        }
-        if (factory == null) {
-            factory = PTMFactory.getInstance();
-        }
-        PTM ptm = factory.getPTM(aUnifiedModName);
-        if (ptm != null && !protocolPtmMap.containsKey(ptm)) {
-            protocolPtmMap.put(ptm, fixed);
+        ArrayList<String> unifiedModNames = pridePtmMapper.lookupRealModNames(aModName.toLowerCase());
+        for (String aUnifiedModName : unifiedModNames) {
+            if (aUnifiedModName == null) {
+                aUnifiedModName = aModName.toLowerCase();
+            }
+            if (factory == null) {
+                factory = PTMFactory.getInstance();
+            }
+            PTM ptm = factory.getPTM(aUnifiedModName);
+            if (ptm != null && !protocolPtmMap.containsKey(ptm)) {
+                protocolPtmMap.put(ptm, fixed);
+            }
         }
     }
 
@@ -384,8 +389,20 @@ public class PrideXmlParser implements FileParser {
     }
 
     @Override
-    public void attachSpectra(File peakFile) throws Exception {
+    public void attachSpectra(File peakFile) throws ClassNotFoundException, MzXMLParsingException, JMzReaderException {
         mgfExtractor = new DefaultMGFExtractor(peakFile);
+    }
+
+    @Override
+    public void saveMGF(File outputFile) throws JMzReaderException, IOException, MGFExtractionException {
+        mgfExtractor.extractMGF(outputFile, timeout);
+    }
+
+    @Override
+    public void saveMGF(File outputFile, File spectrumLogFile) throws JMzReaderException, IOException, MGFExtractionException {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(spectrumLogFile)) {
+            mgfExtractor.extractMGF(outputFile, fileOutputStream, timeout);
+        }
     }
 
 }

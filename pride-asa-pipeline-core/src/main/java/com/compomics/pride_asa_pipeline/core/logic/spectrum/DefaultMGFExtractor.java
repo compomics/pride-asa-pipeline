@@ -11,10 +11,20 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReader;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
@@ -74,7 +84,6 @@ public class DefaultMGFExtractor {
             } catch (JMzReaderException ex) {
                 LOGGER.error(ex);
             }
-
         }
         return spectraMetaDataMap;
     }
@@ -87,9 +96,12 @@ public class DefaultMGFExtractor {
         List<Peak> myPeakList = new ArrayList<>();
         try {
             Spectrum spectrum = jMzReader.getSpectrumById(spectrumId);
-            Map<Double, Double> peakList = spectrum.getPeakList();
-            for (Double anMZ : peakList.keySet()) {
-                myPeakList.add(new Peak(anMZ, peakList.get(anMZ)));
+            //check that the spectrum is MS2...
+            if (spectrum.getMsLevel() == 2) {
+                Map<Double, Double> peakList = spectrum.getPeakList();
+                for (Map.Entry<Double, Double> aPeakPair : peakList.entrySet()) {
+                    myPeakList.add(new Peak(aPeakPair.getKey(), aPeakPair.getValue()));
+                }
             }
         } catch (JMzReaderException ex) {
             LOGGER.error(ex);
@@ -110,47 +122,72 @@ public class DefaultMGFExtractor {
     public Spectrum getSpectrumBySpectrumId(String spectrumId) {
         Spectrum spectrum = null;
         try {
-            spectrum = jMzReader.getSpectrumById(spectrumId.substring(spectrumId.lastIndexOf("=") + 1));
+            spectrum = jMzReader.getSpectrumById(spectrumId);
         } catch (JMzReaderException ex) {
             LOGGER.error(ex);
         }
         return spectrum;
     }
 
+    public File extractMGF(File outputFile, long timeout) throws MGFExtractionException, JMzReaderException {
+        OutputStream reportStream = System.out;
+        return extractMGF(outputFile, reportStream, timeout);
+    }
+
+    public File extractMGF(File outputFile) throws MGFExtractionException, JMzReaderException {
+        return extractMGF(outputFile, 30000);
+    }
+
     /**
      * Convert the peakfile to mgf.
      *
      * @param outputFile
+     * @param reportStream
+     * @param timeout
      * @return
      * @throws
      * com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException
      * @throws uk.ac.ebi.pride.tools.jmzreader.JMzReaderException
      */
-    public File extractMGF(File outputFile) throws MGFExtractionException, JMzReaderException {
-        try {
-            try (FileWriter w = new FileWriter(outputFile); BufferedWriter bw = new BufferedWriter(w)) {
-                List<String> spectra = jMzReader.getSpectraIds();
-                int spectraCount = spectra.size();
-                if (spectraCount == 0) {
-                    bw.close();
-                    w.close();
-                    throw new MGFExtractionException("No spectra present");
-                }
-                int validSpectrumCount = 0;
-                for (String spectrumId : spectra) {
-                    Spectrum spectrum = jMzReader.getSpectrumById(spectrumId);
-                    boolean valid = asMgf(spectrum, bw);
-                    if (valid) {
+    public File extractMGF(File outputFile, OutputStream reportStream, long timeout) throws MGFExtractionException, JMzReaderException {
+        try (FileWriter w = new FileWriter(outputFile);
+                BufferedWriter bw = new BufferedWriter(w);
+                OutputStreamWriter rw = new OutputStreamWriter(reportStream);) {
+            int spectraCount = jMzReader.getSpectraCount();
+            if (spectraCount == 0) {
+                bw.close();
+                w.close();
+                rw.append("No spectra discovered").flush();
+            } else {
+                rw.append("Total amount of spectra \t " + spectraCount + System.lineSeparator()).flush();
+            }
+            int validSpectrumCount = 0;
+
+            System.out.println("Processing Spectra");
+            List<String> spectrumIds = jMzReader.getSpectraIds();
+            for (String aSpectrumId : spectrumIds) {
+                //this part gets stuck sometimes, no idea why...
+                rw.append(aSpectrumId + "\t\t").flush();
+                try {
+                    Spectrum spectrum = monitorNextSpectrum(aSpectrumId, jMzReader, timeout);
+                    if (spectrum != null) {
+                        asMgf(spectrum, bw);
+                        rw.append("VALIDATED" + System.lineSeparator());
                         validSpectrumCount++;
+
+                    } else {
+                        rw.append("\tNOT FOUND").flush();
                     }
-                }
-                if (validSpectrumCount == 0) {
-                    throw new MGFExtractionException("The file (" + inputFile.getName() + ") contains no valid spectra!");
+                } catch (MGFExtractionException | TimeoutException e) {
+                    rw.append("\t" + e.getMessage() + System.lineSeparator()).flush();
                 }
             }
-        } catch (IOException ex) {
+            rw.append("Total usable \t" + validSpectrumCount).flush();
+        } catch (Exception ex) {
             LOGGER.error(ex);
+            ex.printStackTrace();
         }
+        System.out.println("Done");
         return outputFile;
     }
 
@@ -162,28 +199,22 @@ public class DefaultMGFExtractor {
      * @return true of the spectrum could be converted to mgf
      * @throws IOException
      */
-    public boolean asMgf(Spectrum spectrum, BufferedWriter bw) throws IOException {
-        boolean valid = true;
+    public void asMgf(Spectrum spectrum, BufferedWriter bw) throws MGFExtractionException, IOException {
+
         int msLevel = spectrum.getMsLevel();
-        // ignore ms levels other than 2
+        Double precursorMz = spectrum.getPrecursorMZ();
+        Double precursorIntensity = spectrum.getPrecursorIntensity();
+        Integer precursorCharge = spectrum.getPrecursorCharge();
+
+// ignore ms levels other than 2
         if (msLevel == 2) {
             // add precursor details
             if (spectrum.getPrecursorMZ() > 0) {
                 bw.write("BEGIN IONS" + System.getProperty("line.separator"));
                 bw.write("TITLE=" + spectrum.getId() + System.getProperty("line.separator"));
-
-                Double precursorMz = spectrum.getPrecursorMZ();
-                Double precursorIntensity = spectrum.getPrecursorIntensity();
-                Integer precursorCharge = spectrum.getPrecursorCharge();
-
+                bw.write("PEPMASS=" + precursorMz);
                 //TODO SEE WHERE TO GET RT
                 Double precursorRt = null;
-
-                if (precursorMz != null) {
-                    bw.write("PEPMASS=" + precursorMz);
-                } else {
-                    valid = false; // @TODO: cancel conversion??
-                }
 
                 if (precursorIntensity != null) {
                     bw.write("\t" + precursorIntensity);
@@ -215,17 +246,61 @@ public class DefaultMGFExtractor {
                     bw.write(mzEntry.getValue().toString());
                     bw.write(System.getProperty("line.separator"));
                 }
-
                 bw.write("END IONS" + System.getProperty("line.separator") + System.getProperty("line.separator"));
-
             } else {
-                valid = false;
+                throw new MGFExtractionException(spectrum.getId() + "\t" + "No precursor mz");
             }
         } else {
-            valid = false;
+            //TODO not being MS2 is not really an exception...
+            throw new MGFExtractionException(spectrum.getId() + "\t" + "Not ms2 :" + msLevel);
+        }
+    }
+
+    private Spectrum monitorNextSpectrum(String spectrumID, JMzReader jmzReader, long timeout) throws TimeoutException {
+        ExecutorService service = Executors.newFixedThreadPool(1, new ThreadFactory() {
+
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread thread = new Thread(r);
+                thread.setDaemon(true);
+                return thread;
+            }
+        });
+        SpectrumRetriever retriever = new SpectrumRetriever(spectrumID, jmzReader);
+        Future<Spectrum> futureResult = service.submit(retriever);
+        Spectrum result = null;
+        try {
+            result = futureResult.get(timeout, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            futureResult.cancel(true);
+            //for safety kill the service pool?
+            service.shutdownNow();
+            //notify the program that this particular spectrum timed out...
+            throw new TimeoutException("Timed out after " + timeout + " ms (" + System.lineSeparator() + ex + System.lineSeparator() + ")");
+        }
+        service.shutdown();
+        return result;
+    }
+
+    public void clear() {
+        jMzReader = null;
+    }
+
+    private static final class SpectrumRetriever implements Callable<Spectrum> {
+
+        private final JMzReader jmzReader;
+        private final String spectrumId;
+
+        private SpectrumRetriever(String spectrumId, JMzReader jmzReader) {
+            this.jmzReader = jmzReader;
+            this.spectrumId = spectrumId;
         }
 
-        return valid;
+        @Override
+        public Spectrum call() throws Exception {
+            Spectrum spectrum = jmzReader.getSpectrumById(spectrumId);
+            return spectrum;
+        }
     }
 
 }

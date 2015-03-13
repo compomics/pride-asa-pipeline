@@ -5,7 +5,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.util.reporter;
 
-import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapSearchParamExtractor;
+import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapExtractor;
 
 /**
  *
@@ -13,13 +13,16 @@ import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapSearchPar
  */
 public abstract class ProjectReporter {
 
-    protected final PrideAsapSearchParamExtractor extractor;
+    protected final PrideAsapExtractor extractor;
 
-    public ProjectReporter(PrideAsapSearchParamExtractor extractor) {
+    public ProjectReporter(PrideAsapExtractor extractor) {
         this.extractor = extractor;
     }
 
     public abstract void generateReport();
+    
+    public abstract void clear();
+    
 
 
 }

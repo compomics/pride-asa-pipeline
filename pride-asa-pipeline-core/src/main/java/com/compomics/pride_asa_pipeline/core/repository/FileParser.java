@@ -1,10 +1,12 @@
 package com.compomics.pride_asa_pipeline.core.repository;
 
+import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +23,9 @@ import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
  */
 public interface FileParser {
 
-    void attachSpectra(File peakFile) throws Exception;
+    void saveMGF(File outputfolder) throws JMzReaderException, IOException, MGFExtractionException;
+
+    void attachSpectra(File peakFile) throws ClassNotFoundException, MzXMLParsingException, JMzReaderException;
 
     /**
      * Inits the parser with the given Pride XML file
@@ -126,5 +130,7 @@ public interface FileParser {
      * @return the spectrum peaks
      */
     HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(String spectrumId);
+
+    public void saveMGF(File mgfFile, File spectrumLogFile)throws JMzReaderException, IOException, MGFExtractionException;
 
 }

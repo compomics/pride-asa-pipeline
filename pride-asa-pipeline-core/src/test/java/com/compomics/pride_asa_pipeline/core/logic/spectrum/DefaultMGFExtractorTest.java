@@ -8,7 +8,7 @@ package com.compomics.pride_asa_pipeline.core.logic.spectrum;
 import com.compomics.util.experiment.massspectrometry.SpectrumFactory;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 import junit.framework.TestCase;
 import org.springframework.core.io.ClassPathResource;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
@@ -74,7 +74,7 @@ public class DefaultMGFExtractorTest extends TestCase {
     public void testGetSpectrumPeakMapBySpectrumId() throws IOException {
         System.out.println("getSpectrumPeakMapBySpectrumId");
         String spectrumId = "25";
-        HashMap<Double, Double> result = DefaultMGFExtractorTest.instance3.getSpectrumPeakMapBySpectrumId(spectrumId);
+       Map<Double, Double> result = DefaultMGFExtractorTest.instance3.getSpectrumPeakMapBySpectrumId(spectrumId);
         assertEquals(result.size(), 210);
         assertTrue(result.get(962.4208) != null);
     }

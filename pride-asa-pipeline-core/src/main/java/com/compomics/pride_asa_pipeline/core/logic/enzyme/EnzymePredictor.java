@@ -68,6 +68,7 @@ public class EnzymePredictor {
 
     /**
      * This method adds peptide objects to the predictor
+     *
      * @param peptides
      * @throws IOException
      * @throws FileNotFoundException
@@ -80,9 +81,9 @@ public class EnzymePredictor {
         }
     }
 
-    
     /**
      * This method adds peptide sequences to the predictor
+     *
      * @param peptides
      * @throws IOException
      * @throws FileNotFoundException
@@ -291,6 +292,14 @@ public class EnzymePredictor {
             totalMissed += enzyme.getNmissedCleavages(aSequence);
         }
         return PrideAsapStats.round((double) totalMissed / (double) peptideSequences.size());
+    }
+
+    public void clear() {
+        enzymeFactory = null;
+        bestGuess = null;
+        if (peptideSequences != null) {
+            peptideSequences.clear();
+        }
     }
 
 }
