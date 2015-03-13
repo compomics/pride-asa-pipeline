@@ -4,9 +4,16 @@ import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolde
 import com.compomics.pride_asa_pipeline.core.logic.modification.ModificationMarshaller;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -58,7 +65,6 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
 
         if (document != null) {
             Element eRoot = document.getRootElement();
-
             Filter modFilter = new ElementFilter("modification");
             Iterator<Element> modIter = eRoot.getDescendants(modFilter);
             while (modIter.hasNext()) {
@@ -85,15 +91,11 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
                 String modAccessionValue = accessionValueElement.getValue();
 
                 Modification modification = new Modification(name, monoIsotopicMassShift, averageMassShift, location, affectedAminoAcids, modAccession, modAccessionValue);
-                Modification.Type type = readType(modificationElement);
-                if (type != null) {
-                    modification.setType(type);
-                }
-
+                //they will aways be MS2        
+                modification.setType(Modification.Type.MS2);
                 result.add(modification);
             }
         }
-
         return result;
     }
 
@@ -181,14 +183,4 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
         return position;
     }
 
-    private Modification.Type readType(Element modification) {
-        Modification.Type type = null;
-        if (modification.getChild("type") != null) {
-            String txtType = modification.getChild("type").getValue();
-
-            type = Modification.Type.valueOf(txtType);
-        }
-
-        return type;
-    }
 }

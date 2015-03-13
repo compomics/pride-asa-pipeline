@@ -5,9 +5,9 @@
 package com.compomics.pride_asa_pipeline.core.service;
 
 import com.compomics.omssa.xsd.UserModCollection;
-import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,6 +44,7 @@ public interface ModificationService {
      *
      * @param usedModifications map returned by the getUsedModifications method
      * @param spectrumAnnotatorResult the spectrum annotator result
+     * @param aFixedModificationThreshold
      * @return a Map with the used modifications as keys, and Double values that
      * are True when the corresponding Modification. e.g the rate is 0.95 if 95%
      * of all Identifications that can be targeted by a modification are

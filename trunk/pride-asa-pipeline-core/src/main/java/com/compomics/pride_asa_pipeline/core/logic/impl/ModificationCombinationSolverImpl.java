@@ -4,15 +4,20 @@ import com.compomics.pride_asa_pipeline.core.cache.Cache;
 import com.compomics.pride_asa_pipeline.core.cache.impl.PeptideModificationHolderCache;
 import com.compomics.pride_asa_pipeline.core.logic.ModificationCombinationSolver;
 import com.compomics.pride_asa_pipeline.core.logic.ZenArcher;
-import com.compomics.pride_asa_pipeline.model.Modification.Location;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.PeptideModificationHolder;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.Modification.Location;
 import com.compomics.pride_asa_pipeline.model.Peptide;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
@@ -48,7 +53,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
         if (bagSize > peptide.getSequence().length() + 2) {
             //the bag size is already bigger than the possible number of modifications on this peptide!
             //ToDo: maybe replace with exception and check at call time of method ??
-            LOGGER.debug("bag sixe exceeded peptide length for peptide: " + peptide.getSequenceString());
+            LOGGER.debug("bag size exceeded peptide length for peptide: " + peptide.getSequenceString());
             return null;
         }
 

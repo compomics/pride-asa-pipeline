@@ -5,7 +5,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.util.reporter.impl;
 
-import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapSearchParamExtractor;
+import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapExtractor;
 import com.compomics.pride_asa_pipeline.core.util.reporter.ProjectReporter;
 import com.compomics.pride_asa_pipeline.core.util.reporter.plots.EnzymeCountPlotter;
 import com.compomics.pride_asa_pipeline.core.util.reporter.plots.MassErrorPlotter;
@@ -26,7 +26,7 @@ public class DefaultProjectReporter extends ProjectReporter {
     private final File outputFolder;
     private final static Logger LOGGER = Logger.getLogger(DefaultProjectReporter.class);
 
-    public DefaultProjectReporter(PrideAsapSearchParamExtractor extractor, File outputFolder) {
+    public DefaultProjectReporter(PrideAsapExtractor extractor, File outputFolder) {
         super(extractor);
         this.outputFolder = outputFolder;
         if (!outputFolder.exists()) {
@@ -147,6 +147,11 @@ public class DefaultProjectReporter extends ProjectReporter {
         generateFragmentIonReport();
         LOGGER.info("Generating mass error graphs");
         generateMassErrorGraphs();
+    }
+
+    @Override
+    public void clear() {
+       extractor.clear();
     }
 
 }

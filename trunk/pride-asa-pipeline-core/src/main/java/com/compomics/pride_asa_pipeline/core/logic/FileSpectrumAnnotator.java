@@ -90,7 +90,8 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
         //add the pipeline modifications
         Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
         try {
-            modificationHolder.addModifications(pipelineModificationService.loadPipelineModifications(modificationsResource));
+            Set<Modification> loadPipelineModifications = pipelineModificationService.loadPipelineModifications(modificationsResource);
+            modificationHolder.addModifications(loadPipelineModifications);
         } catch (JDOMException ex) {
             LOGGER.error(ex.getMessage(), ex);
         }
@@ -156,7 +157,7 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
      *
      * @param identificationsFile the identifications file
      */
-    public void setFileParser(FileParser existingFileParser) throws Exception {
+    public void setFileParser(FileParser existingFileParser) {
         this.fileParser = existingFileParser;
         experimentService.setFileParser(fileParser);
         ((FileSpectrumService) spectrumService).setFileParser(fileParser);

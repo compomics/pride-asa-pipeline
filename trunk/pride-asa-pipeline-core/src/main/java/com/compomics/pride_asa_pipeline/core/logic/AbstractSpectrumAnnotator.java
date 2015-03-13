@@ -2,6 +2,7 @@ package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.impl.MassDeltaExplainerImpl;
+import com.compomics.pride_asa_pipeline.core.logic.modification.impl.OmssaModificationMarshallerImpl;
 import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
@@ -12,6 +13,7 @@ import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.service.SpectrumService;
+import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.AnnotationData;
@@ -28,7 +30,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import org.apache.log4j.Logger;
+import org.jdom2.JDOMException;
 
 /**
  *
@@ -152,8 +157,6 @@ public abstract class AbstractSpectrumAnnotator<T> {
     /**
      * Abstract methods.
      */
-
-
     /**
      * Loads the experiment identifications and calculates the systematic mass
      * errors per charge state.
@@ -181,22 +184,72 @@ public abstract class AbstractSpectrumAnnotator<T> {
      */
     public abstract void clearTmpResources();
 
+    public static void main(String[] args) {
+        new FileSpectrumAnnotator().annotate();
+    }
+
     /**
      * Public methods.
      */
     /**
-     * Annotate the experiment identifications.
+     * Annotate the experiment identifications in multiple passes according to
+     * the modification prevalence in PRIDE.
      */
     public void annotate() {
-        if (!areModificationsLoaded) {
-            //add the non-conflicting modifications found in pride for the given experiment
-            Set<Modification> prideModifications = initModifications();
-            if (!prideModifications.isEmpty()) {
-                Set<Modification> conflictingModifications = modificationService.filterModifications(modificationHolder, prideModifications);
-                for (Modification prideModification : prideModifications) {
-                    if (!conflictingModifications.contains(prideModification)) {
-                        modificationHolder.addModification(prideModification);
-                    }
+        try {
+            //unmarshal the searchgui mods ad their prevalences
+            OmssaModificationMarshallerImpl marshaller = new OmssaModificationMarshallerImpl();
+            Set<Modification> ordenedModifications = marshaller.unmarshall(ResourceUtils.getResourceByRelativePath("/resources/searchGUI_to_pride_mods_common.xml"));
+            //get a queue of them
+            BlockingQueue<Modification> modQueue = new ArrayBlockingQueue<>(ordenedModifications.size());
+            for (Modification mod : ordenedModifications) {
+                modQueue.offer(mod);
+            }
+            //drain the queue in subset parts
+            Set<Modification> modPassSet = new HashSet<>();
+            List<Identification> completeIdentifications = identifications.getCompleteIdentifications();
+            List<Identification> unmodifiedPrecursors = new ArrayList<>();
+            List<Identification> modifiedPrecursors = new ArrayList<>();
+            List<Identification> unexplainedIdentifications = new ArrayList<>();
+            //create new map with only the precursors that carry a significant mass delta
+            //and were we have possible modification combinations
+            Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap = new HashMap<>();
+
+            int pass = 0;
+            //subset the modQueue in x partitions
+            while ((modQueue.drainTo(modPassSet, 8) > 0)) {
+                if (unexplainedIdentifications.isEmpty() && pass > 0) {
+                    LOGGER.info("No more unexplained identifications !");
+                    break;
+                } else {
+                    pass++;
+                    LOGGER.info("Searching " + pass + "th pass :" + modPassSet);
+                    annotate(modPassSet, modifiedPrecursors, unmodifiedPrecursors, completeIdentifications, unexplainedIdentifications, significantMassDeltaExplanationsMap);
+                    modPassSet.clear();
+                }
+            }
+            //set the master results into the spectrumAnnotator result
+            spectrumAnnotatorResult.setUnexplainedIdentifications(unexplainedIdentifications);
+            spectrumAnnotatorResult.setUnmodifiedPrecursors(unmodifiedPrecursors);
+            spectrumAnnotatorResult.setModifiedPrecursors(modifiedPrecursors);
+        } catch (JDOMException ex) {
+            LOGGER.error(ex);
+        }
+    }
+
+    private void annotate(Set<Modification> prideModifications,
+            List<Identification> modifiedPrecursors,
+            List<Identification> unmodifiedPrecursors,
+            List<Identification> unexplainedModifications,
+            List<Identification> unexplainedIdentifications,
+            Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap) {
+        //add the non-conflicting modifications found in pride for the given experiment
+        if (!prideModifications.isEmpty()) {
+            modificationHolder = new ModificationHolder();
+            Set<Modification> conflictingModifications = modificationService.filterModifications(modificationHolder, prideModifications);
+            for (Modification prideModification : prideModifications) {
+                if (!conflictingModifications.contains(prideModification)) {
+                    modificationHolder.addModification(prideModification);
                 }
             }
         }
@@ -215,9 +268,9 @@ public abstract class AbstractSpectrumAnnotator<T> {
         //-> the only precursors not in this map are those that carry a significant
         //modification, but nevertheless could not be explained!
         int explainedIdentificationsSize = massDeltaExplanationsMap.size();
-        int completeIdentificationsSize = identifications.getCompleteIdentifications().size();
+        int completeIdentificationsSize = unexplainedModifications.size();
         LOGGER.debug("Precursors for which no modification combination could be found: " + (completeIdentificationsSize - explainedIdentificationsSize));
-        List<Identification> unexplainedIdentifications = getUnexplainedIdentifications(identifications.getCompleteIdentifications(), massDeltaExplanationsMap.keySet());
+        unexplainedIdentifications = getUnexplainedIdentifications(unexplainedModifications, massDeltaExplanationsMap.keySet());
         for (Identification identification : unexplainedIdentifications) {
             try {
                 LOGGER.debug("Unresolved precursor: " + identification.getPeptide().toString() + " with mass delta: " + identification.getPeptide().calculateMassDelta());
@@ -225,12 +278,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 LOGGER.error(e.getMessage(), e);
             }
         }
-        spectrumAnnotatorResult.setUnexplainedIdentifications(unexplainedIdentifications);
 
-        //create new map with only the precursors that carry a significant mass delta
-        //and were we have possible modification combinations
-        List<Identification> unmodifiedPrecursors = new ArrayList<>();
-        Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap = new HashMap<>();
         for (Identification identification : massDeltaExplanationsMap.keySet()) {
             if (massDeltaExplanationsMap.get(identification) != null) {
                 significantMassDeltaExplanationsMap.put(identification, massDeltaExplanationsMap.get(identification));
@@ -244,14 +292,13 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 identification.setAnnotationData(annotationData);
             }
         }
-        spectrumAnnotatorResult.setUnmodifiedPrecursors(unmodifiedPrecursors);
+
         LOGGER.debug("Precursors with possible modification(s): " + significantMassDeltaExplanationsMap.size());
         LOGGER.debug("Precursors with mass delta smaller than mass error (probably unmodified): " + unmodifiedPrecursors.size());
 
         ///////////////////////////////////////////////////////////////////////
         //THIRD STEP:  find all possible precursor variations (taking all
         //              the possible modification combinations into account)
-
         //ToDo: the following approach very quickly evolves into a combinatorial explosion,
         //ToDo: we should find better ways to determine which combination of modification
         //ToDo: is best suitable to explain a spectrum.
@@ -267,9 +314,11 @@ public abstract class AbstractSpectrumAnnotator<T> {
         //               match them onto the peaks in the spectrum and decide
         //               which one is the best 'explanation'
         LOGGER.info("finding best matches");
-        List<Identification> modifiedPrecursors = findBestMatches(modifiedPrecursorVariations);
+        modifiedPrecursors.addAll(findBestMatches(modifiedPrecursorVariations));
         LOGGER.debug("finished finding best matches");
-        spectrumAnnotatorResult.setModifiedPrecursors(modifiedPrecursors);
+        //remove all explained in this step
+        unexplainedModifications.removeAll(spectrumAnnotatorResult.getUnmodifiedPrecursors());
+        unexplainedModifications.removeAll(spectrumAnnotatorResult.getModifiedPrecursors());
     }
 
     /**
@@ -324,8 +373,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         if (!modificationHolder.getAllModifications().isEmpty()) {
             massDeltaExplainer = new MassDeltaExplainerImpl(modificationHolder);
             //finally calculate the possible explanations
-            possibleExplanations =
-                    massDeltaExplainer.explainCompleteIndentifications(identifications.getCompleteIdentifications(), massRecalibrationResult, analyzerData);
+            possibleExplanations = massDeltaExplainer.explainCompleteIndentifications(identifications.getCompleteIdentifications(), massRecalibrationResult, analyzerData);
         }
 
         return possibleExplanations;
@@ -408,7 +456,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             if (!explainableIdentifications.contains(identification)) {
                 //annotate the unexplained identifications
                 //score the unexplained identification
-                AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId().replace("index=","")), analyzerData.getFragmentMassError());
+                AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId().replace("index=", "")), analyzerData.getFragmentMassError());
                 identification.setAnnotationData(annotationData);
                 identification.setPipelineExplanationType(PipelineExplanationType.UNEXPLAINED);
 
