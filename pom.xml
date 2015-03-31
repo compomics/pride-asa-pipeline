@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.compomics.pride-asa-pipeline</groupId>
     <artifactId>pride-asa-pipeline</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
     <packaging>pom</packaging>
     <modules>
         <module>pride-asa-pipeline-model</module>
@@ -13,21 +13,21 @@
     </modules>
     <name>pride-asa-pipeline</name>
     <url>https://code.google.com/p/pride-asa-pipeline/</url>
-	
+        
     <issueManagement>
         <url>https://code.google.com/p/pride-asa-pipeline/issues/list</url>
         <system>Google Code</system>
     </issueManagement>
-	
+        
     <scm>
         <url>https://code.google.com/p/pride-asa-pipeline/source/browse/</url>
     </scm>
-	
+        
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <org.springframework.version>3.1.4.RELEASE</org.springframework.version>
     </properties>
-	
+        
     <build>
         <pluginManagement>
             <!-- Plugins -->
@@ -129,7 +129,7 @@
             </plugin>
         </plugins>
     </build>
-	
+        
     <repositories>
         <repository>
             <id>ebi-repo</id>
@@ -155,7 +155,7 @@
             <layout>default</layout>
         </repository>
     </repositories>
-	
+        
     <distributionManagement>        
         <repository>
             <id>genesis-maven2-repo</id>
@@ -163,7 +163,7 @@
             <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
         </repository>
     </distributionManagement>
-	
+        
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -322,7 +322,7 @@
                 <artifactId>cxf-rt-frontend-jaxws</artifactId>
                 <version>2.7.5</version>
             </dependency>
-		
+                
             <!--        <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-transports-http-jetty</artifactId>
@@ -343,7 +343,7 @@
 
         </dependencies>
     </dependencyManagement>
-	
+        
     <dependencies>
         <dependency>
             <groupId>log4j</groupId>
@@ -351,7 +351,7 @@
             <version>1.2.17</version>
         </dependency>
     </dependencies>
-	
+        
     <reporting>
         <plugins>
             <plugin>
@@ -387,7 +387,7 @@
             </plugin>
         </plugins>
     </reporting>
-	
+        
     <profiles>
         <profile>
             <id>development</id>
@@ -403,3 +403,4 @@
         </profile>
     </profiles>
 </project>
+
