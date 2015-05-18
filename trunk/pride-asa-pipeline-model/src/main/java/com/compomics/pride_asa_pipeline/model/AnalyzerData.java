@@ -8,15 +8,50 @@ import org.apache.log4j.Logger;
  */
 public class AnalyzerData {
 
+    private double prec_acc;
+    private double frag_acc;
+
+    private void setPrecursorAccuraccy(double prec_acc) {
+        this.prec_acc = prec_acc;
+    }
+
+    private void setFragmentIonAccuraccy(double frag_acc) {
+        this.frag_acc = frag_acc;
+    }
+
+    public double getPrecursorAccuraccy() {
+        return prec_acc;
+    }
+
+    public double getFragmentAccuraccy() {
+        return frag_acc;
+    }
+
     public static enum ANALYZER_FAMILY {
 
-        IONTRAP,
-        TOF,
-        FT,
-        ORBITRAP,
-        UNKNOWN
+        IONTRAP(1.0, 1.0),
+        TOF(0.3, 0.3),
+        FT(0.1, 0.6),
+        ORBITRAP(0.1, 0.6),
+        UNKNOWN(1.0, 1.0);
+        private final double defaultPrecursorMassError;
+        private final double defaultFragmentMassError;
+
+        private ANALYZER_FAMILY(double precursorMassError, double fragmentMassError) {
+            this.defaultPrecursorMassError = precursorMassError;
+            this.defaultFragmentMassError = fragmentMassError;
+        }
+
+        public double getPrecursorMassError() {
+            return defaultPrecursorMassError;
+        }
+
+        public double getFragmentMassError() {
+            return defaultFragmentMassError;
+        }
+
     }
-    
+
     private static final Logger LOGGER = Logger.getLogger(AnalyzerData.class);
 
     //instrument mass error on precursor ions
@@ -29,6 +64,12 @@ public class AnalyzerData {
     public AnalyzerData(Double precursorMassError, Double fragmentMassError, ANALYZER_FAMILY analyzerFamily) {
         this.precursorMassError = precursorMassError;
         this.fragmentMassError = fragmentMassError;
+        this.analyzerFamily = analyzerFamily;
+    }
+
+    public AnalyzerData(ANALYZER_FAMILY analyzerFamily) {
+        this.precursorMassError = analyzerFamily.getPrecursorMassError();
+        this.fragmentMassError = analyzerFamily.getFragmentMassError();
         this.analyzerFamily = analyzerFamily;
     }
 
@@ -53,8 +94,19 @@ public class AnalyzerData {
                 + '}';
     }
 
-    public static AnalyzerData getAnalyzerDataByAnalyzerType(String analyzerType) {
+    public static AnalyzerData getDataDerivedAnalyzerData(double prec_acc, double frag_acc) {
+        AnalyzerData dataDerivedAnalyzer = new AnalyzerData(prec_acc,frag_acc,ANALYZER_FAMILY.UNKNOWN);
+        return dataDerivedAnalyzer;
+    }
 
+    public static AnalyzerData getDataDerivedAnalyzerDataByAnalyzerType(double prec_acc, double frag_acc, String analyzerType) {
+        AnalyzerData analyzerDataByAnalyzerType = getAnalyzerDataByAnalyzerType(analyzerType);
+        analyzerDataByAnalyzerType.setPrecursorAccuraccy(prec_acc);
+        analyzerDataByAnalyzerType.setFragmentIonAccuraccy(frag_acc);
+        return analyzerDataByAnalyzerType;
+    }
+
+    public static AnalyzerData getAnalyzerDataByAnalyzerType(String analyzerType) {
         /*
          * iontrap PSI:1000010	Analyzer Type	3D-Ion Trap iontrap PSI:1000010
          * analyzer type	ion trap iontrap PSI:1000010	Analyzer Type	Ion_trap
@@ -92,67 +144,47 @@ public class AnalyzerData {
          *
          */
         if (analyzerType == null || "".equals(analyzerType.trim())) {
-            LOGGER.debug("Analyzer not annontated! " + analyzerType);
-            return new AnalyzerData(1.0, 1.0, ANALYZER_FAMILY.UNKNOWN);
+            LOGGER.debug("Analyzer not annotated! " + analyzerType);
+            return new AnalyzerData(ANALYZER_FAMILY.UNKNOWN);
         }
 
         String lcAnalyzerType = analyzerType.trim().toLowerCase().replaceAll(" +", "").replaceAll("_|-", "");
+        String[] possibleMachineTerms;
 
-        //iontrap - 1.0 1.0
-        if (lcAnalyzerType.indexOf("iontrap") > -1) {
-            LOGGER.debug(analyzerType + " recignized as iontrap");
-            return new AnalyzerData(1.0, 1.0, ANALYZER_FAMILY.IONTRAP);
-        } else if (lcAnalyzerType.indexOf("qit") > -1) {
-            LOGGER.debug(analyzerType + " recignized as iontrap");
-            return new AnalyzerData(1.0, 1.0, ANALYZER_FAMILY.IONTRAP);
-        } else if (lcAnalyzerType.indexOf("qtrap") > -1) {
-            LOGGER.debug(analyzerType + " recignized as iontrap");
-            return new AnalyzerData(1.0, 1.0, ANALYZER_FAMILY.IONTRAP);
-        } else if (lcAnalyzerType.indexOf("lineartrap") > -1) {
-            LOGGER.debug(analyzerType + " recignized as iontrap");
-            return new AnalyzerData(1.0, 1.0, ANALYZER_FAMILY.IONTRAP);
-        } else if (lcAnalyzerType.indexOf("lcq") > -1) {
-            LOGGER.debug(analyzerType + " recignized as iontrap");
-            return new AnalyzerData(1.0, 1.0, ANALYZER_FAMILY.IONTRAP);
-        } else if (lcAnalyzerType.equals("ltq")) {
-            LOGGER.debug(analyzerType + " recignized as iontrap");
-            return new AnalyzerData(1.0, 1.0, ANALYZER_FAMILY.IONTRAP);
+//check for iontraps
+        possibleMachineTerms = new String[]{"iontrap", "qit", "qtrap", "lineartrap", "lcq", "ltq"};
+        for (String anIonTrap : possibleMachineTerms) {
+            if (lcAnalyzerType.contains(anIonTrap)) {
+                LOGGER.debug(analyzerType + " recognized as iontrap");
+                return new AnalyzerData(ANALYZER_FAMILY.IONTRAP);
+            }
         }
-
-        //tof/qtof - 0.3 0.3
-        if (lcAnalyzerType.indexOf("tof") > -1) {
-            LOGGER.debug(analyzerType + " recignized as TOF");
-            return new AnalyzerData(0.3, 0.3, ANALYZER_FAMILY.TOF);
-        } else if (lcAnalyzerType.indexOf("timeofflight") > -1) {
-            LOGGER.debug(analyzerType + " recignized as TOF");
-            return new AnalyzerData(0.3, 0.3, ANALYZER_FAMILY.TOF);
-        } else if (lcAnalyzerType.indexOf("4700") > -1) {
-            LOGGER.debug(analyzerType + " recignized as TOF");
-            return new AnalyzerData(0.3, 0.3, ANALYZER_FAMILY.TOF);
-        } else if (lcAnalyzerType.indexOf("qstar") > -1) {
-            LOGGER.debug(analyzerType + " recignized as TOF");
-            return new AnalyzerData(0.3, 0.3, ANALYZER_FAMILY.TOF);
-        } else if (lcAnalyzerType.equals("quadrupole")) {
-            LOGGER.debug(analyzerType + " recignized as TOF");
-            return new AnalyzerData(0.3, 0.3, ANALYZER_FAMILY.TOF);
+        //check for TOF
+        possibleMachineTerms = new String[]{"tof", "timeofflight", "qstar", "quadrupole"};
+        for (String aTof : possibleMachineTerms) {
+            if (lcAnalyzerType.contains(aTof)) {
+                LOGGER.debug(analyzerType + " recognized as Time Of Flight");
+                return new AnalyzerData(ANALYZER_FAMILY.TOF);
+            }
         }
-
-        //orbitrap - 0.1 0.6
-        if (lcAnalyzerType.indexOf("orbitrap") > -1) {
-            LOGGER.debug(analyzerType + " recignized as orbitrap");
-            return new AnalyzerData(0.1, 0.6, ANALYZER_FAMILY.ORBITRAP);
+        //check for orbitrap
+        possibleMachineTerms = new String[]{"orbitrap", "orbi", "exactive"};
+        for (String anOrbi : possibleMachineTerms) {
+            if (lcAnalyzerType.contains(anOrbi)) {
+                LOGGER.debug(analyzerType + " recognized as Orbitrap");
+                return new AnalyzerData(ANALYZER_FAMILY.ORBITRAP);
+            }
         }
-
-        //ft - 0.1 0.6
-        if (lcAnalyzerType.indexOf("fourier") > -1) {
-            LOGGER.debug(analyzerType + " recignized as FT");
-            return new AnalyzerData(0.1, 0.6, ANALYZER_FAMILY.FT);
-        } else if (lcAnalyzerType.indexOf("ft") > -1) { // important to check for toftof before otherwise it'll be mislabeled
-            LOGGER.debug(analyzerType + " recignized as FT");
-            return new AnalyzerData(0.1, 0.6, ANALYZER_FAMILY.FT);
+        //check for FT
+        possibleMachineTerms = new String[]{"fourier", "ft", "transform"};
+        for (String anFT : possibleMachineTerms) {
+            if (lcAnalyzerType.contains(anFT)) {
+                LOGGER.debug(analyzerType + " recognized as Fourrier Transform");
+                return new AnalyzerData(ANALYZER_FAMILY.FT);
+            }
         }
-
+        //unknown !
         LOGGER.warn(analyzerType + " UNRECOGNIZED");
-        return new AnalyzerData(1.0, 1.0, ANALYZER_FAMILY.UNKNOWN);
+        return new AnalyzerData(ANALYZER_FAMILY.UNKNOWN);
     }
 }
