@@ -19,16 +19,14 @@ import org.json.simple.parser.ParseException;
  */
 public abstract class PrideJsonParser {
 
-    private final JSONParser jsonParser = new JSONParser();
-
     protected JSONObject getObjectFromURL(URL url) throws IOException, ParseException {
         JSONObject parsedObject;
         try ( //make sure the stream gets closed !!!!
                 InputStream in = url.openStream(); InputStreamReader inReader = new InputStreamReader(in)) {
+            JSONParser jsonParser = new JSONParser();
             parsedObject = (JSONObject) jsonParser.parse(inReader);
         }
         return parsedObject;
     }
-
 
 }

@@ -123,7 +123,7 @@ public class DefaultMGFExtractor {
         Spectrum spectrum = null;
         try {
             spectrum = jMzReader.getSpectrumById(spectrumId);
-        } catch (JMzReaderException ex) {
+        } catch (NumberFormatException | JMzReaderException ex) {
             LOGGER.error(ex);
         }
         return spectrum;
@@ -169,20 +169,21 @@ public class DefaultMGFExtractor {
                 //this part gets stuck sometimes, no idea why...
                 rw.append(aSpectrumId + "\t\t").flush();
                 try {
-                    Spectrum spectrum = monitorNextSpectrum(aSpectrumId, jMzReader, timeout);
+                    Spectrum spectrum = controlledReadNextSpectrum(aSpectrumId, jMzReader, timeout);
                     if (spectrum != null) {
                         asMgf(spectrum, bw);
                         rw.append("VALIDATED" + System.lineSeparator());
                         validSpectrumCount++;
 
                     } else {
-                        rw.append("\tNOT FOUND").flush();
+                        rw.append("\tNOT FOUND" + System.lineSeparator()).flush();
                     }
                 } catch (MGFExtractionException | TimeoutException e) {
+                    LOGGER.error(e);
                     rw.append("\t" + e.getMessage() + System.lineSeparator()).flush();
                 }
             }
-            rw.append("Total usable \t" + validSpectrumCount).flush();
+            rw.append("Total usable \t" + validSpectrumCount + System.lineSeparator()).flush();
         } catch (Exception ex) {
             LOGGER.error(ex);
             ex.printStackTrace();
@@ -256,7 +257,7 @@ public class DefaultMGFExtractor {
         }
     }
 
-    private Spectrum monitorNextSpectrum(String spectrumID, JMzReader jmzReader, long timeout) throws TimeoutException {
+    private Spectrum controlledReadNextSpectrum(String spectrumID, JMzReader jmzReader, long timeout) throws TimeoutException {
         ExecutorService service = Executors.newFixedThreadPool(1, new ThreadFactory() {
 
             @Override
@@ -272,10 +273,18 @@ public class DefaultMGFExtractor {
         try {
             result = futureResult.get(timeout, TimeUnit.MILLISECONDS);
         } catch (TimeoutException | InterruptedException | ExecutionException ex) {
-            futureResult.cancel(true);
+            boolean cancel = futureResult.cancel(true);
+            retriever.interrupt();
+            if (!cancel) {
+                LOGGER.error("Could not clear the thread for " + spectrumID);
+                retriever = null;
+                futureResult = null;
+            }
             //for safety kill the service pool?
             service.shutdownNow();
             //notify the program that this particular spectrum timed out...
+            //can you completely destroy a future?
+
             throw new TimeoutException("Timed out after " + timeout + " ms (" + System.lineSeparator() + ex + System.lineSeparator() + ")");
         }
         service.shutdown();
@@ -298,9 +307,22 @@ public class DefaultMGFExtractor {
 
         @Override
         public Spectrum call() throws Exception {
+            Thread.currentThread().setName(spectrumId);
             Spectrum spectrum = jmzReader.getSpectrumById(spectrumId);
             return spectrum;
         }
+
+        public void interrupt() {
+            Thread[] a = new Thread[Thread.activeCount()];
+            int n = Thread.enumerate(a);
+            for (int i = 0; i < n; i++) {
+                if (a[i].getName().equals(spectrumId)) {
+                    a[i].interrupt();
+                    break;
+                }
+            }
+        }
+
     }
 
 }

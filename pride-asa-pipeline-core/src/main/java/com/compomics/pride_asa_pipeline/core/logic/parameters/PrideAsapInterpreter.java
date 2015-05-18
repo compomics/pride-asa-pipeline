@@ -95,7 +95,6 @@ public abstract class PrideAsapInterpreter {
         parser.attachSpectra(peakFile);
         ApplicationContextProvider.getInstance().setDefaultApplicationContext();
         applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-
         try {
             fileSpectrumAnnotator = (FileSpectrumAnnotator) applicationContext.getBean("fileSpectrumAnnotator");
             LOGGER.debug("Setting up Pride ASAP for interpretation of inputfile");
@@ -198,7 +197,7 @@ public abstract class PrideAsapInterpreter {
                     }
                 }
                 //0.4 is an arbitrary value TODO verify this !!!
-                if (isQuantMod && modificationRate < (0.4)) {
+                if (isQuantMod && modificationRate < (0.3)) {
                     LOGGER.error(amodName + " is a quant mod, but was not fixed !");
                 } else {
                     LOGGER.info(amodName.toLowerCase() + "\t" + modificationRate);

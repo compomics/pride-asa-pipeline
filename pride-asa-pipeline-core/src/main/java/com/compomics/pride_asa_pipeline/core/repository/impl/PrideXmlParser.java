@@ -202,12 +202,12 @@ public class PrideXmlParser implements FileParser {
     public List<Peak> getSpectrumPeaksBySpectrumId(String spectrumId) {
         List<Peak> peaks = new ArrayList<>();
         uk.ac.ebi.pride.tools.jmzreader.model.Spectrum spectrumBySpectrumId = mgfExtractor.getSpectrumBySpectrumId(spectrumId);
-
-        for (Double anMz : spectrumBySpectrumId.getPeakList().keySet()) {
-            Peak peak = new Peak(anMz, spectrumBySpectrumId.getPeakList().get(anMz));
-            peaks.add(peak);
+        if (spectrumBySpectrumId != null) {
+            for (Double anMz : spectrumBySpectrumId.getPeakList().keySet()) {
+                Peak peak = new Peak(anMz, spectrumBySpectrumId.getPeakList().get(anMz));
+                peaks.add(peak);
+            }
         }
-
         return peaks;
     }
 
