@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
@@ -27,6 +28,8 @@ import org.json.simple.parser.ParseException;
  */
 public class ProjectParser extends PrideJsonParser {
 
+    
+    private static final Logger LOGGER = Logger.getLogger(ProjectParser.class);
     private static final String queryAddress = "http://www.ebi.ac.uk:80/pride/ws/archive/project/list?show=99999999";
 
     /**
@@ -68,10 +71,14 @@ public class ProjectParser extends PrideJsonParser {
         JSONObject objectFromURL = getObjectFromURL(queryURL);
         List<JSONObject> list = (ArrayList<JSONObject>) objectFromURL.get("list");
         for (JSONObject anObject : list) {
+            try{
             if (loadAssays) {
                 projects.add(getProject(getProjectFromJson(anObject).getAccession()));
             } else {
                 projects.add(getProjectFromJson(anObject));
+            }
+            }catch(IOException e){
+              LOGGER.error("Could not parse "+anObject.toJSONString());
             }
         }
         return projects;
