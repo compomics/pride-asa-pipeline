@@ -11,7 +11,7 @@
 
 ## Project Description
 
-pride-asap is a library written in Java that provides a uniform annotation of identified spectra stored in PRIDE. The application can be ran in a command line mode for automated processing of multiple PRIDE experiments, but also has a graphical user interface that allows end users to annotate the spectra in PRIDE experiments and to inspect the results in detail.
+Pride-asap is a library written in Java that provides a uniform annotation of identified spectra stored in PRIDE. The application can be ran in a command line mode for automated processing of multiple PRIDE experiments, but also has a graphical user interface that allows end users to annotate the spectra in PRIDE experiments and to inspect the results in detail.
 
 ### Citation
  * [Hulstaert et al: J Proteomics. 2013 Apr 17. pii: S1874-3919(13)00192-9](http://www.ncbi.nlm.nih.gov/pubmed/23603108)
