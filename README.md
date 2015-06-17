@@ -23,6 +23,8 @@ Pride-asap is a library written in Java that provides a uniform annotation of id
 
 ## Downloads
 
+Download pride-asa-pipelin 1.5.11 [here](http://genesis.ugent.be/maven2/com/compomics/pride-asa-pipeline/1.5.11/pride-asa-pipeline-1.5.11.zip). 
+
 
 [Go to top of page](#pride-asa-pipeline)
 
