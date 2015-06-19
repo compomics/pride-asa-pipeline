@@ -4,7 +4,7 @@
  * [Project Description](#project-description)
  * [Downloads](#downloads)
  * [Usage](#usage)
- * [Troubleshooting] (#troubleshooting)
+ * [Troubleshooting](#troubleshooting)
  * [Related Projects](#related-projects)
  * [Project Support](#project-support)
 
@@ -51,8 +51,7 @@ Please report any issues or requests in the [issues section](https://github.com/
 
 The pride-asa-pipeline makes use of [compomics-utilities](http://code.google.com/p/compomics-utilities).
 
-You might also find some of the following projects interesting: [Peptizer](http://code.google.com/p/peptizer),
-[dbtoolkit](https://github.com/compomics/dbtoolkit),
+You might also find some of the following projects interesting: [Peptizer](http://code.google.com/p/peptizer), [dbtoolkit](https://github.com/compomics/dbtoolkit),
 [ms-lims](http://code.google.com/p/ms-lims),
 [Rover](http://code.google.com/p/compomics-rover) and
 [PeptideShaker](http://code.google.com/p/peptide-shaker).
