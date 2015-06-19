@@ -9,7 +9,7 @@ import com.compomics.pride_asa_pipeline.core.cache.impl.PeptideModificationHolde
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.core.model.PeptideModificationHolder;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**

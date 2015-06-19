@@ -3,19 +3,11 @@ package com.compomics.pride_asa_pipeline.core.gui.controller;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.gui.LoggingBindingListener;
 import com.compomics.pride_asa_pipeline.core.gui.view.ModificationConfigDialog;
-import com.compomics.pride_asa_pipeline.model.AminoAcid;
-import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.*;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.filechooser.FileFilter;
+import com.compomics.pride_asa_pipeline.model.AminoAcid;
+import com.compomics.pride_asa_pipeline.model.Modification;
 import org.apache.log4j.Logger;
 import org.jdesktop.beansbinding.*;
 import org.jdesktop.observablecollections.ObservableCollections;
@@ -29,8 +21,16 @@ import org.jdom2.input.JDOMParseException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.*;
+
 /**
- *
  * @author Niels Hulstaert Hulstaert
  */
 public class ModificationsController {
@@ -120,7 +120,7 @@ public class ModificationsController {
         //table binding
         try {
             modificationsBindingList = ObservableCollections.observableList(getModificationsAsList(
-                    modificationService.loadPipelineModifications(modificationsResource)));
+                    modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP)));
         } catch (JDOMParseException ex) {
             LOGGER.error(ex.getMessage(), ex);
             mainController.showMessageDialog("Import Unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
@@ -239,12 +239,11 @@ public class ModificationsController {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (modificationsConfigDialog.getModifcationsTable().getSelectedRow() != -1) {
-                    Object[] selectedValues = modificationsConfigDialog.getAminoAcidsList().getSelectedValues();
+                    List<AminoAcid> selectedValues = modificationsConfigDialog.getAminoAcidsList().getSelectedValuesList();
 
                     Modification selectedModification = modificationsBindingList.get(modificationsConfigDialog.getModifcationsTable().getSelectedRow());
 
-                    for (Object o : selectedValues) {
-                        AminoAcid aminoAcid = (AminoAcid) o;
+                    for (AminoAcid aminoAcid : selectedValues) {
                         affectedAminoAcidsBindingList.add(aminoAcid);
                         Collections.sort(affectedAminoAcidsBindingList);
                         aminoAcidsBindingList.remove(aminoAcid);
@@ -263,12 +262,11 @@ public class ModificationsController {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (modificationsConfigDialog.getModifcationsTable().getSelectedRow() != -1) {
-                    Object[] selectedValues = modificationsConfigDialog.getAffectedAminoAcidsList().getSelectedValues();
+                    List<AminoAcid> selectedValues = modificationsConfigDialog.getAffectedAminoAcidsList().getSelectedValuesList();
 
                     Modification selectedModification = modificationsBindingList.get(modificationsConfigDialog.getModifcationsTable().getSelectedRow());
 
-                    for (Object o : selectedValues) {
-                        AminoAcid aminoAcid = (AminoAcid) o;
+                    for (AminoAcid aminoAcid : selectedValues) {
                         aminoAcidsBindingList.add(aminoAcid);
                         affectedAminoAcidsBindingList.remove(aminoAcid);
                         Collections.sort(aminoAcidsBindingList);
@@ -315,7 +313,7 @@ public class ModificationsController {
 
                     //import modifications and refill the binding list
                     try {
-                        Set<Modification> importedModifications = modificationService.importPipelineModifications(modificationsImportResource);
+                        Set<Modification> importedModifications = modificationService.importPipelineModifications(modificationsImportResource, InputType.PRIDE_ASAP);
 
                         modificationsBindingList.clear();
                         modificationsBindingList.addAll(importedModifications);
@@ -364,8 +362,7 @@ public class ModificationsController {
     }
 
     /**
-     * Gets the amino acids as list. Arrays.asList(AminoAcid.values()) doesn't
-     * work with the binding.
+     * Gets the amino acids as list. Arrays.asList(AminoAcid.values()) doesn't work with the binding.
      *
      * @return the list of amino acids
      */
@@ -377,9 +374,8 @@ public class ModificationsController {
     }
 
     /**
-     * Changes the state of the removeAminoAcidButton (enable or disabled)
-     * depending on the size of the affected amino acids of the selected
-     * modification
+     * Changes the state of the removeAminoAcidButton (enable or disabled) depending on the size of the affected amino
+     * acids of the selected modification
      *
      * @param selectedModification the selected modification
      */
@@ -392,8 +388,7 @@ public class ModificationsController {
     }
 
     /**
-     * Converter class used for binding. In case of a NumberFormatException, the
-     * value of the bound field is set 0.0
+     * Converter class used for binding. In case of a NumberFormatException, the value of the bound field is set 0.0
      */
     private class DoubleConverter extends Converter<Double, String> {
 

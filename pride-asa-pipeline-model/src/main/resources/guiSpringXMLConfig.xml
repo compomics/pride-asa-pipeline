@@ -25,7 +25,7 @@
         <property name="systematicMassErrorsController" ref="systematicMassErrorsController"/>
         <property name="modificationsMergeController" ref="modificationsMergeController"/>
         <property name="experimentService" ref="dbExperimentService"/>
-        <property name="resultHandler" ref="dbResultHandler"/>
+        <property name="fileResultHandler" ref="dbResultHandler"/>
     </bean>
     
     <bean id="pipelineProgressController"

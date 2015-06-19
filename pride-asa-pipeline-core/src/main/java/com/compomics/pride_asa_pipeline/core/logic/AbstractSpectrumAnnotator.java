@@ -2,41 +2,25 @@ package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.impl.MassDeltaExplainerImpl;
+import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.logic.modification.impl.OmssaModificationMarshallerImpl;
 import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.match.SpectrumMatcher;
-import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
-import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
-import com.compomics.pride_asa_pipeline.core.model.ModifiedPeptidesMatchResult;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.core.model.*;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.service.SpectrumService;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
-import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
-import com.compomics.pride_asa_pipeline.model.AnnotationData;
-import com.compomics.pride_asa_pipeline.model.Identification;
-import com.compomics.pride_asa_pipeline.model.Identifications;
-import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
-import com.compomics.pride_asa_pipeline.model.Peak;
-import com.compomics.pride_asa_pipeline.model.Peptide;
-import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import com.compomics.pride_asa_pipeline.model.*;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
+import org.springframework.core.io.Resource;
+
+import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
- *
  * @author Niels Hulstaert
  */
 public abstract class AbstractSpectrumAnnotator<T> {
@@ -52,8 +36,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
      */
     protected Identifications identifications;
     /**
-     * The pipeline modifications holder; contains all modifications considered
-     * in the pipeline.
+     * The pipeline modifications holder; contains all modifications considered in the pipeline.
      */
     protected ModificationHolder modificationHolder;
     /**
@@ -158,21 +141,21 @@ public abstract class AbstractSpectrumAnnotator<T> {
      * Abstract methods.
      */
     /**
-     * Loads the experiment identifications and calculates the systematic mass
-     * errors per charge state.
+     * Loads the experiment identifications and calculates the systematic mass errors per charge state.
      *
      * @param t the experiment identifier
      */
     public abstract void initIdentifications(T t);
 
     /**
-     * Adds the pipeline modifications to the ModificationHolder and returns the
-     * pride modifications as a set. If the pride modifications are not taken
-     * into account, this set is empty.
+     * Adds the pipeline modifications to the ModificationHolder and returns the pride modifications as a set. If the
+     * pride modifications are not taken into account, this set is empty.
      *
+     * @param modificationsResource the modifications resource
+     * @param inputType             the type of modifications resource
      * @return the modifications found in pride
      */
-    public abstract Set<Modification> initModifications();
+    public abstract Set<Modification> initModifications(Resource modificationsResource, InputType inputType);
 
     /**
      * Clears the pipeline resources.
@@ -192,8 +175,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
      * Public methods.
      */
     /**
-     * Annotate the experiment identifications in multiple passes according to
-     * the modification prevalence in PRIDE.
+     * Annotate the experiment identifications in multiple passes according to the modification prevalence in PRIDE.
      */
     public void annotate() {
         try {
@@ -238,11 +220,11 @@ public abstract class AbstractSpectrumAnnotator<T> {
     }
 
     private void annotate(Set<Modification> prideModifications,
-            List<Identification> modifiedPrecursors,
-            List<Identification> unmodifiedPrecursors,
-            List<Identification> unexplainedModifications,
-            List<Identification> unexplainedIdentifications,
-            Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap) {
+                          List<Identification> modifiedPrecursors,
+                          List<Identification> unmodifiedPrecursors,
+                          List<Identification> unexplainedModifications,
+                          List<Identification> unexplainedIdentifications,
+                          Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap) {
         //add the non-conflicting modifications found in pride for the given experiment
         if (!prideModifications.isEmpty()) {
             modificationHolder = new ModificationHolder();
@@ -327,10 +309,8 @@ public abstract class AbstractSpectrumAnnotator<T> {
     /**
      * finds the systematic mass errors per charge state.
      *
-     * @param completePeptides list of complete peptides (i.e. all sequence AA
-     * masses known)
-     * @return the mass recalibration result (systemic mass error) per charge
-     * state
+     * @param completePeptides list of complete peptides (i.e. all sequence AA masses known)
+     * @return the mass recalibration result (systemic mass error) per charge state
      */
     protected MassRecalibrationResult findSystematicMassError(List<Peptide> completePeptides) {
         //set considered charge states
@@ -357,14 +337,11 @@ public abstract class AbstractSpectrumAnnotator<T> {
     }
 
     /**
-     * finds all possible modifications that could explain a mass delta -> Zen
-     * Archer.
+     * finds all possible modifications that could explain a mass delta -> Zen Archer.
      *
-     * @param massRecalibrationResult the mass recalibration result (systemic
-     * mass error) per charge state
-     * @param identifications the identifications
-     * @return the possible modifications map (key: the identification data,
-     * value the set of modification combinations)
+     * @param massRecalibrationResult the mass recalibration result (systemic mass error) per charge state
+     * @param identifications         the identifications
+     * @return the possible modifications map (key: the identification data, value the set of modification combinations)
      */
     private Map<Identification, Set<ModificationCombination>> findModificationCombinations(MassRecalibrationResult massRecalibrationResult, Identifications identifications) {
         Map<Identification, Set<ModificationCombination>> possibleExplanations = new HashMap<>();
@@ -380,13 +357,11 @@ public abstract class AbstractSpectrumAnnotator<T> {
     }
 
     /**
-     * find all possible precursor variations (taking all the possible
-     * modification combinations into account).
+     * find all possible precursor variations (taking all the possible modification combinations into account).
      *
-     * @param massDeltaExplanationsMap the possible modifications map (key: the
-     * identification data, value the set of modification combinations)
-     * @return the precursor variations map (key: the identification data, value
-     * the set of modification combinations)
+     * @param massDeltaExplanationsMap the possible modifications map (key: the identification data, value the set of
+     *                                 modification combinations)
+     * @return the precursor variations map (key: the identification data, value the set of modification combinations)
      */
     private Map<Identification, Set<ModifiedPeptide>> findPrecursorVariations(Map<Identification, Set<ModificationCombination>> possibleExplanations) {
         //From the theoretical information we already have (e.g. the precursor sequence
@@ -405,13 +380,12 @@ public abstract class AbstractSpectrumAnnotator<T> {
     }
 
     /**
-     * creates theoretical fragment ions for all precursors match them onto the
-     * peaks in the spectrum and decide which one is the best 'explanation'.
+     * creates theoretical fragment ions for all precursors match them onto the peaks in the spectrum and decide which
+     * one is the best 'explanation'.
      *
-     * @param experimentAccession the experiment accession number
-     * @param modifiedPrecursorVariationsMap the modified precursor variations
-     * map (key: the identification data, value the set of modification
-     * combinations)
+     * @param experimentAccession            the experiment accession number
+     * @param modifiedPrecursorVariationsMap the modified precursor variations map (key: the identification data, value
+     *                                       the set of modification combinations)
      * @return the result list of identifications containing a modified peptide
      */
     private List<Identification> findBestMatches(Map<Identification, Set<ModifiedPeptide>> precursorVariations) {
@@ -443,10 +417,9 @@ public abstract class AbstractSpectrumAnnotator<T> {
     }
 
     /**
-     * Gets the identifications that where the mass delta couldn't be explained
-     * by combining modifications.
+     * Gets the identifications that where the mass delta couldn't be explained by combining modifications.
      *
-     * @param identifications all the experiment identifications
+     * @param identifications            all the experiment identifications
      * @param explainableIdentifications the explained identifications
      * @return the unexplained identifications
      */

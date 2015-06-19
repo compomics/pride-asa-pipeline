@@ -9,17 +9,13 @@ import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.repository.FileParser;
 import com.compomics.pride_asa_pipeline.core.repository.factory.FileParserFactory;
 import com.compomics.pride_asa_pipeline.core.service.ResultHandler;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import org.apache.log4j.Logger;
 
+import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- *
  * @author Niels Hulstaert
  */
 public class FileCommandLineRunner {
@@ -48,8 +44,8 @@ public class FileCommandLineRunner {
      * Runs the pride XML file in command line mode.
      *
      * @param identificationsFile the identifications file
-     * @param identificationsFile is the file a sinlge identifications file or
-     * is does it contain identification file paths
+     * @param identificationsFile is the file a sinlge identifications file or is does it contain identification file
+     *                            paths
      */
     public void runFilePipeline(File identificationsFile, boolean singleIdentificationsFile) {
         try {

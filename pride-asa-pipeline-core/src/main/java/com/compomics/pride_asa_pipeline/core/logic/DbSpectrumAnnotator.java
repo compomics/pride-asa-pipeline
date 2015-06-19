@@ -1,6 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
@@ -77,16 +78,15 @@ public class DbSpectrumAnnotator extends AbstractSpectrumAnnotator<String> {
      * @return the modifications found in pride
      */
     @Override
-    public Set<Modification> initModifications() {
+    public Set<Modification> initModifications(Resource modificationsResource, InputType inputType) {
         Set<Modification> prideModifications = new HashSet<>();
 
         //For the solver we need a ModificationHolder (contains all considered modifications)
         modificationHolder = new ModificationHolder();
 
         //add the pipeline modifications
-        Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
         try {
-            modificationHolder.addModifications(pipelineModificationService.loadPipelineModifications(modificationsResource));
+            modificationHolder.addModifications(pipelineModificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP));
         } catch (JDOMException ex) {
             LOGGER.error(ex.getMessage(), ex);
         }

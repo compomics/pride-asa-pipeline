@@ -12,7 +12,7 @@ import com.compomics.pride_asa_pipeline.core.model.webservice.objects.PrideProje
 import com.compomics.pride_asa_pipeline.core.model.webservice.objects.PrideProtein;
 import com.compomics.pride_asa_pipeline.core.util.PrideMetadataUtils;
 import java.util.List;
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

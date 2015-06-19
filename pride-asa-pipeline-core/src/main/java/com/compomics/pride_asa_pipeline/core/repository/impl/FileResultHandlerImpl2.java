@@ -5,44 +5,23 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
-import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
-import com.compomics.pride_asa_pipeline.model.AnnotationData;
-import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
-import com.compomics.pride_asa_pipeline.model.Identification;
-import com.compomics.pride_asa_pipeline.model.IdentificationScore;
-import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.model.ModificationFacade;
-import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
-import com.compomics.pride_asa_pipeline.model.Peptide;
-import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
+import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
-import com.compomics.pride_asa_pipeline.model.UnknownAAException;
-import com.compomics.pride_asa_pipeline.model.comparator.FragmentIonAnnotationComparator;
 import com.compomics.pride_asa_pipeline.core.repository.FileResultHandler;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.util.MathUtils;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
+import com.compomics.pride_asa_pipeline.model.*;
+import com.compomics.pride_asa_pipeline.model.comparator.FragmentIonAnnotationComparator;
 import com.google.common.base.Joiner;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.*;
+
 /**
- *
  * @author Niels Hulstaert
  */
 public class FileResultHandlerImpl2 implements FileResultHandler {
@@ -349,11 +328,10 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
     }
 
     /**
-     * Parses the modifications in the result file and adds them to the modified
-     * peptide. If the modifications is not found by name in the
-     * modifications.xml file, a default modifications is added.
+     * Parses the modifications in the result file and adds them to the modified peptide. If the modifications is not
+     * found by name in the modifications.xml file, a default modifications is added.
      *
-     * @param modifiedPeptide the modified peptide
+     * @param modifiedPeptide     the modified peptide
      * @param modificationsString
      */
     private void parseModifications(ModifiedPeptide modifiedPeptide, String modificationsString) {
@@ -376,13 +354,12 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
     }
 
     /**
-     * loads pipeline modifications in order to map the modification names in
-     * the result file to the right modification
+     * loads pipeline modifications in order to map the modification names in the result file to the right modification
      */
     private void loadModifications() {
         modifications = new HashMap<>();
         try {
-            for (Modification modification : modificationService.loadPipelineModifications(ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file")))) {
+            for (Modification modification : modificationService.loadPipelineModifications(ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file")), InputType.PRIDE_ASAP)) {
                 modifications.put(modification.getName(), modification);
             }
         } catch (JDOMException ex) {
@@ -391,8 +368,8 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
     }
 
     /**
-     * Finds the modification by name in the pipeline modifications. Returns an
-     * "unknown" modification if nothing was found.
+     * Finds the modification by name in the pipeline modifications. Returns an "unknown" modification if nothing was
+     * found.
      *
      * @param modificationName
      * @return the found modification

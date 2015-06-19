@@ -4,6 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic;
 
+import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
@@ -15,7 +16,7 @@ import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import java.io.IOException;
 import java.util.Set;
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,14 +40,13 @@ public class ModCombSolverEqualMassesTest {
 
     @Before
     public void initialize() throws IOException, JDOMException {
-        ResourceUtils.getResourceByRelativePath("modifications_equal_mass.xml");
         //Use @Before instead of @BeforeClass because @Autowired doesn't work with static,
         //so check if the modification holder is already set.
         if (modificationCombinationSolver == null) {
             //add the pipeline modifications
             ModificationHolder modificationHolder = new ModificationHolder();
             Resource modificationsResource = ResourceUtils.getResourceByRelativePath("modifications_equal_mass.xml");
-            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource));
+            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP));
 
             modificationCombinationSolver = new ModificationCombinationSolverImpl(modificationHolder);
         }

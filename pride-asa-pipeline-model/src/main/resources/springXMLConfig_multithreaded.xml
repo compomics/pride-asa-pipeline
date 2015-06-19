@@ -69,13 +69,13 @@
           class="com.compomics.pride_asa_pipeline.core.service.impl.DbExperimentServiceImpl">
         <property name="experimentRepository" ref="experimentRepository"/>
         <property name="spectrumService" ref="dbSpectrumService"/>
-        <property name="resultHandler" ref="dbResultHandler"/>
+        <property name="fileResultHandler" ref="dbResultHandler"/>
     </bean>
     
     <bean id="prideXmlExperimentService"
           class="com.compomics.pride_asa_pipeline.core.service.impl.PrideXmlExperimentServiceImpl" scope="prototype">
         <property name="experimentRepository" ref="experimentRepository"/>
-        <property name="resultHandler" ref="prideXmlResultHandler"/>
+        <property name="fileResultHandler" ref="prideXmlResultHandler"/>
     </bean>  
     
     <bean id="dbSpectrumService"

@@ -7,7 +7,7 @@ import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import java.util.Set;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.junit.runner.RunWith;

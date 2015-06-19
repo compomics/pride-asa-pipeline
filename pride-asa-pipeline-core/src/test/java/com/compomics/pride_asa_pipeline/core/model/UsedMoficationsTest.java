@@ -22,7 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.IOException;
 import java.util.Map;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 /**
  *

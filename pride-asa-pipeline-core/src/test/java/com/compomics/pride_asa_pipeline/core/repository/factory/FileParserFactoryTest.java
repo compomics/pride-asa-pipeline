@@ -8,9 +8,9 @@ package com.compomics.pride_asa_pipeline.core.repository.factory;
 import com.compomics.pride_asa_pipeline.core.repository.FileParser;
 import com.compomics.pride_asa_pipeline.core.repository.impl.MzIdentMlParser;
 import com.compomics.pride_asa_pipeline.core.repository.impl.PrideXmlParser;
-import java.io.File;
-import static junit.framework.Assert.assertTrue;
 import junit.framework.TestCase;
+
+import java.io.File;
 
 
 /**
@@ -36,7 +36,6 @@ public class FileParserFactoryTest extends TestCase {
     /**
      * Test of getFileParser method, of class FileParserFactory.
      *
-     * @throws com.compomics.respin_utilities.exception.ExtractionException
      */
     public void testGetFileParser() {
         System.out.println("getFileParser");

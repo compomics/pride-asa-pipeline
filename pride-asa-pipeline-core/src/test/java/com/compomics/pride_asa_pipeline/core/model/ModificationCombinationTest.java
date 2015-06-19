@@ -2,6 +2,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.model;
 
+import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +33,7 @@ public class ModificationCombinationTest {
     @Test
     public void testEqualsAndHashCode() throws JDOMException {
         Resource modificationsResource = ResourceUtils.getResourceByRelativePath("modifications_equal_mass.xml");
-        Set<Modification> modifications = modificationService.loadPipelineModifications(modificationsResource);
+        Set<Modification> modifications = modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP);
 
         //create 2 modification combinations with the same modifications, but in a different order in the modification list
         List<Modification> modificationsList = new ArrayList<>();

@@ -27,7 +27,7 @@
     <bean id="fileCommandLineRunner"
           class="com.compomics.pride_asa_pipeline.core.FileCommandLineRunner" lazy-init="true">        
         <property name="fileSpectrumAnnotator" ref="fileSpectrumAnnotator"/>        
-        <property name="resultHandler" ref="resultHandler"/>
+        <property name="fileResultHandler" ref="fileResultHandler"/>
     </bean>
             
     <bean id="dbSpectrumAnnotator"
@@ -65,13 +65,13 @@
           class="com.compomics.pride_asa_pipeline.core.service.impl.DbExperimentServiceImpl">
         <property name="experimentRepository" ref="experimentRepository"/>
         <property name="spectrumService" ref="dbSpectrumService"/>
-        <property name="resultHandler" ref="dbResultHandler"/>
+        <property name="fileResultHandler" ref="dbResultHandler"/>
     </bean>
     
     <bean id="fileExperimentService"
           class="com.compomics.pride_asa_pipeline.core.service.impl.FileExperimentServiceImpl">
         <property name="experimentRepository" ref="experimentRepository"/>
-        <property name="resultHandler" ref="resultHandler"/>
+        <property name="fileResultHandler" ref="fileResultHandler"/>
     </bean>  
     
     <bean id="dbSpectrumService"
@@ -106,7 +106,7 @@
         <property name="modificationMarshaller" ref="modificationMarshaller"/>
     </bean>  
     
-    <bean id="resultHandler"
+    <bean id="fileResultHandler"
           class="com.compomics.pride_asa_pipeline.core.service.impl.ResultHandlerImpl" lazy-init="true">
         <property name="fileResultHandler" ref="fileResultHandler"/>
         <property name="modificationMarshaller" ref="modificationMarshaller"/>

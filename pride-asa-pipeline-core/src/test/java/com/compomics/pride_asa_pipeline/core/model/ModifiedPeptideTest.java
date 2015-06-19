@@ -4,6 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.model;
 
+import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
@@ -17,7 +18,7 @@ import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -324,7 +325,7 @@ public class ModifiedPeptideTest {
     @Test
     public void testEquals() throws UnknownAAException, IOException, JDOMException {
         Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
-        Set<Modification> modifications = modificationService.loadPipelineModifications(modificationsResource);
+        Set<Modification> modifications = modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP);
 
         Peptide peptide = new Peptide(1, 1256, new AminoAcidSequence("AAAKENKKNYYY"));
 

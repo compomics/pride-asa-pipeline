@@ -108,8 +108,7 @@ public class OmssaModificationMarshallerImpl implements OmssaModificationMarshal
      * Unmarshalls the given modifications XML resource and returns a set of
      * modifications
      *
-     * @param modificationsResource the OMSSA (or searchGUI) modifications XML
-     * resource to be parsed
+     * @param modificationsResource the OMSSA (or searchGUI) modifications XML resource to be parsed
      * @return the set of modifications
      * @exception JDOMException
      */

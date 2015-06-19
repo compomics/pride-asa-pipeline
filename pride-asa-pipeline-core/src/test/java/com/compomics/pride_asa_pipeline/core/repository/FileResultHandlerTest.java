@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import org.jdom2.JDOMException;
 import org.junit.Rule;
 import org.junit.Test;

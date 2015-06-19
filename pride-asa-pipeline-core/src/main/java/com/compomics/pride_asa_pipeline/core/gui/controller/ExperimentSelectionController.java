@@ -1,17 +1,25 @@
 package com.compomics.pride_asa_pipeline.core.gui.controller;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.core.gui.view.ResultFileSelectionPanel;
-import com.compomics.pride_asa_pipeline.core.gui.view.PrideSelectionPanel;
 import com.compomics.pride_asa_pipeline.core.gui.view.IdentificationsFileSelectionPanel;
+import com.compomics.pride_asa_pipeline.core.gui.view.PrideSelectionPanel;
+import com.compomics.pride_asa_pipeline.core.gui.view.ResultFileSelectionPanel;
 import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
-import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.core.service.ResultHandler;
+import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
+import com.compomics.pride_asa_pipeline.model.Modification;
+import org.apache.log4j.Logger;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -21,16 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.SwingWorker;
-import javax.swing.filechooser.FileFilter;
-import org.apache.log4j.Logger;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 
 /**
- *
  * @author Niels Hulstaert
  * @author Harald Barsnes
  */
@@ -451,7 +451,8 @@ public class ExperimentSelectionController {
         @Override
         protected Set<Modification> doInBackground() throws Exception {
             //init the modfications considered in the pipeline
-            Set<Modification> prideModifications = mainController.getCurrentSpectrumAnnotator().initModifications();
+            Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
+            Set<Modification> prideModifications = mainController.getCurrentSpectrumAnnotator().initModifications(modificationsResource, InputType.PRIDE_ASAP);
 
             return prideModifications;
         }

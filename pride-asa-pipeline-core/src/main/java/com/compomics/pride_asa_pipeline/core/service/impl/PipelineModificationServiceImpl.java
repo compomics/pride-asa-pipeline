@@ -4,26 +4,29 @@
  */
 package com.compomics.pride_asa_pipeline.core.service.impl;
 
+import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.logic.modification.ModificationMarshaller;
 import com.compomics.pride_asa_pipeline.core.logic.modification.OmssaModificationMarshaller;
-import com.compomics.pride_asa_pipeline.core.logic.modification.impl.OmssaModificationMarshallerImpl;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import org.jdom2.JDOMException;
 import org.springframework.core.io.Resource;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- *
  * @author Niels Hulstaert
  */
 public class PipelineModificationServiceImpl implements PipelineModificationService {
 
     protected ModificationMarshaller modificationMarshaller;
-    protected OmssaModificationMarshaller omssaModificationMarshaller = new OmssaModificationMarshallerImpl();
+    protected OmssaModificationMarshaller omssaModificationMarshaller;
+    /**
+     * The set of pipeline modifications.
+     */
     protected Set<Modification> pipelineModifications;
 
     public ModificationMarshaller getModificationMarshaller() {
@@ -34,13 +37,20 @@ public class PipelineModificationServiceImpl implements PipelineModificationServ
         this.modificationMarshaller = modificationMarshaller;
     }
 
+    public OmssaModificationMarshaller getOmssaModificationMarshaller() {
+        return omssaModificationMarshaller;
+    }
+
+    public void setOmssaModificationMarshaller(OmssaModificationMarshaller omssaModificationMarshaller) {
+        this.omssaModificationMarshaller = omssaModificationMarshaller;
+    }
+
     @Override
-    public Set<Modification> loadPipelineModifications(Resource modificationsResource) throws JDOMException {
+    public Set<Modification> loadPipelineModifications(Resource modificationsResource, InputType inputType) throws JDOMException {
         //return the modifications or first unmarshall them from the specified
         //configuration file if not done so before
         if (pipelineModifications == null) {
-           // loadPipelineModificationsFromResource(modificationsResource);
-            includeSearchGUIModifications(pipelineModifications);
+            loadPipelineModificationsFromResource(modificationsResource, inputType);
         }
         return pipelineModifications;
     }
@@ -56,28 +66,38 @@ public class PipelineModificationServiceImpl implements PipelineModificationServ
     }
 
     @Override
-    public Set<Modification> importPipelineModifications(Resource modificationsResource) throws JDOMException {
+    public Set<Modification> importPipelineModifications(Resource modificationsResource, InputType inputType) throws JDOMException {
         Set<Modification> modifications = modificationMarshaller.unmarshall(modificationsResource);
-        loadPipelineModifications(modificationsResource);
+        loadPipelineModifications(modificationsResource, inputType);
         return modifications;
     }
 
     /**
-     * Load the modifications from file.
+     * Load the modifications from file. The modification set will be initialized.
      *
-     * @param modificationFileName the modifications file name
+     * @param modificationsResource the modifications resource
+     * @throws JDOMException thrown in case of a xml parse exception
      */
-    private void loadPipelineModificationsFromResource(Resource modificationsResource) throws JDOMException {
+    private void loadPipelineModificationsFromResource(Resource modificationsResource, InputType inputType) throws JDOMException {
         pipelineModifications = new HashSet<>();
-        pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationsResource));
+        switch (inputType) {
+            case PRIDE_ASAP:
+                pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationsResource));
+                break;
+            case OMSSA:
+                pipelineModifications.addAll(omssaModificationMarshaller.unmarshall(modificationsResource));
+        }
     }
 
     /**
-     * Load the modifications from file.
+     * Load the modifications from file. The modification set will not be initialized, the modifications will be added.
      *
-     * @param modificationFileName the modifications file name
+     * @param modificationsResource the modifications resource
+     * @throws JDOMException thrown in case of a xml parse exception
      */
-    private void includeSearchGUIModifications(Set<Modification> mods) throws JDOMException {
-        mods.addAll(omssaModificationMarshaller.unmarshall(ResourceUtils.getResourceByRelativePath("/resources/searchGUI_to_pride_mods_common.xml")));  
+    private void includePipelineModificationsFromResource(Resource modificationsResource) throws JDOMException {
+        Resource resource = ResourceUtils.getResourceByRelativePath("/resources/searchGUI_to_pride_mods_common.xml");
+        Set<Modification> modifications = omssaModificationMarshaller.unmarshall(resource);
+        pipelineModifications.addAll(modifications);
     }
 }

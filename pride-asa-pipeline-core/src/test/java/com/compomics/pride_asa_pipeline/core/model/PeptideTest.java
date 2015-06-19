@@ -8,7 +8,7 @@ import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import com.compomics.pride_asa_pipeline.model.Peptide;
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**

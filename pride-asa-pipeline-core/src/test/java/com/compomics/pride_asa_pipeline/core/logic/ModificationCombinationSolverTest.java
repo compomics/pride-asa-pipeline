@@ -4,6 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic;
 
+import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
@@ -16,7 +17,7 @@ import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import java.io.IOException;
 import java.util.Set;
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +48,7 @@ public class ModificationCombinationSolverTest {
             //add the pipeline modifications
             ModificationHolder modificationHolder = new ModificationHolder();
             Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
-            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource));
+            modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP));
 
             modificationCombinationSolver = new ModificationCombinationSolverImpl(modificationHolder);
         }

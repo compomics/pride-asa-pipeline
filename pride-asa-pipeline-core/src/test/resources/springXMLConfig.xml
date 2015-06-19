@@ -27,7 +27,7 @@
     <bean id="fileCommandLineRunner"
           class="com.compomics.pride_asa_pipeline.core.FileCommandLineRunner" lazy-init="true">        
         <property name="fileSpectrumAnnotator" ref="fileSpectrumAnnotator"/>        
-        <property name="resultHandler" ref="resultHandler"/>
+        <property name="fileResultHandler" ref="resultHandler"/>
     </bean>
             
     <bean id="dbSpectrumAnnotator"
@@ -100,6 +100,7 @@
     <bean id="pipelineModificationService"
           class="com.compomics.pride_asa_pipeline.core.service.impl.PipelineModificationServiceImpl">
         <property name="modificationMarshaller" ref="modificationMarshaller"/>
+        <property name="omssaModificationMarshaller" ref="omssaModificationMarshaller"/>
     </bean>  
     
     <bean id="dbResultHandler"

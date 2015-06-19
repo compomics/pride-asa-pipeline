@@ -4,6 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic;
 
+import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
@@ -23,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +53,7 @@ public class MassDeltaExplainerTest {
         //add the pipeline modifications
         ModificationHolder modificationHolder = new ModificationHolder();
         Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
-        modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource));
+        modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP));
 
         massDeltaExplainer = new MassDeltaExplainerImpl(modificationHolder);
 
