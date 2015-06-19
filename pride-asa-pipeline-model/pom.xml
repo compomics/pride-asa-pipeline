@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>pride-asa-pipeline-model</artifactId>
-    <version>1.7.3</version>
+    <version>1.7.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>com.compomics.pride-asa-pipeline</groupId>
         <artifactId>pride-asa-pipeline</artifactId>
-        <version>1.7.3</version>
+        <version>1.7.3-SNAPSHOT</version>
     </parent>
 
     <name>pride-asa-pipeline-model</name>   
