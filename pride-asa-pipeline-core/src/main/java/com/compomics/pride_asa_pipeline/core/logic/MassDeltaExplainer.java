@@ -4,6 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic;
 
+import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapStats;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
@@ -28,5 +29,12 @@ public interface MassDeltaExplainer {
      * @param analyzerData the analyzer data
      * @return
      */
-    Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> completeIdentifications, MassRecalibrationResult massRecalibrationResult, AnalyzerData analyzerData);    
+    Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> completeIdentifications, MassRecalibrationResult massRecalibrationResult, AnalyzerData analyzerData);
+
+    /**
+     * Returns the mass deltas that are being assumed to be machine derived
+     *
+     * @return the mass deltas that are being assumed to be machine derived
+     */
+    public PrideAsapStats getExplainedMassDeltas();
 }

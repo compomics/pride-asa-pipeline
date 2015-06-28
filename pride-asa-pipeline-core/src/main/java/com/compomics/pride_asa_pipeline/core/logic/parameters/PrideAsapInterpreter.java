@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.logic.parameters;
 
+import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.logic.enzyme.EnzymePredictor;
 import com.compomics.pride_asa_pipeline.core.logic.modification.PTMMapper;
@@ -7,7 +8,6 @@ import com.compomics.pride_asa_pipeline.core.repository.FileParser;
 import com.compomics.pride_asa_pipeline.core.repository.factory.FileParserFactory;
 import com.compomics.pride_asa_pipeline.core.service.FileModificationService;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
-import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
 import com.compomics.pride_asa_pipeline.model.Identification;
@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,8 +41,6 @@ public abstract class PrideAsapInterpreter {
     private static final Logger LOGGER = Logger.getLogger(PrideAsapInterpreter.class);
     // input file (PRIDEXML / MZID)
     private File identificationsFile;
-    // hashmap of the countable enzymes according to their termini
-    private LinkedHashMap<Enzyme, Integer> enzymeCounts;
     // the enzyme that was highlighted as most likely 
     private Enzyme mainEnzyme;
     EnzymePredictor predictor;
@@ -57,11 +54,9 @@ public abstract class PrideAsapInterpreter {
     private double mostLikelyFragIonAcc;
 
     private final boolean useAbsoluteMassDelta = true;
-    private final double prec_mass_error_cutoff = 1.0;
-    private final double frag_mass_error_cutoff = 1.0;
 
-    private final PrideAsapStats fragmentIonStats = new PrideAsapStats(useAbsoluteMassDelta);
-    private final PrideAsapStats precursorStats = new PrideAsapStats(useAbsoluteMassDelta);
+    private PrideAsapStats fragmentIonStats = new PrideAsapStats(useAbsoluteMassDelta);
+    private PrideAsapStats precursorStats = new PrideAsapStats(useAbsoluteMassDelta);
 
     private double considerationThreshold;
     private final double fixedThreshold = 0.8;
@@ -103,6 +98,7 @@ public abstract class PrideAsapInterpreter {
             fileSpectrumAnnotator.setFileParser(parser);
             fileSpectrumAnnotator.initIdentifications(this.identificationsFile);
             fileSpectrumAnnotator.annotate();
+
             //try to find the used modifications
             inferModifications();
             //recalibrate errors
@@ -147,27 +143,43 @@ public abstract class PrideAsapInterpreter {
                         List<FragmentIonAnnotation> fragmentIonAnnotations = anIdentification.getAnnotationData().getFragmentIonAnnotations();
                         for (FragmentIonAnnotation anAnnotation : fragmentIonAnnotations) {
                             double frag_mass_error = anAnnotation.getMass_error();
-                            if (frag_mass_error <= frag_mass_error_cutoff) {
+                            //C13 peak
+                            if (frag_mass_error < 0.8) {
                                 fragmentIonStats.addValue(frag_mass_error);
                             }
                         }
-                        double abs = Math.abs(anIdentification.getPeptide().calculateMassDelta());
-                        if (abs <= prec_mass_error_cutoff) {
-                            precursorStats.addValue(abs);
-                        }
-                    } catch (AASequenceMassUnknownException | NullPointerException e) {
+                    } catch (NullPointerException e) {
                         //this can happen if there are no unmodified and identified peptides...
                         LOGGER.error("Not able to extract for " + anIdentification);
                     }
                 }
             }
         }
-        LOGGER.info("Attempting to find best suited precursor accuraccy...");
-        mostLikelyPrecursorError = precursorStats.getPercentile(99);
-        LOGGER.debug("Most likely precursor accuraccy found at " + mostLikelyPrecursorError + " da (99 percentile)");
+        LOGGER.info("Attempting to find best suited precursor accuraccy (both sides)...");
+        precursorStats = fileSpectrumAnnotator.getMassDeltaExplainer().getExplainedMassDeltas();
+        mostLikelyPrecursorError = precursorStats.calculateOptimalMassError();
+        if (mostLikelyPrecursorError == Double.NaN
+                || mostLikelyPrecursorError == Double.NEGATIVE_INFINITY
+                || mostLikelyPrecursorError == Double.NEGATIVE_INFINITY) {
+            mostLikelyPrecursorError = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance");
+            ;
+        }
+        LOGGER.info("Most likely precursor accuraccy found at " + mostLikelyPrecursorError);
+
         LOGGER.info("Attempting to find best suited fragment ion accuraccy");
-        mostLikelyFragIonAcc = fragmentIonStats.getPercentile(99);
-        LOGGER.debug("Most likely fragment ion accuraccy found at " + mostLikelyPrecursorError + " da (99 percentile)");
+
+        if (fragmentIonStats.getValues().length == 0) {
+            fragmentIonStats = precursorStats;
+        } else {
+            //calculate the optimal mass ?
+            mostLikelyFragIonAcc = fragmentIonStats.calculateOptimalMassError();
+        }
+        if (mostLikelyFragIonAcc == Double.NaN
+                || mostLikelyFragIonAcc == Double.NEGATIVE_INFINITY
+                || mostLikelyFragIonAcc == Double.POSITIVE_INFINITY) {
+            mostLikelyFragIonAcc = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance");
+        }
+        LOGGER.info("Most likely fragment ion accuraccy found at " + mostLikelyFragIonAcc);
         System.out.println("Done");
     }
 
@@ -214,14 +226,13 @@ public abstract class PrideAsapInterpreter {
         completePeptides = fileSpectrumAnnotator.getExperimentService().loadExperimentIdentifications().getCompletePeptides();
         List<String> completePeptideSequences = new ArrayList<>();
         predictor = new EnzymePredictor();
-        predictor.addPeptideObjects(completePeptides);
         for (Peptide aPeptide : completePeptides) {
             completePeptideSequences.add(aPeptide.getSequenceString());
         }
-        enzymeCounts = predictor.getEnzymeCounts(completePeptideSequences);
-        mainEnzyme = predictor.getMainEnzyme(enzymeCounts);
-        missedCleavages = predictor.estimateMaxMissedCleavages(mainEnzyme);
-        missedCleavageRatio = predictor.getMissedCleavageRatio(mainEnzyme);
+        predictor.addPeptideObjects(completePeptides);
+        mainEnzyme = predictor.estimateBestEnzyme();
+        missedCleavages = predictor.getMissCleavages();
+        missedCleavageRatio = predictor.getMissedCleavageRatio();
     }
 
     private double calculateConsiderationThreshold() {
@@ -243,10 +254,6 @@ public abstract class PrideAsapInterpreter {
         return identificationsFile;
     }
 
-    public LinkedHashMap<Enzyme, Integer> getEnzymeCounts() {
-        return enzymeCounts;
-    }
-
     public Enzyme getMainEnzyme() {
         return mainEnzyme;
     }
@@ -264,11 +271,11 @@ public abstract class PrideAsapInterpreter {
     }
 
     public double getPrecursorAccuraccy() {
-        return PrideAsapStats.round(mostLikelyPrecursorError);
+        return PrideAsapStats.round(mostLikelyPrecursorError, 3);
     }
 
     public double getFragmentIonAccuraccy() {
-        return PrideAsapStats.round(mostLikelyFragIonAcc);
+        return PrideAsapStats.round(mostLikelyFragIonAcc, 3);
     }
 
     public Map<Modification, Double> getModificationRates() {
@@ -300,7 +307,6 @@ public abstract class PrideAsapInterpreter {
         }
         asapMods.clear();
         unknownMods.clear();
-        enzymeCounts.clear();
         if (predictor != null) {
             predictor.clear();
         }

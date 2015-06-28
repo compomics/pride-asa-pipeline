@@ -46,7 +46,7 @@ public class MzIdentMlParser implements FileParser {
     private final List<Identification> identificationsList = new ArrayList<>();
     private final List<com.compomics.pride_asa_pipeline.model.Modification> modificationsList = new ArrayList<>();
     private DefaultMGFExtractor mgfExtractor;
-    private final long timeout=1000;
+    private final long timeout = 1000;
     private static final Logger LOGGER = Logger.getLogger(MzIdentMlParser.class);
 
     @Override
@@ -100,12 +100,17 @@ public class MzIdentMlParser implements FileParser {
 
     @Override
     public List<Identification> getExperimentIdentifications() {
-
-        for (SpectrumIdentificationList anIdentification : specEvidenceList) {
-            for (SpectrumIdentificationResult anIdentificationResult : anIdentification.getSpectrumIdentificationResult()) {
-                for (SpectrumIdentificationItem anIdentificationItem : anIdentificationResult.getSpectrumIdentificationItem()) {
-                    //only allow rank 1 peptides
-                    if (anIdentificationItem.getRank() == 1) {
+        Iterator<SpectrumIdentificationResult> spectrumIdentificationResult
+                = unmarshaller.unmarshalCollectionFromXpath(MzIdentMLElement.SpectrumIdentificationResult);
+        while (spectrumIdentificationResult.hasNext()) {
+            SpectrumIdentificationResult identification = (SpectrumIdentificationResult) spectrumIdentificationResult.next();
+            if (identification != null) {
+                Iterator<SpectrumIdentificationItem> iterator = identification.getSpectrumIdentificationItem().iterator();
+                while (iterator.hasNext()) {
+                    SpectrumIdentificationItem anIdentificationItem = iterator.next();
+                    if (anIdentificationItem != null) {
+                        //only allow rank 1 peptides--> WHY?
+                        //  if (anIdentificationItem.getRank() == 1) {
                         try {
                             //make a pride asap peptide
                             com.compomics.pride_asa_pipeline.model.Peptide peptide = new com.compomics.pride_asa_pipeline.model.Peptide();
@@ -117,7 +122,7 @@ public class MzIdentMlParser implements FileParser {
                             String sequence = peptideMap.get(anIdentificationItem.getPeptideRef()).getPeptideSequence();
                             peptide.setSequence(new AminoAcidSequence(AminoAcidSequence.toAASequence(sequence)));
                             //Verify the spectrum information in the identification part
-                            Identification ident = new Identification(peptide, anIdentificationResult.getSpectraDataRef(), anIdentificationResult.getSpectrumID(), anIdentificationResult.getName());
+                            Identification ident = new Identification(peptide, anIdentificationItem.getId(),identification.getSpectrumID() , identification.getSpectraDataRef());
                             ident.setPeptide(peptide);
                             identificationsList.add(ident);
                             List<Modification> modificationsInFile = peptideMap.get(anIdentificationItem.getPeptideRef()).getModification();
@@ -130,10 +135,10 @@ public class MzIdentMlParser implements FileParser {
                             ex.printStackTrace();
                             LOGGER.error(ex);
                         }
+                        //   }
                     }
                 }
             }
-
         }
         return identificationsList;
     }
@@ -206,7 +211,7 @@ public class MzIdentMlParser implements FileParser {
         List<Peak> peaks = new ArrayList<>();
         try {
             if (spectrumId.contains("index=")) {
-                spectrumId=spectrumId.replaceAll("\"","").replace("index=","");
+                spectrumId = spectrumId.replaceAll("\"", "").replace("index=", "");
             }
             uk.ac.ebi.pride.tools.jmzreader.model.Spectrum aSpectrum = mgfExtractor.getSpectrumBySpectrumId(spectrumId);
             Map<Double, Double> peakValues = aSpectrum.getPeakList();
@@ -228,13 +233,13 @@ public class MzIdentMlParser implements FileParser {
 
     @Override
     public void saveMGF(File outputFile) throws JMzReaderException, IOException, MGFExtractionException {
-        mgfExtractor.extractMGF(outputFile,timeout);
+        mgfExtractor.extractMGF(outputFile, timeout);
     }
 
     @Override
     public void saveMGF(File outputFile, File spectrumLogFile) throws JMzReaderException, IOException, MGFExtractionException {
         try (FileOutputStream fileOutputStream = new FileOutputStream(spectrumLogFile)) {
-            mgfExtractor.extractMGF(outputFile, fileOutputStream,timeout);
+            mgfExtractor.extractMGF(outputFile, fileOutputStream, timeout);
         }
     }
 

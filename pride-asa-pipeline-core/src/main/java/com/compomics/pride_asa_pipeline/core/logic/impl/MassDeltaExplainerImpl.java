@@ -3,6 +3,7 @@ package com.compomics.pride_asa_pipeline.core.logic.impl;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.MassDeltaExplainer;
 import com.compomics.pride_asa_pipeline.core.logic.ModificationCombinationSolver;
+import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapStats;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
@@ -24,7 +25,8 @@ import org.apache.log4j.Logger;
 public class MassDeltaExplainerImpl implements MassDeltaExplainer {
 
     private static final Logger LOGGER = Logger.getLogger(MassDeltaExplainerImpl.class);
-    private ModificationCombinationSolver modificationCombinationSolver;
+    private final ModificationCombinationSolver modificationCombinationSolver;
+    private final PrideAsapStats massErrorStatistics = new PrideAsapStats(true);
 
     public MassDeltaExplainerImpl(ModificationHolder modificationHolder) {
         modificationCombinationSolver = new ModificationCombinationSolverImpl(modificationHolder);
@@ -74,13 +76,14 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                 }
 
                 //take the error window from the mass recalibration as deviation
-                //ToDo: is it correct to use this value here?
-                Double deviation = massRecalibrationResult.getErrorWindow(peptide.getCharge());
+                //ToDo: is it correct to use this value here 
+                //Double deviation =null;// = massRecalibrationResult.getErrorWindow(peptide.getCharge());
                 //check for unconsidered charge states and take the default systematic mass error
-                if (deviation == null) {
-                    double errorTolerance = (analyzerData == null) ? PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance") : analyzerData.getPrecursorMassError();
-                    deviation = errorTolerance / peptide.getCharge();
-                }
+                //if (deviation == null) {
+                double errorTolerance = (analyzerData == null) ? PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance") : analyzerData.getPrecursorMassError();
+                //double errorTolerance = 1.0; //it can never be larger than this on any machine in Da
+                double deviation = errorTolerance / peptide.getCharge();
+                //}
 
                 Set<ModificationCombination> combinations = null;
                 //if the mass delta is larger than a possible mass error (deviation) then
@@ -100,9 +103,12 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                         //so we don't add it to the map!
                     }
                 } else {
-                    //if the mass delta is smaller than a expected mass error,
-                    //there is no point in trying to fit modifications
-                    //ToDo: maybe add to separate list? for easier reporting?
+                    /*if the mass delta is smaller than a expected mass error,
+                     //there is no point in trying to fit modifications
+                     //only if it's less than 0.8 da (C13 peak starts there) ---> this is the maximum */
+                    if (Math.abs(precursorMassDelta) < 0.8) {
+                        massErrorStatistics.addValue(precursorMassDelta);
+                    }
                     possibleExplainedIdentifications.put(identification, null);
                 }
 
@@ -119,5 +125,10 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
 
         //finally return the map of precursors with their possible explantions
         return possibleExplainedIdentifications;
+    }
+
+    @Override
+    public PrideAsapStats getExplainedMassDeltas() {
+        return massErrorStatistics;
     }
 }

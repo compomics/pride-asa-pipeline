@@ -5,12 +5,13 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic.parameters;
 
+import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 
@@ -27,7 +28,7 @@ public class PrideAsapStats extends DescriptiveStatistics {
         addValues(values);
     }
 
-    PrideAsapStats(boolean absolute) {
+    public PrideAsapStats(boolean absolute) {
         this.absolute = absolute;
     }
 
@@ -39,100 +40,102 @@ public class PrideAsapStats extends DescriptiveStatistics {
         super.addValue(value);
     }
 
-    public double getBinnedMode(double binSize) {
-        HashMap<Double, Integer> binCount = new HashMap<>();
-        //fill in bins...
-        double cursor = getMin();
-        while (cursor <= getMax()) {
-            binCount.put(cursor, 0);
-            cursor += binSize;
-        }
-        //make an iterator (fastest way)
-        Iterator<Map.Entry<Double, Integer>> iterator = binCount.entrySet().iterator();
-        Map.Entry<Double, Integer> next = iterator.next();
-        double mode = 0;
-        //fill up the hashmap on the sorted values = only 1 iteration needed
-        for (Double aDouble : getSortedValues()) {
-            if (aDouble > next.getKey() && iterator.hasNext()) {
-                //if the double is on a new bin, switch to it
-                if (next.getValue() > mode) {
-                    //if this bin has a higher count than the last one, use it
-                    //this way, the largest mode wins!
-                    mode = next.getKey();
-                }
-                next = iterator.next();
-            }
-            binCount.put(next.getKey(), next.getValue() + 1);
-        }
-        return mode;
-    }
-
     public void addValues(Collection<Double> values) {     // Add the data from the array
         for (double aWindow : values) {
             addValue(aWindow);
         }
     }
 
-    public long getOutOfConfidence(double confidence) {
-        //confidenceth percentile = kept, so 1-confidenceth percent is lost
-        return Math.round((double) getValues().length * (1 - confidence));
-    }
-
-    public static double round(double value) {
+    public static double round(double value, int decimals) {
         //TODO check if this is correct 
         BigDecimal bd;
         try {
-            bd = new BigDecimal(value).setScale(3, RoundingMode.HALF_UP);
+            bd = new BigDecimal(value).setScale(decimals, RoundingMode.HALF_UP);
+            if (bd.equals(BigDecimal.ZERO)) {
+                String number = "0.";
+                for (int i = 0; i < decimals; i++) {
+                    number += "0";
+                }
+                number += "1";
+                return new BigDecimal(number).doubleValue();
+            }
         } catch (NumberFormatException e) {
             bd = new BigDecimal(1);
         }
         return bd.doubleValue();
     }
 
-    public double getDropOffValue() {
-        double[] temps = getSortedValues();
-        double precAcc = 1.0;
-        if (temps.length > 1) {
-            double maxDifference = Math.abs(temps[0] - temps[1]);
-            for (int i = 0; i < temps.length - 1; i++) {
-                double currentDifference = Math.abs(temps[i] - temps[i + 1]);
-                if (currentDifference > maxDifference) {
-                    maxDifference = currentDifference;
-                    precAcc = temps[i];
-                }
-            }
-        }
-        return precAcc;
+    /**
+     * The mass errors follow an elbowed curve. The elbow point reflects the
+     * best mass error, even in case modifications or mass deviations are not
+     * being picked up. Suppose a line is drawn between the two terminal points
+     * on the sorted values, then the distance to this line determines where the
+     * elbow point is
+     *
+     * @return the most optimal mass error
+     */
+    public double calculateOptimalMassError() {
+        //check the variance, if it high then that means there probably is an elbow point in the graph
+        //ToDo check how to figure out if a variance is large or not???
+        double optimalMassError;
+        double measuringError = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance");
+        optimalMassError = getOutlierThreshold();
+
+        return optimalMassError;
     }
 
-    /**
-     *
-     * @param parameter (1 for mean, 2 for variance, 3 for max)
-     * @return
-     */
-    public double getPostDropStatistic(int parameter) {
-        double[] temps = getSortedValues();
+    private double getOutlierThreshold() {
         DescriptiveStatistics stats = new DescriptiveStatistics();
-        double dropoff = getDropOffValue();
-        if (temps.length > 1) {
-           for(int counter=temps.length - 1; counter >= 0;counter--){
-                if (temps[counter] == dropoff) {
-                    break;
-                }
-                stats.addValue(temps[counter]);
+        boolean outliers = false;
+        if (getN() >= 30) {
+            //calculate the median deviation
+            for (double aValue : getSortedValues()) {
+                //has to be bigger than the value that can be set...
+                //if (Math.abs(aValue) > 0.001) {
+                    double zScore = (aValue - getMean()) / getStandardDeviation();
+                    //half of all values should be within 0.67
+                    if (Math.abs(zScore) <= 0.67) {
+                        //then there are outliers...discard these in a new dataset?
+                    } else {
+                        outliers=true;
+                        break;
+                    }
+                //}
             }
         }
-        switch (parameter) {
-            case 1:
-                return stats.getMean();
-            case 2:
-                return stats.getVariance();
-            case 3:
-                return stats.getMax();
-            default:
-                throw new UnsupportedOperationException("Please use options 1-3");
+        if (outliers) {
+            return getElbowPoint();
+        } else {
+            return stats.getMax();
         }
+    }
 
+    private double getElbowPoint() {
+        double[] sortedValues = getSortedValues();
+        double[] point1 = new double[]{1, sortedValues[0]};
+        double[] point2 = new double[]{sortedValues.length, sortedValues[sortedValues.length - 1]};
+
+        double maxTriangleArea = Double.MIN_VALUE;
+        double elbowMassError = point2[1];
+
+        for (int x = 0; x < sortedValues.length; x++) {
+            double[] point3 = new double[]{x, sortedValues[x]};
+            double triangleArea = (0.5) * Math.abs((point1[0] - point3[0]) * (point2[1] - point1[1]) - (point1[0] - point2[0]) * (point3[1] - point1[1]));
+            if (maxTriangleArea == -1 | triangleArea > maxTriangleArea) {
+                maxTriangleArea = triangleArea;
+
+                elbowMassError = point3[1];
+            }
+        }
+        return elbowMassError;
+    }
+
+    public void dump(File file) throws IOException {
+        try (FileWriter writer = new FileWriter(file)) {
+            for (double aValue : getSortedValues()) {
+                writer.append(String.valueOf(aValue)).append(System.lineSeparator());
+            }
+        }
     }
 
 }

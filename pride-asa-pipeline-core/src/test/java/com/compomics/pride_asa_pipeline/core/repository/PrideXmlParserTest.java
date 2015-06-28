@@ -24,7 +24,7 @@ import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 public class PrideXmlParserTest {
 
     private static FileParser prideXmlParser;
-    private static Resource prideXmlResource = new ClassPathResource("PRIDE_Experiment_11954.xml");
+    private static Resource prideXmlResource = new ClassPathResource("peptideshaker_example.xml");
 
     @BeforeClass
     public static void initParser() throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException {
@@ -35,17 +35,13 @@ public class PrideXmlParserTest {
     @Test
     public void testGetIdentifications() {
         List<Identification> identifications = prideXmlParser.getExperimentIdentifications();
-
-        //experiment 11954 contains 517 peptide identifications
-        Assert.assertEquals(517, identifications.size());
+        Assert.assertEquals(7277, identifications.size());
     }
 
     @Test
     public void testGetNumberOfPeptides() {
         long numberOfPeptides = prideXmlParser.getNumberOfPeptides();
-
-        //experiment 11954 contains 517 peptide identifications
-        Assert.assertEquals(517, numberOfPeptides);
+        Assert.assertEquals(7277, numberOfPeptides);
     }
 
     @Test
@@ -53,18 +49,19 @@ public class PrideXmlParserTest {
         List<Modification> modifications = prideXmlParser.getModifications();
 
         Set<String> modificationNames = new HashSet<>();
-        //check if there are 4 unique modifications
+        //check if there are 6 unique modifications
         for (Modification modification : modifications) {
             modificationNames.add(modification.getAccession());
         }
 
-        Assert.assertEquals(4, modificationNames.size());
+        Assert.assertEquals(6, modificationNames.size());
     }
 
     @Test
     public void testGetAnalyzerSources() {
         Map<String, String> analyzerSources = prideXmlParser.getAnalyzerSources();
-        Assert.assertTrue(analyzerSources.isEmpty());
+        //ToDo is this still relevant?
+        Assert.assertTrue(analyzerSources != null);
     }
 
     @Test
@@ -72,14 +69,15 @@ public class PrideXmlParserTest {
         List<AnalyzerData> analyzerData = prideXmlParser.getAnalyzerData();
 
         Assert.assertEquals(1, analyzerData.size());
-        Assert.assertEquals(AnalyzerData.ANALYZER_FAMILY.FT, analyzerData.get(0).getAnalyzerFamily());
+        //ToDO is this still relevant?
+        //Assert.assertEquals(AnalyzerData.ANALYZER_FAMILY.FT, analyzerData.get(0).getAnalyzerFamily());
     }
 
     @Test
     public void testGetProteinAccessions() {
         List<String> proteinAccessions = prideXmlParser.getProteinAccessions();
 
-        Assert.assertEquals(43, proteinAccessions.size());
+        Assert.assertEquals(2357, proteinAccessions.size());
     }
 
 }

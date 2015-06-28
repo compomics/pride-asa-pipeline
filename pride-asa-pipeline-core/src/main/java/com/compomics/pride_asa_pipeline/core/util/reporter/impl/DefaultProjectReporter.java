@@ -7,10 +7,8 @@ package com.compomics.pride_asa_pipeline.core.util.reporter.impl;
 
 import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapExtractor;
 import com.compomics.pride_asa_pipeline.core.util.reporter.ProjectReporter;
-import com.compomics.pride_asa_pipeline.core.util.reporter.plots.EnzymeCountPlotter;
 import com.compomics.pride_asa_pipeline.core.util.reporter.plots.MassErrorPlotter;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.util.experiment.biology.Enzyme;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -48,18 +46,6 @@ public class DefaultProjectReporter extends ProjectReporter {
         }
     }
 
-    private void generateEnzReport() {
-        File enzymeReport = new File(outputFolder, "enzyme_report.tsv");
-        try (FileWriter enzWriter = new FileWriter(enzymeReport)) {
-            enzWriter.append("MC_RATIO=" + extractor.getMostLikelyMissedCleavageRate()+System.lineSeparator()).flush();
-            enzWriter.append("Enzyme\tN-Terminus Count" + System.lineSeparator()).flush();
-            for (Map.Entry<Enzyme, Integer> enzymeCount : extractor.getEnzymeCounts().entrySet()) {
-                enzWriter.append(("\t\t" + enzymeCount.getKey().getName() + "\t" + enzymeCount.getValue() + System.lineSeparator())).flush();
-            }
-        } catch (IOException ex) {
-            LOGGER.error(ex);
-        }
-    }
 
     private void generatePrecursorAccReport() {
         File precAccReport = new File(outputFolder, "prec_acc_report.tsv");
@@ -75,10 +61,6 @@ public class DefaultProjectReporter extends ProjectReporter {
             precAccWriter.append("Maximum\t" + extractor.getPrecursorStats().getMax() + System.lineSeparator()).flush();
             precAccWriter.append(System.lineSeparator()).flush();
             precAccWriter.append("Post Drop-Off Cut" + System.lineSeparator()).flush();
-            precAccWriter.append("Mean\t" + extractor.getPrecursorStats().getPostDropStatistic(1) + System.lineSeparator()).flush();
-            precAccWriter.append("Variance\t" + extractor.getPrecursorStats().getPostDropStatistic(2) + System.lineSeparator()).flush();
-            precAccWriter.append("Max\t" + extractor.getPrecursorStats().getPostDropStatistic(3) + System.lineSeparator()).flush();
-            precAccWriter.append(System.lineSeparator()).flush();
             precAccWriter.append("Consensus\t" + extractor.getPrecursorAccuraccy() + System.lineSeparator()).flush();
         } catch (IOException ex) {
             LOGGER.error(ex);
@@ -119,15 +101,7 @@ public class DefaultProjectReporter extends ProjectReporter {
         }
     }
 
-    private void generateEnzymeCountGraph() {
-        String yLab = "# matching N-termini";
-        String xLab = "Enzyme";
-        try {
-            EnzymeCountPlotter.savePlotToFile(extractor, outputFolder, "Enzyme N-Terminus Count", xLab, yLab);
-        } catch (IOException ex) {
-            LOGGER.error(ex);
-        }
-    }
+
 
     @Override
     public void generateReport() {
@@ -137,10 +111,6 @@ public class DefaultProjectReporter extends ProjectReporter {
         LOGGER.info("File : " + extractor.getInputFile().getName());
         LOGGER.info("Generating modification report");
         generateModReport();
-        LOGGER.info("Generating enzyme report");
-        generateEnzReport();
-        LOGGER.info("Generating enzyme count distribution graph");
-        generateEnzymeCountGraph();
         LOGGER.info("Generating precursor accuraccy report");
         generatePrecursorAccReport();
         LOGGER.info("Generating fragment ion accuraccy report");
