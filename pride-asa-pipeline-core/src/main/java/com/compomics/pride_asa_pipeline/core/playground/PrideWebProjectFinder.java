@@ -157,7 +157,7 @@ public class PrideWebProjectFinder {
                     if (line.startsWith("BEGIN")) {
                         totalSpectra++;
                     }
-                    out.append(line + System.lineSeparator()).flush();
+                    out.append(line.replace("\t"," ") + System.lineSeparator()).flush();
                 }
             }
         }

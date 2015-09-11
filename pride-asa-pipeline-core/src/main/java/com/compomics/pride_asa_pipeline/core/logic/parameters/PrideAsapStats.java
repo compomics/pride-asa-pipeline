@@ -5,7 +5,6 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic.parameters;
 
-import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -75,12 +74,8 @@ public class PrideAsapStats extends DescriptiveStatistics {
      * @return the most optimal mass error
      */
     public double calculateOptimalMassError() {
-        //check the variance, if it high then that means there probably is an elbow point in the graph
-        //ToDo check how to figure out if a variance is large or not???
         double optimalMassError;
-        double measuringError = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance");
         optimalMassError = getOutlierThreshold();
-
         return optimalMassError;
     }
 

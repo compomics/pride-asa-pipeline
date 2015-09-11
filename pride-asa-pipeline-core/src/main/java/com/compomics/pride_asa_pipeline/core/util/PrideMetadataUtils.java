@@ -65,6 +65,22 @@ public class PrideMetadataUtils {
         return parser.getProjects(filters, loadAssays);
     }
 
+    // PROJECTS
+    /**
+     *
+     * @param filters a collection of filters for the projects
+     * @param loadAssays TRUE = load assay information as well (might take
+     * longer)
+     * @return
+     * @throws MalformedURLException
+     * @throws IOException
+     * @throws ParseException
+     */
+    public List<PrideProject> getProjects(Collection<PrideFilter> filters, boolean loadAssays, int cacheSize) throws MalformedURLException, IOException, ParseException {
+        ProjectParser parser = new ProjectParser();
+        return parser.getProjects(filters, loadAssays, cacheSize);
+    }
+
     /**
      *
      * @param filter a filter for the projects

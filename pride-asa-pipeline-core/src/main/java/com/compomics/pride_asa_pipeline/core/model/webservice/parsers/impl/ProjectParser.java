@@ -28,9 +28,9 @@ import org.json.simple.parser.ParseException;
  */
 public class ProjectParser extends PrideJsonParser {
 
-    
     private static final Logger LOGGER = Logger.getLogger(ProjectParser.class);
-    private static final String queryAddress = "http://www.ebi.ac.uk:80/pride/ws/archive/project/list?show=99999999";
+    private static final String queryAddress = "http://www.ebi.ac.uk:80/pride/ws/archive/project/list?show=";
+    private static final int cacheSize =10;
 
     /**
      *
@@ -43,13 +43,32 @@ public class ProjectParser extends PrideJsonParser {
      * @throws ParseException
      */
     public List<PrideProject> getProjects(Collection<PrideFilter> filters, boolean loadAssays) throws MalformedURLException, IOException, ParseException {
-        String basicURL = queryAddress;
+        String basicURL = queryAddress+cacheSize;
         for (PrideFilter aFilter : filters) {
             basicURL += "&" + aFilter.getType().toString() + "=" + aFilter.getValue();
         }
-        return getProjectsFromURL(new URL(basicURL), loadAssays);
+        return getProjectsFromURL(basicURL, loadAssays);
     }
 
+        /**
+     *
+     * @param filters a collection of filters for the projects
+     * @param loadAssays TRUE = load assay information as well (might take
+     * longer)
+     * @return
+     * @throws MalformedURLException
+     * @throws IOException
+     * @throws ParseException
+     */
+    public List<PrideProject> getProjects(Collection<PrideFilter> filters, boolean loadAssays, int cacheSize) throws MalformedURLException, IOException, ParseException {
+        String basicURL = queryAddress+cacheSize;
+        for (PrideFilter aFilter : filters) {
+            basicURL += "&" + aFilter.getType().toString() + "=" + aFilter.getValue();
+        }
+        return getProjectsFromURL(basicURL, loadAssays);
+    }
+    
+    
     /**
      *
      * @param filter a filter for the projects
@@ -62,23 +81,35 @@ public class ProjectParser extends PrideJsonParser {
      */
     public List<PrideProject> getProjects(PrideFilter filter, boolean loadAssays) throws MalformedURLException, IOException, ParseException {
         String basicURL = queryAddress + "&" + filter.getType().toString() + "=" + filter.getValue();
-        return getProjectsFromURL(new URL(basicURL), loadAssays);
+        return getProjectsFromURL(basicURL, loadAssays);
     }
 
-    private List<PrideProject> getProjectsFromURL(URL queryURL, boolean loadAssays) throws MalformedURLException, IOException, ParseException {
+    private List<PrideProject> getProjectsFromURL(String queryURLAsString, boolean loadAssays) throws MalformedURLException, IOException, ParseException {
         //assays
         ArrayList<PrideProject> projects = new ArrayList<>();
-        JSONObject objectFromURL = getObjectFromURL(queryURL);
-        List<JSONObject> list = (ArrayList<JSONObject>) objectFromURL.get("list");
-        for (JSONObject anObject : list) {
-            try{
-            if (loadAssays) {
-                projects.add(getProject(getProjectFromJson(anObject).getAccession()));
+        //buffer the results
+        boolean moreResults = true;
+        int page = 0;
+        while (moreResults) {
+            URL pagedURL = new URL(queryURLAsString + "&page=" + page);
+            JSONObject objectFromURL = getObjectFromURL(pagedURL);
+            List<JSONObject> list = (ArrayList<JSONObject>) objectFromURL.get("list");
+            if (list.isEmpty()) {
+                moreResults = false;
             } else {
-                projects.add(getProjectFromJson(anObject));
-            }
-            }catch(IOException e){
-              LOGGER.error("Could not parse "+anObject.toJSONString());
+                for (JSONObject anObject : list) {
+                    try {
+                        if (loadAssays) {
+                            projects.add(getProject(getProjectFromJson(anObject).getAccession()));
+                        } else {
+                            projects.add(getProjectFromJson(anObject));
+                        }
+                    } catch (IOException e) {
+                        LOGGER.error("Could not parse " + anObject.toJSONString());
+                    }
+                }
+                LOGGER.debug("Recieved results for page " + page + " ( " + projects.size() + " projects discovered)");
+                page++;
             }
         }
         return projects;
