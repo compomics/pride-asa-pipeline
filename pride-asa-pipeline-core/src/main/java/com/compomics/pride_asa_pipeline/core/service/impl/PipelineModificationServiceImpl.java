@@ -8,14 +8,12 @@ import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.logic.modification.ModificationMarshaller;
 import com.compomics.pride_asa_pipeline.core.logic.modification.OmssaModificationMarshaller;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
-import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import org.jdom2.JDOMException;
-import org.springframework.core.io.Resource;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import org.jdom2.JDOMException;
+import org.springframework.core.io.Resource;
 
 /**
  * @author Niels Hulstaert
@@ -89,15 +87,4 @@ public class PipelineModificationServiceImpl implements PipelineModificationServ
         }
     }
 
-    /**
-     * Load the modifications from file. The modification set will not be initialized, the modifications will be added.
-     *
-     * @param modificationsResource the modifications resource
-     * @throws JDOMException thrown in case of a xml parse exception
-     */
-    private void includePipelineModificationsFromResource(Resource modificationsResource) throws JDOMException {
-        Resource resource = ResourceUtils.getResourceByRelativePath("/resources/searchGUI_to_pride_mods_common.xml");
-        Set<Modification> modifications = omssaModificationMarshaller.unmarshall(resource);
-        pipelineModifications.addAll(modifications);
-    }
 }

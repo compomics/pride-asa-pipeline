@@ -8,7 +8,7 @@ package com.compomics.pride_asa_pipeline.core.logic.enzyme;
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;
 import com.compomics.util.experiment.biology.Protein;
-import com.compomics.util.experiment.identification.SequenceFactory;
+import com.compomics.util.experiment.identification.protein_sequences.SequenceFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

@@ -14,7 +14,7 @@ import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.util.experiment.biology.Enzyme;
-import com.compomics.util.preferences.ModificationProfile;
+import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public abstract class PrideAsapInterpreter {
     private PTMMapper prideToPtmMapper;
     private Map<Modification, Double> modificationRates = new HashMap<>();
     private HashMap<String, Boolean> asapMods = new HashMap<>();
-    protected ModificationProfile modProfile;
+    protected PtmSettings ptmSettings;
     private ArrayList<String> unknownMods = new ArrayList<>();
     double missedCleavageRatio;
     private List<Peptide> completePeptides;
@@ -76,12 +76,12 @@ public abstract class PrideAsapInterpreter {
         init(identificationsFile, peakFile);
     }
 
-    public ModificationProfile getModProfile() {
-        return modProfile;
+    public PtmSettings getPtmSettings() {
+        return ptmSettings;
     }
 
-    public void setModProfile(ModificationProfile modProfile) {
-        this.modProfile = modProfile;
+    public void setModProfile(PtmSettings modProfile) {
+        this.ptmSettings = modProfile;
     }
 
     private void init(File identificationsFile, File peakFile) throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException {
@@ -212,13 +212,13 @@ public abstract class PrideAsapInterpreter {
                 if (isQuantMod && modificationRate < (0.3)) {
                     LOGGER.error(amodName + " is a quant mod, but was not fixed !");
                 } else {
-                    LOGGER.info(amodName.toLowerCase() + "\t" + modificationRate);
-                    asapMods.put(amodName.toLowerCase(), (modificationRate >= fixedThreshold));
+                    LOGGER.info(amodName + "\t" + modificationRate);
+                    asapMods.put(amodName, (modificationRate >= fixedThreshold));
                 }
             }
         }
         unknownMods = new ArrayList<>();
-        modProfile = prideToPtmMapper.buildUniqueMassModProfile(asapMods, unknownMods, mostLikelyPrecursorError);
+        ptmSettings = prideToPtmMapper.buildUniqueMassModProfile(asapMods, unknownMods, mostLikelyPrecursorError);
         prideToPtmMapper.clear();
     }
 

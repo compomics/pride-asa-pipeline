@@ -5,9 +5,10 @@
 package com.compomics.pride_asa_pipeline.core.logic.parameters;
 
 import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
-import com.compomics.util.experiment.identification.SearchParameters;
+import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
@@ -32,7 +33,7 @@ public class PrideAsapExtractor extends PrideAsapInterpreter {
         super(identificationsFile, peakFile);
         String ext = FilenameUtils.getExtension(identificationsFile.getAbsolutePath());
         String fileName = identificationsFile.getName().substring(0, identificationsFile.getName().lastIndexOf(ext));
-        searchparametersfile = new File(identificationsFile.getParentFile(), fileName + "parameters");
+        searchparametersfile = new File(identificationsFile.getParentFile(), fileName + "par");
         mgfFile = new File(identificationsFile.getParentFile(), fileName + "mgf");
         LOGGER.info("Spectrumannotator delivered was initialized");
     }
@@ -50,7 +51,7 @@ public class PrideAsapExtractor extends PrideAsapInterpreter {
             LOGGER.info("SearchGUI.parameters already exists, refreshing !");
             try {
                 SearchParameters.saveIdentificationParameters(parameters, searchparametersfile);
-            } catch (IOException | ClassNotFoundException ex) {
+            } catch (FileNotFoundException | ClassNotFoundException ex) {
                 LOGGER.error(ex);
             }
         }
@@ -58,10 +59,10 @@ public class PrideAsapExtractor extends PrideAsapInterpreter {
 
     private void setModifications() {
         LOGGER.info("Generating new modification-profile");
-        modProfile = getModProfile();
-        modProfile.removeFixedModification("unknown");
-        modProfile.removeVariableModification("unknown");
-        parameters.setModificationProfile(modProfile);
+        ptmSettings = getPtmSettings();
+        ptmSettings.removeFixedModification("unknown");
+        ptmSettings.removeVariableModification("unknown");
+        parameters.setPtmSettings(ptmSettings);
     }
 
     private void setMachineParameters() {
@@ -97,12 +98,11 @@ public class PrideAsapExtractor extends PrideAsapInterpreter {
         return mgfFile;
     }
 
-      public File getMGFFileForProject(File spectrumLogFile) throws JMzReaderException, IOException, MGFExtractionException {
-        parser.saveMGF(mgfFile,spectrumLogFile);
+    public File getMGFFileForProject(File spectrumLogFile) throws JMzReaderException, IOException, MGFExtractionException {
+        parser.saveMGF(mgfFile, spectrumLogFile);
         return mgfFile;
     }
-    
-    
+
     public SearchParameters getSearchParametersFileForProject() throws XmlPullParserException, IOException, GOBOParseException {
         initialize();
         try {
@@ -149,7 +149,7 @@ public class PrideAsapExtractor extends PrideAsapInterpreter {
         searchparametersfile = outputFile;
         try {
             SearchParameters.saveIdentificationParameters(parameters, searchparametersfile);
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (FileNotFoundException | ClassNotFoundException ex) {
             LOGGER.error(ex);
         }
     }

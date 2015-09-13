@@ -14,7 +14,7 @@ import com.compomics.pride_asa_pipeline.core.model.webservice.objects.PrideAssay
 import com.compomics.pride_asa_pipeline.core.util.PrideMetadataUtils;
 import com.compomics.pride_asa_pipeline.core.util.reporter.ProjectReporter;
 import com.compomics.pride_asa_pipeline.core.util.reporter.impl.DefaultProjectReporter;
-import com.compomics.util.experiment.identification.SearchParameters;
+import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;

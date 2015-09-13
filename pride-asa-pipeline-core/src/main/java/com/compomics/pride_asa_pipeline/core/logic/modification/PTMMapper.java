@@ -9,7 +9,7 @@ import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.experiment.biology.PTM;
 import com.compomics.util.experiment.biology.PTMFactory;
-import com.compomics.util.preferences.ModificationProfile;
+import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -60,8 +60,8 @@ public class PTMMapper {
         if (ptmMapper == null) {
             loadSearchGUImodificationFile();
             factory = PTMFactory.getInstance();
-            factory.clearFactory();
-            factory.importModifications(tempSearchGuiModFile, false);
+           // factory.clearFactory();
+          // factory.importModifications(tempSearchGuiModFile, false);
             //factory.importModifications(respProps.getUserModFile(), true, true);
             ptmMapper = new PTMMapper();
             ptmMapper.loadDictionaries();
@@ -155,8 +155,8 @@ public class PTMMapper {
      * @param unknownPtms the list of unknown PTMS, updated during this method
      * @return the filled up modification profile
      */
-    public ModificationProfile buildTotalModProfile(HashMap<String, Boolean> modificationMap, ArrayList<String> unknownPtms) {
-        ModificationProfile modProfile = new ModificationProfile();
+    public PtmSettings buildTotalModProfile(HashMap<String, Boolean> modificationMap, ArrayList<String> unknownPtms) {
+        PtmSettings modProfile = new PtmSettings();
         //set the variable mods that should be fixed as FIXED
         HashMap<String, Boolean> temp = new HashMap<>();
         for (String aMod : modificationMap.keySet()) {
@@ -184,7 +184,7 @@ public class PTMMapper {
         return modProfile;
     }
     
-    private boolean addToProfile(ModificationProfile modProfile, HashMap<String, Boolean> modificationMap, ArrayList<String> unknownPtms, String aModificationName) {
+    private boolean addToProfile(PtmSettings modProfile, HashMap<String, Boolean> modificationMap, ArrayList<String> unknownPtms, String aModificationName) {
         boolean added = false;
         if (factory.containsPTM(aModificationName)) {
             PTM loadedCorrespondingPtm = factory.getPTM(aModificationName);
@@ -244,7 +244,7 @@ public class PTMMapper {
      * @param unknownPtms the list of unknown PTMS, updated during this method
      * @return the filled up modification profile
      */
-    public ModificationProfile buildUniqueMassModProfile(HashMap<String, Boolean> modificationMap, ArrayList<String> unknownPtms, double precursorAcc) {
+    public PtmSettings buildUniqueMassModProfile(HashMap<String, Boolean> modificationMap, ArrayList<String> unknownPtms, double precursorAcc) {
         return removeDuplicateMasses(buildTotalModProfile(modificationMap, unknownPtms), precursorAcc);
     }
 
@@ -274,7 +274,7 @@ public class PTMMapper {
         return newNames;
     }
     
-    public ModificationProfile removeDuplicateMasses(ModificationProfile modProfile, double precursorMassAcc) {
+    public PtmSettings removeDuplicateMasses(PtmSettings modProfile, double precursorMassAcc) {
         TreeMap<Double, String> massToModMap = new TreeMap<>();
         for (String aModName : modProfile.getAllModifications()) {
             massToModMap.put(modProfile.getPtm(aModName).getMass(), aModName);

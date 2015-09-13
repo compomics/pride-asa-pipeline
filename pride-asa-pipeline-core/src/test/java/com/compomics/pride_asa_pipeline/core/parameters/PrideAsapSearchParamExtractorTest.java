@@ -6,7 +6,7 @@
 package com.compomics.pride_asa_pipeline.core.parameters;
 
 import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapExtractor;
-import com.compomics.util.experiment.identification.SearchParameters;
+import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import java.io.File;
 import java.io.IOException;
 import junit.framework.TestCase;
@@ -46,13 +46,13 @@ public class PrideAsapSearchParamExtractorTest extends TestCase {
     public void testGetSearchParametersFileForProject3() throws Exception {
         System.out.println("getSearchParametersFileForProject");
         File testingFile = getFileFromResources("PRIDE_Exp_Complete_Ac_3.xml");
-        File outputFile = new File(testingFile.getParentFile(), "PRIDE_Exp_Complete_Ac_3.parameters");
+        File outputFile = new File(testingFile.getParentFile(), "PRIDE_Exp_Complete_Ac_3.par");
         outputFile.deleteOnExit();
         PrideAsapExtractor instance = new PrideAsapExtractor(testingFile, testingFile);
         instance.getSearchParametersFileForProject();
         instance.save(outputFile, true);
         SearchParameters identificationParameters = SearchParameters.getIdentificationParameters(outputFile);
-        System.out.println(identificationParameters);
+//        System.out.println(identificationParameters);
         assertEquals(0.064, identificationParameters.getPrecursorAccuracy());
         assertEquals(0.048, identificationParameters.getFragmentIonAccuracy());
         assertEquals(identificationParameters.getPrecursorAccuracyType(), SearchParameters.MassAccuracyType.DA);
@@ -60,14 +60,14 @@ public class PrideAsapSearchParamExtractorTest extends TestCase {
         assertEquals(identificationParameters.getMinChargeSearched().value, 1);
         assertEquals(identificationParameters.getMaxChargeSearched().value, 5);
 
-        System.out.println(identificationParameters.getModificationProfile().getFixedModifications());
-        System.out.println(identificationParameters.getModificationProfile().getAllNotFixedModifications());
+        System.out.println(identificationParameters.getPtmSettings().getFixedModifications());
+        System.out.println(identificationParameters.getPtmSettings().getAllNotFixedModifications());
 
-        //assertTrue(identificationParameters.getModificationProfile().getFixedModifications().contains("itraq114 on k"));
-        //assertTrue(identificationParameters.getModificationProfile().getFixedModifications().contains("itraq114 on nterm"));
-        //assertTrue(identificationParameters.getModificationProfile().getVariableModifications().contains("itraq114 on y"));
-        assertTrue(identificationParameters.getModificationProfile().getVariableModifications().contains("oxidation of m"));
-        assertTrue(identificationParameters.getModificationProfile().getFixedModifications().contains("carbamidomethyl c"));
+        //assertTrue(identificationParameters.getPtmSettings().getFixedModifications().contains("itraq114 on k"));
+        //assertTrue(identificationParameters.getPtmSettings().getFixedModifications().contains("itraq114 on nterm"));
+        //assertTrue(identificationParameters.getPtmSettings().getVariableModifications().contains("itraq114 on y"));
+        assertTrue(identificationParameters.getPtmSettings().getVariableModifications().contains("Oxidation of M"));
+        assertTrue(identificationParameters.getPtmSettings().getFixedModifications().contains("Carbamidomethylation of C"));
 
     }
 
@@ -78,7 +78,7 @@ public class PrideAsapSearchParamExtractorTest extends TestCase {
     public void testGetSearchParametersFileForProjectPeptideShaker() throws Exception {
         System.out.println("getSearchParametersFileForProject");
         File testingFile = getFileFromResources("peptideshaker_example.xml");
-        File outputFile = new File(testingFile.getParentFile(), "peptideshaker_example.parameters");
+        File outputFile = new File(testingFile.getParentFile(), "peptideshaker_example.par");
         outputFile.deleteOnExit();
         PrideAsapExtractor instance = new PrideAsapExtractor(testingFile, testingFile);
         instance.getSearchParametersFileForProject();
@@ -97,12 +97,12 @@ public class PrideAsapSearchParamExtractorTest extends TestCase {
         assertEquals(identificationParameters.getMinChargeSearched().value, 1);
         assertEquals(identificationParameters.getMaxChargeSearched().value, 5);
 
-        System.out.println(identificationParameters.getModificationProfile().getFixedModifications());
-        System.out.println(identificationParameters.getModificationProfile().getAllNotFixedModifications());
+        System.out.println(identificationParameters.getPtmSettings().getFixedModifications());
+        System.out.println(identificationParameters.getPtmSettings().getAllNotFixedModifications());
 
-        assertTrue(identificationParameters.getModificationProfile().getVariableModifications().contains("phosphorylation with neutral loss on s"));
-        assertTrue(identificationParameters.getModificationProfile().getVariableModifications().contains("oxidation of m"));
-        assertTrue(identificationParameters.getModificationProfile().getFixedModifications().contains("carbamidomethyl c"));
+        assertTrue(identificationParameters.getPtmSettings().getVariableModifications().contains("Phosphorylation of S"));
+        assertTrue(identificationParameters.getPtmSettings().getVariableModifications().contains("Oxidation of M"));
+        assertTrue(identificationParameters.getPtmSettings().getFixedModifications().contains("Carbamidomethylation of C"));
     }
 
     /**
@@ -113,7 +113,7 @@ public class PrideAsapSearchParamExtractorTest extends TestCase {
         System.out.println("getSearchParametersFileForProject");
         File testingFile = getFileFromResources("peptideshaker_example.mzid");
         File peakFile = getFileFromResources("peptideshaker_example.mgf");
-        File outputFile = new File(testingFile.getParentFile(), "peptideshaker_example.parameters");
+        File outputFile = new File(testingFile.getParentFile(), "peptideshaker_example.par");
         outputFile.deleteOnExit();
         PrideAsapExtractor instance = new PrideAsapExtractor(testingFile, peakFile);
         instance.getSearchParametersFileForProject();
@@ -131,12 +131,12 @@ public class PrideAsapSearchParamExtractorTest extends TestCase {
         assertEquals(identificationParameters.getMinChargeSearched().value, 1);
         assertEquals(identificationParameters.getMaxChargeSearched().value, 5);
 
-        System.out.println(identificationParameters.getModificationProfile().getFixedModifications());
-        System.out.println(identificationParameters.getModificationProfile().getAllNotFixedModifications());
+        System.out.println(identificationParameters.getPtmSettings().getFixedModifications());
+        System.out.println(identificationParameters.getPtmSettings().getAllNotFixedModifications());
 
-        assertTrue(identificationParameters.getModificationProfile().getVariableModifications().contains("phosphorylation with neutral loss on s"));
-        assertTrue(identificationParameters.getModificationProfile().getVariableModifications().contains("oxidation of m"));
-        assertTrue(identificationParameters.getModificationProfile().getFixedModifications().contains("carbamidomethyl c"));
+        assertTrue(identificationParameters.getPtmSettings().getVariableModifications().contains("Phosphorylation of S"));
+        assertTrue(identificationParameters.getPtmSettings().getVariableModifications().contains("Oxidation of M"));
+        assertTrue(identificationParameters.getPtmSettings().getFixedModifications().contains("Carbamidomethylation of C"));
 
     }
 
