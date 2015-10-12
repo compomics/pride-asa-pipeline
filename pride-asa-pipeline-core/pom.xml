@@ -324,9 +324,10 @@
     <dependencies>
         <dependency>
             <groupId>com.compomics.pride-asa-pipeline</groupId>
-            <artifactId>pride-asa-pipeline-model</artifactId>         
+            <artifactId>pride-asa-pipeline-model</artifactId>    
+            <version>1.7.3-SNAPSHOT</version>    
         </dependency>
-        
+  
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -386,7 +387,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.12</version>
             <exclusions>
                 <exclusion>
                     <artifactId>derby</artifactId>
@@ -511,7 +512,7 @@
             <groupId>uk.ac.ebi.pride.tools</groupId>
             <artifactId>mzxml-parser</artifactId>
             <version>1.3.3</version>
-                <type>jar</type>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.pride.tools</groupId>
@@ -531,8 +532,6 @@
             <version>1.2.3</version>
             <type>jar</type>
         </dependency>
-      
-
     </dependencies>
     
     <distributionManagement>        

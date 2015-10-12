@@ -4,6 +4,8 @@ import com.compomics.pride_asa_pipeline.core.repository.impl.PrideXmlParser;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.util.io.compression.ZipUtils;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -13,7 +15,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
 import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
@@ -24,12 +25,22 @@ import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 public class PrideXmlParserTest {
 
     private static FileParser prideXmlParser;
-    private static Resource prideXmlResource = new ClassPathResource("peptideshaker_example.xml");
+
+    private static File getFileFromResources(String fileName) throws IOException {
+        File testResource = new ClassPathResource(fileName).getFile();
+        if (testResource.getName().endsWith(".zip")) {
+            ZipUtils.unzip(testResource, testResource.getParentFile(), null);
+            testResource = new File(testResource.getAbsolutePath().replace(".zip", ""));
+            testResource.deleteOnExit();
+        }
+        return testResource;
+    }
 
     @BeforeClass
     public static void initParser() throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException {
         prideXmlParser = (FileParser) new PrideXmlParser();
-        prideXmlParser.init(prideXmlResource.getFile());
+        File testingFile = getFileFromResources("peptideshaker_example.xml.zip");
+        prideXmlParser.init(testingFile);
     }
 
     @Test

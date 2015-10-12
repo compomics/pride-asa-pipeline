@@ -7,6 +7,7 @@ package com.compomics.pride_asa_pipeline.core.parameters;
 
 import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapExtractor;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
+import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
 import java.io.IOException;
 import junit.framework.TestCase;
@@ -35,40 +36,14 @@ public class PrideAsapSearchParamExtractorTest extends TestCase {
         super.tearDown();
     }
 
-    private File getFileFromResources(String fileName) throws IOException {
-        return new ClassPathResource(fileName).getFile();
-    }
-
-    /**
-     * Test of getSearchParametersFileForProject method, of class
-     * PrideAsapSearchParamExtractor.
-     */
-    public void testGetSearchParametersFileForProject3() throws Exception {
-        System.out.println("getSearchParametersFileForProject");
-        File testingFile = getFileFromResources("PRIDE_Exp_Complete_Ac_3.xml");
-        File outputFile = new File(testingFile.getParentFile(), "PRIDE_Exp_Complete_Ac_3.par");
-        outputFile.deleteOnExit();
-        PrideAsapExtractor instance = new PrideAsapExtractor(testingFile, testingFile);
-        instance.getSearchParametersFileForProject();
-        instance.save(outputFile, true);
-        SearchParameters identificationParameters = SearchParameters.getIdentificationParameters(outputFile);
-//        System.out.println(identificationParameters);
-        assertEquals(0.064, identificationParameters.getPrecursorAccuracy());
-        assertEquals(0.048, identificationParameters.getFragmentIonAccuracy());
-        assertEquals(identificationParameters.getPrecursorAccuracyType(), SearchParameters.MassAccuracyType.DA);
-        assertEquals(identificationParameters.getEnzyme().getName().toLowerCase(), "arg-c");
-        assertEquals(identificationParameters.getMinChargeSearched().value, 1);
-        assertEquals(identificationParameters.getMaxChargeSearched().value, 5);
-
-        System.out.println(identificationParameters.getPtmSettings().getFixedModifications());
-        System.out.println(identificationParameters.getPtmSettings().getAllNotFixedModifications());
-
-        //assertTrue(identificationParameters.getPtmSettings().getFixedModifications().contains("itraq114 on k"));
-        //assertTrue(identificationParameters.getPtmSettings().getFixedModifications().contains("itraq114 on nterm"));
-        //assertTrue(identificationParameters.getPtmSettings().getVariableModifications().contains("itraq114 on y"));
-        assertTrue(identificationParameters.getPtmSettings().getVariableModifications().contains("Oxidation of M"));
-        assertTrue(identificationParameters.getPtmSettings().getFixedModifications().contains("Carbamidomethylation of C"));
-
+      private File getFileFromResources(String fileName) throws IOException {
+        File testResource = new ClassPathResource(fileName).getFile();
+        if(testResource.getName().endsWith(".zip")){
+        ZipUtils.unzip(testResource,testResource.getParentFile(), null);
+        testResource = new File(testResource.getAbsolutePath().replace(".zip",""));
+        testResource.deleteOnExit();
+        }
+        return testResource;
     }
 
     /**
@@ -77,7 +52,7 @@ public class PrideAsapSearchParamExtractorTest extends TestCase {
      */
     public void testGetSearchParametersFileForProjectPeptideShaker() throws Exception {
         System.out.println("getSearchParametersFileForProject");
-        File testingFile = getFileFromResources("peptideshaker_example.xml");
+        File testingFile = getFileFromResources("peptideshaker_example.xml.zip");
         File outputFile = new File(testingFile.getParentFile(), "peptideshaker_example.par");
         outputFile.deleteOnExit();
         PrideAsapExtractor instance = new PrideAsapExtractor(testingFile, testingFile);
@@ -88,8 +63,8 @@ public class PrideAsapSearchParamExtractorTest extends TestCase {
         System.out.println(identificationParameters.getPrecursorAccuracy());
         System.out.println(identificationParameters.getFragmentIonAccuracy());
 
-        assertEquals(0.006, identificationParameters.getPrecursorAccuracy());
-        assertEquals(0.022, identificationParameters.getFragmentIonAccuracy());
+        assertEquals(0.005, identificationParameters.getPrecursorAccuracy());
+        assertEquals(0.019, identificationParameters.getFragmentIonAccuracy());
 
         assertEquals(identificationParameters.getPrecursorAccuracyType(), SearchParameters.MassAccuracyType.DA);
 
@@ -111,8 +86,8 @@ public class PrideAsapSearchParamExtractorTest extends TestCase {
      */
     public void testGetSearchParametersFileForProjectPeptideShakerMzID() throws Exception {
         System.out.println("getSearchParametersFileForProject");
-        File testingFile = getFileFromResources("peptideshaker_example.mzid");
-        File peakFile = getFileFromResources("peptideshaker_example.mgf");
+        File testingFile = getFileFromResources("peptideshaker_example.mzid.zip");
+        File peakFile = getFileFromResources("peptideshaker_example.mgf.zip");
         File outputFile = new File(testingFile.getParentFile(), "peptideshaker_example.par");
         outputFile.deleteOnExit();
         PrideAsapExtractor instance = new PrideAsapExtractor(testingFile, peakFile);

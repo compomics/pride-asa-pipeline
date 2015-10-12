@@ -31,7 +31,7 @@ public class FileParserFactory {
         String extension = FilenameUtils.getExtension(inputFile.getAbsolutePath()).toLowerCase();
         switch (extension.toLowerCase()) {
             case "mzid":
-                LOGGER.info("Detected mzml file extension.");
+                LOGGER.info("Detected mzID file extension.");
                 parser = new MzIdentMlParser();
                 break;
             case "xml":

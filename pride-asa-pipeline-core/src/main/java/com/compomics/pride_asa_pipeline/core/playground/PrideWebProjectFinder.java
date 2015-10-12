@@ -88,7 +88,6 @@ public class PrideWebProjectFinder {
         this.assayAccession = assay.getAssayAccession();
         this.projectAccession = assay.getProjectAccession();
         File assayOutputFolder = new File(outputFolder, projectAccession + "/" + assay.getAssayAccession());
-        File assayPeakFiles = new File(assayOutputFolder, "peak");
         File assayIdentFiles = new File(assayOutputFolder, "ident");
         File assayReportFiles = new File(assayOutputFolder, "report");
         System.out.println("\t Finding metadata for assay : " + assay.getAssayAccession() + " ( part of " + assay.getProjectAccession() + " )");
@@ -96,19 +95,15 @@ public class PrideWebProjectFinder {
         File peakFile = null;
 
         //GET THE SPECTRA
-        //split up the loop to prevent overriding existing things?
-        if (!assayPeakFiles.exists()) {
-            assayPeakFiles.mkdirs();
-        }
         List<File> peakFiles = new ArrayList<File>();
         List<File> identFiles = new ArrayList<File>();
-        
+
         for (PrideAssayFile assayFile : assay.getAssayFiles()) {
             //try to find existing peakfiles online
             if (assayFile.getFileType().equals(PrideFileType.PEAK)) {
-                File downloadFile = assayFile.downloadFile(assayPeakFiles);
+                File downloadFile = assayFile.downloadFile(assayOutputFolder);
                 peakFiles.add(downloadFile);
-                if(downloadFile.getAbsolutePath().endsWith(".xml")){
+                if (downloadFile.getAbsolutePath().endsWith(".xml")) {
                     identFiles.add(downloadFile);
                 }
             }
@@ -116,14 +111,14 @@ public class PrideWebProjectFinder {
         //iterate the result files if there are no peakfiles?
         for (PrideAssayFile assayFile : assay.getAssayFiles()) {
             if (assayFile.getFileType().equals(PrideFileType.RESULT)) {
-                identificationsFile = assayFile.downloadFile(assayIdentFiles);
+                identificationsFile = assayFile.downloadFile(assayOutputFolder);
                 identFiles.add(identificationsFile);
                 //fill up the peakFiles if required
                 // attempt to extract MGF IF it doesn't exist...
-                if (!identificationsFile.getAbsolutePath().toLowerCase().endsWith(".mgf")) {
+                if (peakFiles.isEmpty()&&!identificationsFile.getAbsolutePath().toLowerCase().endsWith(".mgf")) {
                     DefaultMGFExtractor mgfExtractor = new DefaultMGFExtractor(identificationsFile);
                     System.out.println("Extracting MGF");
-                    File tempMGF = new File(assayPeakFiles, assayAccession + "_extracted.mgf");
+                    File tempMGF = new File(assayOutputFolder, assayAccession + "_extracted.mgf");
                     File logFile = new File(assayReportFiles, tempMGF.getName() + ".conversion.log");
                     logFile.getParentFile().mkdirs();
                     logFile.createNewFile();
@@ -134,7 +129,7 @@ public class PrideWebProjectFinder {
                         }
                     }
                 } else {
-                    identificationsFile.renameTo(new File(assayPeakFiles, identificationsFile.getName()));
+                    identificationsFile.renameTo(new File(assayOutputFolder, identificationsFile.getName()));
                 }
 
             }
@@ -157,41 +152,36 @@ public class PrideWebProjectFinder {
                     if (line.startsWith("BEGIN")) {
                         totalSpectra++;
                     }
-                    out.append(line.replace("\t"," ") + System.lineSeparator()).flush();
+                    out.append(line.replace("\t", " ") + System.lineSeparator()).flush();
                 }
             }
         }
 
         //GET THE PARAMETERS
-            ProjectReporter reporter = null;
-            PrideAsapExtractor extractor = null;
-                try {
-                    //TODO what with multiple results?
-                    extractor = new PrideAsapExtractor(identFiles.get(0), localTempMGF);
-                    //extract parameters
-                    System.out.println("Extracting search parameters");
-                    SearchParameters searchParameters = extractor.getSearchParametersFileForProject();
-                    File outputParameters = new File(assayOutputFolder, assay.getAssayAccession() + ".parameters");
+        ProjectReporter reporter = null;
+        PrideAsapExtractor extractor = null;
+        try {
+            //TODO what with multiple results?
+            extractor = new PrideAsapExtractor(identFiles.get(0), localTempMGF);
+            //extract parameters
+            System.out.println("Extracting search parameters");
+            SearchParameters searchParameters = extractor.getSearchParametersFileForProject();
+            File outputParameters = new File(assayOutputFolder, assay.getAssayAccession() + ".par");
 
-                    SearchParameters.saveIdentificationParameters(searchParameters, outputParameters);
-                    //write a report
-                    File parameterReport = new File(assayReportFiles, "extracted_parameters.txt");
-                    try (FileWriter writer = new FileWriter(parameterReport)) {
-                        writer.append("Total spectra considered in assay : " + totalSpectra + System.lineSeparator());
-                        writer.append(SearchParameters.getIdentificationParameters(outputParameters).toString()).flush();
-                    }
-                    reporter = new DefaultProjectReporter(extractor, assayReportFiles);
-                    reporter.generateReport();
-                }catch(Exception e){
-                    e.printStackTrace();
-                } finally {
-                    if (reporter != null) {
-                        reporter.clear();
-                    }
-                    if (extractor != null) {
-                        extractor.clear();
-                    }
-                }
+            SearchParameters.saveIdentificationParameters(searchParameters, outputParameters);
+            //write a report
+            reporter = new DefaultProjectReporter(extractor, assayReportFiles);
+            reporter.generateReport();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (reporter != null) {
+                reporter.clear();
             }
-            //eliminate all that is not MS2 ?
+            if (extractor != null) {
+                extractor.clear();
+            }
         }
+    }
+    //eliminate all that is not MS2 ?
+}

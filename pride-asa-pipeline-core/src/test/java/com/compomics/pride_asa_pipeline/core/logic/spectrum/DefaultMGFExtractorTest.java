@@ -6,6 +6,7 @@
 package com.compomics.pride_asa_pipeline.core.logic.spectrum;
 
 import com.compomics.util.experiment.massspectrometry.SpectrumFactory;
+import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -22,10 +23,20 @@ public class DefaultMGFExtractorTest extends TestCase {
 
     private static DefaultMGFExtractor instance3 = null;
 
+    private File getFileFromResources(String fileName) throws IOException {
+        File testResource = new ClassPathResource(fileName).getFile();
+        if (testResource.getName().endsWith(".zip")) {
+            ZipUtils.unzip(testResource, testResource.getParentFile(), null);
+            testResource = new File(testResource.getAbsolutePath().replace(".zip", ""));
+            testResource.deleteOnExit();
+        }
+        return testResource;
+    }
+
     public DefaultMGFExtractorTest(String testName) throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException {
         super(testName);
         if (DefaultMGFExtractorTest.instance3 == null) {
-            File testingFile3 = new ClassPathResource("PRIDE_Exp_Complete_Ac_3.xml").getFile();
+            File testingFile3 = getFileFromResources("PRIDE_Exp_Complete_Ac_3.xml.zip");
             DefaultMGFExtractorTest.instance3 = new DefaultMGFExtractor(testingFile3);
         }
     }
@@ -69,7 +80,7 @@ public class DefaultMGFExtractorTest extends TestCase {
     public void testGetSpectrumPeakMapBySpectrumId() throws IOException {
         System.out.println("getSpectrumPeakMapBySpectrumId");
         String spectrumId = "25";
-       Map<Double, Double> result = DefaultMGFExtractorTest.instance3.getSpectrumPeakMapBySpectrumId(spectrumId);
+        Map<Double, Double> result = DefaultMGFExtractorTest.instance3.getSpectrumPeakMapBySpectrumId(spectrumId);
         assertEquals(result.size(), 210);
         assertTrue(result.get(962.4208) != null);
     }
@@ -94,7 +105,5 @@ public class DefaultMGFExtractorTest extends TestCase {
         assertEquals(1198.1465, maxMz);
         assertEquals(1958, factory.getSpectrumTitles(result.getName()).size());
     }
-
-
 
 }

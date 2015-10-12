@@ -29,8 +29,20 @@ import org.json.simple.parser.ParseException;
 public class ProjectParser extends PrideJsonParser {
 
     private static final Logger LOGGER = Logger.getLogger(ProjectParser.class);
-    private static final String queryAddress = "http://www.ebi.ac.uk:80/pride/ws/archive/project/list?show=";
-    private static final int cacheSize =10;
+    private final String baseQueryAddress = "http://www.ebi.ac.uk:80/pride/ws/archive/project/list?";
+    private static final int cacheSize = 10;
+    private final String query;
+    private final String queryAddress;
+
+    public ProjectParser(String query) {
+        this.query = "query=" + query.replace(" ", "%20");
+        queryAddress = baseQueryAddress + this.query + "&show=";
+    }
+
+    public ProjectParser() {
+        this.query = "";
+        queryAddress = baseQueryAddress + "&show=";
+    }
 
     /**
      *
@@ -43,14 +55,14 @@ public class ProjectParser extends PrideJsonParser {
      * @throws ParseException
      */
     public List<PrideProject> getProjects(Collection<PrideFilter> filters, boolean loadAssays) throws MalformedURLException, IOException, ParseException {
-        String basicURL = queryAddress+cacheSize;
+        String basicURL = queryAddress + cacheSize;
         for (PrideFilter aFilter : filters) {
             basicURL += "&" + aFilter.getType().toString() + "=" + aFilter.getValue();
         }
         return getProjectsFromURL(basicURL, loadAssays);
     }
 
-        /**
+    /**
      *
      * @param filters a collection of filters for the projects
      * @param loadAssays TRUE = load assay information as well (might take
@@ -61,14 +73,13 @@ public class ProjectParser extends PrideJsonParser {
      * @throws ParseException
      */
     public List<PrideProject> getProjects(Collection<PrideFilter> filters, boolean loadAssays, int cacheSize) throws MalformedURLException, IOException, ParseException {
-        String basicURL = queryAddress+cacheSize;
+        String basicURL = queryAddress + cacheSize;
         for (PrideFilter aFilter : filters) {
             basicURL += "&" + aFilter.getType().toString() + "=" + aFilter.getValue();
         }
         return getProjectsFromURL(basicURL, loadAssays);
     }
-    
-    
+
     /**
      *
      * @param filter a filter for the projects

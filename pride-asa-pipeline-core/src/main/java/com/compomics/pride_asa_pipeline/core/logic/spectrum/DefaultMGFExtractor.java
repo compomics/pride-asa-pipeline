@@ -206,6 +206,12 @@ public class DefaultMGFExtractor {
         Double precursorMz = spectrum.getPrecursorMZ();
         Double precursorIntensity = spectrum.getPrecursorIntensity();
         Integer precursorCharge = spectrum.getPrecursorCharge();
+        Double precursorRt = 0.0;
+        for (CvParam cvParam : spectrum.getAdditional().getCvParams()) {
+            if (cvParam.getAccession().equalsIgnoreCase("MS:1000894")|cvParam.getAccession().equalsIgnoreCase("PSI:1000039")) {
+                precursorRt = Double.parseDouble(cvParam.getValue());
+            }
+        }
 
 // ignore ms levels other than 2
         if (msLevel == 2) {
@@ -214,16 +220,14 @@ public class DefaultMGFExtractor {
                 bw.write("BEGIN IONS" + System.getProperty("line.separator"));
                 bw.write("TITLE=" + spectrum.getId() + System.getProperty("line.separator"));
                 bw.write("PEPMASS=" + precursorMz);
-                //TODO SEE WHERE TO GET RT
-                Double precursorRt = null;
-
+  
                 if (precursorIntensity != null) {
                     bw.write("\t" + precursorIntensity);
                 }
 
                 bw.write(System.getProperty("line.separator"));
 
-                if (precursorRt != null) {
+                if (precursorRt > 0.0) {
                     bw.write("RTINSECONDS=" + precursorRt + System.getProperty("line.separator")); // @TODO: improve the retention time mapping, e.g., support rt windows
                 }
 

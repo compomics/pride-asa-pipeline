@@ -60,8 +60,7 @@ public class PrideMetadataUtils {
      * @throws IOException
      * @throws ParseException
      */
-    public List<PrideProject> getProjects(Collection<PrideFilter> filters, boolean loadAssays) throws MalformedURLException, IOException, ParseException {
-        ProjectParser parser = new ProjectParser();
+    private List<PrideProject> getProjects(ProjectParser parser, Collection<PrideFilter> filters, boolean loadAssays) throws MalformedURLException, IOException, ParseException {
         return parser.getProjects(filters, loadAssays);
     }
 
@@ -76,9 +75,96 @@ public class PrideMetadataUtils {
      * @throws IOException
      * @throws ParseException
      */
-    public List<PrideProject> getProjects(Collection<PrideFilter> filters, boolean loadAssays, int cacheSize) throws MalformedURLException, IOException, ParseException {
-        ProjectParser parser = new ProjectParser();
+    public List<PrideProject> getProjects(Collection<PrideFilter> filters, boolean loadAssays) throws MalformedURLException, IOException, ParseException {
+        return getProjects(new ProjectParser(), filters, loadAssays);
+    }
+
+    // PROJECTS
+    /**
+     *
+     * @param filters a collection of filters for the projects
+     * @param loadAssays TRUE = load assay information as well (might take
+     * longer)
+     * @return
+     * @throws MalformedURLException
+     * @throws IOException
+     * @throws ParseException
+     */
+    public List<PrideProject> getProjects(String query, Collection<PrideFilter> filters, boolean loadAssays) throws MalformedURLException, IOException, ParseException {
+        return getProjects(new ProjectParser(query), filters, loadAssays);
+    }
+
+    // PROJECTS
+    /**
+     *
+     * @param filters a collection of filters for the projects
+     * @param loadAssays TRUE = load assay information as well (might take
+     * longer)
+     * @return
+     * @throws MalformedURLException
+     * @throws IOException
+     * @throws ParseException
+     */
+    private List<PrideProject> getProjects(ProjectParser parser, Collection<PrideFilter> filters, boolean loadAssays, int cacheSize) throws MalformedURLException, IOException, ParseException {
         return parser.getProjects(filters, loadAssays, cacheSize);
+    }
+
+    /**
+     *
+     * @param filters a collection of filters for the projects
+     * @param loadAssays TRUE = load assay information as well (might take
+     * longer)
+     * @return
+     * @throws MalformedURLException
+     * @throws IOException
+     * @throws ParseException
+     */
+    public List<PrideProject> getProjects(String query, Collection<PrideFilter> filters, boolean loadAssays, int cacheSize) throws MalformedURLException, IOException, ParseException {
+        ProjectParser parser = new ProjectParser(query);
+        return getProjects(parser, filters, loadAssays, cacheSize);
+    }
+
+    /**
+     *
+     * @param filters a collection of filters for the projects
+     * @param loadAssays TRUE = load assay information as well (might take
+     * longer)
+     * @return
+     * @throws MalformedURLException
+     * @throws IOException
+     * @throws ParseException
+     */
+    public List<PrideProject> getProjects(Collection<PrideFilter> filters, boolean loadAssays, int cacheSize) throws MalformedURLException, IOException, ParseException {
+        return getProjects(new ProjectParser(), filters, loadAssays, cacheSize);
+    }
+
+    /**
+     *
+     * @param filter a filter for the projects
+     * @param loadAssays TRUE = load assay information as well (might take
+     * longer)
+     * @return
+     * @throws MalformedURLException
+     * @throws IOException
+     * @throws ParseException
+     */
+    private List<PrideProject> getProjects(ProjectParser parser, PrideFilter filter, boolean loadAssays) throws MalformedURLException, IOException, ParseException {
+        return parser.getProjects(filter, loadAssays);
+    }
+
+    /**
+     *
+     * @param filter a filter for the projects
+     * @param loadAssays TRUE = load assay information as well (might take
+     * longer)
+     * @return
+     * @throws MalformedURLException
+     * @throws IOException
+     * @throws ParseException
+     */
+    public List<PrideProject> getProjects(String query, PrideFilter filter, boolean loadAssays) throws MalformedURLException, IOException, ParseException {
+        ProjectParser parser = new ProjectParser(query);
+        return getProjects(parser, filter, loadAssays);
     }
 
     /**
@@ -93,7 +179,7 @@ public class PrideMetadataUtils {
      */
     public List<PrideProject> getProjects(PrideFilter filter, boolean loadAssays) throws MalformedURLException, IOException, ParseException {
         ProjectParser parser = new ProjectParser();
-        return parser.getProjects(filter, loadAssays);
+        return getProjects(parser, filter, loadAssays);
     }
 
     /**

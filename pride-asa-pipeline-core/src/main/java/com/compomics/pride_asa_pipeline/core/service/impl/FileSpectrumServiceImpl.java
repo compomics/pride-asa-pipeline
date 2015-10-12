@@ -5,9 +5,10 @@
 package com.compomics.pride_asa_pipeline.core.service.impl;
 
 import com.compomics.pride_asa_pipeline.core.repository.FileParser;
-import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.core.service.FileSpectrumService;
-import java.util.*;
+import com.compomics.pride_asa_pipeline.model.Peak;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -22,6 +23,10 @@ public class FileSpectrumServiceImpl implements FileSpectrumService {
         this.fileParser = fileParser;
     }       
 
+    public FileParser getFileParser(){
+        return this.fileParser;
+    }
+    
     @Override
     public List<Peak> getSpectrumPeaksBySpectrumId(String spectrumId) {
         return fileParser.getSpectrumPeaksBySpectrumId(spectrumId);
@@ -31,4 +36,6 @@ public class FileSpectrumServiceImpl implements FileSpectrumService {
     public HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(String spectrumId) {
         return fileParser.getSpectrumPeakMapBySpectrumId(spectrumId);
     }
+    
+    
 }

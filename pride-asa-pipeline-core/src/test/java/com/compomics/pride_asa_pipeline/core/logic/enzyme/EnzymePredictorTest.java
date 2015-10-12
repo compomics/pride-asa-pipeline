@@ -9,7 +9,9 @@ import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;
 import com.compomics.util.experiment.biology.Protein;
 import com.compomics.util.experiment.identification.protein_sequences.SequenceFactory;
+import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import junit.framework.TestCase;
@@ -50,10 +52,20 @@ public class EnzymePredictorTest extends TestCase {
         return peptideList;
     }
 
+    private File getFileFromResources(String fileName) throws IOException {
+        File testResource = new ClassPathResource(fileName).getFile();
+        if (testResource.getName().endsWith(".zip")) {
+            ZipUtils.unzip(testResource, testResource.getParentFile(), null);
+            testResource = new File(testResource.getAbsolutePath().replace(".zip", ""));
+            testResource.deleteOnExit();
+        }
+        return testResource;
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        File fastaFile = new ClassPathResource("uniprot-human_reviewed_december_13_concatenated_target_decoy.fasta").getFile();
+        File fastaFile = getFileFromResources("uniprot-human_reviewed_december_13_concatenated_target_decoy.fasta.zip");
         File enzymeFile = new ClassPathResource("searchGUI_enzymes.xml").getFile();
         sequenceFactory = SequenceFactory.getInstance();
         sequenceFactory.loadFastaFile(fastaFile, null);
