@@ -8,21 +8,26 @@ package com.compomics.pride_asa_pipeline.core.playground;
 import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapExtractor;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.DefaultMGFExtractor;
-import com.compomics.pride_asa_pipeline.core.model.webservice.fields.PrideFileType;
-import com.compomics.pride_asa_pipeline.core.model.webservice.objects.PrideAssay;
-import com.compomics.pride_asa_pipeline.core.model.webservice.objects.PrideAssayFile;
-import com.compomics.pride_asa_pipeline.core.util.PrideMetadataUtils;
 import com.compomics.pride_asa_pipeline.core.util.reporter.ProjectReporter;
 import com.compomics.pride_asa_pipeline.core.util.reporter.impl.DefaultProjectReporter;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
+import com.compomics.util.io.FTPDownloader;
+import com.compomics.util.pride.PrideWebService;
+import com.compomics.util.pride.prideobjects.webservice.assay.AssayDetail;
+import com.compomics.util.pride.prideobjects.webservice.file.FileDetail;
+import com.compomics.util.pride.prideobjects.webservice.file.FileDetailList;
+import com.compomics.util.pride.prideobjects.webservice.file.FileType;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 import org.geneontology.oboedit.dataadapter.GOBOParseException;
 import org.json.simple.parser.ParseException;
 import org.xmlpull.v1.XmlPullParserException;
@@ -40,7 +45,7 @@ public class PrideWebProjectFinder {
     private String projectAccession;
     private String assayAccession;
 
-    public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException {
+    public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
         int i = 0;
         //while (true) {
         //  File outputFolder = new File(args[0]);
@@ -67,24 +72,23 @@ public class PrideWebProjectFinder {
         this.outputFolder = outputFolder;
     }
 
-    public void analyze() throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException {
-        PrideMetadataUtils prideService = PrideMetadataUtils.getInstance();
+    public void analyze() throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
         System.out.println("Getting metadata for assay " + assayAccession);
-        PrideAssay prideAssay = prideService.getAssay(assayAccession);
-        projectAccession = prideAssay.getProjectAccession();
+        AssayDetail assayDetail = PrideWebService.getAssayDetail(assayAccession);
+        projectAccession = assayDetail.getProjectAccession();
         File projectOutputFolder = new File(outputFolder, projectAccession);
         projectOutputFolder.mkdirs();
 
         System.out.println("Finding assay files");
-
-        if (prideAssay.getAssayFiles().isEmpty()) {
+        FileDetailList assayFileDetails = PrideWebService.getAssayFileDetails(assayAccession);
+        if (assayFileDetails.getList().isEmpty()) {
             System.out.println("WARNING : THERE ARE NO ASSAY FILES PRESENT!");
         } else {
-            analyzeAssay(prideAssay);
+            analyzeAssay(assayDetail);
         }
     }
 
-    public void analyzeAssay(PrideAssay assay) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException {
+    public void analyzeAssay(AssayDetail assay) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
         this.assayAccession = assay.getAssayAccession();
         this.projectAccession = assay.getProjectAccession();
         File assayOutputFolder = new File(outputFolder, projectAccession + "/" + assay.getAssayAccession());
@@ -97,11 +101,11 @@ public class PrideWebProjectFinder {
         //GET THE SPECTRA
         List<File> peakFiles = new ArrayList<File>();
         List<File> identFiles = new ArrayList<File>();
-
-        for (PrideAssayFile assayFile : assay.getAssayFiles()) {
+        FileDetailList assayFileDetails = PrideWebService.getAssayFileDetails(assayAccession);
+        for (FileDetail assayFile : assayFileDetails.getList()) {
             //try to find existing peakfiles online
-            if (assayFile.getFileType().equals(PrideFileType.PEAK)) {
-                File downloadFile = assayFile.downloadFile(assayOutputFolder);
+            if (assayFile.getFileType().equals(FileType.PEAK.toString())) {
+                File downloadFile = downloadFile(assayFile);
                 peakFiles.add(downloadFile);
                 if (downloadFile.getAbsolutePath().endsWith(".xml")) {
                     identFiles.add(downloadFile);
@@ -109,13 +113,13 @@ public class PrideWebProjectFinder {
             }
         }
         //iterate the result files if there are no peakfiles?
-        for (PrideAssayFile assayFile : assay.getAssayFiles()) {
-            if (assayFile.getFileType().equals(PrideFileType.RESULT)) {
-                identificationsFile = assayFile.downloadFile(assayOutputFolder);
+        for (FileDetail assayFile : assayFileDetails.getList()) {
+            if (assayFile.getFileType().equals(FileType.RESULT.toString())) {
+                identificationsFile = downloadFile(assayFile);
                 identFiles.add(identificationsFile);
                 //fill up the peakFiles if required
                 // attempt to extract MGF IF it doesn't exist...
-                if (peakFiles.isEmpty()&&!identificationsFile.getAbsolutePath().toLowerCase().endsWith(".mgf")) {
+                if (peakFiles.isEmpty() && !identificationsFile.getAbsolutePath().toLowerCase().endsWith(".mgf")) {
                     DefaultMGFExtractor mgfExtractor = new DefaultMGFExtractor(identificationsFile);
                     System.out.println("Extracting MGF");
                     File tempMGF = new File(assayOutputFolder, assayAccession + "_extracted.mgf");
@@ -184,4 +188,33 @@ public class PrideWebProjectFinder {
         }
     }
     //eliminate all that is not MS2 ?
+
+    private File downloadFile(FileDetail detail) throws Exception {
+        URL url = new URL(detail.getDownloadLink());
+        FTPDownloader downloader = new FTPDownloader(url.getHost());
+        File downloadFile = new File(outputFolder, detail.getFileName());
+        System.out.println("Downloading : " + url.getPath());
+        downloader.downloadFile(url.getPath(), downloadFile);
+        if(downloadFile.getAbsolutePath().endsWith(".gz")){
+            File temp =new File(outputFolder,downloadFile.getName().replace(".gz",""));
+            gunzip(downloadFile,temp);
+            downloadFile.delete();
+            downloadFile=temp;
+        }
+        return downloadFile;
+    }
+
+    private void gunzip(File gzipFile, File outputFile) {
+        byte[] buffer = new byte[1024];
+        try (FileOutputStream out = new FileOutputStream(outputFile); GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(gzipFile))) {
+            int len;
+            while ((len = gzis.read(buffer)) > 0) {
+                out.write(buffer, 0, len);
+            }
+            System.out.println("Done");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
 }

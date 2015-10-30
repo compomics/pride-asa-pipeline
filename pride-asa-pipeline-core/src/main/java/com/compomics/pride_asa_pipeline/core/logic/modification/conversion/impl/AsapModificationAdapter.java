@@ -1,0 +1,87 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl;
+
+import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.UniModModification;
+import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.model.AminoAcid;
+import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.Modification.Location;
+import java.util.HashSet;
+import uk.ac.ebi.pridemod.model.Specificity;
+
+/**
+ *
+ * @author Kenneth
+ */
+public class AsapModificationAdapter implements ModificationAdapter<Modification> {
+
+    private HashSet<AminoAcid> affectedAminoAcid;
+
+    @Override
+    public Modification convertModification(UniModModification mod) {
+        uk.ac.ebi.pridemod.model.PTM ptm = mod.getPtm();
+        Double averageIsotopicMass = ptm.getAveDeltaMass();
+        Double monoIsotopicMass = ptm.getMonoDeltaMass();
+        //TODO calcualte this from the formula?
+        if (averageIsotopicMass == null) {
+            averageIsotopicMass = 0.0;
+        }
+        if (monoIsotopicMass == null) {
+            monoIsotopicMass = 0.0;
+        }
+        Location modLocation;
+        try {
+            modLocation = getLocation(ptm);
+        } catch (NullPointerException e) {
+            modLocation = Location.NON_TERMINAL;
+        }
+        return new Modification(ptm.getName(),
+                monoIsotopicMass,
+                averageIsotopicMass,
+                modLocation,
+                affectedAminoAcid,
+                ptm.getAccession(),
+                ptm.getAccession());
+    }
+
+    private Location getLocation(uk.ac.ebi.pridemod.model.PTM ptm) {
+        HashSet<Location> affectedLocations = new HashSet<>();
+        affectedAminoAcid = new HashSet<>();
+        for (Specificity specificity : ptm.getSpecificityCollection()) {
+            if (specificity.getName().equals(specificity.getName().NONE)) {
+                return Modification.Location.NON_TERMINAL;
+            }
+            affectedAminoAcid.add(AminoAcid.getAA(specificity.getName().toString()));
+            Location currentLocation;
+            switch (specificity.getPosition()) {
+                case CTERM:
+                    currentLocation = (Modification.Location.C_TERMINAL);
+                    break;
+                case NTERM:
+                    currentLocation = (Modification.Location.N_TERMINAL);
+                    break;
+                case PCTERM:
+                    currentLocation = (Modification.Location.C_TERMINAL);
+                    break;
+                case PNTERM:
+                    currentLocation = (Modification.Location.N_TERMINAL);
+                    break;
+                default:
+                    currentLocation = (Modification.Location.NON_TERMINAL);
+            }
+            affectedLocations.add(currentLocation);
+        }
+        Location location;
+        if (affectedLocations.size() != 1) {
+            location = Modification.Location.NON_TERMINAL;
+        } else {
+            location = affectedLocations.iterator().next();
+        }
+        return location;
+    }
+
+}

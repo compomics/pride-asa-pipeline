@@ -9,7 +9,7 @@ import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.experiment.biology.PTM;
 import com.compomics.util.experiment.biology.PTMFactory;
-import com.compomics.util.preferences.ModificationProfile;
+import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,7 +33,6 @@ import org.geneontology.oboedit.datamodel.OBOClass;
 import org.geneontology.oboedit.datamodel.OBOSession;
 import org.springframework.core.io.ClassPathResource;
 import org.xmlpull.v1.XmlPullParserException;
-
 /**
  *
  * @author Kenneth Verheggen
@@ -58,26 +57,13 @@ public class PTMMapper {
 
     public static PTMMapper getInstance() throws XmlPullParserException, IOException, GOBOParseException {
         if (ptmMapper == null) {
-            loadSearchGUImodificationFile();
             factory = PTMFactory.getInstance();
             factory.clearFactory();
-            factory.importModifications(tempSearchGuiModFile, false);
             //factory.importModifications(respProps.getUserModFile(), true, true);
             ptmMapper = new PTMMapper();
             ptmMapper.loadDictionaries();
         }
         return ptmMapper;
-    }
-
-    private static void loadSearchGUImodificationFile() throws IOException, XmlPullParserException {
-        if (tempSearchGuiModFile == null) {
-            tempSearchGuiModFile = File.createTempFile("searchGUI_mods", ".xml");
-            InputStream inputStream = new ClassPathResource("searchGUI_mods.xml").getInputStream();
-            OutputStream outputStream = new FileOutputStream(tempSearchGuiModFile);
-            IOUtils.copy(inputStream, outputStream);
-            tempSearchGuiModFile.deleteOnExit();
-            factory.importModifications(tempSearchGuiModFile, false, true);
-        }
     }
 
     private void loadDictionaries() throws IOException, GOBOParseException {
@@ -137,8 +123,8 @@ public class PTMMapper {
      * @param unknownPtms the list of unknown PTMS, updated during this method
      * @return the filled up modification profile
      */
-    public ModificationProfile buildTotalModProfile(HashMap<String, Boolean> modificationMap, ArrayList<String> unknownPtms) {
-        ModificationProfile modProfile = new ModificationProfile();
+    public PtmSettings buildTotalModProfile(HashMap<String, Boolean> modificationMap, ArrayList<String> unknownPtms) {
+        PtmSettings modProfile = new PtmSettings();
         for (String aModificationName : modificationMap.keySet()) {
             if (!addPTMToProfile(modProfile, modificationMap, aModificationName)) {
                 factory.convertPridePtm(aModificationName, modProfile, unknownPtms, modificationMap.get(aModificationName));
@@ -154,7 +140,7 @@ public class PTMMapper {
         return modProfile;
     }
 
-    private boolean addPTMToProfile(ModificationProfile modProfile, HashMap<String, Boolean> modificationMap, String aModificationName) {
+    private boolean addPTMToProfile(PtmSettings modProfile, HashMap<String, Boolean> modificationMap, String aModificationName) {
         if (factory.containsPTM(aModificationName)) {
             PTM loadedCorrespondingPtm = factory.getPTM(aModificationName);
             if (modificationMap.get(aModificationName)) {
@@ -181,7 +167,7 @@ public class PTMMapper {
      * @param unknownPtms the list of unknown PTMS, updated during this method
      * @return the filled up modification profile
      */
-    public ModificationProfile buildUniqueMassModProfile(HashMap<String, Boolean> modificationMap, ArrayList<String> unknownPtms, double precursorAcc) {
+    public PtmSettings buildUniqueMassModProfile(HashMap<String, Boolean> modificationMap, ArrayList<String> unknownPtms, double precursorAcc) {
         return removeDuplicateMasses(buildTotalModProfile(modificationMap, unknownPtms), precursorAcc);
     }
 
@@ -210,7 +196,7 @@ public class PTMMapper {
         return newName;
     }
 
-    public ModificationProfile removeDuplicateMasses(ModificationProfile modProfile, double precursorMassAcc) {
+    public PtmSettings removeDuplicateMasses(PtmSettings modProfile, double precursorMassAcc) {
         TreeMap<Double, String> massToModMap = new TreeMap<>();
         for (String aModName : modProfile.getAllModifications()) {
             massToModMap.put(modProfile.getPtm(aModName).getMass(), aModName);

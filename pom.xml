@@ -172,7 +172,7 @@
             <dependency>
                 <groupId>com.compomics.pride-asa-pipeline</groupId>
                 <artifactId>pride-asa-pipeline-model</artifactId>
-                <version>1.7.0</version>
+                <version>1.7.3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -245,7 +245,7 @@
             <dependency>
                 <groupId>com.compomics</groupId>
                 <artifactId>utilities</artifactId>
-                <version>3.13.56</version>
+                <version>4.1.11</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>derby</artifactId>

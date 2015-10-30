@@ -379,29 +379,7 @@
             <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
         </dependency>       
-        
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>utilities</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>derby</artifactId>
-                    <groupId>org.apache.derby</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>ols-dialog</artifactId>
-                    <groupId>no.uib</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>braf</artifactId>
-                    <groupId>uk.ac.ebi.pride.tools</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>batik-all</artifactId>
-                    <groupId>batik</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+
 
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -523,6 +501,12 @@
             <groupId>org.geneontology</groupId>
             <artifactId>oboedit</artifactId>
             <version>beta8</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>utilities</artifactId>
+            <version>4.1.11</version>
             <type>jar</type>
         </dependency>
     </dependencies>

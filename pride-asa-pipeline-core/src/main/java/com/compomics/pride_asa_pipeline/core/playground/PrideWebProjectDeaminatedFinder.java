@@ -6,20 +6,21 @@
 package com.compomics.pride_asa_pipeline.core.playground;
 
 import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
-import com.compomics.pride_asa_pipeline.core.model.webservice.PrideFilter;
-import com.compomics.pride_asa_pipeline.core.model.webservice.PrideFilterType;
-import com.compomics.pride_asa_pipeline.core.model.webservice.objects.PrideAssay;
-import com.compomics.pride_asa_pipeline.core.model.webservice.objects.PrideModifiedLocation;
-import com.compomics.pride_asa_pipeline.core.model.webservice.objects.PridePeptide;
-import com.compomics.pride_asa_pipeline.core.model.webservice.objects.PrideProject;
-import com.compomics.pride_asa_pipeline.core.util.PrideMetadataUtils;
+import com.compomics.util.pride.PrideWebService;
+import com.compomics.util.pride.prideobjects.webservice.assay.AssayDetail;
+import com.compomics.util.pride.prideobjects.webservice.assay.AssayDetailList;
+import com.compomics.util.pride.prideobjects.webservice.peptide.ModificationLocation;
+import com.compomics.util.pride.prideobjects.webservice.peptide.PsmDetail;
+import com.compomics.util.pride.prideobjects.webservice.peptide.PsmDetailList;
+import com.compomics.util.pride.prideobjects.webservice.project.projectsummary.ProjectSummary;
+import com.compomics.util.pride.prideobjects.webservice.project.projectsummary.ProjectSummaryList;
+import com.compomics.util.pride.prideobjects.webservice.query.PrideFilter;
+import com.compomics.util.pride.prideobjects.webservice.query.PrideFilterType;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,8 +49,6 @@ public class PrideWebProjectDeaminatedFinder {
         proteinOutputFile.createNewFile();
         sequenceOutputFile.createNewFile();
 
-        PrideMetadataUtils prideService = PrideMetadataUtils.getInstance();
-
         //prideService.getProjects(filters, true)
         //    for (PrideProject aProject : toProcess) {
         //  System.out.println("Processing " + aProject.getAccession());
@@ -64,23 +63,22 @@ public class PrideWebProjectDeaminatedFinder {
                 .append("projectId").append("\t")
                 .append("spectrumId").append(System.lineSeparator());
 
-        List<PrideFilter> filters = new ArrayList<>();
-        filters.add(new PrideFilter(PrideFilterType.ptmsFilter, "deamidation"));
         System.out.println("Finding all deamidation projects");
 
         try (FileWriter proteinWriter = new FileWriter(proteinOutputFile); FileWriter peptideWriter = new FileWriter(sequenceOutputFile);) {
             proteinWriter.append(title + System.lineSeparator()).flush();
-            List<PrideProject> projects = prideService.getProjects(filters, true);
+            ProjectSummaryList projects = PrideWebService.getProjectSummaryList("", new PrideFilter(PrideFilterType.ptmsFilter, "deamidation"));
             int counter = 0;
-            for (PrideProject aProject : projects) {
+            for (ProjectSummary aProject : projects.getList()) {
                 try {
                     counter++;
-                    System.out.println("Processing " + counter + "/" + projects.size());
-                    for (PrideAssay anAssay : aProject.values()) {
+                    System.out.println("Processing " + counter + "/" + aProject.getNumAssays());
+                    AssayDetailList assayDetails = PrideWebService.getAssayDetails(aProject.getAccession());
+                    for (AssayDetail anAssay : assayDetails.getList()) {
                         if (anAssay.getPeptideCount() > 0) {
-                            List<PridePeptide> allPeptides = prideService.getAllPeptides(anAssay);
-                            System.out.println(allPeptides.size());
-                            for (PridePeptide aPeptide : allPeptides) {
+                            PsmDetailList psMsByAssay = PrideWebService.getPSMsByAssay(anAssay.getAssayAccession());
+                            System.out.println(psMsByAssay.getList().size());
+                            for (PsmDetail aPeptide : psMsByAssay.getList()) {
                                 String protein = aPeptide.getProteinAccession();
                                 String projectId = aPeptide.getProjectAccession();
                                 String assayId = aPeptide.getAssayAccession();
@@ -97,8 +95,8 @@ public class PrideWebProjectDeaminatedFinder {
                                 String indexesOfQ = getIndexesAsString(sequence, "Q");
                                 String deamidated_peptides = "";
                                 String oxidated_peptides = "";
-                                ArrayList<PrideModifiedLocation> modLocations = aPeptide.getModLocations();
-                                for (PrideModifiedLocation modLoc : modLocations) {
+                                ModificationLocation[] modifications = aPeptide.getModifications();
+                                for (ModificationLocation modLoc : modifications) {
                                     if (modLoc.getModification().equalsIgnoreCase("MOD:00400")) {
                                         deamidated_peptides += modLoc.getLocation() + ",";
                                     }
@@ -133,8 +131,6 @@ public class PrideWebProjectDeaminatedFinder {
             }
         } catch (MalformedURLException ex) {
             Logger.getLogger(PrideWebProjectDeaminatedFinder.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(PrideWebProjectDeaminatedFinder.class.getName()).log(Level.SEVERE, null, ex);
         }
         FileWriter peptideWriter;
         peptideWriter = new FileWriter(sequenceOutputFile);
@@ -167,12 +163,8 @@ public class PrideWebProjectDeaminatedFinder {
     }
 
     public void analyze() throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException {
-        PrideMetadataUtils prideService = PrideMetadataUtils.getInstance();
-        List<PrideFilter> filters = new ArrayList<>();
-        PrideFilter filter = new PrideFilter(PrideFilterType.ptmsFilter, "deamidation");
-        filters.add(filter);
-        List<PrideProject> projects = prideService.getProjects(filters, false);
-        for (PrideProject aProject : projects) {
+        ProjectSummaryList projectSummaryList = PrideWebService.getProjectSummaryList("", new PrideFilter(PrideFilterType.ptmsFilter, "deamidation"));
+        for (ProjectSummary aProject : projectSummaryList.getList()) {
             System.out.println(aProject.getAccession());
         }
     }
