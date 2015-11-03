@@ -1,16 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.pride_asa_pipeline.core.logic.modification.conversion;
 
 /**
  *
- * @author Kenneth
+ * @author Kenneth Verheggen
  */
 public interface ModificationAdapter<T> {
 
+    /**
+     * Converts a unimod modification to the desired format
+     * @param mod the input modification
+     * @return a converted modification
+     */
     public T convertModification(UniModModification mod);
 
 }

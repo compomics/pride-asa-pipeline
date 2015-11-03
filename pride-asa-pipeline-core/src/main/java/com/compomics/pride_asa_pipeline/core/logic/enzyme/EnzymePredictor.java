@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.pride_asa_pipeline.core.logic.enzyme;
 
 import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapStats;
@@ -30,14 +25,41 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 public class EnzymePredictor {
 
+    /**
+     * The enzyme factory
+     */
     private static EnzymeFactory enzymeFactory;
+    /**
+     * A logger
+     */
     private static final Logger LOGGER = Logger.getLogger(EnzymePredictor.class);
+    /**
+     * The most likely enzyme
+     */
     private Enzyme bestGuess;
+    /**
+     * boolean indicating if this project is fit for searches
+     */
     private boolean suitedForSearching = true;
+    /**
+     * The temporary enzyme file
+     */
     private File tempEnzymeFile;
+    /**
+     * the count of amino acid occurences from the N-terminus
+     */
     private HashMap<Character, Integer> N_TerminiCount;
+    /**
+     * the count of amino acid occurences from the C-terminus
+     */
     private HashMap<Character, Integer> C_TerminiCount;
+    /**
+     * The maximal amount of allowed misscleavages
+     */
     private int maxMissedCleavages = 2;
+    /**
+     * the peptide sequences that need to be considered
+     */
     private ArrayList<String> peptideSequences = new ArrayList<>();
 
     public Enzyme getBestGuess() {
@@ -109,6 +131,11 @@ public class EnzymePredictor {
         enzymeFactory.importEnzymes(tempEnzymeFile);
     }
 
+    /**
+     * Estimates the best suited enzyme for a given collection of sequences
+     *
+     * @return the best suited enzyme for the given peptide sequences
+     */
     public Enzyme estimateBestEnzyme() {
         N_TerminiCount = new HashMap<>();
         C_TerminiCount = new HashMap<>();
@@ -150,7 +177,7 @@ public class EnzymePredictor {
             if (correctNess > bestCorrectness) {
                 bestGuess = anEnzyme.getKey();
                 maxMissedCleavages = missedCleavagesMap.get(anEnzyme.getKey());
-                bestCorrectness=correctNess;
+                bestCorrectness = correctNess;
             }
         }
         return bestGuess;
@@ -178,6 +205,9 @@ public class EnzymePredictor {
         return PrideAsapStats.round((double) totalMissed / (double) peptideSequences.size(), 3);
     }
 
+    /**
+     * clears the resources
+     */
     public void clear() {
         enzymeFactory = null;
         bestGuess = null;

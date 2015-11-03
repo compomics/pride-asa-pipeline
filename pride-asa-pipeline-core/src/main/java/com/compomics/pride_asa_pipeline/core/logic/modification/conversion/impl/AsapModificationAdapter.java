@@ -1,12 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl;
 
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.UniModModification;
 import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.UniModModification;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Modification.Location;
@@ -15,7 +10,7 @@ import uk.ac.ebi.pridemod.model.Specificity;
 
 /**
  *
- * @author Kenneth
+ * @author Kenneth Verheggen
  */
 public class AsapModificationAdapter implements ModificationAdapter<Modification> {
 

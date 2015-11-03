@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl;
 
 import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.ModificationAdapter;
@@ -23,16 +18,37 @@ import uk.ac.ebi.pridemod.model.Specificity.Position;
 
 /**
  *
- * @author Kenneth
+ * @author Kenneth Verheggen
  */
 public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
 
+    /**
+     * the targeted residues as a string
+     */
     private String targetResiduesString;
+    /**
+     * the atom chain for masses that contribute to the total mass
+     */
     private AtomChain increaseMassChain = new AtomChain();
+    /**
+     * the atom chain for masses that deduct from the total mass
+     */
     private AtomChain decreaseMassChain = new AtomChain();
+    /**
+     * The regex pattern for atoms
+     */
     private static final Pattern atomPattern = Pattern.compile("[A-Z][a-z]*\\d*");
+    /**
+     * The regex pattern for isotopes
+     */
     private static final Pattern isotopePattern = Pattern.compile("[0-9]*[^A-Z]*[0-9]");
+    /**
+     * The regex pattern for atypical pride formulatae
+     */
     private static final Pattern prideFormatPattern = Pattern.compile("([A-Z][a-z]?[0-9]?\\s[0-9]*)");
+    /**
+     * A logger
+     */
     private static final Logger LOGGER = Logger.getLogger(UtilitiesPTMAdapter.class);
 
     @Override
@@ -112,7 +128,7 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
         }
     }
 
-    public void parseFormula(String formula, String atomSeparator) {
+    private void parseFormula(String formula, String atomSeparator) {
         if (formula != null && !formula.equalsIgnoreCase("none")) {
             if (formula.length() == 1) {
                 AtomImpl atom;
@@ -165,7 +181,7 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
         }
     }
 
-    public void parseFormulaPRIDEFormat(String formula) {
+    private void parseFormulaPRIDEFormat(String formula) {
         //preprocess formula...
         formula = formula.toUpperCase()
                 .replace("METH", "C 1 H 3")

@@ -6,7 +6,7 @@
 package com.compomics.pride_asa_pipeline.core.logic.spectrum;
 
 import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
-import com.compomics.util.experiment.massspectrometry.Peak;
+import com.compomics.pride_asa_pipeline.model.Peak;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
