@@ -166,10 +166,10 @@ public class PrideWebProjectFinder {
         PrideAsapExtractor extractor = null;
         try {
             //TODO what with multiple results?
-            extractor = new PrideAsapExtractor(identFiles.get(0), localTempMGF);
+            extractor = new PrideAsapExtractor(assay.getAssayAccession(),assayIdentFiles);
             //extract parameters
             System.out.println("Extracting search parameters");
-            SearchParameters searchParameters = extractor.getSearchParametersFileForProject();
+            SearchParameters searchParameters = extractor.inferSearchParameters();
             File outputParameters = new File(assayOutputFolder, assay.getAssayAccession() + ".par");
 
             SearchParameters.saveIdentificationParameters(searchParameters, outputParameters);

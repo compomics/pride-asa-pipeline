@@ -1,79 +1,123 @@
 package com.compomics.pride_asa_pipeline.core.logic.parameters;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.core.logic.AbstractSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.logic.enzyme.EnzymePredictor;
-import com.compomics.pride_asa_pipeline.core.logic.modification.PTMMapper;
-import com.compomics.pride_asa_pipeline.core.repository.FileParser;
-import com.compomics.pride_asa_pipeline.core.repository.factory.FileParserFactory;
-import com.compomics.pride_asa_pipeline.core.service.FileModificationService;
-import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
+import com.compomics.pride_asa_pipeline.core.logic.modification.UniModFactory;
+import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.UtilitiesPTMAdapter;
+import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.util.experiment.biology.Enzyme;
+import com.compomics.util.experiment.biology.PTM;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.geneontology.oboedit.dataadapter.GOBOParseException;
-import org.springframework.context.ApplicationContext;
 import org.xmlpull.v1.XmlPullParserException;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
 import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
 public abstract class PrideAsapInterpreter {
 
-    protected ApplicationContext applicationContext;
-    protected static FileSpectrumAnnotator fileSpectrumAnnotator;
-    // parser that handles the identifications
-    protected FileParser parser;
+    /**
+     * The spectrum annotator
+     */
+    protected static AbstractSpectrumAnnotator spectrumAnnotator;
+    /**
+     * A logger
+     */
     private static final Logger LOGGER = Logger.getLogger(PrideAsapInterpreter.class);
-    // input file (PRIDEXML / MZID)
-    private File identificationsFile;
-    // the enzyme that was highlighted as most likely 
+    /**
+     * The best fitting enzyme
+     */
     private Enzyme mainEnzyme;
-    EnzymePredictor predictor;
-    // the amount of estimated missed cleavages
-    private int missedCleavages;
-    // charge states (TODO infer this as well?)
-    private final int maxCharge = 5;
-    private final int minCharge = 1;
-    // the likely mass errors
-    private double mostLikelyPrecursorError;
-    private double mostLikelyFragIonAcc;
-
-    private final boolean useAbsoluteMassDelta = true;
-
-    private PrideAsapStats fragmentIonStats = new PrideAsapStats(useAbsoluteMassDelta);
-    private PrideAsapStats precursorStats = new PrideAsapStats(useAbsoluteMassDelta);
-
-    private double considerationThreshold;
-    private final double fixedThreshold = 0.8;
-
-    private final double modificationConsiderationConfidence = 2.5;
-    private PTMMapper prideToPtmMapper;
-    private Map<Modification, Double> modificationRates = new HashMap<>();
-    private HashMap<String, Boolean> asapMods = new HashMap<>();
-    protected PtmSettings ptmSettings;
-    private ArrayList<String> unknownMods = new ArrayList<>();
+    /**
+     * The amount of missed cleavages (default = 2)
+     */
+    private int missedCleavages = 2;
+    /**
+     * The ratio of missed cleavages
+     */
     double missedCleavageRatio;
+    /**
+     * An ordened set of the encountered charges
+     */
+    private final TreeSet<Integer> encounteredCharges = new TreeSet<>();
+    /**
+     * The most likely inferred precursor error (default to 0.6)
+     */
+    private double mostLikelyPrecursorError = 0.6;
+    /**
+     * The most likely inferred fragment ion error (default to 0.6)
+     */
+    private double mostLikelyFragIonAcc = 0.6;
+    /**
+     * Boolean indicating to use absolute mass errors in the statistical
+     * inference
+     */
+    private final boolean useAbsoluteMassDelta = true;
+    /**
+     * An statistics object for the fragment ions
+     */
+    private PrideAsapStats fragmentIonStats = new PrideAsapStats(useAbsoluteMassDelta);
+    /**
+     * An statistics object for the precursor ion stats
+     */
+    private PrideAsapStats precursorStats = new PrideAsapStats(useAbsoluteMassDelta);
+    /**
+     * The consideration threshold for modifications. At least this value must
+     * carry the modification for it to be considered in the extraction (default
+     * = 5%)
+     */
+    private double considerationThreshold = 0.05;
+    /**
+     * The threshold for fixed modifications
+     */
+    private final double fixedThreshold = 0.8;
+    /**
+     * The confidence in which the modification consideration should lie (using
+     * a percentile for this value)
+     */
+    private final double modificationConsiderationConfidence = 2.5;
+    /**
+     * The rates in which modifications occur on the provided identifications
+     */
+    private Map<Modification, Double> modificationRates = new HashMap<>();
+    /**
+     * The ptm settings (former modification profile)
+     */
+    protected PtmSettings ptmSettings;
+    /**
+     * A full list of complete peptide objects
+     */
     private List<Peptide> completePeptides;
+    /**
+     * A list of mod terms that are actually MS1 / QUANT terms
+     */
+    private final List<String> quantTerms = Arrays.asList(new String[]{"itraq", "tmt", "silac"});
 
-    private List<String> quantTerms = Arrays.asList(new String[]{"itraq", "tmt", "silac"});
-
-    public PrideAsapInterpreter(File identificationsFile, File peakFile) throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException {
-        init(identificationsFile, peakFile);
+    /**
+     * Creates a new interpreter
+     *
+     * @param assay the assay to interpret
+     * @throws IOException
+     * @throws ClassNotFoundException
+     * @throws MzXMLParsingException
+     * @throws JMzReaderException
+     */
+    public PrideAsapInterpreter(String assay) throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException {
+        init(assay);
     }
 
     public PtmSettings getPtmSettings() {
@@ -84,21 +128,10 @@ public abstract class PrideAsapInterpreter {
         this.ptmSettings = modProfile;
     }
 
-    private void init(File identificationsFile, File peakFile) throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException {
-        this.identificationsFile = identificationsFile;
-        this.parser = FileParserFactory.getFileParser(identificationsFile);
-        parser.attachSpectra(peakFile);
-        ApplicationContextProvider.getInstance().setDefaultApplicationContext();
-        applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+    private void init(String assay) throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException {
         try {
-            fileSpectrumAnnotator = (FileSpectrumAnnotator) applicationContext.getBean("fileSpectrumAnnotator");
-            LOGGER.debug("Setting up Pride ASAP for interpretation of inputfile");
-            LOGGER.debug("Setting up modification-service");
-            LOGGER.debug("Annotating spectra");
-            fileSpectrumAnnotator.setFileParser(parser);
-            fileSpectrumAnnotator.initIdentifications(this.identificationsFile);
-            fileSpectrumAnnotator.annotate();
-
+            spectrumAnnotator.initIdentifications(assay);
+            spectrumAnnotator.annotate(assay);
             //try to find the used modifications
             inferModifications();
             //recalibrate errors
@@ -117,25 +150,13 @@ public abstract class PrideAsapInterpreter {
 
     }
 
-    /**
-     *
-     * @return the analyzerdata for the input file.
-     */
-    public Set<AnalyzerData> getInstrumentsForProject() {
-        LOGGER.info("Getting instrument parameters");
-        AnalyzerData lAnalyzerData;
-        lAnalyzerData = fileSpectrumAnnotator.getExperimentService().getAnalyzerData();
-        HashSet<AnalyzerData> lResults = new HashSet<>();
-        lResults.add(lAnalyzerData);
-        return lResults;
-    }
-
     private void recalibrateMachineAccuraccy() throws IOException {
-        List<Identification> experimentIdentifications = fileSpectrumAnnotator.getSpectrumAnnotatorResult().getUnmodifiedPrecursors();
+        List<Identification> experimentIdentifications = spectrumAnnotator.getSpectrumAnnotatorResult().getUnmodifiedPrecursors();
         HashSet<Identification> alreadyProcessedIdentifications = new HashSet<>();
         precursorStats.clear();
         fragmentIonStats.clear();
         for (Identification anIdentification : experimentIdentifications) {
+            encounteredCharges.add(anIdentification.getPeptide().getCharge());
             if (!alreadyProcessedIdentifications.contains(anIdentification)) {
                 alreadyProcessedIdentifications.add(anIdentification);
                 if (anIdentification.getPipelineExplanationType() != null) {
@@ -156,7 +177,7 @@ public abstract class PrideAsapInterpreter {
             }
         }
         LOGGER.info("Attempting to find best suited precursor accuraccy (both sides)...");
-        precursorStats = fileSpectrumAnnotator.getMassDeltaExplainer().getExplainedMassDeltas();
+        precursorStats = spectrumAnnotator.getMassDeltaExplainer().getExplainedMassDeltas();
         mostLikelyPrecursorError = precursorStats.calculateOptimalMassError();
         if (mostLikelyPrecursorError == Double.NaN
                 || mostLikelyPrecursorError == Double.NEGATIVE_INFINITY
@@ -186,11 +207,11 @@ public abstract class PrideAsapInterpreter {
     private void inferModifications() throws XmlPullParserException, IOException, GOBOParseException {
         //FIND NEW MODIFICATIONS       
         LOGGER.info("FINDING PRIDE-ASAP MODIFICATIONS");
-        prideToPtmMapper = PTMMapper.getInstance();
         //annotate spectra
-        FileModificationService modificationService = (FileModificationService) fileSpectrumAnnotator.getModificationService();
-        Map<Modification, Integer> lPrideAsapModificationsMap = modificationService.getUsedModifications(fileSpectrumAnnotator.getSpectrumAnnotatorResult());
-        modificationRates = modificationService.estimateModificationRate(lPrideAsapModificationsMap, fileSpectrumAnnotator.getSpectrumAnnotatorResult(), fixedThreshold);
+        HashMap<String, Boolean> asapMods = new HashMap<>();
+        ModificationService modificationService = spectrumAnnotator.getModificationService();
+        Map<Modification, Integer> lPrideAsapModificationsMap = modificationService.getUsedModifications(spectrumAnnotator.getSpectrumAnnotatorResult());
+        modificationRates = modificationService.estimateModificationRate(lPrideAsapModificationsMap, spectrumAnnotator.getSpectrumAnnotatorResult(), fixedThreshold);
 
 // Write annotation scores 
         // Check pride discovered mods
@@ -217,22 +238,35 @@ public abstract class PrideAsapInterpreter {
                 }
             }
         }
-        unknownMods = new ArrayList<>();
-        ptmSettings = prideToPtmMapper.buildUniqueMassModProfile(asapMods, unknownMods, mostLikelyPrecursorError);
-        prideToPtmMapper.clear();
+        ModificationAdapter adapter = new UtilitiesPTMAdapter();
+        HashSet<Double> encounteredMasses = new HashSet<>();
+        for (Map.Entry<String, Boolean> aMod : asapMods.entrySet()) {
+            PTM aUtilitiesMod = (PTM) UniModFactory.getInstance().getModification(adapter, aMod.getKey());
+            if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
+                encounteredMasses.add(aUtilitiesMod.getRoundedMass());
+                if (aMod.getValue()) {
+                    ptmSettings.addFixedModification(aUtilitiesMod);
+                } else {
+                    ptmSettings.addVariableModification(aUtilitiesMod);
+                }
+            } else {
+                LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
+            }
+        }
     }
 
     private void inferEnzyme() throws IOException, FileNotFoundException, ClassNotFoundException, XmlPullParserException {
-        completePeptides = fileSpectrumAnnotator.getExperimentService().loadExperimentIdentifications().getCompletePeptides();
-        List<String> completePeptideSequences = new ArrayList<>();
-        predictor = new EnzymePredictor();
-        for (Peptide aPeptide : completePeptides) {
-            completePeptideSequences.add(aPeptide.getSequenceString());
+        completePeptides = spectrumAnnotator.getIdentifications().getCompletePeptides();
+        EnzymePredictor predictor = new EnzymePredictor();
+        try {
+            predictor.addPeptideObjects(completePeptides);
+            mainEnzyme = predictor.estimateBestEnzyme();
+            missedCleavages = predictor.getMissCleavages();
+            missedCleavageRatio = predictor.getMissedCleavageRatio();
+        } finally {
+            predictor.clear();
         }
-        predictor.addPeptideObjects(completePeptides);
-        mainEnzyme = predictor.estimateBestEnzyme();
-        missedCleavages = predictor.getMissCleavages();
-        missedCleavageRatio = predictor.getMissedCleavageRatio();
+
     }
 
     private double calculateConsiderationThreshold() {
@@ -250,10 +284,6 @@ public abstract class PrideAsapInterpreter {
         return fixedThreshold;
     }
 
-    public File getInputFile() {
-        return identificationsFile;
-    }
-
     public Enzyme getMainEnzyme() {
         return mainEnzyme;
     }
@@ -263,11 +293,11 @@ public abstract class PrideAsapInterpreter {
     }
 
     public int getMaxCharge() {
-        return maxCharge;
+        return encounteredCharges.last();
     }
 
     public int getMinCharge() {
-        return minCharge;
+        return encounteredCharges.first();
     }
 
     public double getPrecursorAccuraccy() {
@@ -290,32 +320,23 @@ public abstract class PrideAsapInterpreter {
         return precursorStats;
     }
 
+    /**
+     * Clears the resources
+     */
     public void clear() {
-        //cleanup the pipeline
-        //   PTMFactory.getInstance().clearFactory();
-        if (fileSpectrumAnnotator != null) {
-            fileSpectrumAnnotator.clearPipeline();
-            fileSpectrumAnnotator.clearTmpResources();
+        if (spectrumAnnotator != null) {
+            spectrumAnnotator.clearPipeline();
+            spectrumAnnotator.clearTmpResources();
         }
         fragmentIonStats.clear();
         precursorStats.clear();
         if (modificationRates != null) {
             modificationRates.clear();
         }
-        if (parser != null) {
-            parser.clear();
-        }
-        asapMods.clear();
-        unknownMods.clear();
-        if (predictor != null) {
-            predictor.clear();
-        }
         if (completePeptides != null) {
             completePeptides.clear();
         }
-        if (prideToPtmMapper != null) {
-            prideToPtmMapper.clear();
-        }
+        encounteredCharges.clear();
     }
 
 }

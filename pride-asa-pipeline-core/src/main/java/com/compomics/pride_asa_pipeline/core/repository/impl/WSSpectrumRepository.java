@@ -2,7 +2,9 @@ package com.compomics.pride_asa_pipeline.core.repository.impl;
 
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.DefaultMGFExtractor;
 import com.compomics.pride_asa_pipeline.model.Peak;
+import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
 import com.compomics.util.io.FTPDownloader;
+import com.compomics.util.io.compression.ZipUtils;
 import com.compomics.util.pride.PrideWebService;
 import com.compomics.util.pride.prideobjects.webservice.file.FileDetail;
 import com.compomics.util.pride.prideobjects.webservice.file.FileDetailList;
@@ -44,7 +46,7 @@ public class WSSpectrumRepository extends JdbcSpectrumRepository {
     /**
      * The merged peak file (in case there are multiple assay peak files)
      */
-    private File mergedPeakFile;
+    private static File mergedPeakFile;
     /**
      * The mgfExtractor for the merged peak file (to query)
      */
@@ -167,24 +169,53 @@ public class WSSpectrumRepository extends JdbcSpectrumRepository {
             while ((len = gzis.read(buffer)) > 0) {
                 out.write(buffer, 0, len);
             }
-            System.out.println("Done");
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.error(ex);
         }
     }
 
     private void mergeMGFFiles(File motherFile, File daughterFile) throws IOException {
-        String file1Str = FileUtils.readFileToString(daughterFile);
+        String mgfAsString = FileUtils.readFileToString(daughterFile);
         FileWriter writer = new FileWriter(motherFile, true);
-        writer.append(file1Str);
+        writer.append(mgfAsString);
     }
 
     /**
      * returns the master peak file for the assay
+     *
      * @return the merged peak file
      */
-    public File getMergedMGF() {
+    public static File getHandledMGF() {
         return mergedPeakFile;
+    }
+
+    /**
+     * returns the master peak file for the assay
+     *
+     * @param destinationFolder the folder where the MGF has to be stored
+     *
+     * @return the moved peak file
+     */
+    public static File moveHandledMGF(File destinationFolder) throws IOException {
+        File targetFile = new File(destinationFolder, mergedPeakFile.getName());
+        if (mergedPeakFile.renameTo(targetFile)) {
+            LOGGER.debug("File is moved successful!");
+        } else {
+            throw new IOException("Could not move file !");
+        }
+        return targetFile;
+    }
+
+    /**
+     * returns the master peak file for the assay
+     *
+     * @param destinationFolder the folder where the MGF has to be stored
+     * @return the moved and zipped peak file
+     */
+    public static File moveAndZipHandledMGF(File destinationFolder) throws IOException {
+        File targetFile = new File(destinationFolder, mergedPeakFile.getName() + ".zip");
+        ZipUtils.zip(mergedPeakFile, targetFile, new WaitingHandlerCLIImpl(), mergedPeakFile.length());
+        return targetFile;
     }
 
 }

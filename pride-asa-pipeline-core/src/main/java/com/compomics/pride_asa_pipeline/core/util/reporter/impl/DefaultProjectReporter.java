@@ -108,7 +108,6 @@ public class DefaultProjectReporter extends ProjectReporter {
         LOGGER.info("Pride asap extraction report");
         LOGGER.info("General parameters");
         LOGGER.info("___________________________");
-        LOGGER.info("File : " + extractor.getInputFile().getName());
         LOGGER.info("Generating modification report");
         generateModReport();
         LOGGER.info("Generating precursor accuraccy report");

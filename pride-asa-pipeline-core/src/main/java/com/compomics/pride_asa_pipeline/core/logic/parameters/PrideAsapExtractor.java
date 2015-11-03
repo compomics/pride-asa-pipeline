@@ -1,16 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.pride_asa_pipeline.core.logic.parameters;
 
-import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.core.repository.impl.WSSpectrumRepository;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.geneontology.oboedit.dataadapter.GOBOParseException;
 import org.xmlpull.v1.XmlPullParserException;
@@ -19,22 +14,32 @@ import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
 /**
  *
- * @author Kenneth
+ * @author Kenneth Verheggen
  */
 public class PrideAsapExtractor extends PrideAsapInterpreter {
 
+    /**
+     * The output parameters file
+     */
     private File searchparametersfile;
-    private static final Logger LOGGER = Logger.getLogger(PrideAsapExtractor.class);
-    private SearchParameters parameters;
-    private File fastaFile;
-    private final File mgfFile;
 
-    public PrideAsapExtractor(File identificationsFile, File peakFile) throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException, XmlPullParserException {
-        super(identificationsFile, peakFile);
-        String ext = FilenameUtils.getExtension(identificationsFile.getAbsolutePath());
-        String fileName = identificationsFile.getName().substring(0, identificationsFile.getName().lastIndexOf(ext));
-        searchparametersfile = new File(identificationsFile.getParentFile(), fileName + "par");
-        mgfFile = new File(identificationsFile.getParentFile(), fileName + "mgf");
+    /**
+     * A logger
+     */
+    private static final Logger LOGGER = Logger.getLogger(PrideAsapExtractor.class);
+    /**
+     * The searchparameter object
+     */
+    private SearchParameters parameters;
+    /**
+     * The outputfolder for the parameter file and the MGF file
+     */
+    private final File outputFolder;
+
+    public PrideAsapExtractor(String assay, File outputFolder) throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException, XmlPullParserException {
+        super(assay);
+        this.outputFolder = outputFolder;
+        searchparametersfile = new File(outputFolder, assay + ".asap.par");
         LOGGER.info("Spectrumannotator delivered was initialized");
     }
 
@@ -84,26 +89,15 @@ public class PrideAsapExtractor extends PrideAsapInterpreter {
         parameters.setnMissedCleavages(getMostLikelyMissedCleavages());
     }
 
-    private void setFasta() {
+    private void setFasta(File fastaFile) {
         LOGGER.info("Setting fasta file...");
         parameters.setFastaFile(fastaFile);
     }
 
-    public void setFastaFile(File fastaFile) {
-        this.fastaFile = fastaFile;
-    }
-
-    public File getMGFFileForProject() throws JMzReaderException, IOException, MGFExtractionException {
-        parser.saveMGF(mgfFile);
-        return mgfFile;
-    }
-
-    public File getMGFFileForProject(File spectrumLogFile) throws JMzReaderException, IOException, MGFExtractionException {
-        parser.saveMGF(mgfFile, spectrumLogFile);
-        return mgfFile;
-    }
-
-    public SearchParameters getSearchParametersFileForProject() throws XmlPullParserException, IOException, GOBOParseException {
+    /*
+     * Returns the fully inferred parameters for a given assay
+     */
+    public SearchParameters inferSearchParameters() throws XmlPullParserException, IOException, GOBOParseException {
         initialize();
         try {
             System.out.print("Determining mass error settings...");
@@ -120,7 +114,6 @@ public class PrideAsapExtractor extends PrideAsapInterpreter {
         System.out.print("Determining charge settings...");
         setConsideredCharges();
         System.out.println("--Done");
-        setFasta();
         try {
             System.out.print("Determining Modification profile settings...");
             setModifications();
@@ -134,28 +127,34 @@ public class PrideAsapExtractor extends PrideAsapInterpreter {
         return parameters;
     }
 
-    public void save(File outputFile, boolean override) throws IOException {
-        LOGGER.info("Saving parameters to " + outputFile);
-        //CREATE AN EMPTY FILE
-        if (outputFile.exists()) {
-            if (override) {
-                outputFile.delete();
-            } else {
-                throw new IOException("File already exists !");
+    /**
+     * Saves the searchparameters and the related spectra to the specified
+     * outputfolder
+     *
+     * @param outputFolder the output folder
+     * @param savemgf boolean indicating if the mgf file should be saved
+     * @param override boolean indicating if the parameters should be overridden
+     * @throws IOException
+     */
+    public void save(File outputFolder, boolean savemgf, boolean override) throws IOException, FileNotFoundException, ClassNotFoundException {
+        File parameterFile = new File(outputFolder, searchparametersfile.getName());
+        outputFolder.mkdirs();
+        if (searchparametersfile != parameterFile) {
+            LOGGER.info("Saving parameters to " + parameterFile);
+            //CREATE AN EMPTY FILE
+            if (parameterFile.exists()) {
+                if (override) {
+                    parameterFile.delete();
+                } else {
+                    throw new IOException("File already exists !");
+                }
             }
-        }
-        outputFile.getParentFile().mkdirs();
-        outputFile.createNewFile();
-        searchparametersfile = outputFile;
-        try {
             SearchParameters.saveIdentificationParameters(parameters, searchparametersfile);
-        } catch (FileNotFoundException | ClassNotFoundException ex) {
-            LOGGER.error(ex);
+        }
+        if (savemgf) {
+            //move the MGF file
+            LOGGER.info("Saving mgf file...");
+            File moveHandledMGF = WSSpectrumRepository.moveHandledMGF(outputFolder);
         }
     }
-
-    public double getMostLikelyMissedCleavageRate() {
-        return missedCleavageRatio;
-    }
-
 }
