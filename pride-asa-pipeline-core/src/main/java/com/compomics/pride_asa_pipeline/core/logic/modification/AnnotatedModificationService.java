@@ -29,16 +29,16 @@ public class AnnotatedModificationService {
 
     }
 
-    private String[] getProjectAnnotatedPTMs(String projectAccession) throws IOException {
+    public String[] getProjectAnnotatedPTMs(String projectAccession) throws IOException {
         return PrideWebService.getProjectDetail(projectAccession).getPtmNames();
     }
 
-    private String[] getAssayAnnotatedPTMs(String assayAccession) throws IOException {
+    public String[] getAssayAnnotatedPTMs(String assayAccession) throws IOException {
         String projectAccession = PrideWebService.getAssayDetail(assayAccession).getProjectAccession();
         return PrideWebService.getProjectDetail(projectAccession).getPtmNames();
     }
 
-    private List<Modification> convertToAsapMods(String[] ptmNames) {
+    public List<Modification> convertToAsapMods(String[] ptmNames) {
         List<Modification> asapMods = new ArrayList<>();
         for (String aPTMName : ptmNames) {
             asapMods.add((Modification) factory.getModification(asapAdapter, aPTMName));
@@ -67,5 +67,5 @@ public class AnnotatedModificationService {
     public List<Modification> getAssayAnnotatedModifications(String assayAccession) throws IOException {
         return convertToAsapMods(getAssayAnnotatedPTMs(assayAccession));
     }
-
+    
 }

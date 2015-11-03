@@ -2,8 +2,10 @@ package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.impl.MassDeltaExplainerImpl;
+import com.compomics.pride_asa_pipeline.core.logic.modification.AnnotatedModificationService;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
-import com.compomics.pride_asa_pipeline.core.logic.modification.impl.OmssaModificationMarshallerImpl;
+import com.compomics.pride_asa_pipeline.core.logic.modification.UniModFactory;
+import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
@@ -14,7 +16,6 @@ import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.service.SpectrumService;
-import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.AnnotationData;
@@ -25,16 +26,18 @@ import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import org.apache.log4j.Logger;
-import org.jdom2.JDOMException;
 import org.springframework.core.io.Resource;
 
 /**
@@ -190,10 +193,6 @@ public abstract class AbstractSpectrumAnnotator<T> {
      */
     public abstract void clearTmpResources();
 
-    public static void main(String[] args) {
-        new FileSpectrumAnnotator().annotate();
-    }
-
     /**
      * Public methods.
      */
@@ -201,14 +200,28 @@ public abstract class AbstractSpectrumAnnotator<T> {
      * Annotate the experiment identifications in multiple passes according to
      * the modification prevalence in PRIDE.
      */
-    public void annotate() {
+    public void annotate(String... identifier) {
+        if (identifier != null) {
+            throw new IllegalArgumentException("Identifier can not be null : expected assay accession");
+        }
         try {
-            //unmarshal the searchgui mods ad their prevalences
-            OmssaModificationMarshallerImpl marshaller = new OmssaModificationMarshallerImpl();
-            Set<Modification> ordenedModifications = marshaller.unmarshall(ResourceUtils.getResourceByRelativePath("/resources/searchGUI_to_pride_mods_common.xml"));
+            String assayAccession = identifier[0];
+            //load the modifications from the PRIDE annotation
+            AnnotatedModificationService annotatedModService = new AnnotatedModificationService();
+            List<String> assayAnnotatedModificationNames = Arrays.asList(annotatedModService.getAssayAnnotatedPTMs(assayAccession));
+            //order the annotated modifications to prevalence (in case there are more than the selected batch size)
+            LinkedList<Object> sortedAnnotatedModifications = UniModFactory.orderModificationsToPrevalence(assayAnnotatedModificationNames, new AsapModificationAdapter());
+            //get all asap mods
+            Set<Modification> sortedAllModifications = UniModFactory.getAsapMods();
             //get a queue of them
-            BlockingQueue<Modification> modQueue = new ArrayBlockingQueue<>(ordenedModifications.size());
-            for (Modification mod : ordenedModifications) {
+            BlockingQueue<Modification> modQueue = new ArrayBlockingQueue<>(sortedAllModifications.size());
+            //first get the annotated modifications and order those as well?
+            for (Object mod : sortedAnnotatedModifications) {
+                modQueue.offer((Modification) mod);
+                sortedAllModifications.remove((Modification) mod);
+            }
+            //add the others
+            for (Modification mod : sortedAllModifications) {
                 modQueue.offer(mod);
             }
             //drain the queue in subset parts
@@ -238,7 +251,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             spectrumAnnotatorResult.setUnexplainedIdentifications(unexplainedIdentifications);
             spectrumAnnotatorResult.setUnmodifiedPrecursors(unmodifiedPrecursors);
             spectrumAnnotatorResult.setModifiedPrecursors(modifiedPrecursors);
-        } catch (JDOMException ex) {
+        } catch (IOException ex) {
             LOGGER.error(ex);
         }
     }

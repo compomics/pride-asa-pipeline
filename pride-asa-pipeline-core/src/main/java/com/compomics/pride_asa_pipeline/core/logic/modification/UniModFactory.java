@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
@@ -200,6 +201,26 @@ public class UniModFactory {
         JsonMarshaller marshaller = new JsonMarshaller();
         marshaller.saveObjectToJson(mods, outputFile);
         return mods;
+    }
+
+    public static LinkedList<Object> orderModificationsToPrevalence(Collection<String> ptmNames, ModificationAdapter adapter) {
+        TreeSet<UniModModification> orderedModifications = orderModificationsToPrevalence(ptmNames);
+        LinkedList<Object> orderedConvertedModifications = new LinkedList<>();
+        for (UniModModification aModification : orderedModifications) {
+            orderedConvertedModifications.add(adapter.convertModification(aModification));
+        }
+        return orderedConvertedModifications;
+    }
+
+    public static TreeSet<UniModModification> orderModificationsToPrevalence(Collection<String> ptmNames) {
+        TreeSet<UniModModification> orderedModifications = new TreeSet<>();
+        for (String aPTMName : ptmNames) {
+            UniModModification uniModModification = modificationMap.get(aPTMName);
+            if (uniModModification != null) {
+                orderedModifications.add(uniModModification);
+            }
+        }
+        return orderedModifications;
     }
 
     private static class UniModOccurenceGetter implements Callable<UniModModification> {
