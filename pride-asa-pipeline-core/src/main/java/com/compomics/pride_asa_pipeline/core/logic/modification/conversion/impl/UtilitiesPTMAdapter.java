@@ -57,13 +57,13 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
         decreaseMassChain = new AtomChain();
         decreaseMassChain.setAddition(false);
         LOGGER.debug("Getting target residues");
-        fetchTargetResidues(mod.getPtm());
+        fetchTargetResidues(mod);
         LOGGER.debug("Parsing PTM composition");
-        parseFormula(mod.getPtm().getFormula(), " ");
+        parseFormula(mod.getFormula(), " ");
         AminoAcidPattern pattern = new AminoAcidPattern(targetResiduesString);
         LOGGER.debug("Inferring modification type");
-        int type = getModType(mod.getPtm());
-        return new PTM(type, mod.getPtm().getName(), mod.getPtm().getAccession(), increaseMassChain, decreaseMassChain, pattern);
+        int type = getModType(mod);
+        return new PTM(type, mod.getName(), mod.getAccession(), increaseMassChain, decreaseMassChain, pattern);
     }
 
     private void fetchTargetResidues(uk.ac.ebi.pridemod.model.PTM ptm) {

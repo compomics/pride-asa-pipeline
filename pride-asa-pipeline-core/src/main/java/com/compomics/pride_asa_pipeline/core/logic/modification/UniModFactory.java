@@ -3,7 +3,6 @@ package com.compomics.pride_asa_pipeline.core.logic.modification;
 import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.UniModModification;
 import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.AsapModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.io.json.JsonMarshaller;
 import com.compomics.util.pride.PrideWebService;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -24,7 +22,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
+import org.springframework.core.io.ClassPathResource;
 import uk.ac.ebi.pridemod.ModReader;
+import uk.ac.ebi.pridemod.model.UniModPTM;
 
 /**
  *
@@ -54,7 +54,7 @@ public class UniModFactory {
      */
     private final INIT_MODE mode;
 
-    private static enum INIT_MODE {
+    protected static enum INIT_MODE {
 
         ONLINE, OFFLINE;
     }
@@ -77,9 +77,11 @@ public class UniModFactory {
         this.mode = mode;
         try {
             if (mode.equals(INIT_MODE.OFFLINE)) {
-                init(ResourceUtils.getResourceByRelativePath("resources/pride_mods.json").getFile());
+                //TODO TURN THIS INTO A STREAM
+                File jsonLib = new ClassPathResource("resources/pride_mods.json").getFile();
+                init(jsonLib);
+              //  jsonLib.delete();
             } else {
-
                 init();
             }
         } catch (IOException | InterruptedException ex) {
@@ -97,7 +99,7 @@ public class UniModFactory {
     private void init(File inputFile) throws IOException {
         Collection<UniModModification> fromFile = getFromFile(inputFile);
         for (UniModModification aUniMod : fromFile) {
-            modificationMap.put(aUniMod.getPtm().getName(), aUniMod);
+            modificationMap.put(aUniMod.getName(), aUniMod);
         }
     }
 
@@ -111,7 +113,7 @@ public class UniModFactory {
     private void init() throws IOException, InterruptedException {
         Collection<UniModModification> fromFile = getFromPRIDE();
         for (UniModModification aUniMod : fromFile) {
-            modificationMap.put(aUniMod.getPtm().getName(), aUniMod);
+            modificationMap.put(aUniMod.getName(), aUniMod);
         }
     }
 
@@ -151,12 +153,26 @@ public class UniModFactory {
         return pride_mods;
     }
 
-    private static Collection<UniModModification> getFromFile(File inputFile) throws IOException {
+    private static TreeSet<UniModModification> getFromFile(File inputFile) throws IOException {
         JsonMarshaller marshaller = new JsonMarshaller();
         LOGGER.debug("Getting modifications from file...");
-        java.lang.reflect.Type type = new TypeToken<List<UniModModification>>() {
+        java.lang.reflect.Type type = new TypeToken<TreeSet<UniModModification>>() {
         }.getType();
-        return (Collection<UniModModification>) marshaller.fromJson(type, inputFile);
+        return (TreeSet<UniModModification>) marshaller.fromJson(type, inputFile);
+    }
+
+    public static void main(String[] args) throws IOException {
+        UniModFactory factory = getInstance(INIT_MODE.OFFLINE);
+        LinkedHashMap<String, UniModModification> modificationMap1 = factory.getModificationMap();
+        TreeSet<UniModModification> mods = new TreeSet<>();
+        for (UniModModification aMod : modificationMap1.values()) {
+            mods.add(aMod);
+        }
+        JsonMarshaller marshaller = new JsonMarshaller();
+        File file = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\pride_mods.json");
+        marshaller.saveObjectToJson(mods, file);
+        TreeSet<UniModModification> fromPRIDE = getFromFile(file);
+        System.out.println(fromPRIDE.first().getAccession());
     }
 
     public static TreeSet<UniModModification> getFromPRIDE() throws InterruptedException, IOException {
@@ -188,8 +204,8 @@ public class UniModFactory {
             try {
                 UniModModification get = aUniModFuture.get();
                 if (get.getFrequency() > 0 | prideFilters.isEmpty()) {
-                    Double monoDeltaMass = get.getPtm().getMonoDeltaMass();
-                    Double avgDeltaMass = get.getPtm().getAveDeltaMass();
+                    Double monoDeltaMass = get.getMonoDeltaMass();
+                    Double avgDeltaMass = get.getAveDeltaMass();
                     if (monoDeltaMass != null && avgDeltaMass != null && monoDeltaMass != 0.0 && avgDeltaMass != 0.0) {
                         mods.add(get);
                     }
@@ -249,11 +265,17 @@ public class UniModFactory {
         public UniModModification call() {
             int size = 0;
             try {
-                size = PrideWebService.getProjectCount(aPTM.getName().replace(":", "-").replace(" ", "_").replace("/", "").replace("\\", ""));
+                System.out.println("Querying " + aPTM.getName());
+                size = PrideWebService.getProjectCount(aPTM.getAccession().replace(":", "-").replace(" ", "_").replace("/", "").replace("\\", ""));
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return new UniModModification(aPTM, size);
+            if (aPTM instanceof UniModPTM) {
+                return new UniModModification(aPTM, size);
+            } else {
+                return new UniModModification(aPTM, size);
+            }
+
         }
     }
 

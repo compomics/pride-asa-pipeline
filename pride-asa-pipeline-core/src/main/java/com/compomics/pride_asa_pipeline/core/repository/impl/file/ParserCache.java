@@ -60,7 +60,7 @@ public class ParserCache {
      * @throws IOException if the fileparser can not be constructed
      */
     public CachedDataAccessController getParser(String experimentAccession, File identificationsFile, boolean inMemory) {
-        if (!parserCache.containsKey(identificationsFile.getName())) {
+        if (!parserCache.containsKey(experimentAccession)) {
             if (identificationsFile.getName().toUpperCase().endsWith(".XML")) {
                 PrideXmlControllerImpl prideXmlControllerImpl = new PrideXmlControllerImpl(identificationsFile);
                 parserCache.put(experimentAccession, prideXmlControllerImpl);

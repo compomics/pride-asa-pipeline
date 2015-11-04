@@ -28,8 +28,8 @@ public class AnnotatedModificationService {
     }
 
     public String[] getAssayAnnotatedPTMs(String assayAccession) throws IOException {
-        String projectAccession = PrideWebService.getAssayDetail(assayAccession).getProjectAccession();
-        return PrideWebService.getProjectDetail(projectAccession).getPtmNames();
+        String[] ptmNames = PrideWebService.getAssayDetail(assayAccession).getPtmNames();
+        return ptmNames;
     }
 
     public List<Modification> convertToAsapMods(String[] ptmNames) {
@@ -61,5 +61,5 @@ public class AnnotatedModificationService {
     public List<Modification> getAssayAnnotatedModifications(String assayAccession) throws IOException {
         return convertToAsapMods(getAssayAnnotatedPTMs(assayAccession));
     }
-    
+
 }

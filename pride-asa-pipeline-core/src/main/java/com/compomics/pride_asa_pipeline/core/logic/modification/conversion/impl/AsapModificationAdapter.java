@@ -18,9 +18,8 @@ public class AsapModificationAdapter implements ModificationAdapter<Modification
 
     @Override
     public Modification convertModification(UniModModification mod) {
-        uk.ac.ebi.pridemod.model.PTM ptm = mod.getPtm();
-        Double averageIsotopicMass = ptm.getAveDeltaMass();
-        Double monoIsotopicMass = ptm.getMonoDeltaMass();
+        Double averageIsotopicMass = mod.getAveDeltaMass();
+        Double monoIsotopicMass = mod.getMonoDeltaMass();
         //TODO calcualte this from the formula?
         if (averageIsotopicMass == null) {
             averageIsotopicMass = 0.0;
@@ -30,17 +29,17 @@ public class AsapModificationAdapter implements ModificationAdapter<Modification
         }
         Location modLocation;
         try {
-            modLocation = getLocation(ptm);
+            modLocation = getLocation(mod);
         } catch (NullPointerException e) {
             modLocation = Location.NON_TERMINAL;
         }
-        return new Modification(ptm.getName(),
+        return new Modification(mod.getName(),
                 monoIsotopicMass,
                 averageIsotopicMass,
                 modLocation,
                 affectedAminoAcid,
-                ptm.getAccession(),
-                ptm.getAccession());
+                mod.getAccession(),
+                mod.getAccession());
     }
 
     private Location getLocation(uk.ac.ebi.pridemod.model.PTM ptm) {
