@@ -25,8 +25,12 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
     /**
      * The identifier for the current repository (filename or assay accession)
      */
-    private final String experimentIdentifier;
+    private String experimentIdentifier;
 
+    public FileSpectrumRepository(){
+        
+    }   
+            
     public FileSpectrumRepository(String experimentIdentifier) {
         this.experimentIdentifier = experimentIdentifier;
     }
@@ -35,6 +39,22 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
         this.experimentIdentifier = identificationsFile.getName();
     }
 
+    public String getExperimentIdentifier() {
+        return experimentIdentifier;
+    }
+
+    public void setExperimentIdentifier(String experimentIdentifier) {
+        this.experimentIdentifier = experimentIdentifier;
+    }
+
+    public ParserCache getParserCache() {
+        return parserCache;
+    }
+
+    public void setParserCache(ParserCache parserCache) {
+        this.parserCache = parserCache;
+    }   
+    
     @Override
     public double[] getMzValuesBySpectrumId(String spectrumId) {
         Spectrum spectrumById = parserCache.getParser(experimentIdentifier, true).getSpectrumById(spectrumId);
@@ -66,14 +86,15 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
      * Writes an mgf file with the contents of all cached peak files
      *
      * @param experimentID the assay identifier
-     * @param outputFile the output mgf file
+     * @param outputFile the output folder for mgf files
      * @throws IOException when something goes wrong in the reading or writing
      */
-    public void writeToMGF(File outputFile) throws IOException, MGFExtractionException {
+    public File writeToMGF(File outputFolder) throws IOException, MGFExtractionException {
         final long timeout = 30000;
-        try (FileWriter writer = new FileWriter(outputFile, true)) {
+        File mgf = new File(outputFolder, experimentIdentifier + ".mgf");
+        try (FileWriter writer = new FileWriter(mgf, true)) {
             for (File aPeakFile : parserCache.getPeakFiles(experimentIdentifier)) {
-                File tempOut = new File(aPeakFile.getParentFile(), aPeakFile.getName() + "asap.temp.mgf");
+                File tempOut = new File(aPeakFile.getParentFile(), aPeakFile.getName() + ".asap.temp.mgf");
                 tempOut.deleteOnExit();
                 try {
                     new DefaultMGFExtractor(aPeakFile).extractMGF(tempOut, timeout);
@@ -86,6 +107,6 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
                 }
             }
         }
+        return mgf;
     }
-
 }

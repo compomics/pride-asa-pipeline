@@ -18,7 +18,7 @@ public class FileModificationRepository extends ParserCacheConnector implements 
     /**
      * The identifier for the current repository (filename or assay accession)
      */
-    private final String experimentIdentifier;
+    private String experimentIdentifier;
     /**
      * A logger instance
      */
@@ -36,6 +36,18 @@ public class FileModificationRepository extends ParserCacheConnector implements 
         this.experimentIdentifier = experimentIdentifier;
     }
 
+     public FileModificationRepository() {
+      
+    }
+
+    public String getExperimentIdentifier() {
+        return experimentIdentifier;
+    }
+
+    public void setExperimentIdentifier(String experimentIdentifier) {
+        this.experimentIdentifier = experimentIdentifier;
+    }  
+   
     @Override
     public List<Modification> getModificationsByPeptideId(long peptideID) {
         List<Modification> modificationList = new ArrayList<>();

@@ -11,6 +11,8 @@ import com.compomics.pride_asa_pipeline.core.repository.impl.combo.WebServiceFil
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.ParserCache;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
+import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
+import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
@@ -45,14 +47,22 @@ public class PrideWebProjectFinder {
     }
 
     public void analyze(String assay) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
+        LOGGER.info("Setting up experiment repository for assay " + assay);
         WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository(outputFolder);
         experimentRepository.loadExperimentIdentifications(assay);
         //the cache should only have one for now?
         String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
+        LOGGER.info(entry + " was found in the parser cache");
         //write an MGF with all peakfile information?
+        LOGGER.info("Getting related spectrum files from the cache");
         FileSpectrumRepository spectrumRepository = new FileSpectrumRepository(entry);
-        spectrumRepository.writeToMGF(new File(outputFolder, "merged.mgf"));
+        File mgf = spectrumRepository.writeToMGF(outputFolder);
+        //zip the MGF file
+        File zip = new File(mgf.getAbsolutePath()+".zip");
+        ZipUtils.zip(mgf, zip , new WaitingHandlerCLIImpl(), mgf.length());
+        mgf.delete();
         //do the extraction
+        LOGGER.info("Attempting to infer searchparameters");
         PrideAsapExtractor extractor = new PrideAsapExtractor(entry, outputFolder);
         SearchParameters inferSearchParameters = extractor.inferSearchParameters();
         SearchParameters.saveIdentificationParameters(inferSearchParameters, new File(outputFolder, assay + ".asap.par"));
