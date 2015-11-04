@@ -1,12 +1,13 @@
 package com.compomics.pride_asa_pipeline.core.logic.parameters;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.core.logic.AbstractSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.logic.enzyme.EnzymePredictor;
 import com.compomics.pride_asa_pipeline.core.logic.modification.UniModFactory;
 import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.UtilitiesPTMAdapter;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
+import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
@@ -33,7 +34,7 @@ public abstract class PrideAsapInterpreter {
     /**
      * The spectrum annotator
      */
-    protected static AbstractSpectrumAnnotator spectrumAnnotator;
+    protected static DbSpectrumAnnotator spectrumAnnotator;
     /**
      * A logger
      */
@@ -130,7 +131,11 @@ public abstract class PrideAsapInterpreter {
 
     private void init(String assay) throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException {
         try {
+            //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
+            ApplicationContextProvider.getInstance().setDefaultApplicationContext();
+            spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
             spectrumAnnotator.initIdentifications(assay);
+            LOGGER.info("Spectrumannotator delivered was initialized");
             spectrumAnnotator.annotate(assay);
             //try to find the used modifications
             inferModifications();

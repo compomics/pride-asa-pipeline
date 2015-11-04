@@ -1,6 +1,5 @@
 package com.compomics.pride_asa_pipeline.core.logic.parameters;
 
-import com.compomics.pride_asa_pipeline.core.repository.impl.WSSpectrumRepository;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
 import java.io.File;
@@ -40,7 +39,6 @@ public class PrideAsapExtractor extends PrideAsapInterpreter {
         super(assay);
         this.outputFolder = outputFolder;
         searchparametersfile = new File(outputFolder, assay + ".asap.par");
-        LOGGER.info("Spectrumannotator delivered was initialized");
     }
 
     public SearchParameters getParameters() {
@@ -136,7 +134,7 @@ public class PrideAsapExtractor extends PrideAsapInterpreter {
      * @param override boolean indicating if the parameters should be overridden
      * @throws IOException
      */
-    public void save(File outputFolder, boolean savemgf, boolean override) throws IOException, FileNotFoundException, ClassNotFoundException {
+    public void save(File outputFolder,boolean override) throws IOException, FileNotFoundException, ClassNotFoundException {
         File parameterFile = new File(outputFolder, searchparametersfile.getName());
         outputFolder.mkdirs();
         if (searchparametersfile != parameterFile) {
@@ -150,11 +148,6 @@ public class PrideAsapExtractor extends PrideAsapInterpreter {
                 }
             }
             SearchParameters.saveIdentificationParameters(parameters, searchparametersfile);
-        }
-        if (savemgf) {
-            //move the MGF file
-            LOGGER.info("Saving mgf file...");
-            File moveHandledMGF = WSSpectrumRepository.moveHandledMGF(outputFolder);
         }
     }
 }

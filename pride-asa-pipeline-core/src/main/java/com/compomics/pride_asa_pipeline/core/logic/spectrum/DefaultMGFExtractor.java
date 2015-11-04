@@ -1,20 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.pride_asa_pipeline.core.logic.spectrum;
 
 import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
-import com.compomics.pride_asa_pipeline.model.Peak;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -28,10 +20,8 @@ import java.util.concurrent.TimeoutException;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReader;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
-import uk.ac.ebi.pride.tools.jmzreader.model.Param;
 import uk.ac.ebi.pride.tools.jmzreader.model.Spectrum;
 import uk.ac.ebi.pride.tools.jmzreader.model.impl.CvParam;
-import uk.ac.ebi.pride.tools.jmzreader.model.impl.UserParam;
 import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
 /**
@@ -65,89 +55,46 @@ public class DefaultMGFExtractor {
         jMzReader = SpectrumParserFactory.getJMzReader(inputFile);
     }
 
-    public List<Map<String, Object>> getSpectraMetadata() {
-        List<Map<String, Object>> spectraMetaDataMap = new ArrayList<>();
-        for (String spectrumId : jMzReader.getSpectraIds()) {
-            try {
-                Map<String, Object> spectrumMetaDataList = new HashMap<>();
-                Spectrum spectrum = jMzReader.getSpectrumById(spectrumId);
-                spectrumMetaDataList.put("msLv", spectrum.getMsLevel());
-                for (CvParam aParameter : spectrum.getAdditional().getCvParams()) {
-                    spectrumMetaDataList.put(aParameter.getName(), aParameter.getValue());
-                }
-                for (Param aParameter : spectrum.getAdditional().getParams()) {
-                    spectrumMetaDataList.put(aParameter.getName(), aParameter.getValue());
-                }
-                for (UserParam aParameter : spectrum.getAdditional().getUserParams()) {
-                    spectrumMetaDataList.put(aParameter.getName(), aParameter.getValue());
-                }
-            } catch (JMzReaderException ex) {
-                LOGGER.error(ex);
-            }
-        }
-        return spectraMetaDataMap;
-    }
-
-    public List<String> getSpectrumIds() {
-        return jMzReader.getSpectraIds();
-    }
-
-    public List<Peak> getSpectrumPeaksBySpectrumId(String spectrumId) {
-        List<Peak> myPeakList = new ArrayList<>();
-        try {
-            Spectrum spectrum = jMzReader.getSpectrumById(spectrumId);
-            //check that the spectrum is MS2...
-            if (spectrum.getMsLevel() == 2) {
-                Map<Double, Double> peakList = spectrum.getPeakList();
-                for (Map.Entry<Double, Double> aPeakPair : peakList.entrySet()) {
-                    myPeakList.add(new Peak(aPeakPair.getKey(), aPeakPair.getValue()));
-                }
-            }
-        } catch (JMzReaderException ex) {
-            LOGGER.error(ex);
-        }
-        return myPeakList;
-    }
-
-    public HashMap<Double, Double> getSpectrumPeakMapBySpectrumId(String spectrumId) {
-        HashMap<Double, Double> peakMap = null;
-        try {
-            peakMap = (HashMap<Double, Double>) jMzReader.getSpectrumById(spectrumId).getPeakList();
-        } catch (JMzReaderException ex) {
-            LOGGER.error(ex);
-        }
-        return peakMap;
-    }
-
-    public Spectrum getSpectrumBySpectrumId(String spectrumId) {
-        Spectrum spectrum = null;
-        try {
-            spectrum = jMzReader.getSpectrumById(spectrumId);
-        } catch (NumberFormatException | JMzReaderException ex) {
-            LOGGER.error(ex);
-        }
-        return spectrum;
-    }
-
-    public File extractMGF(File outputFile, long timeout) throws MGFExtractionException, JMzReaderException {
-        OutputStream reportStream = System.out;
-        return extractMGF(outputFile, reportStream, timeout);
-    }
-
+    /**
+     * Convert the peakfile to mgf without reporting
+     *
+     * @param outputFile the output MGF file
+     * @return the extracted MGF file
+     * @throws MGFExtractionException
+     * @throws JMzReaderException
+     */
     public File extractMGF(File outputFile) throws MGFExtractionException, JMzReaderException {
         return extractMGF(outputFile, 30000);
     }
 
     /**
-     * Convert the peakfile to mgf.
+     * Convert the peakfile to mgf without reporting
      *
-     * @param outputFile
-     * @param reportStream
-     * @param timeout
-     * @return
-     * @throws
-     * com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException
-     * @throws uk.ac.ebi.pride.tools.jmzreader.JMzReaderException
+     * @param outputFile the output MGF file
+     * @param timeout the timeout for spectrum retrieval (it sometimes blocks)
+     * @return the extracted MGF file
+     * @throws MGFExtractionException
+     * @throws JMzReaderException
+     */
+    public File extractMGF(File outputFile, long timeout) throws MGFExtractionException, JMzReaderException {
+        OutputStream reportStream = new OutputStream() {
+            @Override
+            public void write(int b) throws IOException {
+                //ignore the message
+            }
+        };
+        return extractMGF(outputFile, reportStream, timeout);
+    }
+
+    /**
+     * Convert the peakfile to mgf without reporting
+     *
+     * @param outputFile the output MGF file
+     * @param reportStream the stream to report to (for example System.out)
+     * @param timeout the timeout for spectrum retrieval (it sometimes blocks)
+     * @return the extracted MGF file
+     * @throws MGFExtractionException
+     * @throws JMzReaderException
      */
     public File extractMGF(File outputFile, OutputStream reportStream, long timeout) throws MGFExtractionException, JMzReaderException {
         try (FileWriter w = new FileWriter(outputFile);
@@ -162,8 +109,6 @@ public class DefaultMGFExtractor {
                 rw.append("Total amount of spectra \t " + spectraCount + System.lineSeparator()).flush();
             }
             int validSpectrumCount = 0;
-
-            System.out.println("Processing Spectra");
             List<String> spectrumIds = jMzReader.getSpectraIds();
             for (String aSpectrumId : spectrumIds) {
                 //this part gets stuck sometimes, no idea why...
@@ -174,7 +119,6 @@ public class DefaultMGFExtractor {
                         asMgf(spectrum, bw);
                         rw.append("VALIDATED" + System.lineSeparator());
                         validSpectrumCount++;
-
                     } else {
                         rw.append("\tNOT FOUND" + System.lineSeparator()).flush();
                     }
@@ -195,32 +139,30 @@ public class DefaultMGFExtractor {
     /**
      * Writes the given spectrum to the buffered writer.
      *
-     * @param spectrum
-     * @param bw
+     * @param spectrum the input spectrum object
+     * @param bw the writer to export the mgf to
      * @return true of the spectrum could be converted to mgf
      * @throws IOException
      */
     public void asMgf(Spectrum spectrum, BufferedWriter bw) throws MGFExtractionException, IOException {
-
         int msLevel = spectrum.getMsLevel();
         Double precursorMz = spectrum.getPrecursorMZ();
         Double precursorIntensity = spectrum.getPrecursorIntensity();
         Integer precursorCharge = spectrum.getPrecursorCharge();
         Double precursorRt = 0.0;
         for (CvParam cvParam : spectrum.getAdditional().getCvParams()) {
-            if (cvParam.getAccession().equalsIgnoreCase("MS:1000894")|cvParam.getAccession().equalsIgnoreCase("PSI:1000039")) {
+            if (cvParam.getAccession().equalsIgnoreCase("MS:1000894") | cvParam.getAccession().equalsIgnoreCase("PSI:1000039")) {
                 precursorRt = Double.parseDouble(cvParam.getValue());
             }
         }
-
-// ignore ms levels other than 2
+// ignore ms levels other than 2 ?
         if (msLevel == 2) {
             // add precursor details
             if (spectrum.getPrecursorMZ() > 0) {
                 bw.write("BEGIN IONS" + System.getProperty("line.separator"));
                 bw.write("TITLE=" + spectrum.getId() + System.getProperty("line.separator"));
                 bw.write("PEPMASS=" + precursorMz);
-  
+
                 if (precursorIntensity != null) {
                     bw.write("\t" + precursorIntensity);
                 }

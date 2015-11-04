@@ -1,5 +1,6 @@
-package com.compomics.pride_asa_pipeline.core.repository.impl;
+package com.compomics.pride_asa_pipeline.core.repository.impl.webservice;
 
+import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
@@ -27,7 +28,7 @@ import org.apache.log4j.Logger;
  *
  * @author Kenneth Verheggen
  */
-public class WSExperimentRepository extends JdbcExperimentRepository {
+public class WSExperimentRepository implements ExperimentRepository {
 
     private static final Logger LOGGER = Logger.getLogger(WSExperimentRepository.class);
 

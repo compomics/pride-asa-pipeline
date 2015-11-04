@@ -9,7 +9,6 @@ import com.compomics.util.experiment.massspectrometry.SpectrumFactory;
 import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import junit.framework.TestCase;
 import org.springframework.core.io.ClassPathResource;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
@@ -49,40 +48,6 @@ public class DefaultMGFExtractorTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-    }
-
-    /**
-     * Test of getSpectraMetadata method, of class DefaultMGFExtractor2.
-     *
-     * public void testGetSpectraMetadata() { System.out.println("get
-     * SpectraMetadata"); List<Map<String, Object>> spectraMetadata =
-     * instance.getSpectraMetadata(); List<Map<String, Object>> expResult =
-     * null; List<Map<String, Object>> result = instance.getSpectraMetadata();
-     * assertEquals(expResult, result); // TODO review the generated test code
-     * and remove the default call to fail. fail("The test case is a
-     * prototype."); }
-     *
-     */
-    /**
-     * Test of getSpectrumIds method, of class DefaultMGFExtractor2.
-     */
-    public void testGetSpectrumIds() throws IOException {
-        System.out.println("getSpectrumIds");
-        int expResult = 1958;
-        int result = DefaultMGFExtractorTest.instance3.getSpectrumIds().size();
-        assertEquals(expResult, result);
-    }
-
-    /**
-     * Test of getSpectrumPeakMapBySpectrumId method, of class
-     * DefaultMGFExtractor2.
-     */
-    public void testGetSpectrumPeakMapBySpectrumId() throws IOException {
-        System.out.println("getSpectrumPeakMapBySpectrumId");
-        String spectrumId = "25";
-        Map<Double, Double> result = DefaultMGFExtractorTest.instance3.getSpectrumPeakMapBySpectrumId(spectrumId);
-        assertEquals(result.size(), 210);
-        assertTrue(result.get(962.4208) != null);
     }
 
     /**

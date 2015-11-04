@@ -45,7 +45,7 @@ public class PrideAsapSearchParamExtractorTest extends TestCase {
         File outputMGFFolder = new File(outputFolder, "mgf");
         PrideAsapExtractor instance = new PrideAsapExtractor("3", outputFolder);
         SearchParameters identificationParameters = instance.inferSearchParameters();
-        instance.save(outputMGFFolder, true, true);
+        instance.save(outputMGFFolder, true);
 
         System.out.println(identificationParameters.getPrecursorAccuracy());
         System.out.println(identificationParameters.getFragmentIonAccuracy());

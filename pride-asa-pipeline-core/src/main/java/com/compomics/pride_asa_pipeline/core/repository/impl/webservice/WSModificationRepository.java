@@ -1,7 +1,8 @@
-package com.compomics.pride_asa_pipeline.core.repository.impl;
+package com.compomics.pride_asa_pipeline.core.repository.impl.webservice;
 
 import com.compomics.pride_asa_pipeline.core.logic.modification.UniModFactory;
 import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.pride.PrideWebService;
 import com.compomics.util.pride.prideobjects.webservice.assay.AssayDetail;
@@ -14,7 +15,7 @@ import org.apache.log4j.Logger;
  *
  * @author Kenneth Verheggen
  */
-public class WSModificationRepository extends JdbcModificationRepository {
+public class WSModificationRepository implements ModificationRepository {
 
     private static final Logger LOGGER = Logger.getLogger(WSModificationRepository.class);
 
