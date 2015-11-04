@@ -134,6 +134,7 @@ public abstract class PrideAsapInterpreter {
             //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
             ApplicationContextProvider.getInstance().setDefaultApplicationContext();
             spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
+            //get assay
             spectrumAnnotator.initIdentifications(assay);
             LOGGER.info("Spectrumannotator delivered was initialized");
             spectrumAnnotator.annotate(assay);

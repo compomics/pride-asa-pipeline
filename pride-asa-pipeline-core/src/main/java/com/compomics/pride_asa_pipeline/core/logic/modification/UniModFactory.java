@@ -3,11 +3,11 @@ package com.compomics.pride_asa_pipeline.core.logic.modification;
 import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.UniModModification;
 import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.io.json.JsonMarshaller;
 import com.compomics.util.pride.PrideWebService;
 import com.compomics.util.pride.prideobjects.webservice.query.PrideFilter;
-import com.compomics.util.pride.prideobjects.webservice.query.PrideFilterType;
 import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.io.IOException;
@@ -49,16 +49,42 @@ public class UniModFactory {
      * unimodmodification object
      */
     private static LinkedHashMap<String, UniModModification> modificationMap = new LinkedHashMap<>();
+    /**
+     * The mode (online or offline)
+     */
+    private final INIT_MODE mode;
 
-    public static UniModFactory getInstance() {
+    private static enum INIT_MODE {
+
+        ONLINE, OFFLINE;
+    }
+
+    public static UniModFactory getInstance(INIT_MODE mode) {
         if (instance == null) {
-            instance = new UniModFactory();
+            instance = new UniModFactory(mode);
         }
         return instance;
     }
 
-    private UniModFactory() {
+    public static UniModFactory getInstance() {
+        if (instance == null) {
+            instance = new UniModFactory(INIT_MODE.OFFLINE);
+        }
+        return instance;
+    }
 
+    private UniModFactory(INIT_MODE mode) {
+        this.mode = mode;
+        try {
+            if (mode.equals(INIT_MODE.OFFLINE)) {
+                init(ResourceUtils.getResourceByRelativePath("resources/pride_mods.json").getFile());
+            } else {
+
+                init();
+            }
+        } catch (IOException | InterruptedException ex) {
+            LOGGER.error(ex);
+        }
     }
 
     /**
@@ -68,7 +94,7 @@ public class UniModFactory {
      * @throws IOException an exception if the file could not be correctly
      * handled
      */
-    public void init(File inputFile) throws IOException {
+    private void init(File inputFile) throws IOException {
         Collection<UniModModification> fromFile = getFromFile(inputFile);
         for (UniModModification aUniMod : fromFile) {
             modificationMap.put(aUniMod.getPtm().getName(), aUniMod);
@@ -82,7 +108,7 @@ public class UniModFactory {
      * handled
      * @throws InterruptedException if the multithreading pool fails
      */
-    public void init() throws IOException, InterruptedException {
+    private void init() throws IOException, InterruptedException {
         Collection<UniModModification> fromFile = getFromPRIDE();
         for (UniModModification aUniMod : fromFile) {
             modificationMap.put(aUniMod.getPtm().getName(), aUniMod);
@@ -112,36 +138,17 @@ public class UniModFactory {
     }
 
     /**
-     * Returns an ordened set of human modifications from high prevalence to low
+     * Returns an ordened set of modifications from high prevalence to low
      * prevalence
      *
-     * @param taxonomyID the taxonomyID to filter on
      * @return the ordened modification set
      */
-    public static TreeSet<Modification> getAsapMods(String taxonomyID) {
-        TreeSet<Modification> pride_mods = new TreeSet<>();
-        try {
-            PrideFilter speciesFilter = new PrideFilter(PrideFilterType.speciesFilter, taxonomyID);
-            ArrayList<PrideFilter> filters = new ArrayList<>();
-            filters.add(speciesFilter);
-            TreeSet<UniModModification> uniMods = UniModFactory.getFromPRIDE(filters);
-            for (UniModModification aMod : uniMods) {
-                pride_mods.add(new AsapModificationAdapter().convertModification(aMod));
-            }
-        } catch (InterruptedException | IOException ex) {
-            LOGGER.error("Could not load modifications from the webserver : " + ex);
+    public static LinkedList<Modification> getAsapMods() {
+        LinkedList<Modification> pride_mods = new LinkedList<>();
+        for (UniModModification aMod : modificationMap.values()) {
+            pride_mods.add(new AsapModificationAdapter().convertModification(aMod));
         }
         return pride_mods;
-    }
-
-    /**
-     * Returns an ordened set of human modifications from high prevalence to low
-     * prevalence
-     *
-     * @return the ordened modification set for taxonomyID 9606
-     */
-    public static TreeSet<Modification> getAsapMods() {
-        return getAsapMods("9606");
     }
 
     private static Collection<UniModModification> getFromFile(File inputFile) throws IOException {

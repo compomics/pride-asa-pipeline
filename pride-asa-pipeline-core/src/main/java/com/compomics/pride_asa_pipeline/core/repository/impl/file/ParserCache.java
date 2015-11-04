@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.MzIdentMLControllerImpl;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.PrideXmlControllerImpl;
@@ -51,23 +52,25 @@ public class ParserCache {
     /**
      * Returns an existing or creates a new FileParser for the given input file
      *
+     * @param experimentAccession the experiment accession
      * @param identificationsFile the input identifications file
      * @param boolean indicating if the file is to be parsed in memory (only for
      * mzid)
      * @return a fileparser for the file
      * @throws IOException if the fileparser can not be constructed
      */
-    public CachedDataAccessController getParser(File identificationsFile, boolean inMemory) {
+    public CachedDataAccessController getParser(String experimentAccession, File identificationsFile, boolean inMemory) {
         if (!parserCache.containsKey(identificationsFile.getName())) {
             if (identificationsFile.getName().toUpperCase().endsWith(".XML")) {
-                parserCache.put(identificationsFile.getName(), new PrideXmlControllerImpl(identificationsFile));
-                peakFileCache.put(identificationsFile.getName(), Arrays.asList(new File[]{identificationsFile}));
+                PrideXmlControllerImpl prideXmlControllerImpl = new PrideXmlControllerImpl(identificationsFile);
+                parserCache.put(experimentAccession, prideXmlControllerImpl);
+                peakFileCache.put(experimentAccession, Arrays.asList(new File[]{identificationsFile}));
             } else {
-                parserCache.put(identificationsFile.getName(), new MzIdentMLControllerImpl(identificationsFile, inMemory));
+                parserCache.put(experimentAccession, new MzIdentMLControllerImpl(identificationsFile, inMemory));
             }
-            loadedFiles.put(identificationsFile.getName(), identificationsFile);
+            loadedFiles.put(experimentAccession, identificationsFile);
         }
-        return parserCache.get(identificationsFile.getName());
+        return parserCache.get(experimentAccession);
     }
 
     /**
@@ -79,8 +82,8 @@ public class ParserCache {
      * @return a fileparser for the file
      * @throws IOException if the fileparser can not be constructed
      */
-    public CachedDataAccessController getParser(String identificationsFileName, boolean inMemory) {
-        return getParser(loadedFiles.get(identificationsFileName), inMemory);
+    public CachedDataAccessController getParser(String experimentAccession, boolean inMemory) {
+        return getParser(experimentAccession, loadedFiles.get(experimentAccession), inMemory);
     }
 
     /**
@@ -89,20 +92,12 @@ public class ParserCache {
      * @param identificationsFileName the name of the file to be removed from
      * the cache
      */
-    public void deleteParser(String identificationsFileName) {
-        parserCache.get(identificationsFileName).close();
-        parserCache.remove(identificationsFileName);
+    public void deleteParser(String experimentAccession) {
+        parserCache.get(experimentAccession).close();
+        parserCache.remove(experimentAccession);
     }
 
-    /**
-     * Deletes a parser from the cache
-     *
-     * @param identificationsFileName the file to be removed from the cache
-     */
-    public void deleteParser(File identificationsFile) {
-        deleteParser(identificationsFile.getName());
-    }
-
+ 
     /**
      * Returns a hashmap of all filenames and their paths in the cache
      *
@@ -110,8 +105,8 @@ public class ParserCache {
      */
     public HashMap<String, String> getLoadedFiles() {
         HashMap<String, String> experimentAccessionMap = new HashMap<>();
-        for (File aFile : loadedFiles.values()) {
-            experimentAccessionMap.put(aFile.getName(), aFile.getAbsolutePath());
+        for (Map.Entry<String, File> anEntry : loadedFiles.entrySet()) {
+            experimentAccessionMap.put(anEntry.getKey(), anEntry.getValue().getAbsolutePath());
         }
         return experimentAccessionMap;
     }
@@ -158,8 +153,8 @@ public class ParserCache {
      * @param identificationsFile the mzid file for the experiment
      * @param peakFiles a list of peakfiles related to this mzid file
      */
-    public void addPeakFiles(File identificationsFile, List<File> peakFiles) {
-        addPeakFiles(identificationsFile.getName(), peakFiles);
+    public void addPeakFiles(String experimentAccession,File identificationsFile, List<File> peakFiles) {
+        addPeakFiles(experimentAccession, peakFiles);
     }
 
     /**

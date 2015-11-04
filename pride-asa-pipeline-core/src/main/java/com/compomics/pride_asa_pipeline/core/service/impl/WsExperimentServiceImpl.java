@@ -1,6 +1,5 @@
 package com.compomics.pride_asa_pipeline.core.service.impl;
 
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.util.pride.PrideWebService;
 import com.compomics.util.pride.prideobjects.webservice.peptide.PsmDetail;
 import com.compomics.util.pride.prideobjects.webservice.peptide.PsmDetailList;
@@ -27,12 +26,6 @@ public class WsExperimentServiceImpl extends DbExperimentServiceImpl {
         } catch (IOException ex) {
             LOGGER.error(ex);
         }
-    }
-
-    @Override
-    public AnalyzerData getAnalyzerData(String experimentAccession) {
-        //ToDo: refactor so this is no longer required?
-        return null;
     }
 
 }

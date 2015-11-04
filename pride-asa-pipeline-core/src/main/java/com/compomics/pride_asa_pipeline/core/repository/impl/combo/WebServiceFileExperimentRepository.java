@@ -52,9 +52,9 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
         try {
             File identificationFileForAssay = getIdentificationFile(experimentAccession);
             if (identificationFileForAssay.getName().toLowerCase().endsWith(".xml")) {
-                addPrideXMLFile(identificationFileForAssay);
+                addPrideXMLFile(experimentAccession,identificationFileForAssay);
             } else {
-                addMzID(identificationFileForAssay, getPeakFiles(experimentAccession));
+                addMzID(experimentAccession,identificationFileForAssay, getPeakFiles(experimentAccession));
             }
             identifications = super.loadExperimentIdentifications(identificationFileForAssay.getName());
         } catch (Exception ex) {

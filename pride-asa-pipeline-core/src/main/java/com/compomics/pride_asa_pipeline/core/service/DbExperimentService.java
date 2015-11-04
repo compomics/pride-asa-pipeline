@@ -4,7 +4,6 @@
  */
 package com.compomics.pride_asa_pipeline.core.service;
 
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identifications;
 import java.io.File;
 import java.util.Set;
@@ -32,15 +31,7 @@ public interface DbExperimentService extends ExperimentService {
      */
     void updateChargeStates(String experimentAccession, Set<Integer> chargeStates);
 
-    /**
-     * Gets the experiment analyzer data
-     *
-     * @param experimentAccession the experiment accession number
-     * @return the experiment analyzer data
-     */
-    AnalyzerData getAnalyzerData(String experimentAccession);
-
-    /**
+     /**
      * Gets the number of spectra for a given experiment
      *
      * @param experimentAccession the experiment accession number

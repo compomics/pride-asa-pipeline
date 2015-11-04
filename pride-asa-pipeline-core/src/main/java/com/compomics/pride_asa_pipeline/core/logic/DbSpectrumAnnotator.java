@@ -7,7 +7,6 @@ import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.service.DbExperimentService;
 import com.compomics.pride_asa_pipeline.core.service.DbModificationService;
-import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.*;
 import org.apache.log4j.Logger;
@@ -63,7 +62,6 @@ public class DbSpectrumAnnotator extends AbstractSpectrumAnnotator<String> {
         ///////////////////////////////////////////////////////////////////////
         //FIRST STEP: find the systematic mass error (if there is one)
         //get analyzer data
-        analyzerData = experimentService.getAnalyzerData(experimentAccession);
         LOGGER.info("finding systematic mass errors");
         MassRecalibrationResult massRecalibrationResult = findSystematicMassError(identifications.getCompletePeptides());
         LOGGER.debug("Finished finding systematic mass errors:" + "\n" + massRecalibrationResult.toString());
@@ -111,7 +109,6 @@ public class DbSpectrumAnnotator extends AbstractSpectrumAnnotator<String> {
         consideredChargeStates = null;
         identifications = null;
         spectrumAnnotatorResult = null;
-        analyzerData = null;
         modificationHolder = null;
     }
 

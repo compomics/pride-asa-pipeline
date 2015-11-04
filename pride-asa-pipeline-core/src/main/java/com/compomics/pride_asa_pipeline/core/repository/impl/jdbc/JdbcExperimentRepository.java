@@ -4,11 +4,8 @@
  */
 package com.compomics.pride_asa_pipeline.core.repository.impl.jdbc;
 
-import com.compomics.pride_asa_pipeline.core.data.extractor.AnalyzerSourcesExctractor;
 import com.compomics.pride_asa_pipeline.core.data.extractor.ExperimentAccessionResultExtractor;
 import com.compomics.pride_asa_pipeline.core.data.extractor.IdentificationsExtractor;
-import com.compomics.pride_asa_pipeline.core.data.mapper.AnalyzerDataMapper;
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
 import java.util.List;
@@ -181,22 +178,6 @@ public class JdbcExperimentRepository extends JdbcDaoSupport implements Experime
         List<Identification> identifications = getJdbcTemplate().query(SELECT_EXPERIMENT_IDENTIFICATIONS, new IdentificationsExtractor(), new Object[]{experimentAccession});
         LOGGER.debug("Finished loading " + identifications.size() + " identifications for experiment " + experimentAccession);
         return identifications;
-    }
-
-    @Override
-    public Map<String, String> getAnalyzerSources(String experimentAccession) {
-        LOGGER.debug("Start loading analyzer sources for experiment " + experimentAccession);
-        Map<String, String> analyzerSources = getJdbcTemplate().query(SELECT_ANALYZER_SOURCE_FOR_MALDI, new AnalyzerSourcesExctractor(), new Object[]{experimentAccession});
-        LOGGER.debug("Finished loading analyzer sources identifications for experiment " + experimentAccession);
-        return analyzerSources;
-    }
-
-    @Override
-    public List<AnalyzerData> getAnalyzerData(String experimentAccession) {
-        LOGGER.debug("Start loading analyzer data for experiment " + experimentAccession);
-        List<AnalyzerData> analyzerDataList = getJdbcTemplate().query(SELECT_ANALYZER_SOURCES, new AnalyzerDataMapper(), new Object[]{experimentAccession});
-        LOGGER.debug("Finished loading analyzer data for experiment " + experimentAccession);
-        return analyzerDataList;
     }
 
     @Override

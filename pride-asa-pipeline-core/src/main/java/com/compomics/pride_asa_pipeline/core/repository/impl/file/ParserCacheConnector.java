@@ -1,11 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
-import com.compomics.util.pride.PrideWebService;
-import com.compomics.util.pride.prideobjects.webservice.file.FileDetail;
-import com.compomics.util.pride.prideobjects.webservice.file.FileDetailList;
-import com.compomics.util.pride.prideobjects.webservice.file.FileType;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -31,8 +26,8 @@ public abstract class ParserCacheConnector {
      *
      * @param identificationsFile the prideXML file
      */
-    public void addPrideXMLFile(File identificationsFile) {
-        parserCache.getParser(identificationsFile, true).getName();
+    public void addPrideXMLFile(String experimentAccession,File identificationsFile) {
+        parserCache.getParser(experimentAccession,identificationsFile, true).getName();
     }
 
     /**
@@ -41,31 +36,11 @@ public abstract class ParserCacheConnector {
      * @param identificationsFile the mzID
      * @param peakFiles the peak files
      */
-    public void addMzID(File identificationsFile, List<File> peakFiles) {
-        parserCache.getParser(identificationsFile, true).getName();
-        parserCache.addPeakFiles(identificationsFile, peakFiles);
+    public void addMzID(String experimentAccession,File identificationsFile, List<File> peakFiles) {
+        parserCache.getParser(experimentAccession,identificationsFile, true).getName();
+        parserCache.addPeakFiles(experimentAccession,identificationsFile, peakFiles);
     }
 
-    /**
-     * Converts the given experiment accession to the correct file name
-     *
-     * @param experimentAccession the input experiment accession
-     * @return the given experiment accession to the correct file name
-     */
-    protected String getCorrectExperimentIdentifier(String experimentAccession) {
-        String temp = experimentAccession;
-        try {
-            FileDetailList assayFileDetails = PrideWebService.getAssayFileDetails(experimentAccession);
-            //try to find existing result files online
-            for (FileDetail assayFile : assayFileDetails.getList()) {
-                if (assayFile.getFileType().equals(FileType.RESULT.toString())) {
-                    temp = assayFile.getFileName();
-                }
-            }
-        } catch (IOException ex) {
-            LOGGER.error(ex);
-        }
-        return temp;
-    }
+
 
 }

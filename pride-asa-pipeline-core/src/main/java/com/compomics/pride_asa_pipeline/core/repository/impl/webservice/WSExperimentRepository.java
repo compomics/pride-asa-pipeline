@@ -2,7 +2,6 @@ package com.compomics.pride_asa_pipeline.core.repository.impl.webservice;
 
 import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
@@ -81,16 +80,6 @@ public class WSExperimentRepository implements ExperimentRepository {
         }
 
         return identifications;
-    }
-
-    @Override
-    public Map<String, String> getAnalyzerSources(String experimentAccession) {
-        throw new UnsupportedOperationException("No longer supported through the webservice");
-    }
-
-    @Override
-    public List<AnalyzerData> getAnalyzerData(String experimentAccession) {
-        throw new UnsupportedOperationException("No longer supported through the webservice");
     }
 
     @Override

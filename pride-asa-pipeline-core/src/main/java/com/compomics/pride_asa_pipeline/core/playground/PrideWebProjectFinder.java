@@ -7,7 +7,7 @@ package com.compomics.pride_asa_pipeline.core.playground;
 
 import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapExtractor;
-import com.compomics.pride_asa_pipeline.core.repository.impl.combo.WebServiceFileExperimentRepository;
+import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.ParserCache;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
@@ -39,16 +39,19 @@ public class PrideWebProjectFinder {
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
         File outputFolder = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download");
-        new PrideWebProjectFinder(outputFolder).analyze("3");
+        File inputFile = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download\\PRIDE_Exp_Complete_Ac_3.xml");
+        new PrideWebProjectFinder(outputFolder).analyze(inputFile);
     }
 
     public PrideWebProjectFinder(File outputFolder) {
         this.outputFolder = outputFolder;
     }
 
-    public void analyze(String assay) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
+    public void analyze(File inputFile) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
+        String assay = "3";
         LOGGER.info("Setting up experiment repository for assay " + assay);
-        WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository(outputFolder);
+        FileExperimentRepository experimentRepository = new FileExperimentRepository();
+        experimentRepository.addPrideXMLFile(assay,inputFile);
         experimentRepository.loadExperimentIdentifications(assay);
         //the cache should only have one for now?
         String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
@@ -58,8 +61,8 @@ public class PrideWebProjectFinder {
         FileSpectrumRepository spectrumRepository = new FileSpectrumRepository(entry);
         File mgf = spectrumRepository.writeToMGF(outputFolder);
         //zip the MGF file
-        File zip = new File(mgf.getAbsolutePath()+".zip");
-        ZipUtils.zip(mgf, zip , new WaitingHandlerCLIImpl(), mgf.length());
+        File zip = new File(mgf.getAbsolutePath() + ".zip");
+        ZipUtils.zip(mgf, zip, new WaitingHandlerCLIImpl(), mgf.length());
         mgf.delete();
         //do the extraction
         LOGGER.info("Attempting to infer searchparameters");

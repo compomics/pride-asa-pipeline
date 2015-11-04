@@ -15,12 +15,6 @@ import java.util.List;
 public class AnnotatedModificationService {
 
     /**
-     * The unimod factory that can retrieve modifications and convert them to
-     * utilities/pride asap
-     *
-     */
-    private static final UniModFactory factory = UniModFactory.getInstance();
-    /**
      * The adapter that will convert the pride ptms to asap modifications
      */
     private static final ModificationAdapter asapAdapter = new AsapModificationAdapter();
@@ -41,7 +35,7 @@ public class AnnotatedModificationService {
     public List<Modification> convertToAsapMods(String[] ptmNames) {
         List<Modification> asapMods = new ArrayList<>();
         for (String aPTMName : ptmNames) {
-            asapMods.add((Modification) factory.getModification(asapAdapter, aPTMName));
+            asapMods.add((Modification) UniModFactory.getInstance().getModification(asapAdapter, aPTMName));
         }
         return asapMods;
     }

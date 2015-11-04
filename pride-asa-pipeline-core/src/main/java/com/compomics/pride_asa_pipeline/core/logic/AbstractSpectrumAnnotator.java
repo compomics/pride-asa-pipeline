@@ -201,7 +201,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
      * the modification prevalence in PRIDE.
      */
     public void annotate(String... identifier) {
-        if (identifier != null) {
+        if (identifier == null) {
             throw new IllegalArgumentException("Identifier can not be null : expected assay accession");
         }
         try {
@@ -212,7 +212,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             //order the annotated modifications to prevalence (in case there are more than the selected batch size)
             LinkedList<Object> sortedAnnotatedModifications = UniModFactory.orderModificationsToPrevalence(assayAnnotatedModificationNames, new AsapModificationAdapter());
             //get all asap mods
-            Set<Modification> sortedAllModifications = UniModFactory.getAsapMods();
+            LinkedList<Modification> sortedAllModifications = UniModFactory.getAsapMods();
             //get a queue of them
             BlockingQueue<Modification> modQueue = new ArrayBlockingQueue<>(sortedAllModifications.size());
             //first get the annotated modifications and order those as well?

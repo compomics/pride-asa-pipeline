@@ -2,7 +2,6 @@ package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
 import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
@@ -69,16 +68,6 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
         }
         //get all evidence for all peptide ids
         return identifications;
-    }
-
-    @Override
-    public Map<String, String> getAnalyzerSources(String experimentAccession) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public List<AnalyzerData> getAnalyzerData(String experimentAccession) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

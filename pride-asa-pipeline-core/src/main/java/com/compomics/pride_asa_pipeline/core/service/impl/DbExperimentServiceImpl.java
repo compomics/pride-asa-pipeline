@@ -4,18 +4,27 @@
  */
 package com.compomics.pride_asa_pipeline.core.service.impl;
 
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
-import com.compomics.pride_asa_pipeline.model.Identification;
-import com.compomics.pride_asa_pipeline.model.Identifications;
 import com.compomics.pride_asa_pipeline.core.model.MascotGenericFile;
-import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.core.service.DbExperimentService;
 import com.compomics.pride_asa_pipeline.core.service.DbSpectrumService;
+import com.compomics.pride_asa_pipeline.model.Identification;
+import com.compomics.pride_asa_pipeline.model.Identifications;
+import com.compomics.pride_asa_pipeline.model.Peak;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.apache.log4j.Logger;
 
@@ -48,28 +57,11 @@ public class DbExperimentServiceImpl extends ExperimentServiceImpl implements Db
 
     @Override
     public void updateChargeStates(String experimentAccession, Set<Integer> chargeStates) {
-        Map<String, String> analyzerSources = experimentRepository.getAnalyzerSources(experimentAccession);
-        if (analyzerSources.containsKey(MALDI_SOURCE_ACCESSION)) {
-            LOGGER.debug("Found MALDI source, setting charge state to 1.");
-            chargeStates.clear();
-            chargeStates.add(1);
-        } else {
-            //iterate over values to check if a maldi source is found
-            for (String value : analyzerSources.values()) {
-                if (value.indexOf("maldi") > -1 || value.indexOf("matrix") > -1) {
-                    LOGGER.debug("Found MALDI source, setting charge state to 1.");
-                    chargeStates.clear();
-                    chargeStates.add(1);
-                }
-            }
+        //go over the identifications and check their charges
+        List<Identification> loadExperimentIdentifications = experimentRepository.loadExperimentIdentifications(experimentAccession);
+        for (Identification ident : loadExperimentIdentifications) {
+            chargeStates.add(ident.getPeptide().getCharge());
         }
-    }
-
-    @Override
-    public AnalyzerData getAnalyzerData(String experimentAccession) {
-        //ToDo: for the moment, only take the first result into account, check the other results
-        List<AnalyzerData> analyzerDataList = experimentRepository.getAnalyzerData(experimentAccession);
-        return analyzerDataList.get(0);
     }
 
     @Override
@@ -138,7 +130,6 @@ public class DbExperimentServiceImpl extends ExperimentServiceImpl implements Db
         //get spectra metadata
         List<Map<String, Object>> spectraMetadata = experimentRepository.getSpectraMetadata(experimentAccession);
 
-
         HashMap<String, Map> spectrumIdMap = new HashMap<String, Map>();
         for (Map<String, Object> spectrumMetadata : spectraMetadata) {
             spectrumIdMap.put((String) spectrumMetadata.get("spectrum_id"), spectrumMetadata);
@@ -166,7 +157,6 @@ public class DbExperimentServiceImpl extends ExperimentServiceImpl implements Db
         //get spectra metadata
         List<Map<String, Object>> spectraMetadata = experimentRepository.getSpectraMetadata(experimentAccession);
 
-
         HashMap<String, Map> spectrumIdMap = new HashMap<String, Map>();
         for (Map<String, Object> spectrumMetadata : spectraMetadata) {
             spectrumIdMap.put((String) spectrumMetadata.get("spectrum_id"), spectrumMetadata);
@@ -174,7 +164,6 @@ public class DbExperimentServiceImpl extends ExperimentServiceImpl implements Db
 
         for (String cachedSpectrumId : spectrumIdMap.keySet()) {
             Map spectrumMetadata = spectrumIdMap.get(cachedSpectrumId);
-
 
             //write identification data to stream
             mascotGenericFile = new MascotGenericFile();
