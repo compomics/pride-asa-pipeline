@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.logic.modification.conversion;
+package com.compomics.pride_asa_pipeline.core.inference.modification;
 
 import java.util.List;
 import java.util.Objects;
@@ -10,7 +10,7 @@ import uk.ac.ebi.pridemod.model.Specificity;
  *
  * @since 0.1
  */
-public class UniModModification implements PTM, Comparable<UniModModification> {
+public class PRIDEModification implements PTM, Comparable<PRIDEModification> {
 
     private int frequency;
     private String accession;
@@ -21,7 +21,7 @@ public class UniModModification implements PTM, Comparable<UniModModification> {
     private String formula;
     private List<Specificity> specificityCollection;
 
-    public UniModModification(uk.ac.ebi.pridemod.model.PTM ptm, int frequency) {
+    public PRIDEModification(uk.ac.ebi.pridemod.model.PTM ptm, int frequency) {
         this.accession = ptm.getAccession();
         this.name = ptm.getName();
         this.aveDeltaMass = ptm.getAveDeltaMass();
@@ -32,12 +32,12 @@ public class UniModModification implements PTM, Comparable<UniModModification> {
         this.specificityCollection = ptm.getSpecificityCollection();
     }
 
-    public UniModModification() {
+    public PRIDEModification() {
     }
    
     
     @Override
-    public int compareTo(UniModModification o) {
+    public int compareTo(PRIDEModification o) {
         if (o.getFrequency() > this.getFrequency()) {
             return 1;
         } else if (o.getFrequency() < this.getFrequency()) {
@@ -57,8 +57,8 @@ public class UniModModification implements PTM, Comparable<UniModModification> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof UniModModification) {
-            UniModModification other = (UniModModification) obj;
+        if (obj instanceof PRIDEModification) {
+            PRIDEModification other = (PRIDEModification) obj;
             if (!getAccession().equalsIgnoreCase(other.getAccession())) {
                 return false;
             }

@@ -1,7 +1,7 @@
-package com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl;
+package com.compomics.pride_asa_pipeline.core.inference.modification.impl;
 
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.ModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.UniModModification;
+import com.compomics.pride_asa_pipeline.core.inference.modification.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.inference.modification.PRIDEModification;
 import com.compomics.util.experiment.biology.AminoAcidPattern;
 import com.compomics.util.experiment.biology.Atom;
 import com.compomics.util.experiment.biology.AtomChain;
@@ -52,7 +52,7 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
     private static final Logger LOGGER = Logger.getLogger(UtilitiesPTMAdapter.class);
 
     @Override
-    public PTM convertModification(UniModModification mod) {
+    public PTM convertModification(PRIDEModification mod) {
         increaseMassChain = new AtomChain();
         decreaseMassChain = new AtomChain();
         decreaseMassChain.setAddition(false);

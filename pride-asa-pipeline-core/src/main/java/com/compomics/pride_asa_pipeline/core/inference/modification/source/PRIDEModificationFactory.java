@@ -1,8 +1,8 @@
-package com.compomics.pride_asa_pipeline.core.logic.modification;
+package com.compomics.pride_asa_pipeline.core.inference.modification.source;
 
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.ModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.UniModModification;
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.inference.modification.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.inference.modification.PRIDEModification;
+import com.compomics.pride_asa_pipeline.core.inference.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.io.json.JsonMarshaller;
 import com.compomics.util.pride.PrideWebService;
@@ -30,12 +30,12 @@ import uk.ac.ebi.pridemod.model.UniModPTM;
  *
  * @author Kenneth Verheggen
  */
-public class UniModFactory {
+public class PRIDEModificationFactory {
 
     /**
      * a logger
      */
-    private static final Logger LOGGER = Logger.getLogger(UniModFactory.class);
+    private static final Logger LOGGER = Logger.getLogger(PRIDEModificationFactory.class);
     /**
      * The maximal amount of modifications the factory can load
      */
@@ -43,12 +43,12 @@ public class UniModFactory {
     /**
      * The unimodfactory singleton instance
      */
-    private static UniModFactory instance;
+    private static PRIDEModificationFactory instance;
     /**
      * The map containing the name of the modification and the
      * unimodmodification object
      */
-    private static LinkedHashMap<String, UniModModification> modificationMap = new LinkedHashMap<>();
+    private static LinkedHashMap<String, PRIDEModification> modificationMap = new LinkedHashMap<>();
     /**
      * The mode (online or offline)
      */
@@ -59,21 +59,21 @@ public class UniModFactory {
         ONLINE, OFFLINE;
     }
 
-    public static UniModFactory getInstance(INIT_MODE mode) {
+    public static PRIDEModificationFactory getInstance(INIT_MODE mode) {
         if (instance == null) {
-            instance = new UniModFactory(mode);
+            instance = new PRIDEModificationFactory(mode);
         }
         return instance;
     }
 
-    public static UniModFactory getInstance() {
+    public static PRIDEModificationFactory getInstance() {
         if (instance == null) {
-            instance = new UniModFactory(INIT_MODE.OFFLINE);
+            instance = new PRIDEModificationFactory(INIT_MODE.OFFLINE);
         }
         return instance;
     }
 
-    private UniModFactory(INIT_MODE mode) {
+    private PRIDEModificationFactory(INIT_MODE mode) {
         this.mode = mode;
         try {
             if (mode.equals(INIT_MODE.OFFLINE)) {
@@ -97,8 +97,8 @@ public class UniModFactory {
      * handled
      */
     private void init(File inputFile) throws IOException {
-        Collection<UniModModification> fromFile = getFromFile(inputFile);
-        for (UniModModification aUniMod : fromFile) {
+        Collection<PRIDEModification> fromFile = getFromFile(inputFile);
+        for (PRIDEModification aUniMod : fromFile) {
             modificationMap.put(aUniMod.getName(), aUniMod);
         }
     }
@@ -111,8 +111,8 @@ public class UniModFactory {
      * @throws InterruptedException if the multithreading pool fails
      */
     private void init() throws IOException, InterruptedException {
-        Collection<UniModModification> fromFile = getFromPRIDE();
-        for (UniModModification aUniMod : fromFile) {
+        Collection<PRIDEModification> fromFile = getFromPRIDE();
+        for (PRIDEModification aUniMod : fromFile) {
             modificationMap.put(aUniMod.getName(), aUniMod);
         }
     }
@@ -135,7 +135,7 @@ public class UniModFactory {
      *
      * @return the modification map
      */
-    public LinkedHashMap<String, UniModModification> getModificationMap() {
+    public LinkedHashMap<String, PRIDEModification> getModificationMap() {
         return modificationMap;
     }
 
@@ -147,48 +147,48 @@ public class UniModFactory {
      */
     public static LinkedList<Modification> getAsapMods() {
         LinkedList<Modification> pride_mods = new LinkedList<>();
-        for (UniModModification aMod : modificationMap.values()) {
+        for (PRIDEModification aMod : modificationMap.values()) {
             pride_mods.add(new AsapModificationAdapter().convertModification(aMod));
         }
         return pride_mods;
     }
 
-    private static TreeSet<UniModModification> getFromFile(File inputFile) throws IOException {
+    private static TreeSet<PRIDEModification> getFromFile(File inputFile) throws IOException {
         JsonMarshaller marshaller = new JsonMarshaller();
         LOGGER.debug("Getting modifications from file...");
-        java.lang.reflect.Type type = new TypeToken<TreeSet<UniModModification>>() {
+        java.lang.reflect.Type type = new TypeToken<TreeSet<PRIDEModification>>() {
         }.getType();
-        return (TreeSet<UniModModification>) marshaller.fromJson(type, inputFile);
+        return (TreeSet<PRIDEModification>) marshaller.fromJson(type, inputFile);
     }
 
-    public static void main(String[] args) throws IOException {
-        UniModFactory factory = getInstance(INIT_MODE.OFFLINE);
-        LinkedHashMap<String, UniModModification> modificationMap1 = factory.getModificationMap();
-        TreeSet<UniModModification> mods = new TreeSet<>();
-        for (UniModModification aMod : modificationMap1.values()) {
+    public static void generatePRIDEModJson(File jsonFile) throws IOException {
+        PRIDEModificationFactory factory = getInstance(INIT_MODE.ONLINE);
+        //load the modifications
+        LinkedHashMap<String, PRIDEModification> modificationMap1 = factory.getModificationMap();
+        //sort them according to frequency (the default comparator)
+        TreeSet<PRIDEModification> mods = new TreeSet<>();
+        for (PRIDEModification aMod : modificationMap1.values()) {
             mods.add(aMod);
         }
+        //save them to a file
         JsonMarshaller marshaller = new JsonMarshaller();
-        File file = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\pride_mods.json");
-        marshaller.saveObjectToJson(mods, file);
-        TreeSet<UniModModification> fromPRIDE = getFromFile(file);
-        System.out.println(fromPRIDE.first().getAccession());
+        marshaller.saveObjectToJson(mods, jsonFile);
     }
 
-    public static TreeSet<UniModModification> getFromPRIDE() throws InterruptedException, IOException {
+    public static TreeSet<PRIDEModification> getFromPRIDE() throws InterruptedException, IOException {
         return getFromPRIDE(new ArrayList<PrideFilter>());
     }
 
-    public static TreeSet<UniModModification> getFromPRIDE(File outputFile) throws InterruptedException, IOException {
+    public static TreeSet<PRIDEModification> getFromPRIDE(File outputFile) throws InterruptedException, IOException {
         return getFromPRIDE(outputFile, new ArrayList<PrideFilter>());
     }
 
-    public static TreeSet<UniModModification> getFromPRIDE(Collection<PrideFilter> prideFilters) throws InterruptedException, IOException {
+    public static TreeSet<PRIDEModification> getFromPRIDE(Collection<PrideFilter> prideFilters) throws InterruptedException, IOException {
         ModReader modReader = ModReader.getInstance();
         System.out.println("Looking for modifications...;");
         ExecutorService executors = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         //   ExecutorService executors = Executors.newFixedThreadPool(1);
-        ArrayList<Future<UniModModification>> finishedMods = new ArrayList<>();
+        ArrayList<Future<PRIDEModification>> finishedMods = new ArrayList<>();
         System.out.println("Gathering modification occurences from pride...");
         for (uk.ac.ebi.pridemod.model.PTM aPTM : modReader.getPTMListByPatternName("")) {
             if (finishedMods.size() != MAX) {
@@ -199,10 +199,10 @@ public class UniModFactory {
         }
         executors.shutdown();
         executors.awaitTermination(100, TimeUnit.DAYS);
-        TreeSet<UniModModification> mods = new TreeSet<>();
-        for (Future<UniModModification> aUniModFuture : finishedMods) {
+        TreeSet<PRIDEModification> mods = new TreeSet<>();
+        for (Future<PRIDEModification> aUniModFuture : finishedMods) {
             try {
-                UniModModification get = aUniModFuture.get();
+                PRIDEModification get = aUniModFuture.get();
                 if (get.getFrequency() > 0 | prideFilters.isEmpty()) {
                     Double monoDeltaMass = get.getMonoDeltaMass();
                     Double avgDeltaMass = get.getAveDeltaMass();
@@ -218,8 +218,8 @@ public class UniModFactory {
         return mods;
     }
 
-    public static TreeSet<UniModModification> getFromPRIDE(File outputFile, Collection<PrideFilter> prideFilters) throws InterruptedException, IOException {
-        TreeSet<UniModModification> mods = getFromPRIDE(prideFilters);
+    public static TreeSet<PRIDEModification> getFromPRIDE(File outputFile, Collection<PrideFilter> prideFilters) throws InterruptedException, IOException {
+        TreeSet<PRIDEModification> mods = getFromPRIDE(prideFilters);
         outputFile.getParentFile().mkdirs();
         JsonMarshaller marshaller = new JsonMarshaller();
         marshaller.saveObjectToJson(mods, outputFile);
@@ -227,18 +227,18 @@ public class UniModFactory {
     }
 
     public static LinkedList<Object> orderModificationsToPrevalence(Collection<String> ptmNames, ModificationAdapter adapter) {
-        TreeSet<UniModModification> orderedModifications = orderModificationsToPrevalence(ptmNames);
+        TreeSet<PRIDEModification> orderedModifications = orderModificationsToPrevalence(ptmNames);
         LinkedList<Object> orderedConvertedModifications = new LinkedList<>();
-        for (UniModModification aModification : orderedModifications) {
+        for (PRIDEModification aModification : orderedModifications) {
             orderedConvertedModifications.add(adapter.convertModification(aModification));
         }
         return orderedConvertedModifications;
     }
 
-    public static TreeSet<UniModModification> orderModificationsToPrevalence(Collection<String> ptmNames) {
-        TreeSet<UniModModification> orderedModifications = new TreeSet<>();
+    public static TreeSet<PRIDEModification> orderModificationsToPrevalence(Collection<String> ptmNames) {
+        TreeSet<PRIDEModification> orderedModifications = new TreeSet<>();
         for (String aPTMName : ptmNames) {
-            UniModModification uniModModification = modificationMap.get(aPTMName);
+            PRIDEModification uniModModification = modificationMap.get(aPTMName);
             if (uniModModification != null) {
                 orderedModifications.add(uniModModification);
             }
@@ -246,7 +246,7 @@ public class UniModFactory {
         return orderedModifications;
     }
 
-    private static class UniModOccurenceGetter implements Callable<UniModModification> {
+    private static class UniModOccurenceGetter implements Callable<PRIDEModification> {
 
         private final uk.ac.ebi.pridemod.model.PTM aPTM;
         private Collection<PrideFilter> prideFilters = new ArrayList<>();
@@ -262,7 +262,7 @@ public class UniModFactory {
 
         //convert ptm to pride asap ptm?
         @Override
-        public UniModModification call() {
+        public PRIDEModification call() {
             int size = 0;
             try {
                 System.out.println("Querying " + aPTM.getName());
@@ -271,9 +271,9 @@ public class UniModFactory {
                 e.printStackTrace();
             }
             if (aPTM instanceof UniModPTM) {
-                return new UniModModification(aPTM, size);
+                return new PRIDEModification(aPTM, size);
             } else {
-                return new UniModModification(aPTM, size);
+                return new PRIDEModification(aPTM, size);
             }
 
         }

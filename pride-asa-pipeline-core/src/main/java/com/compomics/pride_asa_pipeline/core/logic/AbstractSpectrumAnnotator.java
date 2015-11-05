@@ -2,10 +2,10 @@ package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.impl.MassDeltaExplainerImpl;
-import com.compomics.pride_asa_pipeline.core.logic.modification.AnnotatedModificationService;
+import com.compomics.pride_asa_pipeline.core.inference.modification.source.AnnotatedModificationService;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
-import com.compomics.pride_asa_pipeline.core.logic.modification.UniModFactory;
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.inference.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.core.inference.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
@@ -217,12 +217,12 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 AsapModificationAdapter adapter = new AsapModificationAdapter();
                 //get other modifications
                 for (String aPTMName : annotatedModService.getAssayAnnotatedPTMs(assayAccession)) {
-                    sortedAnnotatedModifications.add((Modification) UniModFactory.getInstance().getModification(adapter, aPTMName));
+                    sortedAnnotatedModifications.add((Modification) PRIDEModificationFactory.getInstance().getModification(adapter, aPTMName));
                 }
             }
             //order the annotated modifications to prevalence (in case there are more than the selected batch size)
             //get all asap mods
-            LinkedList<Modification> sortedAllModifications = UniModFactory.getAsapMods();
+            LinkedList<Modification> sortedAllModifications = PRIDEModificationFactory.getAsapMods();
             //get a queue of them
             BlockingQueue<Modification> modQueue = new ArrayBlockingQueue<>(sortedAllModifications.size());
             //first get the annotated modifications and order those as well?

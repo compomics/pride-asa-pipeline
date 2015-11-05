@@ -1,11 +1,11 @@
-package com.compomics.pride_asa_pipeline.core.logic.parameters;
+package com.compomics.pride_asa_pipeline.core.inference.parameters;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.core.logic.enzyme.EnzymePredictor;
-import com.compomics.pride_asa_pipeline.core.logic.modification.UniModFactory;
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.ModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.UtilitiesPTMAdapter;
+import com.compomics.pride_asa_pipeline.core.inference.enzyme.EnzymePredictor;
+import com.compomics.pride_asa_pipeline.core.inference.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.core.inference.modification.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.inference.modification.impl.UtilitiesPTMAdapter;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
@@ -247,7 +247,7 @@ public abstract class PrideAsapInterpreter {
         ModificationAdapter adapter = new UtilitiesPTMAdapter();
         HashSet<Double> encounteredMasses = new HashSet<>();
         for (Map.Entry<String, Boolean> aMod : asapMods.entrySet()) {
-            PTM aUtilitiesMod = (PTM) UniModFactory.getInstance().getModification(adapter, aMod.getKey());
+            PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
             if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
                 encounteredMasses.add(aUtilitiesMod.getRoundedMass());
                 if (aMod.getValue()) {

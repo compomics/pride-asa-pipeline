@@ -1,7 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.webservice;
 
-import com.compomics.pride_asa_pipeline.core.logic.modification.UniModFactory;
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.inference.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.core.inference.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.pride.PrideWebService;
@@ -32,7 +32,7 @@ public class WSModificationRepository implements ModificationRepository {
         try {
             AssayDetail assayDetail = PrideWebService.getAssayDetail(String.valueOf(experimentId));
             for (String aPtmName : assayDetail.getPtmNames()) {
-                UniModFactory.getInstance().getModification(adapter, aPtmName);
+                PRIDEModificationFactory.getInstance().getModification(adapter, aPtmName);
             }
             LOGGER.debug("Finished loading modifications for pride experiment with id " + experimentId);
             return modifications;

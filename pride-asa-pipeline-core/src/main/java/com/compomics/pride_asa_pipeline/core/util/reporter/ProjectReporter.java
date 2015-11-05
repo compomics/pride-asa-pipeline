@@ -5,7 +5,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.util.reporter;
 
-import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapExtractor;
+import com.compomics.pride_asa_pipeline.core.inference.parameters.PrideAsapExtractor;
 
 /**
  *

@@ -5,7 +5,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.util.reporter.impl;
 
-import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapExtractor;
+import com.compomics.pride_asa_pipeline.core.inference.parameters.PrideAsapExtractor;
 import com.compomics.pride_asa_pipeline.core.util.reporter.ProjectReporter;
 import com.compomics.pride_asa_pipeline.core.util.reporter.plots.MassErrorPlotter;
 import com.compomics.pride_asa_pipeline.model.Modification;

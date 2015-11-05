@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.logic.modification.conversion;
+package com.compomics.pride_asa_pipeline.core.inference.modification;
 
 /**
  *
@@ -11,6 +11,6 @@ public interface ModificationAdapter<T> {
      * @param mod the input modification
      * @return a converted modification
      */
-    public T convertModification(UniModModification mod);
+    public T convertModification(PRIDEModification mod);
 
 }

@@ -1,6 +1,6 @@
-package com.compomics.pride_asa_pipeline.core.logic.enzyme;
+package com.compomics.pride_asa_pipeline.core.inference.enzyme;
 
-import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapStats;
+import com.compomics.pride_asa_pipeline.core.inference.parameters.PrideAsapStats;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;

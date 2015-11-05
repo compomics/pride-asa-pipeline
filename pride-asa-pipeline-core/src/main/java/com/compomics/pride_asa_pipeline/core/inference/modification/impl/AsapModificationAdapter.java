@@ -1,7 +1,7 @@
-package com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl;
+package com.compomics.pride_asa_pipeline.core.inference.modification.impl;
 
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.ModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.UniModModification;
+import com.compomics.pride_asa_pipeline.core.inference.modification.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.inference.modification.PRIDEModification;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Modification.Location;
@@ -17,7 +17,7 @@ public class AsapModificationAdapter implements ModificationAdapter<Modification
     private HashSet<AminoAcid> affectedAminoAcid;
 
     @Override
-    public Modification convertModification(UniModModification mod) {
+    public Modification convertModification(PRIDEModification mod) {
         Double averageIsotopicMass = mod.getAveDeltaMass();
         Double monoIsotopicMass = mod.getMonoDeltaMass();
         //TODO calcualte this from the formula?

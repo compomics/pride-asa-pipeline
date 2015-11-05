@@ -3,7 +3,7 @@ package com.compomics.pride_asa_pipeline.core.logic.impl;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.MassDeltaExplainer;
 import com.compomics.pride_asa_pipeline.core.logic.ModificationCombinationSolver;
-import com.compomics.pride_asa_pipeline.core.logic.parameters.PrideAsapStats;
+import com.compomics.pride_asa_pipeline.core.inference.parameters.PrideAsapStats;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;

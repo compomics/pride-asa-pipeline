@@ -1,7 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
-import com.compomics.pride_asa_pipeline.core.logic.modification.UniModFactory;
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.inference.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.core.inference.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class FileModificationRepository extends ParserCacheConnector implements 
     /**
      * The UniMod modification factory for all modifications used in PRIDE
      */
-    private final UniModFactory modFactory = UniModFactory.getInstance();
+    private final PRIDEModificationFactory modFactory = PRIDEModificationFactory.getInstance();
 
     public FileModificationRepository(String experimentIdentifier) {
         this.experimentIdentifier = experimentIdentifier;

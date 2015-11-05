@@ -1,7 +1,8 @@
-package com.compomics.pride_asa_pipeline.core.logic.modification;
+package com.compomics.pride_asa_pipeline.core.inference.modification.source;
 
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.ModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.inference.modification.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.inference.modification.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.inference.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.pride.PrideWebService;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class AnnotatedModificationService {
     public List<Modification> convertToAsapMods(Set<String> ptmNames) {
         List<Modification> asapMods = new ArrayList<>();
         for (String aPTMName : ptmNames) {
-            asapMods.add((Modification) UniModFactory.getInstance().getModification(asapAdapter, aPTMName));
+            asapMods.add((Modification) PRIDEModificationFactory.getInstance().getModification(asapAdapter, aPTMName));
         }
         return asapMods;
     }
