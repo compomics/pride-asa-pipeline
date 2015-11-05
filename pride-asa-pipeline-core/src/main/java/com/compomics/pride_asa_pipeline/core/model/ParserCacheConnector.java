@@ -1,5 +1,6 @@
-package com.compomics.pride_asa_pipeline.core.repository.impl.file;
+package com.compomics.pride_asa_pipeline.core.model;
 
+import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import java.io.File;
 import java.util.List;
 import org.apache.log4j.Logger;

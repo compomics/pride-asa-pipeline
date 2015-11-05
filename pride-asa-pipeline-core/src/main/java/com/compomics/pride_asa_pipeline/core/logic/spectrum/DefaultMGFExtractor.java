@@ -1,6 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.logic.spectrum;
 
-import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;

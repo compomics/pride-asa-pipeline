@@ -1,6 +1,8 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
-import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
+import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
+import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.DefaultMGFExtractor;
 import com.compomics.pride_asa_pipeline.core.repository.SpectrumRepository;
 import com.compomics.pride_asa_pipeline.model.Peak;

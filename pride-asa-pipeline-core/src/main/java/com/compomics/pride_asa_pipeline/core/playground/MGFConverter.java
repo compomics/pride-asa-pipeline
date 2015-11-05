@@ -5,7 +5,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.playground;
 
-import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.DefaultMGFExtractor;
 import java.io.File;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;

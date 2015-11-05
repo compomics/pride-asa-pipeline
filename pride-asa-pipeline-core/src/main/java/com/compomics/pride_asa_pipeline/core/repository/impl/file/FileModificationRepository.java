@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
+import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.core.inference.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.inference.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;

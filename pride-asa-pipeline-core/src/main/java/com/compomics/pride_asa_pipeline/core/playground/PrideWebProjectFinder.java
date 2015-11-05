@@ -5,11 +5,11 @@
  */
 package com.compomics.pride_asa_pipeline.core.playground;
 
-import com.compomics.pride_asa_pipeline.core.exceptions.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.inference.parameters.PrideAsapExtractor;
 import com.compomics.pride_asa_pipeline.core.repository.impl.combo.WebServiceFileExperimentRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
-import com.compomics.pride_asa_pipeline.core.repository.impl.file.ParserCache;
+import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
 import com.compomics.util.io.compression.ZipUtils;

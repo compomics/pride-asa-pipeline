@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.repository.impl.file;
+package com.compomics.pride_asa_pipeline.core.cache;
 
 import java.io.File;
 import java.io.IOException;
