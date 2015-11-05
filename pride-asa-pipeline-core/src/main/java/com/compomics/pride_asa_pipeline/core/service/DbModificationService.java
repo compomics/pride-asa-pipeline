@@ -29,5 +29,5 @@ public interface DbModificationService extends ModificationService {
      * @param experimentId the experiment identifier
      * @return the list of modifications
      */
-    Set<Modification> loadExperimentModifications(long experimentId);   
+    Set<Modification> loadExperimentModifications(String experimentId);   
 }

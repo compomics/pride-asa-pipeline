@@ -85,6 +85,14 @@ public class ParserCache {
     public CachedDataAccessController getParser(String experimentAccession, boolean inMemory) {
         return getParser(experimentAccession, loadedFiles.get(experimentAccession), inMemory);
     }
+    /**
+     * Returns a boolean if the given accession is already loaded
+     * @param experimentAccession the experiment accession
+     * @return a boolean whether the accession already is loaded
+     */
+    public boolean containsParser(String experimentAccession) {
+        return loadedFiles.containsKey(experimentAccession);
+    }
 
     /**
      * Deletes a parser from the cache
@@ -97,7 +105,6 @@ public class ParserCache {
         parserCache.remove(experimentAccession);
     }
 
- 
     /**
      * Returns a hashmap of all filenames and their paths in the cache
      *
@@ -153,7 +160,7 @@ public class ParserCache {
      * @param identificationsFile the mzid file for the experiment
      * @param peakFiles a list of peakfiles related to this mzid file
      */
-    public void addPeakFiles(String experimentAccession,File identificationsFile, List<File> peakFiles) {
+    public void addPeakFiles(String experimentAccession, File identificationsFile, List<File> peakFiles) {
         addPeakFiles(experimentAccession, peakFiles);
     }
 

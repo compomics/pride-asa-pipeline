@@ -13,6 +13,8 @@ import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.ModifiedPeptidesMatchResult;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
+import com.compomics.pride_asa_pipeline.core.repository.impl.file.ParserCache;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.service.SpectrumService;
@@ -206,11 +208,21 @@ public abstract class AbstractSpectrumAnnotator<T> {
         }
         try {
             String assayAccession = identifier[0];
+            List<Modification> sortedAnnotatedModifications = new ArrayList<>();
             //load the modifications from the PRIDE annotation
-            AnnotatedModificationService annotatedModService = new AnnotatedModificationService();
-            List<String> assayAnnotatedModificationNames = Arrays.asList(annotatedModService.getAssayAnnotatedPTMs(assayAccession));
+            if (ParserCache.getInstance().containsParser(assayAccession)) {
+                FileModificationRepository repository = new FileModificationRepository();
+                sortedAnnotatedModifications.addAll(repository.getModificationsByExperimentId(assayAccession));
+            } else {
+                AnnotatedModificationService annotatedModService = new AnnotatedModificationService();
+                AsapModificationAdapter adapter = new AsapModificationAdapter();
+                //get other modifications
+                List<String> assayAnnotatedModificationNames = Arrays.asList(annotatedModService.getAssayAnnotatedPTMs(assayAccession));
+                for (String aPTMName : assayAnnotatedModificationNames) {
+                    sortedAnnotatedModifications.add((Modification) UniModFactory.getInstance().getModification(adapter, aPTMName));
+                }
+            }
             //order the annotated modifications to prevalence (in case there are more than the selected batch size)
-            LinkedList<Object> sortedAnnotatedModifications = UniModFactory.orderModificationsToPrevalence(assayAnnotatedModificationNames, new AsapModificationAdapter());
             //get all asap mods
             LinkedList<Modification> sortedAllModifications = UniModFactory.getAsapMods();
             //get a queue of them
@@ -252,6 +264,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             spectrumAnnotatorResult.setUnmodifiedPrecursors(unmodifiedPrecursors);
             spectrumAnnotatorResult.setModifiedPrecursors(modifiedPrecursors);
         } catch (IOException ex) {
+            ex.printStackTrace();
             LOGGER.error(ex);
         }
     }

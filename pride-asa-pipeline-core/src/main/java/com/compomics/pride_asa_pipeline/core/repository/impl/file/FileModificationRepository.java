@@ -62,9 +62,9 @@ public class FileModificationRepository extends ParserCacheConnector implements 
     }
 
     @Override
-    public List<Modification> getModificationsByExperimentId(long experimentId) {
+    public List<Modification> getModificationsByExperimentId(String experimentId) {
         List<Modification> modificationList = new ArrayList<>();
-        CachedDataAccessController parser = parserCache.getParser(experimentIdentifier, true);
+        CachedDataAccessController parser = parserCache.getParser(experimentId, true);
         for (Comparable proteinID : parser.getProteinIds()) {
             for (Comparable peptideID : parser.getPeptideIds(proteinID)) {
                 List<uk.ac.ebi.pride.utilities.data.core.Modification> mods = parser.getPTMs(proteinID, peptideID);

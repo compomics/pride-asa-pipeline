@@ -5,7 +5,6 @@
 package com.compomics.pride_asa_pipeline.core.repository;
 
 import com.compomics.pride_asa_pipeline.model.Modification;
-
 import java.util.List;
 
 /**
@@ -33,6 +32,6 @@ public interface ModificationRepository {
      * @return the peptide modifications that are annotated in the Pride public
      * database instance
      */
-    List<Modification> getModificationsByExperimentId(long experimentId);
+    List<Modification> getModificationsByExperimentId(String experimentId);
 
 }

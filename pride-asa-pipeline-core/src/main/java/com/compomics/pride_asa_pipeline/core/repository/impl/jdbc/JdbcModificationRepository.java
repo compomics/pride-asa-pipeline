@@ -6,8 +6,8 @@ package com.compomics.pride_asa_pipeline.core.repository.impl.jdbc;
 
 import com.compomics.pride_asa_pipeline.core.data.mapper.ExperimentModificationMapper;
 import com.compomics.pride_asa_pipeline.core.data.mapper.PrecursorModificationMapper;
-import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
+import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
@@ -58,7 +58,7 @@ public class JdbcModificationRepository extends JdbcDaoSupport implements Modifi
     }
 
     @Override
-    public List<Modification> getModificationsByExperimentId(long experimentId) {
+    public List<Modification> getModificationsByExperimentId(String experimentId) {
         LOGGER.debug("Loading modifications for experimentid " + experimentId);
         List<Modification> modifications = getJdbcTemplate().query(SELECT_MODIFICATION_BY_EXPERIMENT_ID, new ExperimentModificationMapper(), new Object[]{experimentId});
         LOGGER.debug("Finished loading modifications for pride experiment with id " + experimentId);

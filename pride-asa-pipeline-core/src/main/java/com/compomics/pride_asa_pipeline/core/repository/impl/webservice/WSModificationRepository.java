@@ -25,7 +25,7 @@ public class WSModificationRepository implements ModificationRepository {
     }
 
     @Override
-    public List<Modification> getModificationsByExperimentId(long experimentId) {
+    public List<Modification> getModificationsByExperimentId(String experimentId) {
         LOGGER.debug("Loading modifications for experimentid " + experimentId);
         List<Modification> modifications = new ArrayList<>();
         AsapModificationAdapter adapter = new AsapModificationAdapter();

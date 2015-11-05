@@ -4,13 +4,17 @@
  */
 package com.compomics.pride_asa_pipeline.core.service.impl;
 
-import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.core.service.DbModificationService;
+import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -50,7 +54,7 @@ public class DbModificationServiceImpl extends ModificationServiceImpl implement
     }
 
     @Override
-    public Set<Modification> loadExperimentModifications(long experimentId) {
+    public Set<Modification> loadExperimentModifications(String experimentId) {
 
         Set<String> modificationNames = Sets.newHashSet();
         Set<Modification> modificationSet = Sets.newHashSet();
