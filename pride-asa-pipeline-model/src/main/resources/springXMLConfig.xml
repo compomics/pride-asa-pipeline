@@ -117,17 +117,17 @@
     
     <!-- repository beans -->
     <bean id="experimentRepository"
-          class="com.compomics.pride_asa_pipeline.core.repository.impl.JdbcExperimentRepository">
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.WSExperimentRepository">
         <property name="dataSource" ref="prideDataSource"/>
     </bean>
     
     <bean id="spectrumRepository"
-          class="com.compomics.pride_asa_pipeline.core.repository.impl.JdbcSpectrumRepository">
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.WSSpectrumRepository">
         <property name="dataSource" ref="prideDataSource"/>
     </bean>
     
     <bean id="modificationRepository"
-          class="com.compomics.pride_asa_pipeline.core.repository.impl.JdbcModificationRepository">
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.WSModificationRepository">
         <property name="dataSource" ref="prideDataSource"/>
     </bean>       
     
