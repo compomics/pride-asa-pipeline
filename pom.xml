@@ -131,9 +131,9 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
         </plugins>
-    </build>
+    </build>    
 
-    <repositories>
+    <repositories>                 
         <repository>
             <id>ebi-repo</id>
             <name>The EBI Maven 2 repository</name>
@@ -145,7 +145,7 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-                <!-- EBI repo -->
+        <!-- EBI repo -->
         <repository>
             <id>nexus-ebi-repo</id>
             <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</url>
@@ -277,7 +277,7 @@
                 </exclusions>
             </dependency>
 
-             <dependency>
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>r09</version>
@@ -417,4 +417,3 @@
         </profile>
     </profiles>
 </project>
-
