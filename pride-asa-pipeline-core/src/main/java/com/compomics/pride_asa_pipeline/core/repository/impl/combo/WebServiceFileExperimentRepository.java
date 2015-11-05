@@ -4,8 +4,6 @@ import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperiment
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.util.io.FTPDownloader;
 import com.compomics.util.pride.PrideWebService;
-import com.compomics.util.pride.prideobjects.webservice.file.FileDetail;
-import com.compomics.util.pride.prideobjects.webservice.file.FileDetailList;
 import com.compomics.util.pride.prideobjects.webservice.file.FileType;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import org.apache.log4j.Logger;
+import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
+import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
 
 /**
  *
@@ -64,7 +64,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
     }
 
     private File downloadFile(FileDetail detail) throws Exception {
-        URL url = new URL(detail.getDownloadLink());
+        URL url = detail.getDownloadLink();
         FTPDownloader downloader = new FTPDownloader(url.getHost());
         File downloadFile = new File(tempFolder, detail.getFileName());
         File temp = null;

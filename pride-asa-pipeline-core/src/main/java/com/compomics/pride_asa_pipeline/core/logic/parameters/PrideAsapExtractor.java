@@ -54,7 +54,7 @@ public class PrideAsapExtractor extends PrideAsapInterpreter {
             LOGGER.info("SearchGUI.parameters already exists, refreshing !");
             try {
                 SearchParameters.saveIdentificationParameters(parameters, searchparametersfile);
-            } catch (FileNotFoundException | ClassNotFoundException ex) {
+            } catch (FileNotFoundException ex) {
                 LOGGER.error(ex);
             }
         }

@@ -7,6 +7,7 @@ import com.compomics.util.pride.PrideWebService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -23,16 +24,16 @@ public class AnnotatedModificationService {
 
     }
 
-    public String[] getProjectAnnotatedPTMs(String projectAccession) throws IOException {
+    public Set<String> getProjectAnnotatedPTMs(String projectAccession) throws IOException {
         return PrideWebService.getProjectDetail(projectAccession).getPtmNames();
     }
 
-    public String[] getAssayAnnotatedPTMs(String assayAccession) throws IOException {
-        String[] ptmNames = PrideWebService.getAssayDetail(assayAccession).getPtmNames();
+    public  Set<String> getAssayAnnotatedPTMs(String assayAccession) throws IOException {
+        Set<String> ptmNames = PrideWebService.getAssayDetail(assayAccession).getPtmNames();
         return ptmNames;
     }
 
-    public List<Modification> convertToAsapMods(String[] ptmNames) {
+    public List<Modification> convertToAsapMods(Set<String> ptmNames) {
         List<Modification> asapMods = new ArrayList<>();
         for (String aPTMName : ptmNames) {
             asapMods.add((Modification) UniModFactory.getInstance().getModification(asapAdapter, aPTMName));

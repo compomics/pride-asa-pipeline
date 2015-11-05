@@ -6,14 +6,6 @@ import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import com.compomics.util.pride.PrideWebService;
-import com.compomics.util.pride.prideobjects.webservice.assay.AssayDetail;
-import com.compomics.util.pride.prideobjects.webservice.assay.AssayDetailList;
-import com.compomics.util.pride.prideobjects.webservice.peptide.PsmDetail;
-import com.compomics.util.pride.prideobjects.webservice.peptide.PsmDetailList;
-import com.compomics.util.pride.prideobjects.webservice.project.projectsummary.ProjectSummary;
-import com.compomics.util.pride.prideobjects.webservice.project.projectsummary.ProjectSummaryList;
-import com.compomics.util.pride.prideobjects.webservice.protein.ProteinDetail;
-import com.compomics.util.pride.prideobjects.webservice.protein.ProteinDetailList;
 import com.compomics.util.pride.prideobjects.webservice.query.PrideFilter;
 import com.compomics.util.pride.prideobjects.webservice.query.PrideFilterType;
 import java.io.IOException;
@@ -22,6 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
+import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
+import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetailList;
+import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetail;
+import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetailList;
+import uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummary;
+import uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummaryList;
+import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetail;
+import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetailList;
 
 /**
  *

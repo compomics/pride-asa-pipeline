@@ -30,7 +30,6 @@ import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -217,8 +216,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 AnnotatedModificationService annotatedModService = new AnnotatedModificationService();
                 AsapModificationAdapter adapter = new AsapModificationAdapter();
                 //get other modifications
-                List<String> assayAnnotatedModificationNames = Arrays.asList(annotatedModService.getAssayAnnotatedPTMs(assayAccession));
-                for (String aPTMName : assayAnnotatedModificationNames) {
+                for (String aPTMName : annotatedModService.getAssayAnnotatedPTMs(assayAccession)) {
                     sortedAnnotatedModifications.add((Modification) UniModFactory.getInstance().getModification(adapter, aPTMName));
                 }
             }

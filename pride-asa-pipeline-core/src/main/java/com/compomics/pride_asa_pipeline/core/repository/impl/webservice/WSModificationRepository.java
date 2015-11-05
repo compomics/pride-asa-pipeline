@@ -5,11 +5,11 @@ import com.compomics.pride_asa_pipeline.core.logic.modification.conversion.impl.
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.pride.PrideWebService;
-import com.compomics.util.pride.prideobjects.webservice.assay.AssayDetail;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
+import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 
 /**
  *
