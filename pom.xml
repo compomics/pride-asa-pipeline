@@ -1,7 +1,7 @@
 <project
-        xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.compomics.pride-asa-pipeline</groupId>
     <artifactId>pride-asa-pipeline</artifactId>
@@ -145,6 +145,17 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+                <!-- EBI repo -->
+        <repository>
+            <id>nexus-ebi-repo</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</url>
+        </repository>
+
+        <!-- EBI SNAPSHOT repo -->
+        <repository>
+            <id>nexus-ebi-repo-snapshots</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
+        </repository>   
         <repository>
             <id>genesis-maven-repo</id>
             <name>Genesis maven repository</name>
@@ -245,7 +256,7 @@
             <dependency>
                 <groupId>com.compomics</groupId>
                 <artifactId>utilities</artifactId>
-                <version>4.1.11</version>
+                <version>4.1.12</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>derby</artifactId>
@@ -266,7 +277,7 @@
                 </exclusions>
             </dependency>
 
-            <dependency>
+             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>r09</version>

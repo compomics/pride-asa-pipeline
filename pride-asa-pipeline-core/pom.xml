@@ -320,17 +320,7 @@
             </snapshots>
         </repository>      
         
-        <!-- EBI repo -->
-        <repository>
-            <id>nexus-ebi-repo</id>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</url>
-        </repository>
-
-        <!-- EBI SNAPSHOT repo -->
-        <repository>
-            <id>nexus-ebi-repo-snapshots</id>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
-        </repository>    
+ 
                                          
     </repositories>
 
@@ -398,31 +388,6 @@
         </dependency>       
         
         <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>utilities</artifactId>
-            <version>4.1.13</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>derby</artifactId>
-                    <groupId>org.apache.derby</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>ols-dialog</artifactId>
-                    <groupId>no.uib</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>braf</artifactId>
-                    <groupId>uk.ac.ebi.pride.tools</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>batik-all</artifactId>
-                    <groupId>batik</groupId>
-                </exclusion>
-            </exclusions>
-            <type>jar</type>
-        </dependency>
-
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
@@ -452,9 +417,11 @@
             <artifactId>glazedlists_java15</artifactId>
         </dependency>     
         
-                
-        
-         
+        <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>utilities</artifactId>        
+        </dependency>
+                 
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
@@ -484,12 +451,14 @@
             <version>2.0.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
+
         <dependency>
             <groupId>uk.ac.ebi.pride.utilities</groupId>
             <artifactId>ms-data-core-api</artifactId>
             <version>2.0.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
+
     </dependencies>
     
     <distributionManagement>        
