@@ -5,7 +5,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.parameters;
 
-import com.compomics.pride_asa_pipeline.core.inference.parameters.PrideAsapExtractor;
+import com.compomics.pride_asa_pipeline.core.logic.inference.parameters.PrideAsapExtractor;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import java.io.File;
 import junit.framework.TestCase;

@@ -5,7 +5,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic.enzyme;
 
-import com.compomics.pride_asa_pipeline.core.inference.enzyme.EnzymePredictor;
+import com.compomics.pride_asa_pipeline.core.logic.inference.enzyme.EnzymePredictor;
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;
 import com.compomics.util.experiment.biology.Protein;

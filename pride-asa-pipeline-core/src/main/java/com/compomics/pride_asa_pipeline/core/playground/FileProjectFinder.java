@@ -6,7 +6,7 @@
 package com.compomics.pride_asa_pipeline.core.playground;
 
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
-import com.compomics.pride_asa_pipeline.core.inference.parameters.PrideAsapExtractor;
+import com.compomics.pride_asa_pipeline.core.logic.inference.parameters.PrideAsapExtractor;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;

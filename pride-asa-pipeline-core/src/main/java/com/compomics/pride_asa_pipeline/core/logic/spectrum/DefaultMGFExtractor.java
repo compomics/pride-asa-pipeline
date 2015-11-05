@@ -97,6 +97,7 @@ public class DefaultMGFExtractor {
      * @throws JMzReaderException
      */
     public File extractMGF(File outputFile, OutputStream reportStream, long timeout) throws MGFExtractionException, JMzReaderException {
+        LOGGER.info("Extraction of mgf started...");
         try (FileWriter w = new FileWriter(outputFile);
                 BufferedWriter bw = new BufferedWriter(w);
                 OutputStreamWriter rw = new OutputStreamWriter(reportStream);) {
@@ -130,9 +131,8 @@ public class DefaultMGFExtractor {
             rw.append("Total usable \t" + validSpectrumCount + System.lineSeparator()).flush();
         } catch (Exception ex) {
             LOGGER.error(ex);
-            ex.printStackTrace();
         }
-        System.out.println("Done");
+        LOGGER.info("Extraction completed");
         return outputFile;
     }
 

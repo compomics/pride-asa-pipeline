@@ -1,11 +1,11 @@
-package com.compomics.pride_asa_pipeline.core.inference.parameters;
+package com.compomics.pride_asa_pipeline.core.logic.inference.parameters;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.core.inference.enzyme.EnzymePredictor;
-import com.compomics.pride_asa_pipeline.core.inference.modification.source.PRIDEModificationFactory;
-import com.compomics.pride_asa_pipeline.core.inference.modification.ModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.inference.modification.impl.UtilitiesPTMAdapter;
+import com.compomics.pride_asa_pipeline.core.logic.inference.enzyme.EnzymePredictor;
+import com.compomics.pride_asa_pipeline.core.logic.inference.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.core.logic.inference.modification.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.logic.inference.modification.impl.UtilitiesPTMAdapter;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;

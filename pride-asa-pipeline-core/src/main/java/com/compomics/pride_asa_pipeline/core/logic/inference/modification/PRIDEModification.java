@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.inference.modification;
+package com.compomics.pride_asa_pipeline.core.logic.inference.modification;
 
 import java.util.List;
 import java.util.Objects;

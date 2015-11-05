@@ -1,11 +1,12 @@
 package com.compomics.pride_asa_pipeline.core.logic;
 
+import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.impl.MassDeltaExplainerImpl;
-import com.compomics.pride_asa_pipeline.core.inference.modification.source.AnnotatedModificationService;
+import com.compomics.pride_asa_pipeline.core.logic.inference.modification.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.logic.inference.modification.source.AnnotatedModificationService;
+import com.compomics.pride_asa_pipeline.core.logic.inference.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
-import com.compomics.pride_asa_pipeline.core.inference.modification.source.PRIDEModificationFactory;
-import com.compomics.pride_asa_pipeline.core.inference.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
@@ -14,7 +15,6 @@ import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.ModifiedPeptidesMatchResult;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
-import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.service.SpectrumService;
@@ -42,7 +42,7 @@ import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 
 /**
- * @author Niels Hulstaert
+ * @author Kenneth Verheggen
  */
 public abstract class AbstractSpectrumAnnotator<T> {
 

@@ -5,7 +5,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.util.reporter.plots;
 
-import com.compomics.pride_asa_pipeline.core.inference.parameters.PrideAsapStats;
+import com.compomics.pride_asa_pipeline.core.logic.inference.parameters.PrideAsapStats;
 import java.io.File;
 import java.io.IOException;
 import org.jfree.chart.ChartFactory;

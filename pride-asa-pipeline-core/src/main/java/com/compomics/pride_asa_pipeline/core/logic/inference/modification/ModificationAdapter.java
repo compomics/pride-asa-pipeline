@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.inference.modification;
+package com.compomics.pride_asa_pipeline.core.logic.inference.modification;
 
 /**
  *

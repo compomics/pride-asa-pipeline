@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.inference.parameters;
+package com.compomics.pride_asa_pipeline.core.logic.inference.parameters;
 
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;

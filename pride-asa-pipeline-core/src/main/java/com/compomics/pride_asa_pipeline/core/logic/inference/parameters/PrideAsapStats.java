@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.inference.parameters;
+package com.compomics.pride_asa_pipeline.core.logic.inference.parameters;
 
 import java.io.File;
 import java.io.FileWriter;
