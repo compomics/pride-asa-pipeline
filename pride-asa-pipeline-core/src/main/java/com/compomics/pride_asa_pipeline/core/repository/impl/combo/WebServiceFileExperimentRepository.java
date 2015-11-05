@@ -1,12 +1,11 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.combo;
 
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
-import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.util.io.FTPDownloader;
 import com.compomics.util.pride.PrideWebService;
-import com.compomics.util.pride.prideobjects.webservice.file.FileType;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import org.apache.log4j.Logger;
+import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileType;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
 
@@ -46,24 +46,30 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
         this.tempFolder = tempFolder;
     }
 
-    @Override
-    public List<Identification> loadExperimentIdentifications(String experimentAccession) {
-        List<Identification> identifications = new ArrayList<>();
-        try {
-            File identificationFileForAssay = getIdentificationFile(experimentAccession);
-            if (identificationFileForAssay.getName().toLowerCase().endsWith(".xml")) {
-                addPrideXMLFile(experimentAccession,identificationFileForAssay);
+    /**
+     * Adds an assay to the fileservice
+     *
+     * @param assay the experiment accession
+     * @throws Exception if a file cannot be correctly obtained
+     */
+    public void addAssay(String assay) throws Exception {
+        File identFile = getIdentificationFile(assay);
+        if (identFile != null) {
+            if (!identFile.getName().toLowerCase().endsWith(".xml") & !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
+                List<File> peakFiles = getPeakFiles(assay);
+                super.addMzID(assay, identFile, peakFiles);
             } else {
-                addMzID(experimentAccession,identificationFileForAssay, getPeakFiles(experimentAccession));
+                super.addPrideXMLFile(assay, identFile);
             }
-            identifications = super.loadExperimentIdentifications(identificationFileForAssay.getName());
-        } catch (Exception ex) {
-            LOGGER.error(ex);
+        } else {
+            throw new FileNotFoundException("No identification file was found for assay number " + assay);
         }
-        return identifications;
     }
 
     private File downloadFile(FileDetail detail) throws Exception {
+        if (!tempFolder.exists()) {
+            tempFolder.mkdirs();
+        }
         URL url = detail.getDownloadLink();
         FTPDownloader downloader = new FTPDownloader(url.getHost());
         File downloadFile = new File(tempFolder, detail.getFileName());
@@ -101,7 +107,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
         FileDetailList assayFileDetails = PrideWebService.getAssayFileDetails(experimentAccession);
         //try to find existing result files online
         for (FileDetail assayFile : assayFileDetails.getList()) {
-            if (assayFile.getFileType().equals(FileType.RESULT.toString())) {
+            if (assayFile.getFileType().equals(ProjectFileType.RESULT)) {
                 identificationsFile = downloadFile(assayFile);
             }
         }
@@ -113,7 +119,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
         FileDetailList assayFileDetails = PrideWebService.getAssayFileDetails(experimentAccession);
         //try to find existing result files online
         for (FileDetail assayFile : assayFileDetails.getList()) {
-            if (assayFile.getFileType().equals(FileType.PEAK.toString())) {
+            if (assayFile.getFileType().equals(ProjectFileType.PEAK)) {
                 peakFiles.add(downloadFile(assayFile));
             }
         }
