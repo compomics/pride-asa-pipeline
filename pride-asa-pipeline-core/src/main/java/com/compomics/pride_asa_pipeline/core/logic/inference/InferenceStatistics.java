@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.parameters;
+package com.compomics.pride_asa_pipeline.core.logic.inference;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,16 +13,16 @@ import org.apache.log4j.Logger;
  *
  * @author Kenneth Verheggen
  */
-public class PrideAsapStats extends DescriptiveStatistics {
+public class InferenceStatistics extends DescriptiveStatistics {
 
-    private static final Logger LOGGER = Logger.getLogger(PrideAsapStats.class);
+    private static final Logger LOGGER = Logger.getLogger(InferenceStatistics.class);
     private boolean absolute = false;
 
-    public PrideAsapStats(Collection<Double> values, boolean absolute) {
+    public InferenceStatistics(Collection<Double> values, boolean absolute) {
         addValues(values);
     }
 
-    public PrideAsapStats(boolean absolute) {
+    public InferenceStatistics(boolean absolute) {
         this.absolute = absolute;
     }
 

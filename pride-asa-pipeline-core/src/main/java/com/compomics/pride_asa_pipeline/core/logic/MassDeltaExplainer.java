@@ -4,7 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic;
 
-import com.compomics.pride_asa_pipeline.core.logic.inference.parameters.PrideAsapStats;
+import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
@@ -36,5 +36,5 @@ public interface MassDeltaExplainer {
      *
      * @return the mass deltas that are being assumed to be machine derived
      */
-    public PrideAsapStats getExplainedMassDeltas();
+    public InferenceStatistics getExplainedMassDeltas();
 }

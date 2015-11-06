@@ -1,7 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.webservice;
 
-import com.compomics.pride_asa_pipeline.core.logic.inference.modification.source.PRIDEModificationFactory;
-import com.compomics.pride_asa_pipeline.core.logic.inference.modification.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.pride.PrideWebService;

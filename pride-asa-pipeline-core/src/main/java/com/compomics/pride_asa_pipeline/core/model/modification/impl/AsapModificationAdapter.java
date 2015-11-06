@@ -1,7 +1,7 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.modification.impl;
+package com.compomics.pride_asa_pipeline.core.model.modification.impl;
 
-import com.compomics.pride_asa_pipeline.core.logic.inference.modification.ModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.logic.inference.modification.PRIDEModification;
+import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.model.modification.PRIDEModification;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Modification.Location;

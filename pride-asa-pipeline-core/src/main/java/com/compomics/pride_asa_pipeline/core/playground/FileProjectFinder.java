@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.pride_asa_pipeline.core.playground;
 
+import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
+import com.compomics.pride_asa_pipeline.core.logic.inference.ParameterExtractor;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
-import com.compomics.pride_asa_pipeline.core.logic.inference.parameters.PrideAsapExtractor;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
-import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
 import com.compomics.util.io.compression.ZipUtils;
@@ -51,7 +46,7 @@ public class FileProjectFinder {
         String assay = "3";
         LOGGER.info("Setting up experiment repository for assay " + assay);
         FileExperimentRepository experimentRepository = new FileExperimentRepository();
-        experimentRepository.addPrideXMLFile(assay,inputFile);
+        experimentRepository.addPrideXMLFile(assay, inputFile);
         experimentRepository.loadExperimentIdentifications(assay);
         //the cache should only have one for now?
         String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
@@ -66,8 +61,8 @@ public class FileProjectFinder {
         mgf.delete();
         //do the extraction
         LOGGER.info("Attempting to infer searchparameters");
-        PrideAsapExtractor extractor = new PrideAsapExtractor(entry, outputFolder);
-        SearchParameters inferSearchParameters = extractor.inferSearchParameters();
+        ParameterExtractor extractor = new ParameterExtractor(assay);
+        SearchParameters inferSearchParameters = extractor.getParameters();
         SearchParameters.saveIdentificationParameters(inferSearchParameters, new File(outputFolder, assay + ".asap.par"));
     }
 }

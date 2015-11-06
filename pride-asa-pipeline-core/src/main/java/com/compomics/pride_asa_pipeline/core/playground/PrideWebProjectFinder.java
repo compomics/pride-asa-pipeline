@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.pride_asa_pipeline.core.playground;
 
+import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
+import com.compomics.pride_asa_pipeline.core.logic.inference.ParameterExtractor;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
-import com.compomics.pride_asa_pipeline.core.logic.inference.parameters.PrideAsapExtractor;
 import com.compomics.pride_asa_pipeline.core.repository.impl.combo.WebServiceFileExperimentRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
-import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
 import com.compomics.util.io.compression.ZipUtils;
@@ -65,8 +60,8 @@ public class PrideWebProjectFinder {
         mgf.delete();
         //do the extraction
         LOGGER.info("Attempting to infer searchparameters");
-        PrideAsapExtractor extractor = new PrideAsapExtractor(entry, outputFolder);
-        SearchParameters inferSearchParameters = extractor.inferSearchParameters();
+        ParameterExtractor extractor = new ParameterExtractor(assay);
+        SearchParameters inferSearchParameters = extractor.getParameters();
         SearchParameters.saveIdentificationParameters(inferSearchParameters, new File(outputFolder, assay + ".asap.par"));
     }
 }

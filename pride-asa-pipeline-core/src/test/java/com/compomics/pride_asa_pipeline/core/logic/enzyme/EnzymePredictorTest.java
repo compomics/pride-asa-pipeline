@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.pride_asa_pipeline.core.logic.enzyme;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.enzyme.EnzymePredictor;
@@ -83,7 +78,7 @@ public class EnzymePredictorTest extends TestCase {
         System.out.println("Test Trypsin");
         List<String> peptides = mockUpPeptideDigestion(testingEnzyme, 300);
         EnzymePredictor predictor = new EnzymePredictor(peptides);
-        Enzyme bestGuess = predictor.estimateBestEnzyme();
+        Enzyme bestGuess = predictor.getMostLikelyEnzyme();
         System.out.println("Outcome = " + bestGuess.getName());
         assertTrue(bestGuess.getName().toUpperCase().contains("TRYP"));
     }
@@ -92,7 +87,7 @@ public class EnzymePredictorTest extends TestCase {
         System.out.println("Test ARG-C");
         List<String> peptides = mockUpPeptideDigestion(testingEnzyme2, 300);
         EnzymePredictor predictor = new EnzymePredictor(peptides);
-        Enzyme bestGuess = predictor.estimateBestEnzyme();
+        Enzyme bestGuess = predictor.getMostLikelyEnzyme();
         System.out.println("Outcome = " + bestGuess.getName());
         assertTrue(bestGuess.getName().toUpperCase().contains("ARG-C"));
     }
@@ -101,7 +96,7 @@ public class EnzymePredictorTest extends TestCase {
         System.out.println("Test LYS-C");
         List<String> peptides = mockUpPeptideDigestion(testingEnzyme3, 300);
         EnzymePredictor predictor = new EnzymePredictor(peptides);
-        Enzyme bestGuess = predictor.estimateBestEnzyme();
+        Enzyme bestGuess = predictor.getMostLikelyEnzyme();
         System.out.println("Outcome = " + bestGuess.getName());
         assertTrue(bestGuess.getName().toUpperCase().contains("LYS-C"));
 
@@ -111,7 +106,7 @@ public class EnzymePredictorTest extends TestCase {
         System.out.println("Test PEPSIN");
         List<String> peptides = mockUpPeptideDigestion(testingEnzyme4, 300);
         EnzymePredictor predictor = new EnzymePredictor(peptides);
-        Enzyme bestGuess = predictor.estimateBestEnzyme();
+        Enzyme bestGuess = predictor.getMostLikelyEnzyme();
         System.out.println("Outcome = " + bestGuess.getName());
         assertTrue(bestGuess.getName().toUpperCase().contains("PEPSIN"));
     }
@@ -120,7 +115,7 @@ public class EnzymePredictorTest extends TestCase {
         System.out.println("Test ChymoTrypsin");
         List<String> peptides = mockUpPeptideDigestion(testingEnzyme5, 300);
         EnzymePredictor predictor = new EnzymePredictor(peptides);
-        Enzyme bestGuess = predictor.estimateBestEnzyme();
+        Enzyme bestGuess = predictor.getMostLikelyEnzyme();
         System.out.println("Outcome = " + bestGuess.getName());
         assertTrue(bestGuess.getName().toUpperCase().contains("CHYMOTRYP"));
     }

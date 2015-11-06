@@ -1,7 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.logic.inference.enzyme;
 
-import com.compomics.pride_asa_pipeline.core.logic.inference.parameters.PrideAsapStats;
-import com.compomics.pride_asa_pipeline.model.Peptide;
+import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;
 import java.io.File;
@@ -34,10 +33,6 @@ public class EnzymePredictor {
      */
     private static final Logger LOGGER = Logger.getLogger(EnzymePredictor.class);
     /**
-     * The most likely enzyme
-     */
-    private Enzyme bestGuess;
-    /**
      * boolean indicating if this project is fit for searches
      */
     private boolean suitedForSearching = true;
@@ -61,14 +56,10 @@ public class EnzymePredictor {
      * the peptide sequences that need to be considered
      */
     private ArrayList<String> peptideSequences = new ArrayList<>();
-
-    public Enzyme getBestGuess() {
-        return bestGuess;
-    }
-
-    public void setBestGuess(Enzyme bestGuess) {
-        this.bestGuess = bestGuess;
-    }
+    /*
+    * The most likely enzyme
+    */
+    private Enzyme mostLikelyEnzyme;
 
     public boolean isSuitedForSearching() {
         return suitedForSearching;
@@ -79,44 +70,13 @@ public class EnzymePredictor {
     }
 
     public EnzymePredictor() throws IOException, FileNotFoundException, ClassNotFoundException, XmlPullParserException {
-        LOGGER.info("Setting up factories");
         loadEnzymeFactory();
-        this.bestGuess = enzymeFactory.getEnzyme("Trypsin");
     }
 
-    public EnzymePredictor(List<String> peptideSequences) throws IOException, FileNotFoundException, ClassNotFoundException, XmlPullParserException {
-        LOGGER.info("Setting up factories");
+    public EnzymePredictor(List<String> peptideSequences) throws IOException, XmlPullParserException {
         loadEnzymeFactory();
-        this.bestGuess = enzymeFactory.getEnzyme("Trypsin");
         this.peptideSequences.addAll(peptideSequences);
-    }
-
-    /**
-     * This method adds peptide objects to the predictor
-     *
-     * @param peptides
-     * @throws IOException
-     * @throws FileNotFoundException
-     * @throws ClassNotFoundException
-     * @throws XmlPullParserException
-     */
-    public void addPeptideObjects(List<Peptide> peptides) throws IOException, FileNotFoundException, ClassNotFoundException, XmlPullParserException {
-        for (Peptide aPeptide : peptides) {
-            peptideSequences.add(aPeptide.getSequenceString());
-        }
-    }
-
-    /**
-     * This method adds peptide sequences to the predictor
-     *
-     * @param peptides
-     * @throws IOException
-     * @throws FileNotFoundException
-     * @throws ClassNotFoundException
-     * @throws XmlPullParserException
-     */
-    public void addPeptides(List<String> peptides) throws IOException, FileNotFoundException, ClassNotFoundException, XmlPullParserException {
-        peptideSequences.addAll(peptides);
+        estimateBestEnzyme();
     }
 
     private void loadEnzymeFactory() throws IOException, XmlPullParserException {
@@ -134,9 +94,9 @@ public class EnzymePredictor {
     /**
      * Estimates the best suited enzyme for a given collection of sequences
      *
-     * @return the best suited enzyme for the given peptide sequences
      */
-    public Enzyme estimateBestEnzyme() {
+    private void estimateBestEnzyme() {
+        mostLikelyEnzyme = enzymeFactory.getEnzyme("Trypsin");
         N_TerminiCount = new HashMap<>();
         C_TerminiCount = new HashMap<>();
         for (String sequence : peptideSequences) {
@@ -175,12 +135,11 @@ public class EnzymePredictor {
         for (Map.Entry<Enzyme, Double> anEnzyme : correctnessMap.entrySet()) {
             double correctNess = anEnzyme.getValue() / (missedCleavagesMap.get(anEnzyme.getKey()) + 1);
             if (correctNess > bestCorrectness) {
-                bestGuess = anEnzyme.getKey();
+                mostLikelyEnzyme = anEnzyme.getKey();
                 maxMissedCleavages = missedCleavagesMap.get(anEnzyme.getKey());
                 bestCorrectness = correctNess;
             }
         }
-        return bestGuess;
     }
 
     /**
@@ -188,7 +147,7 @@ public class EnzymePredictor {
      * @param enzyme the used enzyme
      * @return the maximum amount of misscleavages found in a peptidesequence
      */
-    public int getMissCleavages() {
+    public int getMissedCleavages() {
         return maxMissedCleavages;
     }
 
@@ -200,20 +159,13 @@ public class EnzymePredictor {
     public double getMissedCleavageRatio() {
         int totalMissed = 0;
         for (String aSequence : peptideSequences) {
-            totalMissed += bestGuess.getNmissedCleavages(aSequence);
+            totalMissed += mostLikelyEnzyme.getNmissedCleavages(aSequence);
         }
-        return PrideAsapStats.round((double) totalMissed / (double) peptideSequences.size(), 3);
+        return InferenceStatistics.round((double) totalMissed / (double) peptideSequences.size(), 3);
     }
 
-    /**
-     * clears the resources
-     */
-    public void clear() {
-        enzymeFactory = null;
-        bestGuess = null;
-        if (peptideSequences != null) {
-            peptideSequences.clear();
-        }
+    public Enzyme getMostLikelyEnzyme() {
+        return mostLikelyEnzyme;
     }
 
 }

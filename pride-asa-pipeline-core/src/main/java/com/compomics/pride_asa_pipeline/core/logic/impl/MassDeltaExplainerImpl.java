@@ -3,7 +3,7 @@ package com.compomics.pride_asa_pipeline.core.logic.impl;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.MassDeltaExplainer;
 import com.compomics.pride_asa_pipeline.core.logic.ModificationCombinationSolver;
-import com.compomics.pride_asa_pipeline.core.logic.inference.parameters.PrideAsapStats;
+import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
@@ -26,7 +26,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
 
     private static final Logger LOGGER = Logger.getLogger(MassDeltaExplainerImpl.class);
     private final ModificationCombinationSolver modificationCombinationSolver;
-    private final PrideAsapStats massErrorStatistics = new PrideAsapStats(true);
+    private final InferenceStatistics massErrorStatistics = new InferenceStatistics(true);
 
     public MassDeltaExplainerImpl(ModificationHolder modificationHolder) {
         modificationCombinationSolver = new ModificationCombinationSolverImpl(modificationHolder);
@@ -128,7 +128,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
     }
 
     @Override
-    public PrideAsapStats getExplainedMassDeltas() {
+    public InferenceStatistics getExplainedMassDeltas() {
         return massErrorStatistics;
     }
 }

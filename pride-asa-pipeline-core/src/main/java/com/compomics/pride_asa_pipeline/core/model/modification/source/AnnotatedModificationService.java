@@ -1,8 +1,8 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.modification.source;
+package com.compomics.pride_asa_pipeline.core.model.modification.source;
 
-import com.compomics.pride_asa_pipeline.core.logic.inference.modification.ModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.logic.inference.modification.ModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.logic.inference.modification.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.pride.PrideWebService;
 import java.io.IOException;
