@@ -1,9 +1,9 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
-import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
-import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.data.extractor.MGFExtractor;
+import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.core.repository.SpectrumRepository;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import java.io.File;
@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
-import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
-import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 import uk.ac.ebi.pride.utilities.data.core.Spectrum;
 
 /**
@@ -29,10 +27,10 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
      */
     private String experimentIdentifier;
 
-    public FileSpectrumRepository(){
-        
-    }   
-            
+    public FileSpectrumRepository() {
+
+    }
+
     public FileSpectrumRepository(String experimentIdentifier) {
         this.experimentIdentifier = experimentIdentifier;
     }
@@ -55,8 +53,8 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
 
     public void setParserCache(ParserCache parserCache) {
         this.parserCache = parserCache;
-    }   
-    
+    }
+
     @Override
     public double[] getMzValuesBySpectrumId(String spectrumId) {
         Spectrum spectrumById = parserCache.getParser(experimentIdentifier, true).getSpectrumById(spectrumId);
@@ -102,8 +100,6 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
                     new MGFExtractor(aPeakFile).extractMGF(tempOut, timeout);
                     String mgfAsString = FileUtils.readFileToString(tempOut);
                     writer.append(mgfAsString).append(System.lineSeparator());
-                } catch (ClassNotFoundException | MzXMLParsingException | JMzReaderException ex) {
-                    throw new MGFExtractionException(ex.getMessage());
                 } finally {
                     tempOut.delete();
                 }

@@ -5,11 +5,9 @@
  */
 package com.compomics.pride_asa_pipeline.core.playground;
 
-import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.data.extractor.MGFExtractor;
+import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import java.io.File;
-import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
-import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
 /**
  *
@@ -24,7 +22,7 @@ public class MGFConverter {
             File output = new File("C:\\Users\\Kenneth\\Desktop\\mzML-test\\output.mgf");
             MGFExtractor extractor = new MGFExtractor(input);
             extractor.extractMGF(output,1000);
-        } catch (ClassNotFoundException | MGFExtractionException | JMzReaderException | MzXMLParsingException ex) {
+        } catch (MGFExtractionException ex) {
             ex.printStackTrace();
         } finally {
             System.out.println("Done !");

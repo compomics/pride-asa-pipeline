@@ -75,9 +75,8 @@ public class MGFExtractor {
      * @param outputFile the output MGF file
      * @return the extracted MGF file
      * @throws MGFExtractionException
-     * @throws JMzReaderException
      */
-    public File extractMGF(File outputFile) throws MGFExtractionException, JMzReaderException {
+    public File extractMGF(File outputFile) throws MGFExtractionException {
         return extractMGF(outputFile, 30000);
     }
 
@@ -88,9 +87,8 @@ public class MGFExtractor {
      * @param timeout the timeout for spectrum retrieval (it sometimes blocks)
      * @return the extracted MGF file
      * @throws MGFExtractionException
-     * @throws JMzReaderException
      */
-    public File extractMGF(File outputFile, long timeout) throws MGFExtractionException, JMzReaderException {
+    public File extractMGF(File outputFile, long timeout) throws MGFExtractionException {
         OutputStream reportStream = new OutputStream() {
             @Override
             public void write(int b) throws IOException {
@@ -110,7 +108,7 @@ public class MGFExtractor {
      * @throws MGFExtractionException
      * @throws JMzReaderException
      */
-    public File extractMGF(File outputFile, OutputStream reportStream, long timeout) throws MGFExtractionException, JMzReaderException {
+    public File extractMGF(File outputFile, OutputStream reportStream, long timeout) throws MGFExtractionException {
         LOGGER.info("Extraction of mgf started...");
         try (FileWriter w = new FileWriter(outputFile);
                 BufferedWriter bw = new BufferedWriter(w);
@@ -237,8 +235,6 @@ public class MGFExtractor {
             retriever.interrupt();
             if (!cancel) {
                 LOGGER.error("Could not clear the thread for " + spectrumID);
-                retriever = null;
-                futureResult = null;
             }
             //for safety kill the service pool?
             service.shutdownNow();
@@ -253,36 +249,6 @@ public class MGFExtractor {
 
     public void clear() {
         jMzReader = null;
-    }
-
-    private static final class SpectrumRetriever implements Callable<Spectrum> {
-
-        private final JMzReader jmzReader;
-        private final String spectrumId;
-
-        private SpectrumRetriever(String spectrumId, JMzReader jmzReader) {
-            this.jmzReader = jmzReader;
-            this.spectrumId = spectrumId;
-        }
-
-        @Override
-        public Spectrum call() throws Exception {
-            Thread.currentThread().setName(spectrumId);
-            Spectrum spectrum = jmzReader.getSpectrumById(spectrumId);
-            return spectrum;
-        }
-
-        public void interrupt() {
-            Thread[] a = new Thread[Thread.activeCount()];
-            int n = Thread.enumerate(a);
-            for (int i = 0; i < n; i++) {
-                if (a[i].getName().equals(spectrumId)) {
-                    a[i].interrupt();
-                    break;
-                }
-            }
-        }
-
     }
 
     private JMzReader getJMzReader(File inputFile) throws ClassNotFoundException, MzXMLParsingException, JMzReaderException {
@@ -325,6 +291,36 @@ public class MGFExtractor {
                 throw new ClassNotFoundException("No suitable parser was found for the inputfile.");
         }
         return parser;
+    }
+
+    private static final class SpectrumRetriever implements Callable<Spectrum> {
+
+        private final JMzReader jmzReader;
+        private final String spectrumId;
+
+        private SpectrumRetriever(String spectrumId, JMzReader jmzReader) {
+            this.jmzReader = jmzReader;
+            this.spectrumId = spectrumId;
+        }
+
+        @Override
+        public Spectrum call() throws Exception {
+            Thread.currentThread().setName(spectrumId);
+            Spectrum spectrum = jmzReader.getSpectrumById(spectrumId);
+            return spectrum;
+        }
+
+        public void interrupt() {
+            Thread[] a = new Thread[Thread.activeCount()];
+            int n = Thread.enumerate(a);
+            for (int i = 0; i < n; i++) {
+                if (a[i].getName().equals(spectrumId)) {
+                    a[i].interrupt();
+                    break;
+                }
+            }
+        }
+
     }
 
 }

@@ -1,25 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.pride_asa_pipeline.core.logic.spectrum;
 
 import com.compomics.pride_asa_pipeline.core.data.extractor.MGFExtractor;
+import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.util.experiment.massspectrometry.SpectrumFactory;
 import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
 import java.io.IOException;
 import junit.framework.TestCase;
 import org.springframework.core.io.ClassPathResource;
-import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
-import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
 /**
  *
  * @author Kenneth
  */
-public class DefaultMGFExtractorTest extends TestCase {
+public class MGFExtractorTest extends TestCase {
 
     private static MGFExtractor instance3 = null;
 
@@ -33,11 +27,11 @@ public class DefaultMGFExtractorTest extends TestCase {
         return testResource;
     }
 
-    public DefaultMGFExtractorTest(String testName) throws IOException, ClassNotFoundException, MzXMLParsingException, JMzReaderException {
+    public MGFExtractorTest(String testName) throws MGFExtractionException, IOException {
         super(testName);
-        if (DefaultMGFExtractorTest.instance3 == null) {
+        if (MGFExtractorTest.instance3 == null) {
             File testingFile3 = getFileFromResources("PRIDE_Exp_Complete_Ac_3.xml.zip");
-            DefaultMGFExtractorTest.instance3 = new MGFExtractor(testingFile3);
+            MGFExtractorTest.instance3 = new MGFExtractor(testingFile3);
         }
     }
 
@@ -54,12 +48,12 @@ public class DefaultMGFExtractorTest extends TestCase {
     /**
      * Test of extractMGF method, of class DefaultMGFExtractor2.
      */
-    public void testExtractMGF() throws Exception {
+    public void testExtractMGF() throws MGFExtractionException, IOException  {
         System.out.println("extractMGF");
 
         File outputFile = new File("pride_project_3.mgf");
         outputFile.deleteOnExit();
-        File result = DefaultMGFExtractorTest.instance3.extractMGF(outputFile);
+        File result = MGFExtractorTest.instance3.extractMGF(outputFile);
         SpectrumFactory factory = SpectrumFactory.getInstance();
         factory.clearFactory();
         factory.addSpectra(outputFile, null);
