@@ -5,6 +5,7 @@ import com.compomics.pride_asa_pipeline.core.logic.inference.ParameterExtractor;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
+import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
 import com.compomics.util.io.compression.ZipUtils;
@@ -45,7 +46,9 @@ public class FileProjectFinder {
     public void analyze(File inputFile) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
         String assay = "3";
         LOGGER.info("Setting up experiment repository for assay " + assay);
-        FileExperimentRepository experimentRepository = new FileExperimentRepository();
+        //load into the spring setup
+        ApplicationContextProvider.getInstance().setDefaultApplicationContext();
+        FileExperimentRepository experimentRepository = (FileExperimentRepository) ApplicationContextProvider.getInstance().getBean("experimentRepository");
         experimentRepository.addPrideXMLFile(assay, inputFile);
         experimentRepository.loadExperimentIdentifications(assay);
         //the cache should only have one for now?
