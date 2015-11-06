@@ -1,7 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.webservice;
 
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
-import com.compomics.pride_asa_pipeline.core.logic.spectrum.DefaultMGFExtractor;
+import com.compomics.pride_asa_pipeline.core.data.extractor.MGFExtractor;
 import com.compomics.pride_asa_pipeline.core.repository.SpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.model.Peak;
@@ -77,7 +77,7 @@ public class WSSpectrumRepository extends ParserCacheConnector implements Spectr
                 File tempOut = new File(aPeakFile.getParentFile(), aPeakFile.getName() + "asap.temp.mgf");
                 tempOut.deleteOnExit();
                 try {
-                    new DefaultMGFExtractor(aPeakFile).extractMGF(tempOut, timeout);
+                    new MGFExtractor(aPeakFile).extractMGF(tempOut, timeout);
                     String mgfAsString = FileUtils.readFileToString(tempOut);
                     writer.append(mgfAsString).append(System.lineSeparator());
                 } catch (ClassNotFoundException | MzXMLParsingException | JMzReaderException ex) {

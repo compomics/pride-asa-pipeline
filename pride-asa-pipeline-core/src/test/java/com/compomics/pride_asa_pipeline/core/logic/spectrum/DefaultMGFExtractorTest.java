@@ -5,6 +5,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic.spectrum;
 
+import com.compomics.pride_asa_pipeline.core.data.extractor.MGFExtractor;
 import com.compomics.util.experiment.massspectrometry.SpectrumFactory;
 import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
@@ -20,7 +21,7 @@ import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
  */
 public class DefaultMGFExtractorTest extends TestCase {
 
-    private static DefaultMGFExtractor instance3 = null;
+    private static MGFExtractor instance3 = null;
 
     private File getFileFromResources(String fileName) throws IOException {
         File testResource = new ClassPathResource(fileName).getFile();
@@ -36,7 +37,7 @@ public class DefaultMGFExtractorTest extends TestCase {
         super(testName);
         if (DefaultMGFExtractorTest.instance3 == null) {
             File testingFile3 = getFileFromResources("PRIDE_Exp_Complete_Ac_3.xml.zip");
-            DefaultMGFExtractorTest.instance3 = new DefaultMGFExtractor(testingFile3);
+            DefaultMGFExtractorTest.instance3 = new MGFExtractor(testingFile3);
         }
     }
 

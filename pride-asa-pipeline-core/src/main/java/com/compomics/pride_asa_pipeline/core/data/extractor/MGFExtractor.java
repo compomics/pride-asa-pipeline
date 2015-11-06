@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.logic.spectrum;
+package com.compomics.pride_asa_pipeline.core.data.extractor;
 
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import java.io.BufferedWriter;
@@ -17,30 +17,39 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
+import uk.ac.ebi.pride.tools.dta_parser.DtaFile;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReader;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
 import uk.ac.ebi.pride.tools.jmzreader.model.Spectrum;
 import uk.ac.ebi.pride.tools.jmzreader.model.impl.CvParam;
+import uk.ac.ebi.pride.tools.mgf_parser.MgfFile;
+import uk.ac.ebi.pride.tools.ms2_parser.Ms2File;
+import uk.ac.ebi.pride.tools.mzdata_parser.MzDataFile;
+import uk.ac.ebi.pride.tools.mzml_wrapper.MzMlWrapper;
+import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLFile;
 import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
+import uk.ac.ebi.pride.tools.pkl_parser.PklFile;
+import uk.ac.ebi.pride.tools.pride_wrapper.PRIDEXmlWrapper;
 
 /**
  *
  * @author Kenneth Verheggen
  */
-public class DefaultMGFExtractor {
+public class MGFExtractor {
 
     JMzReader jMzReader;
-    private final static Logger LOGGER = Logger.getLogger(DefaultMGFExtractor.class);
+    private final static Logger LOGGER = Logger.getLogger(MGFExtractor.class);
     public File inputFile;
     private Integer maxPrecursorCharge = 5;
     private Integer minPrecursorCharge = 1;
 
-    public DefaultMGFExtractor() {
+    public MGFExtractor() {
 
     }
 
-    public DefaultMGFExtractor(File inputFile) throws ClassNotFoundException, MzXMLParsingException, JMzReaderException {
+    public MGFExtractor(File inputFile) throws MGFExtractionException {
         init(inputFile);
     }
 
@@ -49,10 +58,15 @@ public class DefaultMGFExtractor {
     }
 
 //the prideFTP should be checked before this...
-    private void init(File inputFile) throws ClassNotFoundException, MzXMLParsingException, JMzReaderException {
+    private void init(File inputFile) throws MGFExtractionException {
         this.inputFile = inputFile;
         LOGGER.info("Getting parser for " + inputFile.getName());
-        jMzReader = SpectrumParserFactory.getJMzReader(inputFile);
+        try {
+            jMzReader = getJMzReader(inputFile);
+        } catch (ClassNotFoundException | MzXMLParsingException | JMzReaderException ex) {
+            LOGGER.error("Could not initiate spectrum extraction !");
+            throw new MGFExtractionException(ex.getMessage());
+        }
     }
 
     /**
@@ -269,6 +283,48 @@ public class DefaultMGFExtractor {
             }
         }
 
+    }
+
+    private JMzReader getJMzReader(File inputFile) throws ClassNotFoundException, MzXMLParsingException, JMzReaderException {
+        JMzReader parser = null;
+        String extension = FilenameUtils.getExtension(inputFile.getAbsolutePath());
+        switch (extension.toLowerCase()) {
+            case "mzxml":
+                LOGGER.info("Detected mzXml file extension.");
+                parser = new MzXMLFile(inputFile);
+                break;
+            case "mzml":
+                LOGGER.info("Detected mzml file extension.");
+                parser = new MzMlWrapper(inputFile);
+                break;
+            case "dta":
+                LOGGER.info("Detected dta file extension.");
+                parser = new DtaFile(inputFile);
+                break;
+            case "mgf":
+                LOGGER.info("Detected mgf file extension.");
+                parser = new MgfFile(inputFile);
+                break;
+            case "ms2":
+                LOGGER.info("Detected ms2 file extension.");
+                parser = new Ms2File(inputFile);
+                break;
+            case "mzData":
+                LOGGER.info("Detected mzData file extension.");
+                parser = new MzDataFile(inputFile);
+                break;
+            case "xml":
+                LOGGER.info("Detected xml file extension.");
+                parser = new PRIDEXmlWrapper(inputFile);
+                break;
+            case "pkl":
+                LOGGER.info("Detected pkl file extension.");
+                parser = new PklFile(inputFile);
+                break;
+            default:
+                throw new ClassNotFoundException("No suitable parser was found for the inputfile.");
+        }
+        return parser;
     }
 
 }
