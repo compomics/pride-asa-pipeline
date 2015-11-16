@@ -34,7 +34,7 @@ public class PrideWebProjectFinder {
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
         File outputFolder = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download");
-        String inputAssay = "3";
+        String inputAssay = "33005";
         new PrideWebProjectFinder(outputFolder).analyze(inputAssay);
     }
 
@@ -43,10 +43,9 @@ public class PrideWebProjectFinder {
     }
 
     public void analyze(String assayAccession) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
-        String assay = "3";
-        LOGGER.info("Setting up experiment repository for assay " + assay);
+        LOGGER.info("Setting up experiment repository for assay " + assayAccession);
         WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository();
-        experimentRepository.addAssay(assay);
+        experimentRepository.addAssay(assayAccession);
         //the cache should only have one for now?
         String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
         LOGGER.info(entry + " was found in the parser cache");
@@ -60,8 +59,8 @@ public class PrideWebProjectFinder {
         mgf.delete();
         //do the extraction
         LOGGER.info("Attempting to infer searchparameters");
-        ParameterExtractor extractor = new ParameterExtractor(assay);
+        ParameterExtractor extractor = new ParameterExtractor(assayAccession);
         SearchParameters inferSearchParameters = extractor.getParameters();
-        SearchParameters.saveIdentificationParameters(inferSearchParameters, new File(outputFolder, assay + ".asap.par"));
+        SearchParameters.saveIdentificationParameters(inferSearchParameters, new File(outputFolder, assayAccession + ".asap.par"));
     }
 }

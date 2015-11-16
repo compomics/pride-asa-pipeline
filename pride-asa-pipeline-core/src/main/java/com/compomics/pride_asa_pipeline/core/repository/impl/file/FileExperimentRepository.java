@@ -1,7 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
-import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
+import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.Identification;
@@ -60,8 +60,12 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
                     double mz = spectrumIdentification.getExperimentalMassToCharge();
                     AminoAcidSequence aaSequence = new AminoAcidSequence(aPeptide.getPeptideSequence().getSequence());
                     Peptide peptide = new Peptide(charge, mz, aaSequence);
-                    Identification identification = new Identification();
-                    identification.setPeptide(peptide);
+                    Identification identification = new Identification(
+                            //@TODO is this correct?
+                            peptide, 
+                            String.valueOf(spectrumIdentification.getSpectrum().getIndex()), 
+                            String.valueOf(spectrumIdentification.getSpectrum().getId()), 
+                            spectrumIdentification.getName());
                     identifications.add(identification);
                 } catch (UnknownAAException ex) {
                     LOGGER.error(ex);
@@ -97,4 +101,5 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    
 }

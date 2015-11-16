@@ -63,11 +63,13 @@ public class MassAccuraccyPredictor {
     }
 
     private void inferMachineSettings() {
+        //use the known unmodified precorsors
         List<Identification> experimentIdentifications = spectrumAnnotatorResult.getUnmodifiedPrecursors();
         HashSet<Identification> alreadyProcessedIdentifications = new HashSet<>();
         precursorStats.clear();
         fragmentIonStats.clear();
         for (Identification anIdentification : experimentIdentifications) {
+            //if the identification was processed before, don't repeat it
             if (!alreadyProcessedIdentifications.contains(anIdentification)) {
                 encounteredCharges.add(anIdentification.getPeptide().getCharge());
                 alreadyProcessedIdentifications.add(anIdentification);
@@ -77,20 +79,20 @@ public class MassAccuraccyPredictor {
                         for (FragmentIonAnnotation anAnnotation : fragmentIonAnnotations) {
                             double frag_mass_error = anAnnotation.getMass_error();
                             //C13 peaks
-                            if (frag_mass_error < Atom.C.getDifferenceToMonoisotopic(1)) {
+                            if (frag_mass_error < Atom.C.getMonoisotopicMass() / 12) {
                                 fragmentIonStats.addValue(frag_mass_error);
                             }
                         }
                     } catch (NullPointerException e) {
                         //this can happen if there are no unmodified and identified peptides...
-                        LOGGER.error("Not able to extract for " + anIdentification);
+                        //  LOGGER.error("Not able to extract for " + anIdentification);
                     }
                 }
             }
         }
         LOGGER.info("Attempting to find best suited precursor accuraccy (both sides)...");
         precursorStats = massDeltaExplainer.getExplainedMassDeltas();
-        mostLikelyPrecursorError = precursorStats.calculateOptimalMassError();
+        mostLikelyPrecursorError = InferenceStatistics.round(precursorStats.calculateOptimalMassError(), 3);
         if (mostLikelyPrecursorError == Double.NaN
                 || mostLikelyPrecursorError == Double.NEGATIVE_INFINITY
                 || mostLikelyPrecursorError == Double.NEGATIVE_INFINITY) {
@@ -104,7 +106,7 @@ public class MassAccuraccyPredictor {
             fragmentIonStats = precursorStats;
         } else {
             //calculate the optimal mass ?
-            mostLikelyFragIonAcc = fragmentIonStats.calculateOptimalMassError();
+            mostLikelyFragIonAcc = InferenceStatistics.round(fragmentIonStats.calculateOptimalMassError(), 3);
         }
         if (mostLikelyFragIonAcc == Double.NaN
                 || mostLikelyFragIonAcc == Double.NEGATIVE_INFINITY

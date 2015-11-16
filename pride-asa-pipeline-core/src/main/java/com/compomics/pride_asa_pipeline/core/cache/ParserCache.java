@@ -83,10 +83,12 @@ public class ParserCache {
      * @throws IOException if the fileparser can not be constructed
      */
     public CachedDataAccessController getParser(String experimentAccession, boolean inMemory) {
-        return getParser(experimentAccession, loadedFiles.get(experimentAccession), inMemory);
+         return getParser(experimentAccession, loadedFiles.get(experimentAccession), inMemory);
     }
+
     /**
      * Returns a boolean if the given accession is already loaded
+     *
      * @param experimentAccession the experiment accession
      * @return a boolean whether the accession already is loaded
      */

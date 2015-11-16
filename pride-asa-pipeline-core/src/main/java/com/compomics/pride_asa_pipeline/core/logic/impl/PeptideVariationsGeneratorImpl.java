@@ -22,7 +22,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
     private static final Logger LOGGER = Logger.getLogger(PeptideVariationsGeneratorImpl.class);
 
     @Override
-    public Set<ModifiedPeptide> generateVariations(Peptide precursor, Set<ModificationCombination> modifications) {       
+    public Set<ModifiedPeptide> generateVariations(Peptide precursor, Set<ModificationCombination> modifications) {
         Set<ModifiedPeptide> result = new HashSet<>();
         if (modifications != null) {
             //for each ModificationCombination generate all possible modified peptide variations
@@ -69,7 +69,6 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         //that only one modification can occur at a particular index.
         //Combine the first two sets and then combine the result with the next set and
         //the result of that with the following set, ...
-
         //ToDo: check the following
         Iterator<Set<ModifiedPeptide>> iterator = modifiedPeptidesByModifications.iterator();
         Set<ModifiedPeptide> combinedModifiedPeptides = iterator.next();
@@ -208,7 +207,8 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
             int numberOfModifiableLocations = countModifiableLocations(precursor, modification);
             if (numberOfModifiableLocations < occurances) {
                 //we have more modifications of this kind than we have modifiable AAs??
-                throw new IllegalStateException("Can not have more modifications than there are modifiable AAs.");
+                //  throw new IllegalStateException("Can not have more modifications than there are modifiable AAs.");
+                LOGGER.warn("Can not have more modifications than there are modifiable AAs.");
             } else if (numberOfModifiableLocations == occurances) {
                 //all the affectable locations are affected (easy solution)
                 //we only need to create one ModifiedPeptide were all the affectable AA are modified

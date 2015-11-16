@@ -1,8 +1,8 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
 import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
-import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataA
 
 /**
  *
- * @author Kenneth
+ * @author Kenneth Verheggen
  */
 public class FileModificationRepository extends ParserCacheConnector implements ModificationRepository {
 
@@ -37,8 +37,8 @@ public class FileModificationRepository extends ParserCacheConnector implements 
         this.experimentIdentifier = experimentIdentifier;
     }
 
-     public FileModificationRepository() {
-      
+    public FileModificationRepository() {
+
     }
 
     public String getExperimentIdentifier() {
@@ -47,8 +47,8 @@ public class FileModificationRepository extends ParserCacheConnector implements 
 
     public void setExperimentIdentifier(String experimentIdentifier) {
         this.experimentIdentifier = experimentIdentifier;
-    }  
-   
+    }
+
     @Override
     public List<Modification> getModificationsByPeptideId(long peptideID) {
         List<Modification> modificationList = new ArrayList<>();
@@ -74,6 +74,8 @@ public class FileModificationRepository extends ParserCacheConnector implements 
                 }
             }
         }
+        //@TODO handle peptideshaker projects
+        //peptideshaker projects are a special case as it stores some mods in the user params...how can we deal with this? do a complete text parsing of the file?
         return modificationList;
     }
 

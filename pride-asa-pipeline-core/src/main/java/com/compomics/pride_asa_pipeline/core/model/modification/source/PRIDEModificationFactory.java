@@ -21,6 +21,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.collections.BidiMap;
+import org.apache.commons.collections.bidimap.DualHashBidiMap;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import uk.ac.ebi.pridemod.ModReader;
@@ -48,7 +50,12 @@ public class PRIDEModificationFactory {
      * The map containing the name of the modification and the
      * unimodmodification object
      */
-    private static LinkedHashMap<String, PRIDEModification> modificationMap = new LinkedHashMap<>();
+    private static LinkedHashMap<String, PRIDEModification> modificationNameMap = new LinkedHashMap<>();
+    /**
+     * The map containing the accession of the modification and the
+     * unimodmodification name
+     */
+    private static BidiMap modificationAccessionMap = new DualHashBidiMap();
     /**
      * The mode (online or offline)
      */
@@ -80,7 +87,7 @@ public class PRIDEModificationFactory {
                 //TODO TURN THIS INTO A STREAM
                 File jsonLib = new ClassPathResource("resources/pride_mods.json").getFile();
                 init(jsonLib);
-              //  jsonLib.delete();
+                //  jsonLib.delete();
             } else {
                 init();
             }
@@ -99,7 +106,8 @@ public class PRIDEModificationFactory {
     private void init(File inputFile) throws IOException {
         Collection<PRIDEModification> fromFile = getFromFile(inputFile);
         for (PRIDEModification aUniMod : fromFile) {
-            modificationMap.put(aUniMod.getName(), aUniMod);
+            modificationNameMap.put(aUniMod.getName(), aUniMod);
+            modificationAccessionMap.put(aUniMod.getAccession(), aUniMod.getName());
         }
     }
 
@@ -113,7 +121,8 @@ public class PRIDEModificationFactory {
     private void init() throws IOException, InterruptedException {
         Collection<PRIDEModification> fromFile = getFromPRIDE();
         for (PRIDEModification aUniMod : fromFile) {
-            modificationMap.put(aUniMod.getName(), aUniMod);
+            modificationNameMap.put(aUniMod.getName(), aUniMod);
+            modificationAccessionMap.put(aUniMod.getAccession(), aUniMod.getName());
         }
     }
 
@@ -127,7 +136,45 @@ public class PRIDEModificationFactory {
      * adapter
      */
     public Object getModification(ModificationAdapter adapter, String ptmName) {
-        return adapter.convertModification(modificationMap.get(ptmName));
+        return adapter.convertModification(modificationNameMap.get(ptmName));
+    }
+
+    /**
+     * Returns an instance of a converted modification using the provided
+     * adapter
+     *
+     * @param adapter the modification adapter
+     * @param ptmAccession the modification accession
+     * @return an instance of a converted modification using the provided
+     * adapter
+     */
+    public Object getModificationFromAccession(ModificationAdapter adapter, String ptmAccession) {
+        String modName;
+        Object convertModification = null;
+        if ((modName = (String) modificationAccessionMap.get(ptmAccession)) != null) {
+            convertModification = adapter.convertModification(modificationNameMap.get(modName));
+        }
+        return convertModification;
+    }
+
+    /**
+     * Returns the loaded modification name for an accession
+     *
+     * @param ptmAccession the modification accession
+     * @return the loaded modification name for an accession
+     */
+    public String getModificationNameFromAccession(String ptmAccession) {
+        return (String) modificationAccessionMap.get(ptmAccession);
+    }
+
+    /**
+     * Returns the loaded modification accession for a name
+     *
+     * @param ptmName the modification name
+     * @return the loaded modification accession for a name
+     */
+    public String getModificationAccessionFromName(String ptmName) {
+        return (String) modificationAccessionMap.getKey(ptmName);
     }
 
     /**
@@ -136,7 +183,16 @@ public class PRIDEModificationFactory {
      * @return the modification map
      */
     public LinkedHashMap<String, PRIDEModification> getModificationMap() {
-        return modificationMap;
+        return modificationNameMap;
+    }
+
+    /**
+     * Returns a map of modifications
+     *
+     * @return the modification map
+     */
+    public BidiMap getAccessionMapping() {
+        return modificationAccessionMap;
     }
 
     /**
@@ -147,7 +203,7 @@ public class PRIDEModificationFactory {
      */
     public static LinkedList<Modification> getAsapMods() {
         LinkedList<Modification> pride_mods = new LinkedList<>();
-        for (PRIDEModification aMod : modificationMap.values()) {
+        for (PRIDEModification aMod : modificationNameMap.values()) {
             pride_mods.add(new AsapModificationAdapter().convertModification(aMod));
         }
         return pride_mods;
@@ -238,7 +294,7 @@ public class PRIDEModificationFactory {
     public static TreeSet<PRIDEModification> orderModificationsToPrevalence(Collection<String> ptmNames) {
         TreeSet<PRIDEModification> orderedModifications = new TreeSet<>();
         for (String aPTMName : ptmNames) {
-            PRIDEModification uniModModification = modificationMap.get(aPTMName);
+            PRIDEModification uniModModification = modificationNameMap.get(aPTMName);
             if (uniModModification != null) {
                 orderedModifications.add(uniModModification);
             }

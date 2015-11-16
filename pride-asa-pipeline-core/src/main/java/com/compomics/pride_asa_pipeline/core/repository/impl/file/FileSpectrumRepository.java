@@ -1,6 +1,5 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
-import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.data.extractor.MGFExtractor;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
@@ -45,14 +44,6 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
 
     public void setExperimentIdentifier(String experimentIdentifier) {
         this.experimentIdentifier = experimentIdentifier;
-    }
-
-    public ParserCache getParserCache() {
-        return parserCache;
-    }
-
-    public void setParserCache(ParserCache parserCache) {
-        this.parserCache = parserCache;
     }
 
     @Override

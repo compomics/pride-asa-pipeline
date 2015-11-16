@@ -128,7 +128,24 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
         }
     }
 
+    public static void main(String[] args) {
+        UtilitiesPTMAdapter adapter = new UtilitiesPTMAdapter();
+        String formula = "H(2) C(2) O";
+        adapter.parseFormula(formula, " ");
+        System.out.println(adapter.increaseMassChain.getMass());
+        System.out.println(adapter.decreaseMassChain.getMass());
+        formula = "H C N O";
+        adapter.parseFormula(formula, " ");
+        System.out.println(adapter.increaseMassChain.getMass());
+        System.out.println(adapter.decreaseMassChain.getMass());
+        formula = "C6 H12 O6";
+        adapter.parseFormula(formula, " ");
+        System.out.println(adapter.increaseMassChain.getMass());
+        System.out.println(adapter.decreaseMassChain.getMass());
+    }
+
     private void parseFormula(String formula, String atomSeparator) {
+        LOGGER.info("Converting " + formula);
         if (formula != null && !formula.equalsIgnoreCase("none")) {
             if (formula.length() == 1) {
                 AtomImpl atom;
@@ -148,31 +165,52 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
                         .replace("HEPT", "C(7)H(15)")
                         .replace("OCT", "C(8)H(17)")
                         .replace("NON", "C(9)H(19)")
-                        .replace("DEC", "C(10)H(21)");
+                        .replace("DEC", "C(10)H(21)")
+                        .replace("(", "")
+                        .replace(")", "");
                 String[] compounds = formula.split(atomSeparator);
-                for (String aCompound : compounds) {
-                    Matcher atomMatcher = atomPattern.matcher(aCompound);
-                    Matcher isotopeMatcher = isotopePattern.matcher(aCompound);
-                    if (atomMatcher.find()) {
-                        String atomSymbol = atomMatcher.group();
-                        //check if it contains an isotope? (for example C1)
-                        int isotope = 0;
-                        if (isotopeMatcher.matches()) {
-                            isotope = Integer.parseInt(isotopeMatcher.group());
+
+                for (int compoundIndex = 0; compoundIndex < compounds.length; compoundIndex++) {
+                    //put the isotope ints seperatly
+                    String aCompound = compounds[compoundIndex];
+                    String isotope = "0";
+                    int i = 0;
+                    char currentChar;
+                    while (compoundIndex < aCompound.length()) {
+                        currentChar = aCompound.charAt(i);
+                        if (!Character.isDigit(currentChar)) {
+                            break;
+                        } else {
+                            isotope += currentChar;
                         }
-                        int compoundOccurence = 1;
-                        if (aCompound.contains("(")) {
-                            compoundOccurence = Integer.parseInt(aCompound.split("\\(")[1].replace(")", ""));
+                        i++;
+                    }
+                    //put the atom ints seperatly
+                    String currentAtom = "";
+                    while (i < aCompound.length()) {
+                        currentChar = aCompound.charAt(i);
+                        if (!Character.isAlphabetic(currentChar)) {
+                            break;
+                        } else {
+                            currentAtom += currentChar;
                         }
-                        AtomImpl atom;
-                        atom = new AtomImpl(Atom.getAtom(atomSymbol), isotope);
+                        i++;
+                    }
+                    int compoundOccurence = 1;
+                    if (compoundIndex + 1 < compounds.length) {
+                        if (isInteger(compounds[compoundIndex + 1])) {
+                            compoundIndex++;
+                            compoundOccurence = Integer.parseInt(compounds[compoundIndex]);
+                        }
+                    }
+                    AtomImpl atom;
+                    if (!currentAtom.isEmpty()) {
+                        atom = new AtomImpl(Atom.getAtom(currentAtom), Integer.parseInt(isotope));
                         if (compoundOccurence > 0) {
                             increaseMassChain.append(atom, compoundOccurence);
                         } else {
                             decreaseMassChain.append(atom, Math.abs(compoundOccurence));
                         }
-                    } else {
-                        throw new IllegalArgumentException("Can not parse chemical formula :" + formula);
                     }
                 }
             }
@@ -181,6 +219,15 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
         }
     }
 
+    private boolean isInteger(String compound) {
+        try {
+            Integer.parseInt(compound);
+        } catch (NumberFormatException | NullPointerException e) {
+            return false;
+        }
+        return true;
+    }   
+    
     private void parseFormulaPRIDEFormat(String formula) {
         //preprocess formula...
         formula = formula.toUpperCase()

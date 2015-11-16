@@ -3,9 +3,6 @@ package com.compomics.pride_asa_pipeline.core.logic;
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.impl.MassDeltaExplainerImpl;
-import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.model.modification.source.AnnotatedModificationService;
-import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.match.SpectrumMatcher;
@@ -14,6 +11,9 @@ import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.ModifiedPeptidesMatchResult;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.model.modification.source.AnnotatedModificationService;
+import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,10 @@ public abstract class AbstractSpectrumAnnotator<T> {
      * Boolean that keeps track of the modifications state.
      */
     protected boolean areModificationsLoaded;
+    /**
+     * Boolean that keeps track of the modifications state.
+     */
+    protected double courseFragmentAccuraccy = 1.0;
     /**
      * Beans.
      */
@@ -162,6 +167,14 @@ public abstract class AbstractSpectrumAnnotator<T> {
         return modificationHolder;
     }
 
+    public double getCourseFragmentAccuraccy() {
+        return courseFragmentAccuraccy;
+    }
+
+    public void setCourseFragmentAccuraccy(double courseFragmentAccuraccy) {
+        this.courseFragmentAccuraccy = courseFragmentAccuraccy;
+    }
+
     /**
      * Abstract methods.
      */
@@ -205,9 +218,10 @@ public abstract class AbstractSpectrumAnnotator<T> {
         if (identifier == null) {
             throw new IllegalArgumentException("Identifier can not be null : expected assay accession");
         }
+
         try {
             String assayAccession = identifier[0];
-            List<Modification> sortedAnnotatedModifications = new ArrayList<>();
+            LinkedHashSet<Modification> sortedAnnotatedModifications = new LinkedHashSet<>();
             //load the modifications from the PRIDE annotation
             if (ParserCache.getInstance().containsParser(assayAccession)) {
                 FileModificationRepository repository = new FileModificationRepository();
@@ -223,6 +237,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             //order the annotated modifications to prevalence (in case there are more than the selected batch size)
             //get all asap mods
             LinkedList<Modification> sortedAllModifications = PRIDEModificationFactory.getAsapMods();
+            LOGGER.info("There are " + sortedAnnotatedModifications.size() + " annotated mods out of " + sortedAllModifications.size() + " total.");
             //get a queue of them
             BlockingQueue<Modification> modQueue = new ArrayBlockingQueue<>(sortedAllModifications.size());
             //first get the annotated modifications and order those as well?
@@ -246,14 +261,16 @@ public abstract class AbstractSpectrumAnnotator<T> {
 
             int pass = 0;
             //subset the modQueue in x partitions
+            LOGGER.info("Subsetting the modqueue (size=" + modQueue.size() + " ) into " + (int) (modQueue.size() / 8) + " subsets");
             while ((modQueue.drainTo(modPassSet, 8) > 0)) {
+                //special cases such as oxidation, co-occurence of impossible mods,...
                 if (unexplainedIdentifications.isEmpty() && pass > 0) {
                     LOGGER.info("No more unexplained identifications !");
                     break;
                 } else {
                     pass++;
                     LOGGER.info("Searching " + pass + "th pass :" + modPassSet);
-                    annotate(modPassSet, modifiedPrecursors, unmodifiedPrecursors, completeIdentifications, unexplainedIdentifications, significantMassDeltaExplanationsMap);
+                    annotate(convertToUseCase(modPassSet), modifiedPrecursors, unmodifiedPrecursors, completeIdentifications, unexplainedIdentifications, significantMassDeltaExplanationsMap);
                     modPassSet.clear();
                 }
             }
@@ -318,7 +335,8 @@ public abstract class AbstractSpectrumAnnotator<T> {
 
                 //annotate the unmodified identifications
                 //score the unmodified identification
-                AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()), analyzerData.getFragmentMassError());
+                //    AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()), analyzerData.getFragmentMassError());
+                AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()), courseFragmentAccuraccy);
                 identification.setAnnotationData(annotationData);
             }
         }
@@ -455,7 +473,9 @@ public abstract class AbstractSpectrumAnnotator<T> {
         for (Identification identification : precursorVariations.keySet()) {
             //load spectrum
             List<Peak> peaks = spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
-            ModifiedPeptidesMatchResult modifiedPeptidesMatchResult = spectrumMatcher.findBestModifiedPeptideMatch(identification.getPeptide(), precursorVariations.get(identification), peaks, analyzerData.getFragmentMassError());
+            //     ModifiedPeptidesMatchResult modifiedPeptidesMatchResult = spectrumMatcher.findBestModifiedPeptideMatch(identification.getPeptide(), precursorVariations.get(identification), peaks, analyzerData.getFragmentMassError());
+            ModifiedPeptidesMatchResult modifiedPeptidesMatchResult = spectrumMatcher.findBestModifiedPeptideMatch(identification.getPeptide(), precursorVariations.get(identification), peaks, courseFragmentAccuraccy);
+
             if (modifiedPeptidesMatchResult != null) {
                 identification.setPeptide(modifiedPeptidesMatchResult.getModifiedPeptide());
                 identification.setAnnotationData(modifiedPeptidesMatchResult.getAnnotationData());
@@ -484,9 +504,9 @@ public abstract class AbstractSpectrumAnnotator<T> {
         List<Identification> unexplainedIdentifications = new ArrayList<>();
         for (Identification identification : identifications) {
             if (!explainableIdentifications.contains(identification)) {
-                //annotate the unexplained identifications
-                //score the unexplained identification
-                AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId().replace("index=", "")), analyzerData.getFragmentMassError());
+                //AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId().replace("index=", "")), analyzerData.getFragmentMassError());
+
+                AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId().replace("index=", "")), courseFragmentAccuraccy);
                 identification.setAnnotationData(annotationData);
                 identification.setPipelineExplanationType(PipelineExplanationType.UNEXPLAINED);
 
@@ -496,4 +516,16 @@ public abstract class AbstractSpectrumAnnotator<T> {
         return unexplainedIdentifications;
     }
 
+    private Set<Modification> convertToUseCase(Set<Modification> modifications) {
+        HashSet<Modification> temp = new HashSet<>();
+        for (Modification aMod : modifications) {
+            //oxidation is too general, must be transformed into another variant (oxidation of m for example)
+            if (aMod.getAccession().equalsIgnoreCase("UNIMOD:35")) {
+                //replace with the non-generic PRIDE modification 
+                aMod = (Modification) PRIDEModificationFactory.getInstance().getModificationFromAccession(new AsapModificationAdapter(), "MOD:00719");
+            }
+            temp.add(aMod);
+        }
+        return temp;
+    }
 }

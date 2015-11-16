@@ -1,6 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.logic.inference.modification;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
+import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.ModificationReportGenerator;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.UtilitiesPTMAdapter;
@@ -9,6 +10,8 @@ import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.experiment.biology.PTM;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,16 +42,12 @@ public class ModificationPredictor {
      * carry the modification for it to be considered in the extraction (default
      * = 5%)
      */
-    private double considerationThreshold = 0.05;
+    private double considerationThreshold = 0.01;
     /**
      * The threshold for fixed modifications
+     * @ToDo everything should be variable?
      */
-    private final double fixedThreshold = 0.8;
-    /**
-     * The confidence in which the modification consideration should lie (using
-     * a percentile for this value)
-     */
-    private final double modificationConsiderationConfidence = 2.5;
+    private final double fixedThreshold = 0.99;
     /**
      * The rates in which modifications occur on the provided identifications
      */
@@ -58,14 +57,25 @@ public class ModificationPredictor {
      */
     protected PtmSettings ptmSettings;
     /**
-     * A list of mod terms that are actually MS1 / QUANT terms
+     * A list of UNIMOD quant related terms
      */
-    private final List<String> quantTerms = Arrays.asList(new String[]{"itraq", "tmt", "silac"});
+    private final List<Integer> quantAccessions = Arrays.asList(new Integer[]{258, 259, 267, 367, 687, 365, 866, 730, 532, 730, 533, 731, 739, 738, 737, 984, 985, 1341, 1342});
 
     public ModificationPredictor(SpectrumAnnotatorResult spectrumAnnotatorResult, ModificationService modificationService) {
         this.spectrumAnnotatorResult = spectrumAnnotatorResult;
         this.modificationService = modificationService;
         inferModifications();
+    }
+
+    public ModificationPredictor(SpectrumAnnotatorResult spectrumAnnotatorResult, ModificationService modificationService, OutputStream reportStream) {
+        this.spectrumAnnotatorResult = spectrumAnnotatorResult;
+        this.modificationService = modificationService;
+        inferModifications();
+        try {
+            new ModificationReportGenerator(this).writeReport(reportStream, true);
+        } catch (IOException ex) {
+            LOGGER.error("Failed to write modification report : " + ex);
+        }
     }
 
     private void inferModifications() {
@@ -75,25 +85,27 @@ public class ModificationPredictor {
         Map<Modification, Integer> lPrideAsapModificationsMap = modificationService.getUsedModifications(spectrumAnnotatorResult);
         LOGGER.info("Estimating modification rates");
         modificationRates = modificationService.estimateModificationRate(lPrideAsapModificationsMap, spectrumAnnotatorResult, fixedThreshold);
+        boolean allowUnlimitedModifications = true;
+        if (lPrideAsapModificationsMap.size() > 6) {
+            considerationThreshold = calculateConsiderationThreshold();
+            LOGGER.warn("Warning, it is not recommended to search with more than 6 variable PTMs. A consideration threshold (" + considerationThreshold + ") will be applied to limit the combinations");
+            allowUnlimitedModifications = false;
+        }
 
-// Write annotation scores 
-        // Check pride discovered mods
-        considerationThreshold = calculateConsiderationThreshold();
         for (Modification aMod : lPrideAsapModificationsMap.keySet()) {
             //correct positions for oxidation and pyro-glu
             String amodName = aMod.getName();
-            if (modificationRates.get(aMod) >= considerationThreshold) {
+            if (allowUnlimitedModifications || modificationRates.get(aMod) >= considerationThreshold) {
                 double modificationRate = modificationRates.get(aMod);
                 //check for quantmods
                 boolean isQuantMod = false;
-                for (String quantTerm : quantTerms) {
-                    if (aMod.getName().toLowerCase().contains(quantTerm)) {
+                for (Integer quantTerm : quantAccessions) {
+                    if (aMod.getName().toLowerCase().equalsIgnoreCase(PRIDEModificationFactory.getInstance().getModificationNameFromAccession("UNIMOD:" + quantTerm))) {
                         isQuantMod = true;
                         break;
                     }
                 }
-                //0.3 is an arbitrary value TODO verify this !!!
-                if (isQuantMod && modificationRate < (0.3)) {
+                if (isQuantMod && modificationRate < (fixedThreshold)) {
                     LOGGER.error(amodName + " is a quant mod, but was not fixed !");
                 } else {
                     LOGGER.info(amodName + "\t" + modificationRate);
@@ -103,9 +115,11 @@ public class ModificationPredictor {
         }
         LOGGER.info("Converting modifications to utilities objects");
         ModificationAdapter adapter = new UtilitiesPTMAdapter();
+        ptmSettings = new PtmSettings();
         HashSet<Double> encounteredMasses = new HashSet<>();
         for (Map.Entry<String, Boolean> aMod : asapMods.entrySet()) {
             PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
+            System.out.println(aUtilitiesMod.getShortName());
             if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
                 encounteredMasses.add(aUtilitiesMod.getRoundedMass());
                 if (aMod.getValue()) {
@@ -121,7 +135,7 @@ public class ModificationPredictor {
 
     private double calculateConsiderationThreshold() {
         InferenceStatistics stats = new InferenceStatistics(modificationRates.values(), false);
-        double threshold = Math.max(0.025, stats.getPercentile(modificationConsiderationConfidence));
+        double threshold = Math.max(0.01, stats.getPercentile(2.5));
         System.out.println("ConsiderationThreshold = " + threshold);
         return threshold;
     }

@@ -82,14 +82,14 @@ public class InferenceStatistics extends DescriptiveStatistics {
             for (double aValue : getSortedValues()) {
                 //has to be bigger than the value that can be set...
                 //if (Math.abs(aValue) > 0.001) {
-                    double zScore = (aValue - getMean()) / getStandardDeviation();
-                    //half of all values should be within 0.67
-                    if (Math.abs(zScore) <= 0.67) {
-                        //then there are outliers...discard these in a new dataset?
-                    } else {
-                        outliers=true;
-                        break;
-                    }
+                double zScore = (aValue - getMean()) / getStandardDeviation();
+                //half of all values should be within 0.67
+                if (Math.abs(zScore) <= 0.67) {
+                    //then there are outliers...discard these in a new dataset?
+                } else {
+                    outliers = true;
+                    break;
+                }
                 //}
             }
         }
@@ -101,6 +101,7 @@ public class InferenceStatistics extends DescriptiveStatistics {
     }
 
     private double getElbowPoint() {
+        //done by triangulation of the curve ---> the point with the furthest distance to the line connecting the lowest and the highest value is the elbow point
         double[] sortedValues = getSortedValues();
         double[] point1 = new double[]{1, sortedValues[0]};
         double[] point2 = new double[]{sortedValues.length, sortedValues[sortedValues.length - 1]};
