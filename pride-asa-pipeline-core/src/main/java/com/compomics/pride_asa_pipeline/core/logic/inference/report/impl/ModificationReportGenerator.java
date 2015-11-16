@@ -8,7 +8,7 @@ import java.io.OutputStreamWriter;
 import java.util.Map;
 
 /**
- * e
+ * 
  *
  * @author Kenneth
  */
@@ -30,7 +30,10 @@ public class ModificationReportGenerator extends InferenceReportGenerator {
             Modification aMod = aModEntry.getKey();
             reportWriter.append(aMod.getAccession() + "\t" + aMod.getName() + "\t" + aModEntry.getValue()).append(System.lineSeparator()).flush();
         }
-
+        reportWriter.append("FINAL DECISION ON PTM SETTINGS ").append(System.lineSeparator());
+        for (String aPtm : predictor.getPtmSettings().getAllModifications()) {
+            reportWriter.append(aPtm + "\t" + predictor.getPtmSettings().getFixedModifications().contains(aPtm)).append(System.lineSeparator()).flush();
+        }
     }
 
 }

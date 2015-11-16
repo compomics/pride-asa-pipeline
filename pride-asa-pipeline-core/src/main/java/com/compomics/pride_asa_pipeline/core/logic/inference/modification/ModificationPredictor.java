@@ -9,9 +9,11 @@ import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModi
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.experiment.biology.PTM;
+import com.compomics.util.experiment.biology.PTMFactory;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,6 +47,7 @@ public class ModificationPredictor {
     private double considerationThreshold = 0.01;
     /**
      * The threshold for fixed modifications
+     *
      * @ToDo everything should be variable?
      */
     private final double fixedThreshold = 0.99;
@@ -113,29 +116,34 @@ public class ModificationPredictor {
                 }
             }
         }
-        LOGGER.info("Converting modifications to utilities objects");
         ModificationAdapter adapter = new UtilitiesPTMAdapter();
         ptmSettings = new PtmSettings();
         HashSet<Double> encounteredMasses = new HashSet<>();
         for (Map.Entry<String, Boolean> aMod : asapMods.entrySet()) {
-            PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
-            System.out.println(aUtilitiesMod.getShortName());
-            if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
-                encounteredMasses.add(aUtilitiesMod.getRoundedMass());
-                if (aMod.getValue()) {
-                    ptmSettings.addFixedModification(aUtilitiesMod);
+            ArrayList<String> unknownPTM = new ArrayList<>();
+            PTMFactory.getInstance().convertPridePtm(aMod.getKey(), ptmSettings, unknownPTM, false);
+            if (!unknownPTM.isEmpty()) {
+                LOGGER.info(aMod.getKey() + " is not a standard modification. Converting to utilities object");
+                PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
+                if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
+                    encounteredMasses.add(aUtilitiesMod.getRoundedMass());
+                    if (aMod.getValue()) {
+                        ptmSettings.addFixedModification(aUtilitiesMod);
+                    } else {
+                        ptmSettings.addVariableModification(aUtilitiesMod);
+                    }
                 } else {
-                    ptmSettings.addVariableModification(aUtilitiesMod);
+                    LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
                 }
             } else {
-                LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
+                LOGGER.info(aMod.getKey() + " was found in the default PTMs");
             }
         }
     }
 
     private double calculateConsiderationThreshold() {
         InferenceStatistics stats = new InferenceStatistics(modificationRates.values(), false);
-        double threshold = Math.max(0.01, stats.getPercentile(2.5));
+        double threshold = Math.max(0.005, stats.getPercentile(2.5));
         System.out.println("ConsiderationThreshold = " + threshold);
         return threshold;
     }

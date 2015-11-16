@@ -26,7 +26,7 @@ import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
  *
  * @author Kenneth Verheggen
  */
-public class FileProjectFinder {
+public class FileProjectExtractor {
 
     /**
      * The output folder for the extraction
@@ -35,20 +35,20 @@ public class FileProjectFinder {
     /**
      * The Logger instance
      */
-    private static final Logger LOGGER = Logger.getLogger(FileProjectFinder.class);
+    private static final Logger LOGGER = Logger.getLogger(FileProjectExtractor.class);
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
         File outputFolder = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download");
-        File inputFile = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download\\PRIDE_Exp_Complete_Ac_3.xml");
-        //File inputFile = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download\\PeptideShaker_Example.xml");
-        new FileProjectFinder(outputFolder).analyze(inputFile,inputFile.getName());
+        //File inputFile = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download\\PRIDE_Exp_Complete_Ac_3.xml");
+        File inputFile = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download\\PeptideShaker_Example.xml");
+        new FileProjectExtractor(outputFolder).analyze(inputFile, inputFile.getName());
     }
 
-    public FileProjectFinder(File outputFolder) {
+    public FileProjectExtractor(File outputFolder) {
         this.outputFolder = outputFolder;
     }
 
-    public void analyze(File inputFile,String assay) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
+    public SearchParameters analyze(File inputFile, String assay) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
         LOGGER.info("Setting up experiment repository for assay " + assay);
         //load into the spring setup
         ApplicationContextProvider.getInstance().setDefaultApplicationContext();
@@ -89,11 +89,6 @@ public class FileProjectFinder {
         LOGGER.info("Attempting to infer searchparameters");
         ParameterExtractor extractor = new ParameterExtractor(assay, errorPredictor.getFragmentIonAccuraccy());
         //ParameterExtractor extractor = new ParameterExtractor(assay);
-        SearchParameters inferSearchParameters = extractor.getParameters();
-        System.out.println("MASS_OUTPUT : " + inferSearchParameters.getPrecursorAccuracyDalton() + "\t" + inferSearchParameters.getFragmentIonAccuracy());
-        System.out.println("MOD FIXED: " + inferSearchParameters.getPtmSettings().getFixedModifications());
-        System.out.println("MOD VAR: " + inferSearchParameters.getPtmSettings().getAllNotFixedModifications());
-
-        //SearchParameters.saveIdentificationParameters(inferSearchParameters, new File(outputFolder, assay + ".asap.par"));
+        return extractor.getParameters();
     }
 }

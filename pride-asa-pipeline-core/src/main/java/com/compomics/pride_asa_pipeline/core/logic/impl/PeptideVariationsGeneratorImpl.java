@@ -166,7 +166,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                     combinedModifiedPeptides.add(combinedModifiedPeptide);
                 } else {
                     //ToDo: maybe report the rubbish result
-                    LOGGER.info("Non-sensical modification combination in ModifiedPeptide.");
+                    LOGGER.warn("Non-sensical modification combination in ModifiedPeptide.");
                 }
                 //go on to the next combination
 
@@ -207,8 +207,8 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
             int numberOfModifiableLocations = countModifiableLocations(precursor, modification);
             if (numberOfModifiableLocations < occurances) {
                 //we have more modifications of this kind than we have modifiable AAs??
-                //  throw new IllegalStateException("Can not have more modifications than there are modifiable AAs.");
-                LOGGER.warn("Can not have more modifications than there are modifiable AAs.");
+                throw new IllegalStateException("Can not have more modifications than there are modifiable AAs.");
+                //LOGGER.warn("Can not have more modifications than there are modifiable AAs.");
             } else if (numberOfModifiableLocations == occurances) {
                 //all the affectable locations are affected (easy solution)
                 //we only need to create one ModifiedPeptide were all the affectable AA are modified

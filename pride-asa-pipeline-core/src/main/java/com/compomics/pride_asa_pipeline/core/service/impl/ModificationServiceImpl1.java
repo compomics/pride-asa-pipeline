@@ -1,7 +1,3 @@
-/*
- *
-
- */
 package com.compomics.pride_asa_pipeline.core.service.impl;
 
 import com.compomics.omssa.xsd.UserModCollection;
@@ -20,7 +16,6 @@ import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,9 +27,9 @@ import org.apache.log4j.Logger;
  *
  * @author Niels Hulstaert
  */
-public abstract class ModificationServiceImpl implements ModificationService {
+public abstract class ModificationServiceImpl1 implements ModificationService {
 
-    private static final Logger LOGGER = Logger.getLogger(ModificationServiceImpl.class);
+    private static final Logger LOGGER = Logger.getLogger(ModificationServiceImpl1.class);
     private static final String[] MS1_MODIFICATION_NAMES = {"itraq", "tmt"};
     protected OmssaModificationMarshaller omssaModificationMarshaller;
 
@@ -69,46 +64,6 @@ public abstract class ModificationServiceImpl implements ModificationService {
         }
 
         return modifications;
-    }
-
-    public Map<Modification, Double> estimateModificationRate2(Map<Modification, Integer> usedModifications, SpectrumAnnotatorResult spectrumAnnotatorResult, double fixedModificationThreshold) {
-
-        // calculate number of peptides that contain
-        HashMultiset<AminoAcid> aminoAcidHashMultiset = HashMultiset.create();
-        List<Identification> identifications = spectrumAnnotatorResult.getIdentifications();
-        for (Identification identification : identifications) {
-            String sequenceString = identification.getPeptide().getSequenceString();
-            for (AminoAcid aa : EnumSet.allOf(AminoAcid.class)) {
-                if (sequenceString.contains("" + aa.letter())) {
-                    aminoAcidHashMultiset.add(aa);
-                }
-            }
-        }
-
-        // convert to aminoacid/integer map
-        Map<AminoAcid, Integer> aminoAcidCounts = new HashMap<>();
-        for (Multiset.Entry entry : aminoAcidHashMultiset.entrySet()) {
-            aminoAcidCounts.put((AminoAcid) entry.getElement(), entry.getCount());
-        }
-
-        // run over used modifications and their frequencies,
-        // verify which Modifications are nearly always present when the
-        // affected amino acid is in the peptide sequence
-        Map<Modification, Double> result = new HashMap<>();
-        for (Modification usedModifiation : usedModifications.keySet()) {
-            double modificationCount = new Double(usedModifications.get(usedModifiation));
-            double aminoAcidCount = 0;
-            for (AminoAcid affectedAminoAcid : usedModifiation.getAffectedAminoAcids()) {
-                aminoAcidCount += aminoAcidCounts.get(affectedAminoAcid);
-            }
-
-            // Fix the fixed modification treshold at 95%
-            double modificationRate = modificationCount / aminoAcidCount;
-            result.put(usedModifiation, modificationRate);
-        }
-
-        return result;
-
     }
 
     @Override
@@ -149,21 +104,21 @@ public abstract class ModificationServiceImpl implements ModificationService {
         //run over used modifications and their frequencies,
         //verify which Modifications are nearly always present when the
         //affected amino acid is in the peptide sequence
-        for (Modification modifiation : usedModifications.keySet()) {
+        for (Modification modification : usedModifications.keySet()) {
             double modificationRate = 0.0;
-            Map<AminoAcid, Integer> modificationAminoAcidCounts = calculateModificationAminoAcidCounts(spectrumAnnotatorResult, modifiation);
+            Map<AminoAcid, Integer> modificationAminoAcidCounts = calculateModificationAminoAcidCounts(spectrumAnnotatorResult, modification);
             List<Double> modificationAminoAcidRates = new ArrayList<>();
-            if (modifiation.getLocation().equals(Modification.Location.N_TERMINAL)) {
+            if (modification.getLocation().equals(Modification.Location.N_TERMINAL)) {
                 for (AminoAcid affectedAminoAcid : modificationAminoAcidCounts.keySet()) {
                     modificationAminoAcidRates.add(modificationAminoAcidCounts.get(affectedAminoAcid).doubleValue() / nTermimalAminoAcidCounts.get(affectedAminoAcid));
                 }
                 modificationRate = MathUtils.calculateMedian(modificationAminoAcidRates);
-            } else if (modifiation.getLocation().equals(Modification.Location.NON_TERMINAL)) {
+            } else if (modification.getLocation().equals(Modification.Location.NON_TERMINAL)) {
                 for (AminoAcid affectedAminoAcid : modificationAminoAcidCounts.keySet()) {
                     modificationAminoAcidRates.add(modificationAminoAcidCounts.get(affectedAminoAcid).doubleValue() / nonTermimalAminoAcidCounts.get(affectedAminoAcid));
                 }
                 modificationRate = MathUtils.calculateMedian(modificationAminoAcidRates);
-            } else if (modifiation.getLocation().equals(Modification.Location.C_TERMINAL)) {
+            } else if (modification.getLocation().equals(Modification.Location.C_TERMINAL)) {
                 for (AminoAcid affectedAminoAcid : modificationAminoAcidCounts.keySet()) {
                     modificationAminoAcidRates.add(modificationAminoAcidCounts.get(affectedAminoAcid).doubleValue() / cTermimalAminoAcidCounts.get(affectedAminoAcid));
                 }
@@ -171,7 +126,7 @@ public abstract class ModificationServiceImpl implements ModificationService {
             } else {
                 //do nothing
             }
-            modificationRates.put(modifiation, modificationRate);
+            modificationRates.put(modification, modificationRate);
         }
 
         return modificationRates;
@@ -296,10 +251,10 @@ public abstract class ModificationServiceImpl implements ModificationService {
      */
     private Map<AminoAcid, Integer> calculateModificationAminoAcidCounts(SpectrumAnnotatorResult spectrumAnnotatorResult, Modification modification) {
         Map<AminoAcid, Integer> modificationAminoAcidCounts = new HashMap<>();
+        LOGGER.info(modification.getName() + " is " + modification.getLocation().toString());
         HashMultiset<AminoAcid> modificationAminoAcidCountsMultiSet = HashMultiset.create();
         for (Identification identification : spectrumAnnotatorResult.getModifiedPrecursors()) {
             ModifiedPeptide modifiedPeptide = (ModifiedPeptide) identification.getPeptide();
-
             if (modification.getLocation().equals(Modification.Location.N_TERMINAL) && modifiedPeptide.getNTermMod() != null) {
                 ModificationFacade modificationFacade = modifiedPeptide.getNTermMod();
                 if (modificationFacade != null && modificationFacade.getName().equals(modification.getName())) {

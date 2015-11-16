@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
  * @since 0.1
  */
 public class AnalyzerData {
-
+    
     private double prec_acc;
     private double frag_acc;
 

@@ -21,7 +21,7 @@ import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
  *
  * @author Kenneth Verheggen
  */
-public class PrideWebProjectFinder {
+public class WebProjectExtractor {
 
     /**
      * The output folder for the extraction
@@ -30,19 +30,19 @@ public class PrideWebProjectFinder {
     /**
      * The Logger instance
      */
-    private static final Logger LOGGER = Logger.getLogger(PrideWebProjectFinder.class);
+    private static final Logger LOGGER = Logger.getLogger(WebProjectExtractor.class);
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
         File outputFolder = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download");
         String inputAssay = "33005";
-        new PrideWebProjectFinder(outputFolder).analyze(inputAssay);
+        new WebProjectExtractor(outputFolder).analyze(inputAssay);
     }
 
-    public PrideWebProjectFinder(File outputFolder) {
+    public WebProjectExtractor(File outputFolder) {
         this.outputFolder = outputFolder;
     }
 
-    public void analyze(String assayAccession) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
+    public SearchParameters analyze(String assayAccession) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
         LOGGER.info("Setting up experiment repository for assay " + assayAccession);
         WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository();
         experimentRepository.addAssay(assayAccession);
@@ -60,7 +60,6 @@ public class PrideWebProjectFinder {
         //do the extraction
         LOGGER.info("Attempting to infer searchparameters");
         ParameterExtractor extractor = new ParameterExtractor(assayAccession);
-        SearchParameters inferSearchParameters = extractor.getParameters();
-        SearchParameters.saveIdentificationParameters(inferSearchParameters, new File(outputFolder, assayAccession + ".asap.par"));
+        return extractor.getParameters();
     }
 }

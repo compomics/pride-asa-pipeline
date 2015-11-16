@@ -261,7 +261,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
 
             int pass = 0;
             //subset the modQueue in x partitions
-            LOGGER.info("Subsetting the modqueue (size=" + modQueue.size() + " ) into " + (int) (modQueue.size() / 8) + " subsets");
+            LOGGER.info("Subsetting the modqueue (size=" + modQueue.size() + ") into " + (int) (modQueue.size() / 8) + " subsets");
             while ((modQueue.drainTo(modPassSet, 8) > 0)) {
                 //special cases such as oxidation, co-occurence of impossible mods,...
                 if (unexplainedIdentifications.isEmpty() && pass > 0) {
@@ -516,7 +516,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         return unexplainedIdentifications;
     }
 
-    private Set<Modification> convertToUseCase(Set<Modification> modifications) {
+        private Set<Modification> convertToUseCase(Set<Modification> modifications) {
         HashSet<Modification> temp = new HashSet<>();
         for (Modification aMod : modifications) {
             //oxidation is too general, must be transformed into another variant (oxidation of m for example)
@@ -528,4 +528,5 @@ public abstract class AbstractSpectrumAnnotator<T> {
         }
         return temp;
     }
+
 }
