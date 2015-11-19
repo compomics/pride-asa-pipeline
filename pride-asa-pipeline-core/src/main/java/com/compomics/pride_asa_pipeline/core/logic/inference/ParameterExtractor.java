@@ -84,10 +84,10 @@ public class ParameterExtractor {
         //--------------------------------
         // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
         ModificationPredictor modificationPredictor = new ModificationPredictor(spectrumAnnotator.getSpectrumAnnotatorResult(), spectrumAnnotator.getModificationService());
-        new ModificationReportGenerator(modificationPredictor).writeReport(System.out, true);
+        new ModificationReportGenerator(modificationPredictor).writeReport(System.out);
         //--------------------------------
         //recalibrate errors
-
+        LOGGER.info("Using the " + (100 - qualityPercentile) + " % best identifications");
         //USE ONLY THE HIGH QUALITY HITS FOR MASS ACCURACCIES, THESE WILL USUALLY NOT HAVE MISSING MODIFICATIONS ETC
         List<Identification> experimentIdentifications = spectrumAnnotator.getIdentifications().getCompleteIdentifications();
         IdentificationFilter filter = new IdentificationFilter(experimentIdentifications);

@@ -75,7 +75,7 @@ public class ModificationPredictor {
         this.modificationService = modificationService;
         inferModifications();
         try {
-            new ModificationReportGenerator(this).writeReport(reportStream, true);
+            new ModificationReportGenerator(this).writeReport(reportStream);
         } catch (IOException ex) {
             LOGGER.error("Failed to write modification report : " + ex);
         }

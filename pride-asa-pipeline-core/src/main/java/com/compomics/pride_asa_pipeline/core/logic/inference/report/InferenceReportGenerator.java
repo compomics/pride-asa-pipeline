@@ -10,14 +10,11 @@ import java.io.OutputStreamWriter;
  */
 public abstract class InferenceReportGenerator {
 
-    public void writeReport(OutputStream out, boolean closeStream) throws IOException {
+    public void writeReport(OutputStream out) throws IOException {
         OutputStreamWriter reportWriter = new OutputStreamWriter(out);
         writeReport(reportWriter);
         reportWriter.flush();
-        if (closeStream) {
-            reportWriter.close();
-        }
     }
 
-   protected abstract void writeReport(OutputStreamWriter reportWriter) throws IOException;
+    protected abstract void writeReport(OutputStreamWriter reportWriter) throws IOException;
 }
