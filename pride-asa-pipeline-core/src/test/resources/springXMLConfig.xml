@@ -7,7 +7,7 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>${property_file.source}:resources/pride-asa-pipeline-core.properties
+                <value>classpath:resources/pride-asa-pipeline-core.properties
                 </value>
             </list>
         </property>
@@ -116,18 +116,18 @@
 
     <!-- repository beans -->
     <bean id="experimentRepository"
-          class="com.compomics.pride_asa_pipeline.core.repository.impl.JdbcExperimentRepository">
-        <property name="dataSource" ref="prideDataSource"/>
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository">
+    <!--     <property name="dataSource" ref="prideDataSource"/>-->
     </bean>
 
     <bean id="spectrumRepository"
-          class="com.compomics.pride_asa_pipeline.core.repository.impl.JdbcSpectrumRepository">
-        <property name="dataSource" ref="prideDataSource"/>
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository">
+    <!--     <property name="dataSource" ref="prideDataSource"/>-->
     </bean>
 
     <bean id="modificationRepository"
-          class="com.compomics.pride_asa_pipeline.core.repository.impl.JdbcModificationRepository">
-        <property name="dataSource" ref="prideDataSource"/>
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository">
+    <!--     <property name="dataSource" ref="prideDataSource"/>-->
     </bean>
 
     <bean id="fileResultHandler"

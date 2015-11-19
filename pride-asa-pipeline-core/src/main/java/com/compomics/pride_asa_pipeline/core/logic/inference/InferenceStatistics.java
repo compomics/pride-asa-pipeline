@@ -75,29 +75,35 @@ public class InferenceStatistics extends DescriptiveStatistics {
     }
 
     private double getOutlierThreshold() {
-        DescriptiveStatistics stats = new DescriptiveStatistics();
-        boolean outliers = false;
         if (getN() >= 30) {
-            //calculate the median deviation
-            for (double aValue : getSortedValues()) {
+            //sort values the other way?
+            for (int i = getSortedValues().length - 1; i > -1; i--) {
+                double aValue = getSortedValues()[i];
                 //has to be bigger than the value that can be set...
                 //if (Math.abs(aValue) > 0.001) {
                 double zScore = (aValue - getMean()) / getStandardDeviation();
                 //half of all values should be within 0.67
                 if (Math.abs(zScore) <= 0.67) {
-                    //then there are outliers...discard these in a new dataset?
-                } else {
-                    outliers = true;
-                    break;
+                    //return the correct value
+                    return aValue;
                 }
                 //}
             }
         }
-        if (outliers) {
-            return getElbowPoint();
-        } else {
-            return stats.getMax();
+        LOGGER.info("Returning threshold using elbow point cutoff value");
+        return getPartialMedian(getElbowPoint());
+    }
+
+    private double getPartialMedian(double cutOffValue) {
+        DescriptiveStatistics temp = new DescriptiveStatistics();
+        for (double aDouble : getSortedValues()) {
+            if (aDouble <= cutOffValue) {
+                temp.addValue(aDouble);
+            } else {
+                break;
+            }
         }
+        return temp.getMean();
     }
 
     private double getElbowPoint() {

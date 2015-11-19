@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -26,16 +27,45 @@ import java.util.TreeMap;
  */
 public class AminoAcidMassInference {
 
-    //the identified peptide including modifications
+    /**
+     * the identified peptide including modifications
+     */
     private final Peptide peptide;
-    //the charge of the precursorpeptide
+    /**
+     * the charge of the precursorpeptide
+     */
     private final BigDecimal precursorCharge;
-    //the used mass tolerance
+    /**
+     * the used mass tolerance
+     */
     private final BigDecimal massTolerance;
+    /**
+     * the mz values for the peptide
+     */
     private final double[] mzValues;
 
+    /**
+     *
+     * @param mzValues the known mzValues for the peptide
+     * @param peptide the identified peptide for the mz range
+     * @param precursorCharge the charge of the precursor (or peptide)
+     * @param massTolerance the mass tolerance to allow for errors
+     */
     public AminoAcidMassInference(double[] mzValues, Peptide peptide, BigDecimal precursorCharge, BigDecimal massTolerance) {
         this.massTolerance = massTolerance;
+        this.mzValues = mzValues;
+        this.peptide = peptide;
+        this.precursorCharge = precursorCharge;
+    }
+
+       /**
+     * Using this constructor will apply a broad mass precursor error to determine the actual one
+     * @param mzValues the known mzValues for the peptide
+     * @param peptide the identified peptide for the mz range
+     * @param precursorCharge the charge of the precursor (or peptide)
+     */
+    public AminoAcidMassInference(double[] mzValues, Peptide peptide, BigDecimal precursorCharge) {
+        this.massTolerance = new BigDecimal(2.0);
         this.mzValues = mzValues;
         this.peptide = peptide;
         this.precursorCharge = precursorCharge;
@@ -47,6 +77,25 @@ public class AminoAcidMassInference {
 
     public BigDecimal getMassTolerance() {
         return massTolerance;
+    }
+
+    public List<Double> getMassErrors() throws IOException {
+        //get the list of measured MZ values
+        LinkedList<BigDecimal> measuredMZList = new LinkedList<>();
+        ArrayList<Double> reportedMassErrors = new ArrayList<>();
+        for (double mz : mzValues) {
+            measuredMZList.add(new BigDecimal(mz));
+        }
+        //get the annotated matches per charge state
+        TreeMap<BigDecimal, MassMatch> annotateSpectrum = annotateSpectrum(precursorCharge, measuredMZList);
+        //iterate the annotated y-fragments
+        Iterator<Map.Entry<BigDecimal, MassMatch>> iterator = annotateSpectrum.entrySet().iterator();
+        //first match
+        if (iterator.hasNext()) {
+            MassMatch firstMatch = iterator.next().getValue();
+            reportedMassErrors.add(Math.abs((firstMatch.getTheoreticalMz().subtract(firstMatch.getObservedMz())).doubleValue()));
+        }
+        return reportedMassErrors;
     }
 
     public LinkedList<MassDeficitResult> getMassDeficits() throws IOException {
@@ -71,7 +120,7 @@ public class AminoAcidMassInference {
                 MassMatch secondMatch = iterator.next().getValue();
                 BigDecimal gapToNext = secondMatch.getObservedMz().subtract(firstMatch.getObservedMz());
                 BigDecimal secondMassDeficit = getMassDeficit(gapToNext);
-                BigDecimal deficitToMassRatio = secondMassDeficit.divide(new BigDecimal(Math.max(firstMatch.getObservedMz().doubleValue(),1.0)), 10, RoundingMode.HALF_UP).multiply(new BigDecimal(10000));
+                BigDecimal deficitToMassRatio = secondMassDeficit.divide(new BigDecimal(Math.max(firstMatch.getObservedMz().doubleValue(), 1.0)), 10, RoundingMode.HALF_UP).multiply(new BigDecimal(10000));
                 BigDecimal massRatioGap = secondMassDeficit.subtract(massDeficit);
                 // write the specific fragment ion information
                 MassDeficitResult result = new MassDeficitResult(getCorrespondingAminoAcid(gapToNext, massTolerance),

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import uk.ac.ebi.pride.utilities.mol.Atom;
 
 /**
  * @author Florian Reisinger Date: 04-Sep-2009
@@ -75,6 +76,13 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                     precursorMassDelta -= errorAdjustment;
                 }
 
+                /*if the mass delta is smaller than a expected mass error,
+                 //there is no point in trying to fit modifications
+                 //only if it's less than C13 peak mass */
+                if (Math.abs(precursorMassDelta) < Atom.C_12.getMonoMass() / 12) {
+                    massErrorStatistics.addValue(precursorMassDelta/peptide.getCharge());
+                }
+
                 //take the error window from the mass recalibration as deviation
                 //ToDo: is it correct to use this value here 
                 //Double deviation =null;// = massRecalibrationResult.getErrorWindow(peptide.getCharge());
@@ -90,7 +98,6 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                 //we might have modifications we need to explain (or at least try to)
                 if (Math.abs(precursorMassDelta) > deviation) {
                     combinations = modificationCombinationSolver.findModificationCombinations(peptide, modificationCombinationSizeLimit, precursorMassDelta, deviation);
-
                     //add all newly found combinations (if any) to the set of all modifications for this peptide
                     if (combinations != null && combinations.size() > 0) {
                         if (possibleExplainedIdentifications.get(identification) == null) {
@@ -103,12 +110,6 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                         //so we don't add it to the map!
                     }
                 } else {
-                    /*if the mass delta is smaller than a expected mass error,
-                     //there is no point in trying to fit modifications
-                     //only if it's less than 0.8 da (C13 peak starts there) ---> this is the maximum */
-                    if (Math.abs(precursorMassDelta) < 0.8) {
-                        massErrorStatistics.addValue(precursorMassDelta);
-                    }
                     possibleExplainedIdentifications.put(identification, null);
                 }
 

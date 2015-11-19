@@ -57,8 +57,8 @@ public class EnzymePredictor {
      */
     private ArrayList<String> peptideSequences = new ArrayList<>();
     /*
-    * The most likely enzyme
-    */
+     * The most likely enzyme
+     */
     private Enzyme mostLikelyEnzyme;
 
     public boolean isSuitedForSearching() {
@@ -126,7 +126,8 @@ public class EnzymePredictor {
         HashMap<Enzyme, Integer> missedCleavagesMap = new HashMap<>();
         for (Enzyme anEnzyme : enzymeFactory.getEnzymes()) {
             for (String aSequence : peptideSequences) {
-                missedCleavagesMap.put(anEnzyme, Math.max(missedCleavagesMap.getOrDefault(anEnzyme, 0), anEnzyme.getNmissedCleavages(aSequence)));
+                int currentMissedCleavages = Math.max(anEnzyme.getNmissedCleavages(aSequence), missedCleavagesMap.getOrDefault(anEnzyme, 0));
+                missedCleavagesMap.put(anEnzyme, currentMissedCleavages);
             }
         }
         //select the best Enzyme
@@ -145,7 +146,8 @@ public class EnzymePredictor {
     /**
      *
      * @param enzyme the used enzyme
-     * @return the maximum amount of misscleavages found in a peptidesequence
+     * @return the maximum amount of misscleavages found in the provided
+     * peptidesequences
      */
     public int getMissedCleavages() {
         return maxMissedCleavages;
