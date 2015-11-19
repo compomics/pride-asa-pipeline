@@ -87,13 +87,15 @@ public class ParameterExtractor {
         new ModificationReportGenerator(modificationPredictor).writeReport(System.out);
         //--------------------------------
         //recalibrate errors
-        LOGGER.info("Using the " + (100 - qualityPercentile) + " % best identifications");
+        //precursor needs to be very accurate (considering mods / isotopes / etc)
+        LOGGER.info("Using the " + (100 - qualityPercentile) + " % best identifications for precursor estimation");
         //USE ONLY THE HIGH QUALITY HITS FOR MASS ACCURACCIES, THESE WILL USUALLY NOT HAVE MISSING MODIFICATIONS ETC
         List<Identification> experimentIdentifications = spectrumAnnotator.getIdentifications().getCompleteIdentifications();
         IdentificationFilter filter = new IdentificationFilter(experimentIdentifications);
-
+        //fragment ion is harder, more leanway should be given
+        LOGGER.info("Using the " + 25 + " % best identifications for fragment ion estimation");
         HashMap<Peptide, double[]> mzValueMap = new HashMap<>();
-        for (Identification anExpIdentification : filter.getTopFragmentIonHits(qualityPercentile)) {
+        for (Identification anExpIdentification : filter.getTopFragmentIonHits(75)) {
             double[] mzValuesBySpectrumId = fileSpectrumRepository.getMzValuesBySpectrumId(anExpIdentification.getSpectrumId());
             Peptide peptide = anExpIdentification.getPeptide();
             mzValueMap.put(peptide, mzValuesBySpectrumId);

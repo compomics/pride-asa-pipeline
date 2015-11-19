@@ -33,9 +33,9 @@ public class FileProjectExtractor {
     private static final Logger LOGGER = Logger.getLogger(FileProjectExtractor.class);
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
-        File outputFolder = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download");
-        //File inputFile = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download\\PRIDE_Exp_Complete_Ac_3.xml");
-        File inputFile = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download\\PeptideShaker_Example.xml");
+        File outputFolder = new File("C:\\Users\\compomics\\Documents\\Example_Files\\download");
+        //      File inputFile = new File("C:\\Users\\compomics\\Documents\\Example_Files\\PRIDE_Exp_Complete_Ac_3.xml");
+        File inputFile = new File("C:\\Users\\compomics\\Documents\\Example_Files\\PeptideShaker_Example.xml");
         System.out.println(new FileProjectExtractor(outputFolder).analyze(inputFile, inputFile.getName()));
     }
 
@@ -60,7 +60,7 @@ public class FileProjectExtractor {
         //the cache should only have one for now?
         String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
         LOGGER.info(entry + " was found in the parser cache");
-        
+
         //write an MGF with all peakfile information?
         /* 
          LOGGER.info("Getting related spectrum files from the cache");

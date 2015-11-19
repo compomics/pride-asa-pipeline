@@ -42,7 +42,7 @@ public class FragmentIonErrorPredictor {
     private void init() throws IOException {
         ArrayList<ModificationMatch> mockMods = new ArrayList<>();
         InferenceStatistics fragmentStats = new InferenceStatistics(true);
-     //   LOGGER.info("Calculating fragment ion accuraccy using mass deficits...");
+        //   LOGGER.info("Calculating fragment ion accuraccy using mass deficits...");
         for (Map.Entry<Peptide, double[]> aPeptide : peptideMzMap.entrySet()) {
             com.compomics.util.experiment.biology.Peptide utilitiesPeptide = new com.compomics.util.experiment.biology.Peptide(aPeptide.getKey().getSequenceString(), mockMods);
             AminoAcidMassInference aaInference = new AminoAcidMassInference(aPeptide.getValue(), utilitiesPeptide, new BigDecimal(aPeptide.getKey().getCharge()), new BigDecimal(1.0));
@@ -54,7 +54,7 @@ public class FragmentIonErrorPredictor {
                 }
             }
         }
-        this.fragmentIonAccuraccy = Math.min(1.0, InferenceStatistics.round(fragmentStats.calculateOptimalMassError(),3));
+        this.fragmentIonAccuraccy = Math.min(1.0, InferenceStatistics.round(fragmentStats.calculateOptimalMassError(), 3));
         LOGGER.info("Estimated fragment ion accuraccy at " + fragmentIonAccuraccy);
     }
 
