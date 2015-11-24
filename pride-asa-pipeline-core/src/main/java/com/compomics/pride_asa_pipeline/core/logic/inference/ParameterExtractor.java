@@ -84,7 +84,7 @@ public class ParameterExtractor {
 
         //--------------------------------
         // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
-        ModificationPredictor modificationPredictor = new ModificationPredictor(spectrumAnnotator.getSpectrumAnnotatorResult(), spectrumAnnotator.getModificationService());
+        ModificationPredictor modificationPredictor = new ModificationPredictor(assay,spectrumAnnotator.getSpectrumAnnotatorResult(), spectrumAnnotator.getModificationService());
 
         new ModificationReportGenerator(modificationPredictor).writeReport(System.out);
         //--------------------------------

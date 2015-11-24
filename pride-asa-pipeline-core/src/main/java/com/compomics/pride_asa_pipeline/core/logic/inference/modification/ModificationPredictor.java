@@ -6,6 +6,7 @@ import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.UtilitiesPTMAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.experiment.biology.PTM;
@@ -63,17 +64,19 @@ public class ModificationPredictor {
      * A list of UNIMOD quant related terms
      */
     private final List<Integer> quantAccessions = Arrays.asList(new Integer[]{258, 259, 267, 367, 687, 365, 866, 730, 532, 730, 533, 731, 739, 738, 737, 984, 985, 1341, 1342});
+    private String assay;
 
-
-    public ModificationPredictor(SpectrumAnnotatorResult spectrumAnnotatorResult, ModificationService modificationService) {
+    public ModificationPredictor(String assay, SpectrumAnnotatorResult spectrumAnnotatorResult, ModificationService modificationService) {
         this.spectrumAnnotatorResult = spectrumAnnotatorResult;
         this.modificationService = modificationService;
+        this.assay = assay;
         inferModifications();
     }
 
-    public ModificationPredictor(SpectrumAnnotatorResult spectrumAnnotatorResult, ModificationService modificationService, OutputStream reportStream) {
+    public ModificationPredictor(String assay, SpectrumAnnotatorResult spectrumAnnotatorResult, ModificationService modificationService, OutputStream reportStream) {
         this.spectrumAnnotatorResult = spectrumAnnotatorResult;
         this.modificationService = modificationService;
+        this.assay = assay;
         inferModifications();
         try {
             new ModificationReportGenerator(this).writeReport(reportStream);
@@ -119,6 +122,13 @@ public class ModificationPredictor {
         }
         ModificationAdapter adapter = new UtilitiesPTMAdapter();
         ptmSettings = new PtmSettings();
+        //make sure the annotated mods are in there as well
+        FileModificationRepository repository = new FileModificationRepository();
+        List<Modification> modificationsByExperimentId = repository.getModificationsByExperimentId(assay);
+        for (Modification annotatedMod : modificationsByExperimentId) {
+            asapMods.put(annotatedMod.getName(), false);
+        }
+        //and add the new ones
         HashSet<Double> encounteredMasses = new HashSet<>();
         for (Map.Entry<String, Boolean> aMod : asapMods.entrySet()) {
             ArrayList<String> unknownPTM = new ArrayList<>();

@@ -2,9 +2,13 @@ package com.compomics.pride_asa_pipeline.core.playground;
 
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.logic.inference.ParameterExtractor;
+import com.compomics.pride_asa_pipeline.core.logic.inference.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.repository.impl.combo.WebServiceFileExperimentRepository;
+import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
+import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
+import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
@@ -30,7 +34,7 @@ public class WebProjectExtractor {
     private static final Logger LOGGER = Logger.getLogger(WebProjectExtractor.class);
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
-        File outputFolder = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download");
+        File outputFolder = new File("C:\\Users\\compomics\\Desktop\\MzID_Test\\download");
         String inputAssay = "8173";
         SearchParameters analyze = new WebProjectExtractor(outputFolder).analyze(inputAssay);
         System.out.println(analyze);
@@ -49,15 +53,19 @@ public class WebProjectExtractor {
         LOGGER.info(entry + " was found in the parser cache");
         //write an MGF with all peakfile information?
         LOGGER.info("Getting related spectrum files from the cache");
-       /* FileSpectrumRepository spectrumRepository = new FileSpectrumRepository(entry);
+        FileSpectrumRepository spectrumRepository = new FileSpectrumRepository(entry);
         File mgf = spectrumRepository.writeToMGF(outputFolder);
         //zip the MGF file
         File zip = new File(mgf.getAbsolutePath() + ".zip");
         ZipUtils.zip(mgf, zip, new WaitingHandlerCLIImpl(), mgf.length());
-        mgf.delete();*/
+        mgf.delete();
         //do the extraction
         LOGGER.info("Attempting to infer searchparameters");
         ParameterExtractor extractor = new ParameterExtractor(assayAccession);
-        return extractor.getParameters();
+        SearchParameters parameters = extractor.getParameters();
+        LOGGER.info("Printing additional masses of interest...");
+        MassScanResult.printToFile(new File(outputFolder,assayAccession+ ".mass_scan.tsv"), parameters.getPrecursorAccuracyDalton(), parameters.getFragmentIonAccuracy());
+        SearchParameters.saveIdentificationParameters(parameters,new File(outputFolder,assayAccession+".par"));
+        return parameters;
     }
 }

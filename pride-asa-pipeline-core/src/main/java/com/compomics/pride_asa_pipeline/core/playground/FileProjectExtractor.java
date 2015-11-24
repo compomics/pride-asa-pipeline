@@ -56,7 +56,6 @@ public class FileProjectExtractor {
 
         //load the file into the repository
         experimentRepository.addPrideXMLFile(assay, inputFile);
-        List<Identification> loadExperimentIdentifications = experimentRepository.loadExperimentIdentifications(assay);
         spectrumRepository.setExperimentIdentifier(assay);
         modificationRepository.setExperimentIdentifier(assay);
 

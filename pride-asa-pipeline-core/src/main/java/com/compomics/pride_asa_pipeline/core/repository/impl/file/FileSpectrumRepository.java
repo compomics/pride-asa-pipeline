@@ -83,6 +83,10 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
     public File writeToMGF(File outputFolder) throws IOException, MGFExtractionException {
         final long timeout = 30000;
         File mgf = new File(outputFolder, experimentIdentifier + ".mgf");
+        if(!mgf.exists()){
+            mgf.getParentFile().mkdirs();
+            mgf.createNewFile();
+        }
         try (FileWriter writer = new FileWriter(mgf, true)) {
             for (File aPeakFile : parserCache.getPeakFiles(experimentIdentifier)) {
                 File tempOut = new File(aPeakFile.getParentFile(), aPeakFile.getName() + ".asap.temp.mgf");
