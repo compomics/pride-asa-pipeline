@@ -31,7 +31,9 @@ public class IdentificationFilter {
                     double value = identificationScore.getAverageAminoAcidScore();
                     if (threshold <= value) {
                         topIdentifications.add(anIdentification);
-                    }
+                    }else{
+                        //@ToDo what can we do with the others?
+                       }
                 } catch (NullPointerException e) {
                    //then there is no scoring information known?
                 }

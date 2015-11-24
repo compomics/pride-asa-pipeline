@@ -2,14 +2,17 @@ package com.compomics.pride_asa_pipeline.core.playground;
 
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.logic.inference.ParameterExtractor;
+import com.compomics.pride_asa_pipeline.core.logic.inference.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
+import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.geneontology.oboedit.dataadapter.GOBOParseException;
@@ -34,7 +37,7 @@ public class FileProjectExtractor {
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
         File outputFolder = new File("C:\\Users\\compomics\\Documents\\Example_Files\\download");
-        //      File inputFile = new File("C:\\Users\\compomics\\Documents\\Example_Files\\PRIDE_Exp_Complete_Ac_3.xml");
+        //File inputFile = new File("C:\\Users\\compomics\\Documents\\Example_Files\\PRIDE_Exp_Complete_Ac_3.xml");
         File inputFile = new File("C:\\Users\\compomics\\Documents\\Example_Files\\PeptideShaker_Example.xml");
         System.out.println(new FileProjectExtractor(outputFolder).analyze(inputFile, inputFile.getName()));
     }
@@ -53,7 +56,7 @@ public class FileProjectExtractor {
 
         //load the file into the repository
         experimentRepository.addPrideXMLFile(assay, inputFile);
-        experimentRepository.loadExperimentIdentifications(assay);
+        List<Identification> loadExperimentIdentifications = experimentRepository.loadExperimentIdentifications(assay);
         spectrumRepository.setExperimentIdentifier(assay);
         modificationRepository.setExperimentIdentifier(assay);
 
@@ -73,7 +76,10 @@ public class FileProjectExtractor {
         //do the extraction
         LOGGER.info("Attempting to infer searchparameters");
         ParameterExtractor extractor = new ParameterExtractor(assay);
+        SearchParameters parameters = extractor.getParameters();
         //ParameterExtractor extractor = new ParameterExtractor(assay);
-        return extractor.getParameters();
+        LOGGER.info("Printing additional masses of interest...");
+        MassScanResult.printToFile(new File(inputFile + ".mass_scan.tsv"), parameters.getPrecursorAccuracyDalton(), parameters.getFragmentIonAccuracy());
+        return parameters;
     }
 }

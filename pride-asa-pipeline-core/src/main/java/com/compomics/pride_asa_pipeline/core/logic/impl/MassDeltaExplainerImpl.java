@@ -4,6 +4,7 @@ import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolde
 import com.compomics.pride_asa_pipeline.core.logic.MassDeltaExplainer;
 import com.compomics.pride_asa_pipeline.core.logic.ModificationCombinationSolver;
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
+import com.compomics.pride_asa_pipeline.core.logic.inference.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
@@ -40,7 +41,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
     @Override
     public Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> identifications, MassRecalibrationResult massRecalibrationResult, AnalyzerData analyzerData) {
         Map<Identification, Set<ModificationCombination>> possibleExplainedIdentifications = new HashMap<>();
-
+        HashMap<Identification, Double> identificationsWithUnexplainedMass = new HashMap<Identification, Double>();
         //keep track of ratios determining the loop condition
         //initialized negative to the ratio difference will be positive!
         double previousExplainedRatio = -1D;
@@ -80,7 +81,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                  //there is no point in trying to fit modifications
                  //only if it's less than C13 peak mass */
                 if (Math.abs(precursorMassDelta) < Atom.C_12.getMonoMass() / 12) {
-                    massErrorStatistics.addValue(precursorMassDelta/peptide.getCharge());
+                    massErrorStatistics.addValue(precursorMassDelta / peptide.getCharge());
                 }
 
                 //take the error window from the mass recalibration as deviation
@@ -108,6 +109,8 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                         //there is a mass delta the needs to be explained, but
                         //we could not find a suitable modification combination
                         //so we don't add it to the map!
+                        //check the precursor against the maps !
+                        identificationsWithUnexplainedMass.put(identification,precursorMassDelta);
                     }
                 } else {
                     possibleExplainedIdentifications.put(identification, null);
@@ -123,7 +126,8 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
             //increase the number of considered modifications for the next round in case we are not reaching the convergence
             modificationCombinationSizeLimit++;
         }
-
+        LOGGER.debug("Scanning for contaminants...");
+        MassScanResult.scanForPrecursorIonContamination(identificationsWithUnexplainedMass);
         //finally return the map of precursors with their possible explantions
         return possibleExplainedIdentifications;
     }

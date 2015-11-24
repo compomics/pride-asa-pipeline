@@ -1,7 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.logic.inference.glyco;
 
 /**
- * An enum for known glycan related precursor mz peaks
+ * An enum for known glycan related precursor mz peaks (not masses)
  * 
  * @author Kenneth Verheggen
  */

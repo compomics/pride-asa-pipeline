@@ -5,6 +5,7 @@ import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.logic.inference.enzyme.EnzymePredictor;
 import com.compomics.pride_asa_pipeline.core.logic.inference.machine.PrecursorIonErrorPredictor;
 import com.compomics.pride_asa_pipeline.core.logic.inference.massdeficit.FragmentIonErrorPredictor;
+import com.compomics.pride_asa_pipeline.core.logic.inference.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.logic.inference.modification.ModificationPredictor;
 import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.ModificationReportGenerator;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
@@ -84,6 +85,7 @@ public class ParameterExtractor {
         //--------------------------------
         // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
         ModificationPredictor modificationPredictor = new ModificationPredictor(spectrumAnnotator.getSpectrumAnnotatorResult(), spectrumAnnotator.getModificationService());
+
         new ModificationReportGenerator(modificationPredictor).writeReport(System.out);
         //--------------------------------
         //recalibrate errors
@@ -95,12 +97,14 @@ public class ParameterExtractor {
         //fragment ion is harder, more leanway should be given
         LOGGER.info("Using the " + 25 + " % best identifications for fragment ion estimation");
         HashMap<Peptide, double[]> mzValueMap = new HashMap<>();
-        for (Identification anExpIdentification : filter.getTopFragmentIonHits(75)) {
+        List<Identification> topFragmentIonHits = filter.getTopFragmentIonHits(75);
+        for (Identification anExpIdentification : topFragmentIonHits) {
             double[] mzValuesBySpectrumId = fileSpectrumRepository.getMzValuesBySpectrumId(anExpIdentification.getSpectrumId());
             Peptide peptide = anExpIdentification.getPeptide();
             mzValueMap.put(peptide, mzValuesBySpectrumId);
-        }
 
+        }
+        MassScanResult.reportFragmentIonContamination(topFragmentIonHits);
         //FragmentIonErrorPredictor fragmentIonErrorPredictor = new IterativeFragmentIonErrorPredictor(mzValueMap);
         FragmentIonErrorPredictor fragmentIonErrorPredictor = new FragmentIonErrorPredictor(mzValueMap);
 
