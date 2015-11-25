@@ -231,17 +231,15 @@ public class MGFExtractor {
         try {
             result = futureResult.get(timeout, TimeUnit.MILLISECONDS);
         } catch (TimeoutException | InterruptedException | ExecutionException ex) {
-            boolean cancel = futureResult.cancel(true);
+            futureResult.cancel(true);
             retriever.interrupt();
-            if (!cancel) {
-                LOGGER.error("Could not clear the thread for " + spectrumID);
-            }
             //for safety kill the service pool?
             service.shutdownNow();
             //notify the program that this particular spectrum timed out...
             //can you completely destroy a future?
-
-            throw new TimeoutException("Timed out after " + timeout + " ms (" + System.lineSeparator() + ex + System.lineSeparator() + ")");
+            if (ex instanceof TimeoutException | ex instanceof InterruptedException) {
+                throw new TimeoutException("Timed out after " + timeout + " ms (" + System.lineSeparator() + ex + System.lineSeparator() + ")");
+            }
         }
         service.shutdown();
         return result;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.pride_asa_pipeline.core.logic.inference.massdeficit.model;
+package com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.massdeficit.model;
 
 import java.math.BigDecimal;
 

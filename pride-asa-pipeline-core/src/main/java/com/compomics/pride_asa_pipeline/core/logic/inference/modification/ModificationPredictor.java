@@ -155,7 +155,6 @@ public class ModificationPredictor {
     private double calculateConsiderationThreshold() {
         InferenceStatistics stats = new InferenceStatistics(modificationRates.values(), false);
         double threshold = Math.max(0.005, stats.getPercentile(2.5));
-        System.out.println("ConsiderationThreshold = " + threshold);
         return threshold;
     }
 

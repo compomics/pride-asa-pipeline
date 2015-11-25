@@ -40,8 +40,6 @@ public abstract class ParserCacheConnector {
     public void addMzID(String experimentAccession,File identificationsFile, List<File> peakFiles) {
         parserCache.getParser(experimentAccession,identificationsFile, true).getName();
         parserCache.addPeakFiles(experimentAccession,identificationsFile, peakFiles);
-    }
-
-
+    }    
 
 }

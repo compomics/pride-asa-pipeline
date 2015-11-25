@@ -41,6 +41,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
 
     /**
      * Creates a new File experiment repository
+     * @param tempFolder the temp folder location (for example when the input files need to be saved as well)
      */
     public WebServiceFileExperimentRepository(File tempFolder) {
         this.tempFolder = tempFolder;
@@ -55,7 +56,8 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
     public void addAssay(String assay) throws Exception {
         File identFile = getIdentificationFile(assay);
         if (identFile != null) {
-            if (!identFile.getName().toLowerCase().endsWith(".xml") & !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
+            if (!identFile.getName().toLowerCase().endsWith(".xml") &
+                    !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
                 List<File> peakFiles = getPeakFiles(assay);
                 super.addMzID(assay, identFile, peakFiles);
             } else {

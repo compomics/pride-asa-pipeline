@@ -1,8 +1,8 @@
 package com.compomics.pride_asa_pipeline.core.playground;
 
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
-import com.compomics.pride_asa_pipeline.core.logic.inference.ParameterExtractor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.contaminants.MassScanResult;
+import com.compomics.pride_asa_pipeline.core.data.extractor.ParameterExtractor;
+import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
@@ -10,6 +10,8 @@ import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRe
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
+import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
+import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -37,8 +39,8 @@ public class FileProjectExtractor {
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
         File outputFolder = new File("C:\\Users\\compomics\\Documents\\Example_Files\\download");
-        //File inputFile = new File("C:\\Users\\compomics\\Documents\\Example_Files\\PRIDE_Exp_Complete_Ac_3.xml");
-        File inputFile = new File("C:\\Users\\compomics\\Documents\\Example_Files\\PeptideShaker_Example.xml");
+        File inputFile = new File("C:\\Users\\compomics\\Documents\\Example_Files\\PRIDE_Exp_Complete_Ac_3.xml");
+        //File inputFile = new File("C:\\Users\\compomics\\Documents\\Example_Files\\PeptideShaker_Example.xml");
         System.out.println(new FileProjectExtractor(outputFolder).analyze(inputFile, inputFile.getName()));
     }
 
@@ -63,22 +65,19 @@ public class FileProjectExtractor {
         String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
         LOGGER.info(entry + " was found in the parser cache");
 
-        //write an MGF with all peakfile information?
-        /* 
-         LOGGER.info("Getting related spectrum files from the cache");
-         File mgf = spectrumRepository.writeToMGF(outputFolder);
-         //zip the MGF file
-         File zip = new File(mgf.getAbsolutePath() + ".zip");
-         ZipUtils.zip(mgf, zip, new WaitingHandlerCLIImpl(), mgf.length());
-         mgf.delete();
-         */
+        LOGGER.info("Getting related spectrum files from the cache");
+        //    FileSpectrumRepository spectrumRepository = new FileSpectrumRepository(entry);
+        File mgf = spectrumRepository.writeToMGF(outputFolder);
+        //zip the MGF file
+        File zip = new File(mgf.getAbsolutePath() + ".zip");
+        ZipUtils.zip(mgf, zip, new WaitingHandlerCLIImpl(), mgf.length());
+        mgf.delete();
         //do the extraction
         LOGGER.info("Attempting to infer searchparameters");
         ParameterExtractor extractor = new ParameterExtractor(assay);
         SearchParameters parameters = extractor.getParameters();
-        //ParameterExtractor extractor = new ParameterExtractor(assay);
-        LOGGER.info("Printing additional masses of interest...");
-        MassScanResult.printToFile(new File(inputFile + ".mass_scan.tsv"), parameters.getPrecursorAccuracyDalton(), parameters.getFragmentIonAccuracy());
+        extractor.printReports(outputFolder);
+        SearchParameters.saveIdentificationParameters(parameters, new File(outputFolder, assay + ".par"));
         return parameters;
     }
 }

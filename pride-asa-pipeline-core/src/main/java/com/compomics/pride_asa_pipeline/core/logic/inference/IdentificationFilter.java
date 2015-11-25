@@ -47,7 +47,7 @@ public class IdentificationFilter {
 
     public List<Identification> getTopFragmentIonHits(double percentile) {
         List<Identification> topIdentifications = new ArrayList<>();
-        if (identifications.size() > 30) {
+        if (identifications.size() > 100) {
             double threshold = getFragmentIonThreshold(percentile);
             LOGGER.info("Only retaining identifications above " + threshold);
             for (Identification anIdentification : identifications) {
@@ -68,7 +68,7 @@ public class IdentificationFilter {
         return topIdentifications;
     }
 
-    private double getPrecursorThreshold(double percentile) {
+    public double getPrecursorThreshold(double percentile) {
         InferenceStatistics statistics = new InferenceStatistics(true);
         for (Identification anIdentification : identifications) {
             try {
@@ -87,7 +87,7 @@ public class IdentificationFilter {
         return statistics.getPercentile(percentile);
     }
 
-    private double getFragmentIonThreshold(double percentile) {
+    public double getFragmentIonThreshold(double percentile) {
         InferenceStatistics statistics = new InferenceStatistics(true);
         for (Identification anIdentification : identifications) {
             try {

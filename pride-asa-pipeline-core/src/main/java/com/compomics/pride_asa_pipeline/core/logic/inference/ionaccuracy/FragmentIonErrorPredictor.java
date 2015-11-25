@@ -1,7 +1,7 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.massdeficit;
+package com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
-import com.compomics.pride_asa_pipeline.core.logic.inference.massdeficit.logic.AminoAcidMassInference;
+import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.massdeficit.logic.AminoAcidMassInference;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.util.experiment.identification.matches.ModificationMatch;
 import java.io.IOException;
@@ -33,6 +33,7 @@ public class FragmentIonErrorPredictor {
      * The logger
      */
     private static final Logger LOGGER = Logger.getLogger(FragmentIonErrorPredictor.class);
+    private List<AminoAcidMassInference> aaInferences = new ArrayList<>();
 
     public FragmentIonErrorPredictor(HashMap<Peptide, double[]> peptideMzMap) throws IOException {
         this.peptideMzMap = peptideMzMap;
@@ -46,6 +47,7 @@ public class FragmentIonErrorPredictor {
         for (Map.Entry<Peptide, double[]> aPeptide : peptideMzMap.entrySet()) {
             com.compomics.util.experiment.biology.Peptide utilitiesPeptide = new com.compomics.util.experiment.biology.Peptide(aPeptide.getKey().getSequenceString(), mockMods);
             AminoAcidMassInference aaInference = new AminoAcidMassInference(aPeptide.getValue(), utilitiesPeptide, new BigDecimal(aPeptide.getKey().getCharge()), new BigDecimal(1.0));
+            aaInferences.add(aaInference);
             List<Double> reportedMassErrors = aaInference.getMassErrors();
             for (Double massError : reportedMassErrors) {
                 if (massError < (Atom.C_12.getMonoMass() / 12)) {
@@ -54,12 +56,25 @@ public class FragmentIonErrorPredictor {
                 }
             }
         }
-        this.fragmentIonAccuraccy = Math.min(1.0, InferenceStatistics.round(fragmentStats.calculateOptimalMassError(), 3));
+        double acc = InferenceStatistics.round(fragmentStats.calculateOptimalMassError(), 3);
+        if (acc == 0.0) {
+            acc = InferenceStatistics.round(fragmentStats.getMax(), 3);
+        }
+        //what if the max also is 0.0???? (no idea how this is possible, except if only those identified peaks were set?)
+        if (acc == 0.0) {
+            //if that happens, set it to 1.0 (to have a broad starting point?)
+            acc = 1.0;
+        }
+        this.fragmentIonAccuraccy = Math.min(1.0, acc);
         LOGGER.info("Estimated fragment ion accuraccy at " + fragmentIonAccuraccy);
     }
 
     public double getFragmentIonAccuraccy() {
         return fragmentIonAccuraccy;
+    }
+
+    public List<AminoAcidMassInference> getAaInferences() {
+        return aaInferences;
     }
 
 }

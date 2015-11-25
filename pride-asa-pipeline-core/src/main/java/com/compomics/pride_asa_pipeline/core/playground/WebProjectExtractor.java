@@ -1,8 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.playground;
 
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
-import com.compomics.pride_asa_pipeline.core.logic.inference.ParameterExtractor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.contaminants.MassScanResult;
+import com.compomics.pride_asa_pipeline.core.data.extractor.ParameterExtractor;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.repository.impl.combo.WebServiceFileExperimentRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
@@ -12,6 +11,7 @@ import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.geneontology.oboedit.dataadapter.GOBOParseException;
 import org.xmlpull.v1.XmlPullParserException;
@@ -35,18 +35,25 @@ public class WebProjectExtractor {
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
         File outputFolder = new File("C:\\Users\\compomics\\Desktop\\MzID_Test\\download");
+        if (outputFolder.exists()) {
+            outputFolder.delete();
+        }
+        outputFolder.mkdirs();
         String inputAssay = "8173";
         SearchParameters analyze = new WebProjectExtractor(outputFolder).analyze(inputAssay);
         System.out.println(analyze);
     }
+    private final File tempFolder;
 
     public WebProjectExtractor(File outputFolder) {
         this.outputFolder = outputFolder;
+        this.tempFolder = new File(outputFolder, "PRIDE");
+        tempFolder.mkdirs();
     }
 
     public SearchParameters analyze(String assayAccession) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
         LOGGER.info("Setting up experiment repository for assay " + assayAccession);
-        WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository();
+        WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository(tempFolder);
         experimentRepository.addAssay(assayAccession);
         //the cache should only have one for now?
         String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
@@ -63,9 +70,13 @@ public class WebProjectExtractor {
         LOGGER.info("Attempting to infer searchparameters");
         ParameterExtractor extractor = new ParameterExtractor(assayAccession);
         SearchParameters parameters = extractor.getParameters();
-        LOGGER.info("Printing additional masses of interest...");
-        MassScanResult.printToFile(new File(outputFolder,assayAccession+ ".mass_scan.tsv"), parameters.getPrecursorAccuracyDalton(), parameters.getFragmentIonAccuracy());
-        SearchParameters.saveIdentificationParameters(parameters,new File(outputFolder,assayAccession+".par"));
+        extractor.printReports(outputFolder);
+        SearchParameters.saveIdentificationParameters(parameters, new File(outputFolder, assayAccession + ".par"));
         return parameters;
     }
+    
+    public void clearTempFolder() throws IOException{
+        FileUtils.deleteDirectory(tempFolder);
+    }
+    
 }

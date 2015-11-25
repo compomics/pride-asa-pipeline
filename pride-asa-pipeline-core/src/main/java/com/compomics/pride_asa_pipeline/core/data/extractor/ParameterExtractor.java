@@ -1,13 +1,19 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference;
+package com.compomics.pride_asa_pipeline.core.data.extractor;
 
 import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.core.logic.inference.IdentificationFilter;
 import com.compomics.pride_asa_pipeline.core.logic.inference.enzyme.EnzymePredictor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.machine.PrecursorIonErrorPredictor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.massdeficit.FragmentIonErrorPredictor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.contaminants.MassScanResult;
+import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.PrecursorIonErrorPredictor;
+import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.FragmentIonErrorPredictor;
+import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.logic.inference.modification.ModificationPredictor;
+import com.compomics.pride_asa_pipeline.core.logic.inference.report.InferenceReportGenerator;
+import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.ContaminationReportGenerator;
+import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.EnzymeReportGenerator;
+import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.FragmentIonReporter;
 import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.ModificationReportGenerator;
+import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.PrecursorIonReporter;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.service.impl.DbModificationServiceImpl;
@@ -17,6 +23,8 @@ import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +54,10 @@ public class ParameterExtractor {
      * The quality percentile
      */
     private double qualityPercentile = 90;
+    private FragmentIonErrorPredictor fragmentIonErrorPredictor;
+    private PrecursorIonErrorPredictor precursorIonErrorPredictor;
+    private ModificationPredictor modificationPredictor;
+    private EnzymePredictor enzymePredictor;
 
     /**
      * An extractor for parameters
@@ -80,13 +92,12 @@ public class ParameterExtractor {
         for (Peptide aPeptide : spectrumAnnotator.getIdentifications().getCompletePeptides()) {
             peptideSequences.add(aPeptide.getSequenceString());
         }
-        EnzymePredictor enzymePredictor = new EnzymePredictor(peptideSequences);
+        enzymePredictor = new EnzymePredictor(peptideSequences);
 
         //--------------------------------
         // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
-        ModificationPredictor modificationPredictor = new ModificationPredictor(assay,spectrumAnnotator.getSpectrumAnnotatorResult(), spectrumAnnotator.getModificationService());
+        modificationPredictor = new ModificationPredictor(assay, spectrumAnnotator.getSpectrumAnnotatorResult(), spectrumAnnotator.getModificationService());
 
-        new ModificationReportGenerator(modificationPredictor).writeReport(System.out);
         //--------------------------------
         //recalibrate errors
         //precursor needs to be very accurate (considering mods / isotopes / etc)
@@ -104,11 +115,11 @@ public class ParameterExtractor {
             mzValueMap.put(peptide, mzValuesBySpectrumId);
 
         }
-        MassScanResult.reportFragmentIonContamination(topFragmentIonHits);
+        MassScanResult.scanFragmentIonContamination(topFragmentIonHits);
         //FragmentIonErrorPredictor fragmentIonErrorPredictor = new IterativeFragmentIonErrorPredictor(mzValueMap);
-        FragmentIonErrorPredictor fragmentIonErrorPredictor = new FragmentIonErrorPredictor(mzValueMap);
+        fragmentIonErrorPredictor = new FragmentIonErrorPredictor(mzValueMap);
 
-        PrecursorIonErrorPredictor precursorIonErrorPredictor = new PrecursorIonErrorPredictor(filter.getTopPrecursorHits(qualityPercentile));
+        precursorIonErrorPredictor = new PrecursorIonErrorPredictor(filter.getTopPrecursorHits(qualityPercentile));
         //construct a parameter object
         parameters = new SearchParameters();
 
@@ -117,13 +128,21 @@ public class ParameterExtractor {
 
         parameters.setPtmSettings(modificationPredictor.getPtmSettings());
 
-        parameters.setPrecursorAccuracy(precursorIonErrorPredictor.getRecalibratedPrecursorAccuraccy());
+        double predictedPrecursorMassError = precursorIonErrorPredictor.getRecalibratedPrecursorAccuraccy();
+        if (predictedPrecursorMassError == 0.0) {
+            predictedPrecursorMassError = MassScanResult.estimatePrecursorIonToleranceBasedOnContaminants();
+        }
+        parameters.setPrecursorAccuracy(predictedPrecursorMassError);
         parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
         parameters.setMinChargeSearched(new Charge(Charge.PLUS, precursorIonErrorPredictor.getRecalibratedMinCharge()));
         parameters.setMaxChargeSearched(new Charge(Charge.PLUS, precursorIonErrorPredictor.getRecalibratedMaxCharge()));
 
+        double predictedFragmentMassError = fragmentIonErrorPredictor.getFragmentIonAccuraccy();
+        if (predictedFragmentMassError == 0.0) {
+            predictedFragmentMassError = MassScanResult.estimateFragmentIonToleranceBasedOnContaminants();
+        }
         parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-        parameters.setFragmentIonAccuracy(fragmentIonErrorPredictor.getFragmentIonAccuraccy());
+        parameters.setFragmentIonAccuracy(predictedFragmentMassError);
 
     }
 
@@ -132,6 +151,34 @@ public class ParameterExtractor {
      */
     public SearchParameters getParameters() {
         return parameters;
+    }
+
+    public void printReports() throws IOException {
+        List<InferenceReportGenerator> reportGenerators = new ArrayList<>();
+        reportGenerators.add(new EnzymeReportGenerator(enzymePredictor));
+        reportGenerators.add(new FragmentIonReporter(fragmentIonErrorPredictor));
+        reportGenerators.add(new PrecursorIonReporter(precursorIonErrorPredictor));
+        reportGenerators.add(new ModificationReportGenerator(modificationPredictor));
+        reportGenerators.add(new ContaminationReportGenerator(precursorIonErrorPredictor.getRecalibratedPrecursorAccuraccy(), fragmentIonErrorPredictor.getFragmentIonAccuraccy()));
+        for (InferenceReportGenerator reportGenerator : reportGenerators) {
+            reportGenerator.writeReport(System.out);
+        }
+    }
+
+    public void printReports(File outputFolder) throws IOException {
+        List<InferenceReportGenerator> reportGenerators = new ArrayList<>();
+        reportGenerators.add(new EnzymeReportGenerator(enzymePredictor));
+        reportGenerators.add(new FragmentIonReporter(fragmentIonErrorPredictor));
+        reportGenerators.add(new PrecursorIonReporter(precursorIonErrorPredictor));
+        reportGenerators.add(new ModificationReportGenerator(modificationPredictor));
+        reportGenerators.add(new ContaminationReportGenerator(precursorIonErrorPredictor.getRecalibratedPrecursorAccuraccy(), fragmentIonErrorPredictor.getFragmentIonAccuraccy()));
+        for (InferenceReportGenerator reportGenerator : reportGenerators) {
+            LOGGER.info("Exporting " + reportGenerator.getReportName());
+            File outputFile = new File(outputFolder, reportGenerator.getReportName());
+            try (FileOutputStream out = new FileOutputStream(outputFile)) {
+                reportGenerator.writeReport(out);
+            }
+        }
     }
 
 }

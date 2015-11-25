@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.massdeficit.model.identifications;
+package com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.massdeficit.model.identifications;
 
 import com.compomics.pride_asa_pipeline.model.Peak;
 import java.util.Collection;

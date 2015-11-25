@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.pride_asa_pipeline.core.logic.inference.massdeficit.logic;
+package com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.massdeficit.logic;
 
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.compomics.util.experiment.biology.Peptide;
@@ -39,9 +39,6 @@ public class ModifiedSequenceConverter {
     private static void init() {
         ArrayList<String> defaultModifications = ptmFactory.getDefaultModifications();
         Collections.sort(defaultModifications);
-        for (String aPTM : defaultModifications) {
-            System.out.println(aPTM);
-        }
     }
 
     private static String eliminateTermini(final String str) {

@@ -1,5 +1,6 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.contaminants;
+package com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants;
 
+import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import java.io.File;
@@ -74,7 +75,7 @@ public class MassScanResult {
      *
      * @param identifications a collection of identifications
      */
-    public static void reportFragmentIonContamination(Collection<Identification> identifications) {
+    public static void scanFragmentIonContamination(Collection<Identification> identifications) {
         for (Identification identification : identifications) {
             String sequence = identification.getPeptide().getSequenceString();
             try {
@@ -93,7 +94,7 @@ public class MassScanResult {
                             double observedMassDifference = Math.abs(masses[j] - temp[k]);
                             double aQueryMass = shift.getValue();
                             if (aQueryMass - tolerance <= observedMassDifference && observedMassDifference <= aQueryMass + tolerance) {
-                                precursorContamination.add(new Contamination(shift.getKey(), sequence, observedMassDifference, aQueryMass, true));
+                                fragmentContamination.add(new Contamination(shift.getKey(), sequence, observedMassDifference, aQueryMass, true));
                             }
                         }
                     }
@@ -102,6 +103,22 @@ public class MassScanResult {
                 //no annotations?
             }
         }
+    }
+
+    public static double estimateFragmentIonToleranceBasedOnContaminants() {
+        InferenceStatistics stat = new InferenceStatistics(true);
+        for (Contamination contamination : fragmentContamination) {
+            stat.addValue(contamination.getObserved() - contamination.getTheoretical());
+        }
+        return  InferenceStatistics.round(stat.calculateOptimalMassError(),3);
+    }
+
+    public static double estimatePrecursorIonToleranceBasedOnContaminants() {
+        InferenceStatistics stat = new InferenceStatistics(true);
+        for (Contamination contamination : precursorContamination) {
+            stat.addValue(contamination.getObserved() - contamination.getTheoretical());
+        }
+        return InferenceStatistics.round(stat.calculateOptimalMassError(),3);
     }
 
     /**
@@ -153,6 +170,14 @@ public class MassScanResult {
             ex.printStackTrace();
         }
         return shifts;
+    }
+
+    public static Iterable<Contamination> getPrecursorContamination() {
+        return precursorContamination;
+    }
+
+    public static Iterable<Contamination> getFragmentContamination() {
+        return fragmentContamination;
     }
 
 }

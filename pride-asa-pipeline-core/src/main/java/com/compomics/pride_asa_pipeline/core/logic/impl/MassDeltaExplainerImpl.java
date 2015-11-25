@@ -4,7 +4,7 @@ import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolde
 import com.compomics.pride_asa_pipeline.core.logic.MassDeltaExplainer;
 import com.compomics.pride_asa_pipeline.core.logic.ModificationCombinationSolver;
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
-import com.compomics.pride_asa_pipeline.core.logic.inference.contaminants.MassScanResult;
+import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;

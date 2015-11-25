@@ -36,4 +36,9 @@ public class ModificationReportGenerator extends InferenceReportGenerator {
         }
     }
 
+        @Override
+    public String getReportName() {
+        return "modifications.tsv";
+    }
+    
 }

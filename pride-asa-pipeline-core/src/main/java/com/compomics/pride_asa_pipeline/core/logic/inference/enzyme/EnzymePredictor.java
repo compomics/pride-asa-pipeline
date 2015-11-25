@@ -170,4 +170,14 @@ public class EnzymePredictor {
         return mostLikelyEnzyme;
     }
 
+    public HashMap<Character, Integer> getN_TerminiCount() {
+        return N_TerminiCount;
+    }
+
+    public HashMap<Character, Integer> getC_TerminiCount() {
+        return C_TerminiCount;
+    }
+
+    
+    
 }

@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.contaminants;
+package com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants;
 
 /**
  * This class represents technical contaminations in a spectrum.

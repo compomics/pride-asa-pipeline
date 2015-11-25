@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.machine;
+package com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
@@ -40,18 +40,18 @@ public class PrecursorIonErrorPredictor {
      * The mass difference of a carbon isotope
      */
     private final double C13IsotopeMass = Atom.C.getMonoisotopicMass() / 12;
-     /**
+    /**
      * The mass difference of a carbon isotope
      */
     private final Collection<Identification> experimentIdentifications;
 
     public PrecursorIonErrorPredictor(Collection<Identification> identifications) {
-        this.experimentIdentifications=identifications;
+        this.experimentIdentifications = identifications;
         inferMachineSettings();
     }
-   
+
     private void inferMachineSettings() {
-        precursorIonStats.clear();     
+        precursorIonStats.clear();
         for (Identification anIdentification : experimentIdentifications) {
             try {
                 //only use the top 25% identifications?
@@ -69,15 +69,15 @@ public class PrecursorIonErrorPredictor {
                     } catch (AASequenceMassUnknownException ex) {
                         LOGGER.warn(anIdentification.getPeptide().getSequenceString() + " contains unknown amino acids and will be skipped");
                     }
-                //C13 peaks
+                    //C13 peaks
                 }
             } catch (NullPointerException e) {
-                    //this can happen if there are no unmodified and identified peptides?
+                //this can happen if there are no unmodified and identified peptides?
                 //  LOGGER.error("Not able to extract for " + anIdentification);
             }
         }
 
-        LOGGER.info(                "Attempting to find best suited precursor accuraccy (both sides)...");
+        LOGGER.info("Attempting to find best suited precursor accuraccy (both sides)...");
 
         mostLikelyPrecursorError = InferenceStatistics.round(precursorIonStats.calculateOptimalMassError(), 3);
         if (mostLikelyPrecursorError == Double.NaN
@@ -97,6 +97,22 @@ public class PrecursorIonErrorPredictor {
 
     public int getRecalibratedMinCharge() {
         return encounteredCharges.first();
+    }
+
+    public InferenceStatistics getPrecursorIonStats() {
+        return precursorIonStats;
+    }
+
+    public TreeSet<Integer> getEncounteredCharges() {
+        return encounteredCharges;
+    }
+
+    public Collection<Identification> getExperimentIdentifications() {
+        return experimentIdentifications;
+    }
+
+    public double getC13IsotopeMass() {
+        return C13IsotopeMass;
     }
 
 }

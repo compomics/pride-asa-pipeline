@@ -10,6 +10,10 @@ import java.io.OutputStreamWriter;
  */
 public abstract class InferenceReportGenerator {
 
+    public String getReportName(){
+        return this.getClass().getName().replace("com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.","")+".report.tsv";
+    }
+    
     public void writeReport(OutputStream out) throws IOException {
         OutputStreamWriter reportWriter = new OutputStreamWriter(out);
         writeReport(reportWriter);
