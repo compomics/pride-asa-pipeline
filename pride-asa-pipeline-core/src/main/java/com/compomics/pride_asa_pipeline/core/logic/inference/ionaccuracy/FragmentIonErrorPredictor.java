@@ -65,6 +65,7 @@ public class FragmentIonErrorPredictor {
         System.out.println(fragmentStats);
         this.fragmentIonAccuraccy = Math.min(1.0, acc);
         LOGGER.info("Estimated fragment ion accuraccy at " + fragmentIonAccuraccy);
+          TotalReportGenerator.setFragmentAccMethod(fragmentStats.getMethodUsed());
         if (fragmentIonAccuraccy == 0.0
                 || fragmentIonAccuraccy >= 1.0) {
             fragmentIonAccuraccy = MassScanResult.estimateFragmentIonToleranceBasedOnContaminants();
