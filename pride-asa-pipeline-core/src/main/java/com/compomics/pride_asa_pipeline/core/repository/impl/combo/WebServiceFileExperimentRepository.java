@@ -1,6 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.combo;
 
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.util.io.FTPDownloader;
 import com.compomics.util.pride.PrideWebService;
 import java.io.File;
@@ -11,9 +12,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileType;
+import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
 
@@ -41,7 +44,9 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
 
     /**
      * Creates a new File experiment repository
-     * @param tempFolder the temp folder location (for example when the input files need to be saved as well)
+     *
+     * @param tempFolder the temp folder location (for example when the input
+     * files need to be saved as well)
      */
     public WebServiceFileExperimentRepository(File tempFolder) {
         this.tempFolder = tempFolder;
@@ -56,8 +61,8 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
     public void addAssay(String assay) throws Exception {
         File identFile = getIdentificationFile(assay);
         if (identFile != null) {
-            if (!identFile.getName().toLowerCase().endsWith(".xml") &
-                    !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
+            if (!identFile.getName().toLowerCase().endsWith(".xml")
+                    & !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
                 List<File> peakFiles = getPeakFiles(assay);
                 super.addMzID(assay, identFile, peakFiles);
             } else {
@@ -75,17 +80,15 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
         URL url = detail.getDownloadLink();
         FTPDownloader downloader = new FTPDownloader(url.getHost());
         File downloadFile = new File(tempFolder, detail.getFileName());
-        File temp = null;
+        File temp = new File(tempFolder, downloadFile.getName());
         if (downloadFile.getName().endsWith(".gz")) {
-            temp = new File(tempFolder, downloadFile.getName().replace(".gz", ""));
+            temp = new File(temp.getAbsolutePath().replace(".gz", ""));
         }
-        if (temp != null && !temp.exists()) {
-            LOGGER.debug("Downloading : " + url.getPath());
-            downloader.downloadFile(url.getPath(), downloadFile);
-            if (downloadFile.getAbsolutePath().endsWith(".gz")) {
-                gunzip(downloadFile, temp);
-                downloadFile.delete();
-            }
+        LOGGER.debug("Downloading : " + url.getPath());
+        downloader.downloadFile(url.getPath(), downloadFile);
+        if (downloadFile.getAbsolutePath().endsWith(".gz")) {
+            gunzip(downloadFile, temp);
+            downloadFile.delete();
         }
         return temp;
     }

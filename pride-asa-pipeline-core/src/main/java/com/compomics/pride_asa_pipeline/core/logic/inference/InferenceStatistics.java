@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.logic.inference;
 
+import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.TotalReportGenerator;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,6 +18,7 @@ public class InferenceStatistics extends DescriptiveStatistics {
 
     private static final Logger LOGGER = Logger.getLogger(InferenceStatistics.class);
     private boolean absolute = false;
+    private String methodUsed;
 
     public InferenceStatistics(Collection<Double> values, boolean absolute) {
         addValues(values);
@@ -24,6 +26,10 @@ public class InferenceStatistics extends DescriptiveStatistics {
 
     public InferenceStatistics(boolean absolute) {
         this.absolute = absolute;
+    }
+
+    public String getMethodUsed() {
+        return methodUsed;
     }
 
     @Override
@@ -70,40 +76,48 @@ public class InferenceStatistics extends DescriptiveStatistics {
      */
     public double calculateOptimalMassError() {
         double optimalMassError;
-        optimalMassError = getOutlierThreshold();
+        //a lot of values are required to assume a normal distribution
+        if (getN() > 1000) {
+            methodUsed = ("Z-score derived outlier threshold");
+            optimalMassError = getThresholdBasedOnZScore();
+        } else {
+            optimalMassError = getValueThroughSkewness();
+        }
         return optimalMassError;
     }
 
-    private double getOutlierThreshold() {
-        if (getN() >= 30) {
-            //sort values the other way?
-            for (int i = getSortedValues().length - 1; i > -1; i--) {
-                double aValue = getSortedValues()[i];
-                //has to be bigger than the value that can be set...
-                //if (Math.abs(aValue) > 0.001) {
-                double zScore = (aValue - getMean()) / getStandardDeviation();
-                //half of all values should be within 0.67
-                if (Math.abs(zScore) <= 0.67) {
-                    //return the correct value
-                    return aValue;
-                }
-                //}
+    private double getThresholdBasedOnZScore() {
+        double mean = getMean();
+        double stdev = getStandardDeviation();
+        //calculate the zScores till it becomes larger than 0.05
+        for (double aValue : getSortedValues()) {
+            double zScore = (aValue - mean) / stdev;
+            if (zScore > 0.05) {
+                return aValue;
             }
         }
-        LOGGER.info("Returning threshold using elbow point cutoff value");
-        return getPartialMedian(getElbowPoint());
+        //return the mean error otherwise
+        return getMean();
     }
 
-    private double getPartialMedian(double cutOffValue) {
-        DescriptiveStatistics temp = new DescriptiveStatistics();
-        for (double aDouble : getSortedValues()) {
-            if (aDouble <= cutOffValue) {
-                temp.addValue(aDouble);
-            } else {
-                break;
-            }
+    private double getValueThroughSkewness() {
+        //check if the values are skewed to one side (ergo there is a big slope - more than 5% increase- between the min and max)
+        double basicskewness = Math.abs(getMean() - getPercentile(50)) / (getMean());
+        double threshold;
+        LOGGER.info("The mean differs from the median by " + (100 * basicskewness) + "%");
+        //if it's more than 5% difference, then there are more values that are higher...
+        if (basicskewness > 0.05) {
+            methodUsed = ("Elbow point to determine outlier threshold");
+            threshold = getElbowPoint();
+        } else {
+            methodUsed = ("90th percentile to determine outlier threshold");
+            threshold = getPercentile(90);
         }
-        return temp.getMean();
+        if (threshold == 0) {
+            //then they either have a REALLY accurate machine, or the submission was tailored to perfect hits?
+            return getMax();
+        }
+        return getMean();
     }
 
     private double getElbowPoint() {
@@ -133,6 +147,17 @@ public class InferenceStatistics extends DescriptiveStatistics {
                 writer.append(String.valueOf(aValue)).append(System.lineSeparator());
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "N\t" + getN() + System.lineSeparator()
+                + "Mean\t" + getMean() + System.lineSeparator()
+                + "Min\t" + getMin() + System.lineSeparator()
+                + "25p\t" + getPercentile(25) + System.lineSeparator()
+                + "Median\t" + getPercentile(50) + System.lineSeparator()
+                + "75p\t" + getPercentile(75) + System.lineSeparator()
+                + "Max\t" + getMax();
     }
 
 }

@@ -18,6 +18,7 @@ public class AsapModificationAdapter implements ModificationAdapter<Modification
 
     @Override
     public Modification convertModification(PRIDEModification mod) {
+        try{
         Double averageIsotopicMass = mod.getAveDeltaMass();
         Double monoIsotopicMass = mod.getMonoDeltaMass();
         //TODO calcualte this from the formula?
@@ -40,6 +41,10 @@ public class AsapModificationAdapter implements ModificationAdapter<Modification
                 affectedAminoAcid,
                 mod.getAccession(),
                 mod.getAccession());
+    }catch(NullPointerException e){
+        //@ToDo figure out why this happens...
+        return null;
+    }
     }
 
     private Location getLocation(uk.ac.ebi.pridemod.model.PTM ptm) {

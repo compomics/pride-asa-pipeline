@@ -2,6 +2,7 @@ package com.compomics.pride_asa_pipeline.core.logic.inference.modification;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
 import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.ModificationReportGenerator;
+import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.TotalReportGenerator;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.UtilitiesPTMAdapter;
@@ -150,6 +151,8 @@ public class ModificationPredictor {
                 LOGGER.info(aMod.getKey() + " was found in the default PTMs");
             }
         }
+        TotalReportGenerator.setPtmSettings(ptmSettings);
+        TotalReportGenerator.setPtmSettingsMethod("Fragment mass error analysis");
     }
 
     private double calculateConsiderationThreshold() {

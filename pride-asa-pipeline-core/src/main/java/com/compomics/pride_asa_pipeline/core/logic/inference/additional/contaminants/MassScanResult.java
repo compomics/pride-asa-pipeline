@@ -15,6 +15,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import org.springframework.core.io.ClassPathResource;
+import uk.ac.ebi.pride.utilities.mol.Atom;
 
 /**
  * This class represents the result of a scan across all unexplained mass
@@ -110,7 +111,12 @@ public class MassScanResult {
         for (Contamination contamination : fragmentContamination) {
             stat.addValue(contamination.getObserved() - contamination.getTheoretical());
         }
-        return  InferenceStatistics.round(stat.calculateOptimalMassError(),3);
+        double calculateOptimalMassError = Math.abs(stat.calculateOptimalMassError());
+        double isotopeMass = Atom.C_12.getMonoMass() / 12;
+        if (calculateOptimalMassError > isotopeMass) {
+            calculateOptimalMassError -= isotopeMass;
+        }
+        return InferenceStatistics.round(calculateOptimalMassError, 3);
     }
 
     public static double estimatePrecursorIonToleranceBasedOnContaminants() {
@@ -118,7 +124,12 @@ public class MassScanResult {
         for (Contamination contamination : precursorContamination) {
             stat.addValue(contamination.getObserved() - contamination.getTheoretical());
         }
-        return InferenceStatistics.round(stat.calculateOptimalMassError(),3);
+        double calculateOptimalMassError = Math.abs(stat.calculateOptimalMassError());
+        double isotopeMass = Atom.C_12.getMonoMass() / 12;
+        if (calculateOptimalMassError > isotopeMass) {
+            calculateOptimalMassError -= isotopeMass;
+        }
+        return InferenceStatistics.round(calculateOptimalMassError, 3);
     }
 
     /**

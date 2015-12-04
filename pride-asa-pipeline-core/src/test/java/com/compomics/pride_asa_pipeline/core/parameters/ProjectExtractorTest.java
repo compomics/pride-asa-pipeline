@@ -58,8 +58,8 @@ public class ProjectExtractorTest extends TestCase {
 
         SearchParameters identificationParameters = instance.analyze(inputFile, "test_" + inputFile.getName().replace(".xml", ""));
 
-        assertEquals(0.004, identificationParameters.getPrecursorAccuracy());
-        assertEquals(0.037, identificationParameters.getFragmentIonAccuracy());
+        assertEquals(0.003, identificationParameters.getPrecursorAccuracy());
+        assertEquals(0.027, identificationParameters.getFragmentIonAccuracy());
 
         assertEquals(identificationParameters.getPrecursorAccuracyType(), SearchParameters.MassAccuracyType.DA);
 

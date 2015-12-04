@@ -4,6 +4,7 @@ import com.compomics.pride_asa_pipeline.core.data.extractor.MGFExtractor;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.core.repository.SpectrumRepository;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import java.io.File;
 import java.io.FileWriter;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
+import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 import uk.ac.ebi.pride.utilities.data.core.Spectrum;
 
 /**
@@ -44,8 +46,8 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
 
     public void setExperimentIdentifier(String experimentIdentifier) {
         this.experimentIdentifier = experimentIdentifier;
-    }
-
+    }  
+      
     @Override
     public double[] getMzValuesBySpectrumId(String spectrumId) {
         Spectrum spectrumById = parserCache.getParser(experimentIdentifier, true).getSpectrumById(spectrumId);

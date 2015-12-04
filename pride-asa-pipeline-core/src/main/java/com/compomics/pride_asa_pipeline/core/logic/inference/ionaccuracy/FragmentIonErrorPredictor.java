@@ -1,13 +1,19 @@
 package com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
+import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.massdeficit.logic.AminoAcidMassInference;
+import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.TotalReportGenerator;
+import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.util.experiment.identification.matches.ModificationMatch;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -33,7 +39,8 @@ public class FragmentIonErrorPredictor {
      * The logger
      */
     private static final Logger LOGGER = Logger.getLogger(FragmentIonErrorPredictor.class);
-    private List<AminoAcidMassInference> aaInferences = new ArrayList<>();
+    private final List<AminoAcidMassInference> aaInferences = new ArrayList<>();
+    private InferenceStatistics fragmentStats;
 
     public FragmentIonErrorPredictor(HashMap<Peptide, double[]> peptideMzMap) throws IOException {
         this.peptideMzMap = peptideMzMap;
@@ -42,31 +49,27 @@ public class FragmentIonErrorPredictor {
 
     private void init() throws IOException {
         ArrayList<ModificationMatch> mockMods = new ArrayList<>();
-        InferenceStatistics fragmentStats = new InferenceStatistics(true);
+        fragmentStats = new InferenceStatistics(true);
         //   LOGGER.info("Calculating fragment ion accuraccy using mass deficits...");
+        LOGGER.info("Allowing errors smaller than " + (Atom.C_12.getMonoMass() / 12));
         for (Map.Entry<Peptide, double[]> aPeptide : peptideMzMap.entrySet()) {
             com.compomics.util.experiment.biology.Peptide utilitiesPeptide = new com.compomics.util.experiment.biology.Peptide(aPeptide.getKey().getSequenceString(), mockMods);
             AminoAcidMassInference aaInference = new AminoAcidMassInference(aPeptide.getValue(), utilitiesPeptide, new BigDecimal(aPeptide.getKey().getCharge()), new BigDecimal(1.0));
             aaInferences.add(aaInference);
             List<Double> reportedMassErrors = aaInference.getMassErrors();
             for (Double massError : reportedMassErrors) {
-                if (massError < (Atom.C_12.getMonoMass() / 12)) {
-                    //mass over charge error?
-                    fragmentStats.addValue(massError);
-                }
+                fragmentStats.addValue(massError);
             }
         }
         double acc = InferenceStatistics.round(fragmentStats.calculateOptimalMassError(), 3);
-        if (acc == 0.0) {
-            acc = InferenceStatistics.round(fragmentStats.getMax(), 3);
-        }
-        //what if the max also is 0.0???? (no idea how this is possible, except if only those identified peaks were set?)
-        if (acc == 0.0) {
-            //if that happens, set it to 1.0 (to have a broad starting point?)
-            acc = 1.0;
-        }
+        System.out.println(fragmentStats);
         this.fragmentIonAccuraccy = Math.min(1.0, acc);
         LOGGER.info("Estimated fragment ion accuraccy at " + fragmentIonAccuraccy);
+        if (fragmentIonAccuraccy == 0.0
+                || fragmentIonAccuraccy >= 1.0) {
+            fragmentIonAccuraccy = MassScanResult.estimateFragmentIonToleranceBasedOnContaminants();
+            TotalReportGenerator.setFragmentAccMethod("Estimated based on known mass spectrometry related contaminants");
+        }
     }
 
     public double getFragmentIonAccuraccy() {
@@ -75,6 +78,10 @@ public class FragmentIonErrorPredictor {
 
     public List<AminoAcidMassInference> getAaInferences() {
         return aaInferences;
+    }
+
+    public InferenceStatistics getFragmentIonStats() {
+        return fragmentStats;
     }
 
 }

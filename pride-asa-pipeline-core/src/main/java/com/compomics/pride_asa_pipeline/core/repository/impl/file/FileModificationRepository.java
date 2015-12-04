@@ -70,7 +70,14 @@ public class FileModificationRepository extends ParserCacheConnector implements 
             for (Comparable peptideID : parser.getPeptideIds(proteinID)) {
                 List<uk.ac.ebi.pride.utilities.data.core.Modification> mods = parser.getPTMs(proteinID, peptideID);
                 for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : mods) {
-                    modificationList.add((Modification) modFactory.getModification(adapter, aMod.getName()));
+                    if (aMod != null && aMod.getName() != null) {
+                        Object modification = modFactory.getModification(adapter, aMod.getName());
+                        if (modification != null) {
+                            modificationList.add((Modification) modification);
+                        } else {
+                            LOGGER.warn(aMod.getName() + " was not found in the modifications");
+                        }
+                    }
                 }
             }
         }

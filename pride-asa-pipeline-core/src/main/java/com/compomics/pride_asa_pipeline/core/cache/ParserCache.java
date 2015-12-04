@@ -129,7 +129,8 @@ public class ParserCache {
     public void addPeakFiles(String experimentName, List<File> peakFiles) {
         CachedDataAccessController controller = parserCache.get(experimentName);
         if (controller instanceof MzIdentMLControllerImpl) {
-            ((MzIdentMLControllerImpl) controller).addMSController(peakFiles);
+            MzIdentMLControllerImpl temp = (MzIdentMLControllerImpl) controller;
+            temp.addMSController(peakFiles);
             List<File> peakFileList = peakFileCache.getOrDefault(experimentName, new ArrayList<File>());
             peakFileList.addAll(peakFiles);
             peakFileCache.put(experimentName, peakFileList);
