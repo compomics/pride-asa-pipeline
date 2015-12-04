@@ -125,11 +125,6 @@ public class TotalReportGenerator extends InferenceReportGenerator {
         for (String mod : getPtmSettings().getAllModifications()) {
             reportWriter.append(mod + ",");
         }
-        reportWriter.append(System.lineSeparator());
-
-        reportWriter.append("Missed cleavages : " + getMaxMissedCleavages()).append(System.lineSeparator());
-        reportWriter.append("MC-Ration :" + getMissedCleavageRatio()).append(System.lineSeparator());
-
     }
 
     @Override

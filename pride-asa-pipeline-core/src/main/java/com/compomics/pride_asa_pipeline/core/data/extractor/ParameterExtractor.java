@@ -161,15 +161,14 @@ public class ParameterExtractor {
             LOGGER.info("Remediating erronous estimations...");
             if (parameters.getFragmentIonAccuracy() == 0 || parameters.getFragmentIonAccuracy() > data.getFragmentAccuraccy()) {
                 LOGGER.info("Remediating fragment accuracy to match " + data.getAnalyzerFamily().toString() + " analyzers.");
-                parameters.setFragmentIonAccuracy(data.getFragmentAccuraccy());
+                parameters.setFragmentIonAccuracy(data.getFragmentMassError());
                 parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
 
                 TotalReportGenerator.setFragmentAccMethod("Used annotated machine parameters : " + data.getAnalyzerFamily().toString());
             }
             if (parameters.getPrecursorAccuracy() == 0 || parameters.getPrecursorAccuracy() > data.getPrecursorAccuraccy()) {
                 LOGGER.info("Remediating precursor accuracy to match " + data.getAnalyzerFamily().toString() + " analyzers.");
-                parameters.setPrecursorAccuracy(data.getPrecursorAccuraccy());
-
+                parameters.setPrecursorAccuracy(data.getPrecursorMassError());
                 TotalReportGenerator.setPrecursorAccMethod("Used annotated machine parameters : " + data.getAnalyzerFamily().toString());
             }
         }
