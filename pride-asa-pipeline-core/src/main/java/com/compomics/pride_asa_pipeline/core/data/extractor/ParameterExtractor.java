@@ -15,6 +15,7 @@ import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.Fragmen
 import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.ModificationReportGenerator;
 import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.PrecursorIonReporter;
 import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.TotalReportGenerator;
+import com.compomics.pride_asa_pipeline.core.repository.impl.FileResultHandlerImpl3;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.service.impl.DbModificationServiceImpl;
@@ -23,6 +24,7 @@ import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
+import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
 import com.compomics.util.pride.PrideWebService;
@@ -158,19 +160,40 @@ public class ParameterExtractor {
     public void remediateParametersWithAnnotation(String assay) throws IOException {
         AnalyzerData data = getAnalyzerData(assay);
         if (data != null) {
+            double minimalAccuracy = 0.001; //~5ppm for orbitrap family
+            if (data.getAnalyzerFamily().equals(AnalyzerData.ANALYZER_FAMILY.FT)
+                    | data.getAnalyzerFamily().equals(AnalyzerData.ANALYZER_FAMILY.TOF
+                    )) {
+                minimalAccuracy = 0.010; // ~50ppm for others?;
+            }
+
             LOGGER.info("Remediating erronous estimations...");
-            if (parameters.getFragmentIonAccuracy() == 0 || parameters.getFragmentIonAccuracy() > data.getFragmentAccuraccy()) {
+            if (parameters.getPrecursorAccuracy() < minimalAccuracy) {
+                TotalReportGenerator.setPrecursorAccMethod("Using default, minimal machine --> inferred accuracy (" + parameters.getFragmentIonAccuracy() + ") too high for " + data.getAnalyzerFamily().toString());
+                parameters.setPrecursorAccuracy(minimalAccuracy);
+                parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
+            } else if (parameters.getPrecursorAccuracy() > data.getFragmentMassError()) {
+                LOGGER.info("Remediating fragment accuracy to match " + data.getAnalyzerFamily().toString() + " analyzers.");
+                parameters.setPrecursorAccuracy(data.getFragmentMassError());
+                parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
+                TotalReportGenerator.setPrecursorAccMethod("Used annotated machine parameters : " + data.getAnalyzerFamily().toString());
+            }
+
+            if (parameters.getFragmentIonAccuracy() < parameters.getPrecursorAccuracy()) {
+                TotalReportGenerator.setFragmentAccMethod("Precursor < Fragment --> inferred accuracy (" + parameters.getFragmentIonAccuracy() + ") set to match precursor");
+                parameters.setFragmentIonAccuracy(parameters.getPrecursorAccuracy());
+                parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
+            } else if (parameters.getFragmentIonAccuracy() < minimalAccuracy) {
+                TotalReportGenerator.setFragmentAccMethod("Using default, minimal machine --> inferred accuracy (" + parameters.getFragmentIonAccuracy() + ") too high for " + data.getAnalyzerFamily().toString());
+                parameters.setFragmentIonAccuracy(minimalAccuracy);
+                parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
+            } else if (parameters.getFragmentIonAccuracy() > data.getFragmentMassError()) {
                 LOGGER.info("Remediating fragment accuracy to match " + data.getAnalyzerFamily().toString() + " analyzers.");
                 parameters.setFragmentIonAccuracy(data.getFragmentMassError());
                 parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-
                 TotalReportGenerator.setFragmentAccMethod("Used annotated machine parameters : " + data.getAnalyzerFamily().toString());
             }
-            if (parameters.getPrecursorAccuracy() == 0 || parameters.getPrecursorAccuracy() > data.getPrecursorAccuraccy()) {
-                LOGGER.info("Remediating precursor accuracy to match " + data.getAnalyzerFamily().toString() + " analyzers.");
-                parameters.setPrecursorAccuracy(data.getPrecursorMassError());
-                TotalReportGenerator.setPrecursorAccMethod("Used annotated machine parameters : " + data.getAnalyzerFamily().toString());
-            }
+
         }
     }
 
@@ -204,19 +227,7 @@ public class ParameterExtractor {
         return parameters;
     }
 
-    public void printReports() throws IOException {
-        List<InferenceReportGenerator> reportGenerators = new ArrayList<>();
-        reportGenerators.add(new EnzymeReportGenerator(enzymePredictor));
-        reportGenerators.add(new FragmentIonReporter(fragmentIonErrorPredictor));
-        reportGenerators.add(new PrecursorIonReporter(precursorIonErrorPredictor));
-        reportGenerators.add(new ModificationReportGenerator(modificationPredictor));
-        reportGenerators.add(new ContaminationReportGenerator(precursorIonErrorPredictor.getRecalibratedPrecursorAccuraccy(), fragmentIonErrorPredictor.getFragmentIonAccuraccy()));
-        for (InferenceReportGenerator reportGenerator : reportGenerators) {
-            reportGenerator.writeReport(System.out);
-        }
-    }
-
-    public void printReports(File outputFolder) throws IOException {
+    public List<InferenceReportGenerator> getReportGenerators() {
         List<InferenceReportGenerator> reportGenerators = new ArrayList<>();
         reportGenerators.add(new EnzymeReportGenerator(enzymePredictor));
         reportGenerators.add(new FragmentIonReporter(fragmentIonErrorPredictor));
@@ -224,13 +235,37 @@ public class ParameterExtractor {
         reportGenerators.add(new ModificationReportGenerator(modificationPredictor));
         reportGenerators.add(new ContaminationReportGenerator(precursorIonErrorPredictor.getRecalibratedPrecursorAccuraccy(), fragmentIonErrorPredictor.getFragmentIonAccuraccy()));
         reportGenerators.add(new TotalReportGenerator());
-        for (InferenceReportGenerator reportGenerator : reportGenerators) {
+
+        return reportGenerators;
+    }
+
+    public void printReports() throws IOException {
+        for (InferenceReportGenerator reportGenerator : getReportGenerators()) {
+            reportGenerator.writeReport(System.out);
+        }
+    }
+
+    public void printReports(File outputFolder) throws IOException {
+        for (InferenceReportGenerator reportGenerator : getReportGenerators()) {
             LOGGER.info("Exporting " + reportGenerator.getReportName());
             File outputFile = new File(outputFolder, reportGenerator.getReportName());
             try (FileOutputStream out = new FileOutputStream(outputFile)) {
                 reportGenerator.writeReport(out);
             }
         }
+        printPRIDEAsapIdentificationResult(outputFolder);
+    }
+
+    public void printPRIDEAsapIdentificationResult(File outputFolder) {
+        LOGGER.info("Exporting PRIDE Asap identification reports");
+        FileResultHandlerImpl3 fileResultHandler = new FileResultHandlerImpl3();
+        List<Identification> completeIdentifications = spectrumAnnotator.getIdentifications().getCompleteIdentifications();
+        for (Identification ident : completeIdentifications) {
+            if (ident.getPipelineExplanationType() == null) {
+                ident.setPipelineExplanationType(PipelineExplanationType.UNEXPLAINED);
+            }
+        }
+        fileResultHandler.writeResult(new File(outputFolder, "complete_id.txt"), completeIdentifications);
     }
 
 }

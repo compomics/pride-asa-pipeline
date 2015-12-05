@@ -1,9 +1,11 @@
 package com.compomics.pride_asa_pipeline.core.logic.inference.report.impl;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.report.InferenceReportGenerator;
+import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.List;
 
 /**
  *
@@ -24,6 +26,7 @@ public class TotalReportGenerator extends InferenceReportGenerator {
     private static String ptmSettingsMethod;
     private static int maxMissedCleavages;
     private static double missedCleavageRatio;
+    private static List<Modification> annotatedMods;
 
     public static double getPrecursorAcc() {
         return precursorAcc;
@@ -105,6 +108,10 @@ public class TotalReportGenerator extends InferenceReportGenerator {
         return missedCleavageRatio;
     }
 
+    public static void setExperimentMods(List<Modification> annotatedMods) {
+        TotalReportGenerator.annotatedMods = annotatedMods;
+    }
+
     @Override
     protected void writeReport(OutputStreamWriter reportWriter) throws IOException {
         reportWriter.append("MASS ACCURACIES").append(System.lineSeparator());
@@ -121,7 +128,11 @@ public class TotalReportGenerator extends InferenceReportGenerator {
 
         reportWriter.append("MODIFICATION STATISTICS").append(System.lineSeparator());
         reportWriter.append("Modification Method\t" + getPtmSettingsMethod()).append(System.lineSeparator());
-        reportWriter.append("Mods\t");
+        reportWriter.append("Annotated Mods\t");
+        for (Modification mod : annotatedMods) {
+            reportWriter.append(mod.getName() + ",");
+        }
+        reportWriter.append(System.lineSeparator()).append("Used Mods (utilities)\t");
         for (String mod : getPtmSettings().getAllModifications()) {
             reportWriter.append(mod + ",");
         }

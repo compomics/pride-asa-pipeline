@@ -80,6 +80,9 @@ public class InferenceStatistics extends DescriptiveStatistics {
         if (getN() > 1000) {
             methodUsed = ("Z-score derived outlier threshold");
             optimalMassError = getThresholdBasedOnZScore();
+        } else if (getN() < 10) {
+            methodUsed = ("Using maximal value for low amount of data points");
+            optimalMassError = getMax();
         } else {
             optimalMassError = getValueThroughSkewness();
         }
@@ -104,20 +107,15 @@ public class InferenceStatistics extends DescriptiveStatistics {
         //check if the values are skewed to one side (ergo there is a big slope - more than 5% increase- between the min and max)
         double basicskewness = Math.abs(getMean() - getPercentile(50)) / (getMean());
         double threshold;
-        LOGGER.info("The mean differs from the median by " + (100 * basicskewness) + "%");
         //if it's more than 5% difference, then there are more values that are higher...
-        if (basicskewness > 0.05) {
-            methodUsed = ("Elbow point to determine outlier threshold");
-            threshold = getElbowPoint();
+        if (basicskewness < 0.05) {
+            methodUsed = ("Using mean to determine outlier threshold");
+            threshold = getMean();
         } else {
-            methodUsed = ("90th percentile to determine outlier threshold");
-            threshold = getPercentile(90);
+            methodUsed = ("Using median to determine outlier threshold");
+            threshold = getPercentile(50);
         }
-        if (threshold == 0) {
-            //then they either have a REALLY accurate machine, or the submission was tailored to perfect hits?
-            return getMax();
-        }
-        return getMean();
+        return threshold;
     }
 
     private double getElbowPoint() {
