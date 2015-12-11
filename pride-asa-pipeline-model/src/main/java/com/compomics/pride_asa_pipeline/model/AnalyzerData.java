@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
  * @since 0.1
  */
 public class AnalyzerData {
-    
+
     private double prec_acc;
     private double frag_acc;
 
@@ -28,11 +28,11 @@ public class AnalyzerData {
     }
 
     public static enum ANALYZER_FAMILY {
-
         IONTRAP(1.0, 1.0),
         TOF(0.3, 0.3),
         FT(0.1, 0.6),
         ORBITRAP(0.1, 0.6),
+        QEXACTIVE(0.02, 0.04),
         UNKNOWN(1.0, 1.0);
         private final double defaultPrecursorMassError;
         private final double defaultFragmentMassError;
@@ -95,7 +95,7 @@ public class AnalyzerData {
     }
 
     public static AnalyzerData getDataDerivedAnalyzerData(double prec_acc, double frag_acc) {
-        AnalyzerData dataDerivedAnalyzer = new AnalyzerData(prec_acc,frag_acc,ANALYZER_FAMILY.UNKNOWN);
+        AnalyzerData dataDerivedAnalyzer = new AnalyzerData(prec_acc, frag_acc, ANALYZER_FAMILY.UNKNOWN);
         return dataDerivedAnalyzer;
     }
 
@@ -151,6 +151,14 @@ public class AnalyzerData {
         String lcAnalyzerType = analyzerType.trim().toLowerCase().replaceAll(" +", "").replaceAll("_|-", "");
         String[] possibleMachineTerms;
 
+//check for orbitrap
+        possibleMachineTerms = new String[]{"exactive"};
+        for (String anOrbi : possibleMachineTerms) {
+            if (lcAnalyzerType.contains(anOrbi)) {
+                LOGGER.debug(analyzerType + " recognized as Q-exactive");
+                return new AnalyzerData(ANALYZER_FAMILY.QEXACTIVE);
+            }
+        }
 //check for iontraps
         possibleMachineTerms = new String[]{"iontrap", "qit", "qtrap", "lineartrap", "lcq", "ltq"};
         for (String anIonTrap : possibleMachineTerms) {
@@ -168,7 +176,7 @@ public class AnalyzerData {
             }
         }
         //check for orbitrap
-        possibleMachineTerms = new String[]{"orbitrap", "orbi", "exactive"};
+        possibleMachineTerms = new String[]{"orbitrap", "orbi"};
         for (String anOrbi : possibleMachineTerms) {
             if (lcAnalyzerType.contains(anOrbi)) {
                 LOGGER.debug(analyzerType + " recognized as Orbitrap");

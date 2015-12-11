@@ -109,11 +109,11 @@ public class InferenceStatistics extends DescriptiveStatistics {
         double threshold;
         //if it's more than 5% difference, then there are more values that are higher...
         if (basicskewness < 0.05) {
-            methodUsed = ("Using mean to determine outlier threshold");
-            threshold = getMean();
-        } else {
             methodUsed = ("Using median to determine outlier threshold");
             threshold = getPercentile(50);
+        } else {
+            methodUsed = ("Using p75+1.5*(p75-p25) to determine outlier threshold");
+            threshold = getPercentile(75)+1.5*(getPercentile(75)-getPercentile(25));
         }
         return threshold;
     }
