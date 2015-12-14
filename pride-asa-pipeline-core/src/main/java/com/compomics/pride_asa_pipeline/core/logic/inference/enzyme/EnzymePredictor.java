@@ -61,25 +61,25 @@ public class EnzymePredictor {
      * The most likely enzyme
      */
     private Enzyme mostLikelyEnzyme;
-    
+
     public boolean isSuitedForSearching() {
         return suitedForSearching;
     }
-    
+
     public void setSuitedForSearching(boolean suitedForSearching) {
         this.suitedForSearching = suitedForSearching;
     }
-    
-    public EnzymePredictor() throws IOException, FileNotFoundException, ClassNotFoundException, XmlPullParserException {
+
+    public EnzymePredictor() throws IOException, XmlPullParserException {
         loadEnzymeFactory();
     }
-    
+
     public EnzymePredictor(List<String> peptideSequences) throws IOException, XmlPullParserException {
         loadEnzymeFactory();
         this.peptideSequences.addAll(peptideSequences);
         estimateBestEnzyme();
     }
-    
+
     private void loadEnzymeFactory() throws IOException, XmlPullParserException {
         if (tempEnzymeFile == null) {
             tempEnzymeFile = File.createTempFile("searchGUI_enzymes", ".xml");
@@ -133,14 +133,18 @@ public class EnzymePredictor {
         }
         //select the best Enzyme
         double bestCorrectness = 0;
-        
-        for (Map.Entry<Enzyme, Double> anEnzyme : correctnessMap.entrySet()) {
-            double correctNess = anEnzyme.getValue() / (missedCleavagesMap.get(anEnzyme.getKey()) + 1);
-            if (correctNess > bestCorrectness) {
-                mostLikelyEnzyme = anEnzyme.getKey();
-                maxMissedCleavages = missedCleavagesMap.get(anEnzyme.getKey());
-                bestCorrectness = correctNess;
+        try {
+            for (Map.Entry<Enzyme, Double> anEnzyme : correctnessMap.entrySet()) {
+                double correctNess = anEnzyme.getValue() / (missedCleavagesMap.get(anEnzyme.getKey()) + 1);
+                if (correctNess > bestCorrectness) {
+                    mostLikelyEnzyme = anEnzyme.getKey();
+                    maxMissedCleavages = missedCleavagesMap.get(anEnzyme.getKey());
+                    bestCorrectness = correctNess;
+                }
             }
+        } catch (NullPointerException e) {
+            LOGGER.error("Something went wrong , defaulting to Trypsin !");
+            mostLikelyEnzyme = enzymeFactory.getEnzyme("Trypsin");
         }
         TotalReportGenerator.setEnzyme(mostLikelyEnzyme.getName());
         TotalReportGenerator.setMissedCleavages(maxMissedCleavages);
@@ -170,17 +174,20 @@ public class EnzymePredictor {
         }
         return InferenceStatistics.round((double) totalMissed / (double) peptideSequences.size(), 3);
     }
-    
+
     public Enzyme getMostLikelyEnzyme() {
+        if (mostLikelyEnzyme == null) {
+            mostLikelyEnzyme = enzymeFactory.getEnzyme("Trypsin");
+        }
         return mostLikelyEnzyme;
     }
-    
+
     public HashMap<Character, Integer> getN_TerminiCount() {
         return N_TerminiCount;
     }
-    
+
     public HashMap<Character, Integer> getC_TerminiCount() {
         return C_TerminiCount;
     }
-    
+
 }

@@ -61,8 +61,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
     public void addAssay(String assay) throws Exception {
         File identFile = getIdentificationFile(assay);
         if (identFile != null) {
-            if (!identFile.getName().toLowerCase().endsWith(".xml")
-                    & !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
+            if (!identFile.getName().toLowerCase().endsWith(".xml") & !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
                 List<File> peakFiles = getPeakFiles(assay);
                 super.addMzID(assay, identFile, peakFiles);
             } else {

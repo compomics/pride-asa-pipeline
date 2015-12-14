@@ -15,6 +15,9 @@ import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.Fragmen
 import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.ModificationReportGenerator;
 import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.PrecursorIonReporter;
 import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.TotalReportGenerator;
+import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.model.modification.impl.UtilitiesPTMAdapter;
+import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.impl.FileResultHandlerImpl3;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
@@ -25,6 +28,7 @@ import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
+import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
 import com.compomics.util.pride.PrideWebService;
@@ -39,6 +43,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.xmlpull.v1.XmlPullParserException;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
+import uk.ac.ebi.pridemod.model.PTM;
 
 /**
  *
@@ -66,6 +71,7 @@ public class ParameterExtractor {
     private PrecursorIonErrorPredictor precursorIonErrorPredictor;
     private ModificationPredictor modificationPredictor;
     private EnzymePredictor enzymePredictor;
+    private boolean printableReports = true;
 
     /**
      * An extractor for parameters
@@ -97,64 +103,70 @@ public class ParameterExtractor {
 
         // USE ALL THE IDENTIFICATIONS FOR THE PEPTIDE SEQUENCES AS THE ALL HAVE USEFUL INFORMATION
         List<String> peptideSequences = new ArrayList<>();
-        for (Peptide aPeptide : spectrumAnnotator.getIdentifications().getCompletePeptides()) {
-            peptideSequences.add(aPeptide.getSequenceString());
+        List<Peptide> completePeptides = spectrumAnnotator.getIdentifications().getCompletePeptides();
+        if (completePeptides.isEmpty()) {
+            useDefaults(assay);
+        } else {
+            for (Peptide aPeptide : completePeptides) {
+                peptideSequences.add(aPeptide.getSequenceString());
+            }
+
+            enzymePredictor = new EnzymePredictor(peptideSequences);
+
+            //--------------------------------
+            // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
+            modificationPredictor = new ModificationPredictor(assay, spectrumAnnotator.getSpectrumAnnotatorResult(), spectrumAnnotator.getModificationService());
+
+            //--------------------------------
+            //recalibrate errors
+            //precursor needs to be very accurate (considering mods / isotopes / etc)
+            LOGGER.info("Using the " + (100 - qualityPercentile) + " % best identifications for precursor accuracy estimation");
+            //USE ONLY THE HIGH QUALITY HITS FOR MASS ACCURACCIES, THESE WILL USUALLY NOT HAVE MISSING MODIFICATIONS ETC
+            List<Identification> experimentIdentifications = spectrumAnnotator.getIdentifications().getCompleteIdentifications();
+            IdentificationFilter filter = new IdentificationFilter(experimentIdentifications);
+            List<Identification> topPrecursorHits = filter.getTopPrecursorHits(90);
+
+            precursorIonErrorPredictor = new PrecursorIonErrorPredictor(topPrecursorHits);
+
+            //fragment ion is harder, more leanway should be given
+            HashMap<Peptide, double[]> mzValueMap = new HashMap<>();
+            //just use all of them
+            // List<Identification> topFragmentIonHits = filter.getTopFragmentIonHits(75);
+            for (Identification anExpIdentification : experimentIdentifications) {
+
+                double[] mzValuesBySpectrumId = fileSpectrumRepository.getMzValuesBySpectrumId(anExpIdentification.getSpectrumId());
+                Peptide peptide = anExpIdentification.getPeptide();
+                mzValueMap.put(peptide, mzValuesBySpectrumId);
+
+            }
+            MassScanResult.scanFragmentIonContamination(topPrecursorHits);
+            //FragmentIonErrorPredictor fragmentIonErrorPredictor = new IterativeFragmentIonErrorPredictor(mzValueMap);
+            fragmentIonErrorPredictor = new FragmentIonErrorPredictor(mzValueMap);
+
+            //construct a parameter object
+            parameters = new SearchParameters();
+
+            parameters.setEnzyme(enzymePredictor.getMostLikelyEnzyme());
+            parameters.setnMissedCleavages(enzymePredictor.getMissedCleavages());
+
+            parameters.setPtmSettings(modificationPredictor.getPtmSettings());
+
+            double predictedPrecursorMassError = precursorIonErrorPredictor.getRecalibratedPrecursorAccuraccy();
+
+            parameters.setPrecursorAccuracy(predictedPrecursorMassError);
+            parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
+
+            parameters.setMinChargeSearched(new Charge(Charge.PLUS, precursorIonErrorPredictor.getRecalibratedMinCharge()));
+            parameters.setMaxChargeSearched(new Charge(Charge.PLUS, precursorIonErrorPredictor.getRecalibratedMaxCharge()));
+
+            double predictedFragmentMassError = fragmentIonErrorPredictor.getFragmentIonAccuraccy();
+
+            parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
+            parameters.setFragmentIonAccuracy(predictedFragmentMassError);
+            remediateParametersWithAnnotation(assay);
+            TotalReportGenerator.setFragmentAcc(parameters.getFragmentIonAccuracy());
+            TotalReportGenerator.setPrecursorAcc(parameters.getPrecursorAccuracy());
         }
-        enzymePredictor = new EnzymePredictor(peptideSequences);
-
-        //--------------------------------
-        // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
-        modificationPredictor = new ModificationPredictor(assay, spectrumAnnotator.getSpectrumAnnotatorResult(), spectrumAnnotator.getModificationService());
-
-        //--------------------------------
-        //recalibrate errors
-        //precursor needs to be very accurate (considering mods / isotopes / etc)
-        LOGGER.info("Using the " + (100 - qualityPercentile) + " % best identifications for precursor accuracy estimation");
-        //USE ONLY THE HIGH QUALITY HITS FOR MASS ACCURACCIES, THESE WILL USUALLY NOT HAVE MISSING MODIFICATIONS ETC
-        List<Identification> experimentIdentifications = spectrumAnnotator.getIdentifications().getCompleteIdentifications();
-        IdentificationFilter filter = new IdentificationFilter(experimentIdentifications);
-        List<Identification> topPrecursorHits = filter.getTopPrecursorHits(90);
-
-        precursorIonErrorPredictor = new PrecursorIonErrorPredictor(topPrecursorHits);
-
-        //fragment ion is harder, more leanway should be given
-        HashMap<Peptide, double[]> mzValueMap = new HashMap<>();
-        //just use all of them
-        // List<Identification> topFragmentIonHits = filter.getTopFragmentIonHits(75);
-        for (Identification anExpIdentification : experimentIdentifications) {
-
-            double[] mzValuesBySpectrumId = fileSpectrumRepository.getMzValuesBySpectrumId(anExpIdentification.getSpectrumId());
-            Peptide peptide = anExpIdentification.getPeptide();
-            mzValueMap.put(peptide, mzValuesBySpectrumId);
-
-        }
-        MassScanResult.scanFragmentIonContamination(topPrecursorHits);
-        //FragmentIonErrorPredictor fragmentIonErrorPredictor = new IterativeFragmentIonErrorPredictor(mzValueMap);
-        fragmentIonErrorPredictor = new FragmentIonErrorPredictor(mzValueMap);
-
-        //construct a parameter object
-        parameters = new SearchParameters();
-
-        parameters.setEnzyme(enzymePredictor.getMostLikelyEnzyme());
-        parameters.setnMissedCleavages(enzymePredictor.getMissedCleavages());
-
-        parameters.setPtmSettings(modificationPredictor.getPtmSettings());
-
-        double predictedPrecursorMassError = precursorIonErrorPredictor.getRecalibratedPrecursorAccuraccy();
-
-        parameters.setPrecursorAccuracy(predictedPrecursorMassError);
-        parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
-
-        parameters.setMinChargeSearched(new Charge(Charge.PLUS, precursorIonErrorPredictor.getRecalibratedMinCharge()));
-        parameters.setMaxChargeSearched(new Charge(Charge.PLUS, precursorIonErrorPredictor.getRecalibratedMaxCharge()));
-
-        double predictedFragmentMassError = fragmentIonErrorPredictor.getFragmentIonAccuraccy();
-
-        parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-        parameters.setFragmentIonAccuracy(predictedFragmentMassError);
-        remediateParametersWithAnnotation(assay);
-        TotalReportGenerator.setFragmentAcc(parameters.getFragmentIonAccuracy());
-        TotalReportGenerator.setPrecursorAcc(parameters.getPrecursorAccuracy());
     }
 
     public void remediateParametersWithAnnotation(String assay) throws IOException {
@@ -246,14 +258,18 @@ public class ParameterExtractor {
     }
 
     public void printReports(File outputFolder) throws IOException {
-        for (InferenceReportGenerator reportGenerator : getReportGenerators()) {
-            LOGGER.info("Exporting " + reportGenerator.getReportName());
-            File outputFile = new File(outputFolder, reportGenerator.getReportName());
-            try (FileOutputStream out = new FileOutputStream(outputFile)) {
-                reportGenerator.writeReport(out);
+        if (printableReports) {
+            for (InferenceReportGenerator reportGenerator : getReportGenerators()) {
+                LOGGER.info("Exporting " + reportGenerator.getReportName());
+                File outputFile = new File(outputFolder, reportGenerator.getReportName());
+                try (FileOutputStream out = new FileOutputStream(outputFile)) {
+                    reportGenerator.writeReport(out);
+                }
             }
+            printPRIDEAsapIdentificationResult(outputFolder);
+        } else {
+            LOGGER.info("Printing of reports was skipped : no inference performed");
         }
-        printPRIDEAsapIdentificationResult(outputFolder);
     }
 
     public void printPRIDEAsapIdentificationResult(File outputFolder) {
@@ -266,6 +282,51 @@ public class ParameterExtractor {
             }
         }
         fileResultHandler.writeResult(new File(outputFolder, "complete_id.txt"), completeIdentifications);
+    }
+
+    private void useDefaults(String assay) throws IOException, XmlPullParserException {
+        LOGGER.info("There are no identifications present, using broad spectrum parameters !");
+        printableReports = false;
+        parameters = new SearchParameters();
+        parameters.setEnzyme(new EnzymePredictor().getMostLikelyEnzyme());
+        parameters.setnMissedCleavages(2);
+        PtmSettings ptmSettings = new PtmSettings();
+        ModificationAdapter adapter = new UtilitiesPTMAdapter();
+        PRIDEModificationFactory ptmFactory = PRIDEModificationFactory.getInstance();
+        //add carbamidomethyl c
+        com.compomics.util.experiment.biology.PTM carbamidomethylC
+                = (com.compomics.util.experiment.biology.PTM) ptmFactory.getModification(adapter, ptmFactory.getModificationNameFromAccession("UNIMOD:940"));
+        ptmSettings.addFixedModification(carbamidomethylC);
+        //add oxidation of m
+        com.compomics.util.experiment.biology.PTM oxidationM
+                = (com.compomics.util.experiment.biology.PTM) ptmFactory.getModification(adapter, ptmFactory.getModificationNameFromAccession("UNIMOD:35"));
+        ptmSettings.addVariableModification(oxidationM);
+        parameters.setPtmSettings(ptmSettings);
+
+        //try to get from machine...
+        AnalyzerData data = getAnalyzerData(assay);
+
+        double predictedPrecursorMassError = 1.0;
+        double predictedFragmentMassError = 1.0;
+        if (data != null) {
+            LOGGER.info("Getting mass errors from machine type : " + data.getAnalyzerFamily());
+            predictedPrecursorMassError = data.getPrecursorMassError();
+            predictedFragmentMassError = data.getFragmentMassError();
+        }
+
+        parameters.setPrecursorAccuracy(predictedPrecursorMassError);
+        parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
+        parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
+        parameters.setFragmentIonAccuracy(predictedFragmentMassError);
+
+        parameters.setMinChargeSearched(new Charge(Charge.PLUS, 2));
+        parameters.setMaxChargeSearched(new Charge(Charge.PLUS, 5));
+
+        TotalReportGenerator.setEnzymeMethod("Defaulted");
+        TotalReportGenerator.setFragmentAccMethod("Defaulted");
+        TotalReportGenerator.setPrecursorAccMethod("Defaulted");
+        TotalReportGenerator.setPtmSettingsMethod("Defaulted");
+
     }
 
 }

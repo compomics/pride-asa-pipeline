@@ -37,12 +37,12 @@ public class WebProjectExtractor {
     private static final Logger LOGGER = Logger.getLogger(WebProjectExtractor.class);
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
-        File outputFolder = new File("C:\\Users\\compomics\\Desktop\\");
+        File outputFolder = new File("C:\\Users\\compomics\\Desktop\\21223");
         if (outputFolder.exists()) {
             outputFolder.delete();
         }
         outputFolder.mkdirs();
-        String inputAssay = "55026";
+        String inputAssay = "21223";
         SearchParameters analyze = new WebProjectExtractor(outputFolder).analyze(inputAssay);
         System.out.println(analyze);
     }

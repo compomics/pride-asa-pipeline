@@ -118,11 +118,20 @@ public class PrecursorIonErrorPredictor {
     }
 
     public int getRecalibratedMaxCharge() {
-        return encounteredCharges.last();
+        if (encounteredCharges.size() > 0) {
+            return encounteredCharges.last();
+        } else {
+            return 5;
+        }
     }
 
     public int getRecalibratedMinCharge() {
-        return encounteredCharges.first();
+        if (encounteredCharges.size() > 0) {
+            return encounteredCharges.first();
+        } else {
+            return 2;
+        }
+
     }
 
     public InferenceStatistics getPrecursorIonStats() {
