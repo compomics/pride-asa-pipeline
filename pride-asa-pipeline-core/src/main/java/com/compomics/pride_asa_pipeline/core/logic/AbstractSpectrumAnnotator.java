@@ -419,7 +419,6 @@ public abstract class AbstractSpectrumAnnotator<T> {
      */
     private Map<Identification, Set<ModificationCombination>> findModificationCombinations(MassRecalibrationResult massRecalibrationResult, Identifications identifications) {
         Map<Identification, Set<ModificationCombination>> possibleExplanations = new HashMap<>();
-
         //check if the modification holder contains at least one modification
         if (!modificationHolder.getAllModifications().isEmpty()) {
             massDeltaExplainer = new MassDeltaExplainerImpl(modificationHolder);

@@ -213,7 +213,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                     //location is non-terminal
                     //check how many AA can be affected by this modification
                     int numberOfModifiableLocations = countModifiableLocations(precursor, modification);
-                    if (numberOfModifiableLocations > 0) {
+                    if (numberOfModifiableLocations == 0) {
                         throw new IllegalStateException("Identification does not have a modifiable location : " + precursor.getSequenceString() + " for mod " + modification.getName());
                     } else if (numberOfModifiableLocations < occurances) {
                         //we have more modifications of this kind than we have modifiable AAs??
