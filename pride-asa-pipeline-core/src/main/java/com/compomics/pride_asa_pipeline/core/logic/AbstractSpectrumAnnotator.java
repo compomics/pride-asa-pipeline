@@ -232,7 +232,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 //get other modifications
                 for (String aPTMName : annotatedModService.getAssayAnnotatedPTMs(assayAccession)) {
                     sortedAnnotatedModifications.add((Modification) PRIDEModificationFactory.getInstance().getModification(adapter, aPTMName));
-                
+
                 }
             }
             //order the annotated modifications to prevalence (in case there are more than the selected batch size)
@@ -243,8 +243,8 @@ public abstract class AbstractSpectrumAnnotator<T> {
             BlockingQueue<Modification> modQueue = new ArrayBlockingQueue<>(sortedAllModifications.size());
             //first get the annotated modifications and order those as well?
             for (Object modObject : sortedAnnotatedModifications) {
-                Modification mod = (Modification)modObject;
-                  LOGGER.info("Annotated mod : "+mod.getName());
+                Modification mod = (Modification) modObject;
+                LOGGER.info("Annotated mod : " + mod.getName());
                 modQueue.offer(mod);
                 sortedAllModifications.remove(mod);
             }
@@ -273,6 +273,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 } else {
                     pass++;
                     LOGGER.info("Searching " + pass + "th pass :" + modPassSet);
+                    modificationHolder = new ModificationHolder();
                     annotate(convertToUseCase(modPassSet), modifiedPrecursors, unmodifiedPrecursors, completeIdentifications, unexplainedIdentifications, significantMassDeltaExplanationsMap);
                     modPassSet.clear();
                 }
@@ -295,7 +296,6 @@ public abstract class AbstractSpectrumAnnotator<T> {
             Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap) {
         //add the non-conflicting modifications found in pride for the given experiment
         if (!prideModifications.isEmpty()) {
-            modificationHolder = new ModificationHolder();
             Set<Modification> conflictingModifications = modificationService.filterModifications(modificationHolder, prideModifications);
             for (Modification prideModification : prideModifications) {
                 if (!conflictingModifications.contains(prideModification)) {
@@ -453,9 +453,6 @@ public abstract class AbstractSpectrumAnnotator<T> {
 
         return precursorVariations;
     }
-    
-   
-    
 
     /**
      * creates theoretical fragment ions for all precursors match them onto the
@@ -521,7 +518,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         return unexplainedIdentifications;
     }
 
-        private Set<Modification> convertToUseCase(Set<Modification> modifications) {
+    private Set<Modification> convertToUseCase(Set<Modification> modifications) {
         HashSet<Modification> temp = new HashSet<>();
         for (Modification aMod : modifications) {
             //oxidation is too general, must be transformed into another variant (oxidation of m for example)
