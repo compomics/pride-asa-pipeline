@@ -30,6 +30,7 @@ import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -258,6 +259,9 @@ public abstract class AbstractSpectrumAnnotator<T> {
             List<Identification> unmodifiedPrecursors = new ArrayList<>();
             List<Identification> modifiedPrecursors = new ArrayList<>();
             List<Identification> unexplainedIdentifications = new ArrayList<>();
+            //keep track of what needs to be processed
+            List<Identification> identificationsToProcess = new ArrayList<>();
+            identificationsToProcess.addAll(completeIdentifications);
             //create new map with only the precursors that carry a significant mass delta
             //and were we have possible modification combinations
             Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap = new HashMap<>();
@@ -274,7 +278,13 @@ public abstract class AbstractSpectrumAnnotator<T> {
                     pass++;
                     LOGGER.info("Searching " + pass + "th pass :" + modPassSet);
                     modificationHolder = new ModificationHolder();
-                    annotate(convertToUseCase(modPassSet), modifiedPrecursors, unmodifiedPrecursors, completeIdentifications, unexplainedIdentifications, significantMassDeltaExplanationsMap);
+                    annotate(convertToUseCase(modPassSet), 
+                            identificationsToProcess,
+                            modifiedPrecursors, 
+                            unmodifiedPrecursors, 
+                            completeIdentifications, 
+                            unexplainedIdentifications, 
+                            significantMassDeltaExplanationsMap);
                     modPassSet.clear();
                 }
             }
@@ -287,8 +297,9 @@ public abstract class AbstractSpectrumAnnotator<T> {
             LOGGER.error(ex);
         }
     }
-
+    
     private void annotate(Set<Modification> prideModifications,
+            List<Identification> identificationsToProcess,
             List<Identification> modifiedPrecursors,
             List<Identification> unmodifiedPrecursors,
             List<Identification> unexplainedModifications,
@@ -303,31 +314,20 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 }
             }
         }
-
         ///////////////////////////////////////////////////////////////////////
         //SECOND STEP: find all the modification combinations that could
         //              explain a given mass delta (if there is one) -> Zen Archer
         LOGGER.info("finding modification combinations");
         //set fragment mass error for the identification scorer
-        Map<Identification, Set<ModificationCombination>> massDeltaExplanationsMap = findModificationCombinations(spectrumAnnotatorResult.getMassRecalibrationResult(), identifications);
+        Map<Identification, Set<ModificationCombination>> massDeltaExplanationsMap = findModificationCombinations(spectrumAnnotatorResult.getMassRecalibrationResult(), identificationsToProcess);
+        identificationsToProcess.removeAll(massDeltaExplanationsMap.keySet());
         LOGGER.debug("Finished finding modification combinations");
-
         //the returned possibleExplanations map will contain all precursors for which a
         //possible explanation was found or which do not need to be explained (e.g. the
         //mass delta is smaller than the expected mass error)
         //-> the only precursors not in this map are those that carry a significant
         //modification, but nevertheless could not be explained!
-        int explainedIdentificationsSize = massDeltaExplanationsMap.size();
-        int completeIdentificationsSize = unexplainedModifications.size();
-        LOGGER.debug("Precursors for which no modification combination could be found: " + (completeIdentificationsSize - explainedIdentificationsSize));
-        unexplainedIdentifications = getUnexplainedIdentifications(unexplainedModifications, massDeltaExplanationsMap.keySet());
-        for (Identification identification : unexplainedIdentifications) {
-            try {
-                LOGGER.debug("Unresolved precursor: " + identification.getPeptide().toString() + " with mass delta: " + identification.getPeptide().calculateMassDelta());
-            } catch (AASequenceMassUnknownException e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-        }
+        unexplainedIdentifications.addAll(getUnexplainedIdentifications(unexplainedModifications, massDeltaExplanationsMap.keySet()));
 
         for (Identification identification : massDeltaExplanationsMap.keySet()) {
             if (massDeltaExplanationsMap.get(identification) != null) {
@@ -335,10 +335,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             } else {
                 identification.setPipelineExplanationType(PipelineExplanationType.UNMODIFIED);
                 unmodifiedPrecursors.add(identification);
-
                 //annotate the unmodified identifications
-                //score the unmodified identification
-                //    AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()), analyzerData.getFragmentMassError());
                 AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId()), courseFragmentAccuraccy);
                 identification.setAnnotationData(annotationData);
             }
@@ -386,7 +383,6 @@ public abstract class AbstractSpectrumAnnotator<T> {
     protected MassRecalibrationResult findSystematicMassError(List<Peptide> completePeptides) {
         //set considered charge states
         massRecalibrator.setConsideredChargeStates(consideredChargeStates);
-
         MassRecalibrationResult massRecalibrationResult = null;
         try {
             massRecalibrationResult = massRecalibrator.recalibrate(analyzerData, completePeptides);
@@ -417,15 +413,14 @@ public abstract class AbstractSpectrumAnnotator<T> {
      * @return the possible modifications map (key: the identification data,
      * value the set of modification combinations)
      */
-    private Map<Identification, Set<ModificationCombination>> findModificationCombinations(MassRecalibrationResult massRecalibrationResult, Identifications identifications) {
+    private Map<Identification, Set<ModificationCombination>> findModificationCombinations(MassRecalibrationResult massRecalibrationResult, List<Identification> identifications) {
         Map<Identification, Set<ModificationCombination>> possibleExplanations = new HashMap<>();
         //check if the modification holder contains at least one modification
         if (!modificationHolder.getAllModifications().isEmpty()) {
             massDeltaExplainer = new MassDeltaExplainerImpl(modificationHolder);
             //finally calculate the possible explanations
-            possibleExplanations = massDeltaExplainer.explainCompleteIndentifications(identifications.getCompleteIdentifications(), massRecalibrationResult, analyzerData);
+            possibleExplanations = massDeltaExplainer.explainCompleteIndentifications(identifications, massRecalibrationResult, analyzerData);
         }
-
         return possibleExplanations;
     }
 
@@ -450,7 +445,6 @@ public abstract class AbstractSpectrumAnnotator<T> {
             precursorVariations.put(identificationSet, precursorVariationsSet);
         }
         LOGGER.debug("Peptide variations found for " + precursorVariations.size() + " peptides.");
-
         return precursorVariations;
     }
 
@@ -506,12 +500,9 @@ public abstract class AbstractSpectrumAnnotator<T> {
         List<Identification> unexplainedIdentifications = new ArrayList<>();
         for (Identification identification : identifications) {
             if (!explainableIdentifications.contains(identification)) {
-                //AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId().replace("index=", "")), analyzerData.getFragmentMassError());
-
                 AnnotationData annotationData = spectrumMatcher.matchPrecursor(identification.getPeptide(), spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId().replace("index=", "")), courseFragmentAccuraccy);
                 identification.setAnnotationData(annotationData);
                 identification.setPipelineExplanationType(PipelineExplanationType.UNEXPLAINED);
-
                 unexplainedIdentifications.add(identification);
             }
         }
