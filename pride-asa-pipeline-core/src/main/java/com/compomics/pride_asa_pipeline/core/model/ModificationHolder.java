@@ -38,34 +38,35 @@ public class ModificationHolder {
     }
 
     public void addModification(Modification modification) {
-        //add the given modification to its corresponding map
-        if (modification.getLocation() == Modification.Location.NON_TERMINAL) {
-            //add this modification to all non-terminal amino acids that could be affected
-            for (AminoAcid aa : modification.getAffectedAminoAcids()) {
-                if (nonTerminalMods.get(aa) == null) {
-                    nonTerminalMods.put(aa, new HashSet<Modification>());
-                }
-                nonTerminalMods.get(aa).add(modification);
-            }
-        } else if (modification.getLocation() == Modification.Location.N_TERMINAL) {
-            //add this modification to all N-terminal amino acids that could be affected
-            for (AminoAcid aa : modification.getAffectedAminoAcids()) {
-                if (nTerminalMods.get(aa) == null) {
-                    nTerminalMods.put(aa, new HashSet<Modification>());
-                }
-                nTerminalMods.get(aa).add(modification);
-            }
-        } else if (modification.getLocation() == Modification.Location.C_TERMINAL) {
-            //add this modification to all C-terminal amino acids that could be affected
-            for (AminoAcid aa : modification.getAffectedAminoAcids()) {
-                if (cTerminalMods.get(aa) == null) {
-                    cTerminalMods.put(aa, new HashSet<Modification>());
-                }
-                cTerminalMods.get(aa).add(modification);
-            }
-        } else {
-            //sanity check
-            throw new IllegalStateException("Illegal amino acid position!! " + modification.getLocation());
+        if (null != modification.getLocation()) //add the given modification to its corresponding map
+        switch (modification.getLocation()) {
+            case NON_TERMINAL:
+                //add this modification to all non-terminal amino acids that could be affected
+                for (AminoAcid aa : modification.getAffectedAminoAcids()) {
+                    if (nonTerminalMods.get(aa) == null) {
+                        nonTerminalMods.put(aa, new HashSet<Modification>());
+                    }
+                    nonTerminalMods.get(aa).add(modification);
+                }   break;
+            case N_TERMINAL:
+                //add this modification to all N-terminal amino acids that could be affected
+                for (AminoAcid aa : modification.getAffectedAminoAcids()) {
+                    if (nTerminalMods.get(aa) == null) {
+                        nTerminalMods.put(aa, new HashSet<Modification>());
+                    }
+                    nTerminalMods.get(aa).add(modification);
+                }   break;
+            case C_TERMINAL:
+                //add this modification to all C-terminal amino acids that could be affected
+                for (AminoAcid aa : modification.getAffectedAminoAcids()) {
+                    if (cTerminalMods.get(aa) == null) {
+                        cTerminalMods.put(aa, new HashSet<Modification>());
+                    }
+                    cTerminalMods.get(aa).add(modification);
+                }   break;
+            default:
+                //sanity check
+                throw new IllegalStateException("Illegal amino acid position!! " + modification.getLocation());
         }
 
         //update the mass to modification map

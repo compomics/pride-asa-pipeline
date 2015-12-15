@@ -138,6 +138,9 @@ public class ModificationPredictor {
                 LOGGER.info(aMod.getKey() + " was found in the default PTMs");
             }
         }
+        for (String aString : ptmSettings.getAllModifications()) {
+            System.out.println("I HAVE ENTERED " + aString);
+        }
         TotalReportGenerator.setPtmSettings(ptmSettings);
         TotalReportGenerator.setPtmSettingsMethod("Fragment mass error analysis");
     }

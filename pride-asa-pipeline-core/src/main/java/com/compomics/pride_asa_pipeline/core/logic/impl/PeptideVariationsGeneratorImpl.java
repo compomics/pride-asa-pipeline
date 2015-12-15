@@ -18,9 +18,9 @@ import org.apache.log4j.Logger;
  * @since 0.1
  */
 public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerator {
-    
+
     private static final Logger LOGGER = Logger.getLogger(PeptideVariationsGeneratorImpl.class);
-    
+
     @Override
     public Set<ModifiedPeptide> generateVariations(Peptide precursor, Set<ModificationCombination> modifications) {
         Set<ModifiedPeptide> result = new HashSet<>();
@@ -35,7 +35,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         }
         return result;
     }
-    
+
     private Set<ModifiedPeptide> generateVariation(Peptide precursor, ModificationCombination modificationCombination) {
         //we calculate the possible distribution combinations for each modification type and
         //store them in a set
@@ -56,7 +56,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         //for the whole ModificationCombination
         return combineVariationSets(modifiedPeptidesByModifications);
     }
-    
+
     private Set<ModifiedPeptide> combineVariationSets(Set<Set<ModifiedPeptide>> modifiedPeptidesByModifications) {
         //check that we really have something to work with
         if (modifiedPeptidesByModifications == null || modifiedPeptidesByModifications.isEmpty()) {
@@ -81,10 +81,10 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
             modifiedPeptidesByModification = iterator.next();
             combinedModifiedPeptides = combineVariations(combinedModifiedPeptides, modifiedPeptidesByModification);
         }
-        
+
         return combinedModifiedPeptides;
     }
-    
+
     private Set<ModifiedPeptide> combineVariations(Set<ModifiedPeptide> modPeptidesByModOne, Set<ModifiedPeptide> modPeptidesByModTwo) {
         //combine each ModifiedPeptide of the first set with all ModifiedPeptideS of the second set and
         //take into account (at least at the moment) we don't allow multiple non-terminal modifications
@@ -97,7 +97,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         ModificationFacade nTermMofication = null;
         //keep track of the C-terminal modification
         ModificationFacade cTermModification = null;
-        
+
         Set<ModifiedPeptide> combinedModifiedPeptides = new HashSet<>();
         //loop over first set
         for (ModifiedPeptide modPeptideByModOne : modPeptidesByModOne) {
@@ -158,9 +158,9 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                             break; //no need to check the other residues
                         }
                     } else //m2 not null, so the first modified peptide carries a modification here
-                    if (m2 != null) {
-                        combinedModifiedPeptide.setNTModification(i, m2);
-                    }
+                     if (m2 != null) {
+                            combinedModifiedPeptide.setNTModification(i, m2);
+                        }
                 }
 
                 //check that we have a sensible combination (e.g. not null and at least one modification)
@@ -178,7 +178,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         //return the found combinations
         return combinedModifiedPeptides;
     }
-    
+
     private int getNumberOfOccurances(ModificationCombination modComb, Modification mod) {
         int result = 0;
         for (Modification modification : modComb.getModifications()) {
@@ -188,7 +188,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         }
         return result;
     }
-    
+
     private Set<ModifiedPeptide> variateModification(Peptide precursor, Modification modification, int occurances) {
         if (precursor == null || modification == null) {
             throw new IllegalStateException("Need precursor peptide and modification to generate peptide variations.");
@@ -213,9 +213,11 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                     //location is non-terminal
                     //check how many AA can be affected by this modification
                     int numberOfModifiableLocations = countModifiableLocations(precursor, modification);
-                    if (numberOfModifiableLocations < occurances) {
+                    if (numberOfModifiableLocations > 0) {
+                        throw new IllegalStateException("Identification does not have a modifiable location : " + precursor.getSequenceString() + " for mod " + modification.getName());
+                    } else if (numberOfModifiableLocations < occurances) {
                         //we have more modifications of this kind than we have modifiable AAs??
-                        throw new IllegalStateException("Can not have more modifications than there are modifiable AAs.");
+                        throw new IllegalStateException(precursor.getSequenceString() + " can not have more modifications than there are modifiable AAs:" + numberOfModifiableLocations + " < " + occurances);
                         //LOGGER.warn("Can not have more modifications than there are modifiable AAs.");
                     } else if (numberOfModifiableLocations == occurances) {
                         //all the affectable locations are affected (easy solution)
@@ -250,14 +252,14 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                             }
                             result.add(modifiedPeptide);
                         }
-                        
+
                     } //end of munber of mod possible cases
                     break; //end of location cases
             } //end of location cases
         }
         return result;
     }
-    
+
     private int countModifiableLocations(Peptide precursor, Modification modification) {
         int counter = 0;
         //check all amino acids in the precursor sequence, and if they
@@ -269,10 +271,10 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         }
         return counter;
     }
-    
+
     private Integer[] getPositionIndexes(Peptide precursor, Modification modification, int modifiableLocations) {
         Integer[] positionIndexes = new Integer[modifiableLocations];
-        
+
         int counter = 0;
         for (int i = 0; i < precursor.getSequence().length(); i++) {
             if (modification.getAffectedAminoAcids().contains(precursor.getSequence().getAA(i))) {
@@ -280,7 +282,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                 counter++;
             }
         }
-        
+
         return positionIndexes;
     }
 }

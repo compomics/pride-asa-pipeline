@@ -73,10 +73,12 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
                     if (parserCache.containsParser(assay)) {
                         if (identFile.getName().toUpperCase().contains("PRIDE_EXP_COMPLETE_")) {
                             addToParsers = true;
+                            LOGGER.info(identFile.getName() + " was found and will be used");
                         } else {
                             long currentSize = new File(parserCache.getLoadedFiles().get(assay)).length();
                             long newSize = identFile.length();
                             addToParsers = newSize > currentSize;
+                            LOGGER.info(identFile.getName() + " is larger than the currently submitted file and will be used");
                         }
                     }
                     if (addToParsers) {

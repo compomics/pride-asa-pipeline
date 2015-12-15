@@ -58,7 +58,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
         }
 
         //the set that will hold the list of modification combinations
-        HashSet<ModificationCombination> modificationCombinations = new HashSet<ModificationCombination>();
+        HashSet<ModificationCombination> modificationCombinations = new HashSet<>();
 
         //generates the PeptideModificationHolder for the given peptide.
         //For performance purposes, the previous PeptideModificationHolders are cached
