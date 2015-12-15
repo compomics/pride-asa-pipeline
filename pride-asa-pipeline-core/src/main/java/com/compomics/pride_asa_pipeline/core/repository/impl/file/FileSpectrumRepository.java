@@ -4,9 +4,10 @@ import com.compomics.pride_asa_pipeline.core.data.extractor.MGFExtractor;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.core.repository.SpectrumRepository;
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Peak;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
-import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 import uk.ac.ebi.pride.utilities.data.core.Spectrum;
 
 /**
@@ -46,8 +46,8 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
 
     public void setExperimentIdentifier(String experimentIdentifier) {
         this.experimentIdentifier = experimentIdentifier;
-    }  
-      
+    }
+
     @Override
     public double[] getMzValuesBySpectrumId(String spectrumId) {
         Spectrum spectrumById = parserCache.getParser(experimentIdentifier, true).getSpectrumById(spectrumId);
@@ -85,7 +85,7 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
     public File writeToMGF(File outputFolder) throws IOException, MGFExtractionException {
         final long timeout = 30000;
         File mgf = new File(outputFolder, experimentIdentifier + ".mgf");
-        if(!mgf.exists()){
+        if (!mgf.exists()) {
             mgf.getParentFile().mkdirs();
             mgf.createNewFile();
         }
@@ -95,8 +95,12 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
                 tempOut.deleteOnExit();
                 try {
                     new MGFExtractor(aPeakFile).extractMGF(tempOut, timeout);
-                    String mgfAsString = FileUtils.readFileToString(tempOut);
-                    writer.append(mgfAsString).append(System.lineSeparator());
+                    //merge everything in one big file
+                    BufferedReader reader = new BufferedReader(new FileReader(tempOut));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        writer.append(line).append(System.lineSeparator()).flush();
+                    }
                 } finally {
                     tempOut.delete();
                 }

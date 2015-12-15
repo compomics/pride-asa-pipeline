@@ -25,14 +25,14 @@ import org.apache.log4j.Logger;
  * @author Jonathan Rameseder
  * @since 0.1
  */
-public class ModificationCombinationSolverImpl implements ModificationCombinationSolver {
+public class ModificationCombinationSolverImpl2 implements ModificationCombinationSolver {
 
-    private static final Logger LOGGER = Logger.getLogger(ModificationCombinationSolverImpl.class);
+    private static final Logger LOGGER = Logger.getLogger(ModificationCombinationSolverImpl2.class);
     private ModificationHolder modificationHolder;
     private Cache<String, PeptideModificationHolder> peptideModificationHolderCache;
     private ZenArcher zenArcher;
 
-    public ModificationCombinationSolverImpl(ModificationHolder modificationHolder) {
+    public ModificationCombinationSolverImpl2(ModificationHolder modificationHolder) {
         if (modificationHolder == null || modificationHolder.getNumberOfModifications() < 1) {
             //no modifications to choose from!
             LOGGER.error("ERROR: no selection for all possible modifications has been provided!");
@@ -292,9 +292,10 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
                     }
                 }
             }
-        } else //if there are no possible modifications at the current position (sequenceIndex)
-        //then we have to prevent the recursion from breaking
-         if ((sequenceIndex + 1) < possibleModifications.size()) {
+        } else {
+            //if there are no possible modifications at the current position (sequenceIndex)
+            //then we have to prevent the recursion from breaking
+            if ((sequenceIndex + 1) < possibleModifications.size()) {
                 calculateModificationCombinations(sequenceIndex + 1, possibleModifications, modificationCombinations, candidateModifications);
             } else {
                 //if end of list reached, store candidates as new solutions
@@ -306,6 +307,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
                     modificationCombinations.add(comb);
                 }
             }
+        }
     }
 
     /**
@@ -316,7 +318,8 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
     private void generateCandidateModificationCombinations(PeptideModificationHolder peptideModificationHolder) {
         HashSet<ModificationCombination> modificationCombinations = new HashSet<>();
         calculateModificationCombinations(0, peptideModificationHolder.getModifications(), modificationCombinations, new ArrayList<Modification>());
-       //store the possible modification combinations in the peptide modification holder
+
+        //store the possible modification combinations in the peptide modification holder
         peptideModificationHolder.setCandidateModificationCombinations(modificationCombinations);
     }
 
