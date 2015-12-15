@@ -18,9 +18,9 @@ import org.apache.log4j.Logger;
  * @since 0.1
  */
 public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerator {
-
+    
     private static final Logger LOGGER = Logger.getLogger(PeptideVariationsGeneratorImpl.class);
-
+    
     @Override
     public Set<ModifiedPeptide> generateVariations(Peptide precursor, Set<ModificationCombination> modifications) {
         Set<ModifiedPeptide> result = new HashSet<>();
@@ -35,7 +35,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         }
         return result;
     }
-
+    
     private Set<ModifiedPeptide> generateVariation(Peptide precursor, ModificationCombination modificationCombination) {
         //we calculate the possible distribution combinations for each modification type and
         //store them in a set
@@ -45,14 +45,18 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         for (Modification modification : modificationCombination.getUniqueModifications()) {
             //get the number of occurances of the current modification type in the ModificationCombination
             int occurances = getNumberOfOccurances(modificationCombination, modification);
-            modifiedPeptidesByModifications.add(variateModification(precursor, modification, occurances));
+            try {
+                modifiedPeptidesByModifications.add(variateModification(precursor, modification, occurances));
+            } catch (IllegalStateException e) {
+                LOGGER.warn("Modification :" + modification.getName() + " will be skipped : ", e);
+            }
         }
 
         //now combine the variation sets for each modification type into a set of variations
         //for the whole ModificationCombination
         return combineVariationSets(modifiedPeptidesByModifications);
     }
-
+    
     private Set<ModifiedPeptide> combineVariationSets(Set<Set<ModifiedPeptide>> modifiedPeptidesByModifications) {
         //check that we really have something to work with
         if (modifiedPeptidesByModifications == null || modifiedPeptidesByModifications.isEmpty()) {
@@ -77,10 +81,10 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
             modifiedPeptidesByModification = iterator.next();
             combinedModifiedPeptides = combineVariations(combinedModifiedPeptides, modifiedPeptidesByModification);
         }
-
+        
         return combinedModifiedPeptides;
     }
-
+    
     private Set<ModifiedPeptide> combineVariations(Set<ModifiedPeptide> modPeptidesByModOne, Set<ModifiedPeptide> modPeptidesByModTwo) {
         //combine each ModifiedPeptide of the first set with all ModifiedPeptideS of the second set and
         //take into account (at least at the moment) we don't allow multiple non-terminal modifications
@@ -93,7 +97,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         ModificationFacade nTermMofication = null;
         //keep track of the C-terminal modification
         ModificationFacade cTermModification = null;
-
+        
         Set<ModifiedPeptide> combinedModifiedPeptides = new HashSet<>();
         //loop over first set
         for (ModifiedPeptide modPeptideByModOne : modPeptidesByModOne) {
@@ -153,11 +157,9 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                             combinedModifiedPeptide = null;
                             break; //no need to check the other residues
                         }
-                    } else {
-                        //m2 not null, so the first modified peptide carries a modification here
-                        if (m2 != null) {
-                            combinedModifiedPeptide.setNTModification(i, m2);
-                        }
+                    } else //m2 not null, so the first modified peptide carries a modification here
+                    if (m2 != null) {
+                        combinedModifiedPeptide.setNTModification(i, m2);
                     }
                 }
 
@@ -176,7 +178,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         //return the found combinations
         return combinedModifiedPeptides;
     }
-
+    
     private int getNumberOfOccurances(ModificationCombination modComb, Modification mod) {
         int result = 0;
         for (Modification modification : modComb.getModifications()) {
@@ -186,70 +188,76 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         }
         return result;
     }
-
+    
     private Set<ModifiedPeptide> variateModification(Peptide precursor, Modification modification, int occurances) {
         if (precursor == null || modification == null) {
             throw new IllegalStateException("Need precursor peptide and modification to generate peptide variations.");
         }
         Set<ModifiedPeptide> result = new HashSet<>();
-        //check if we have terminal modifications (they are easy, as they are either present or not)
-        if (modification.getLocation() == Modification.Location.N_TERMINAL) {
-            ModifiedPeptide modifiedPeptide = new ModifiedPeptide(precursor);
-            modifiedPeptide.setNTermMod(modification);
-            result.add(modifiedPeptide);
-        } else if (modification.getLocation() == Modification.Location.C_TERMINAL) {
-            ModifiedPeptide modifiedPeptide = new ModifiedPeptide(precursor);
-            modifiedPeptide.setCTermMod(modification);
-            result.add(modifiedPeptide);
-        } else {
-            //location is non-terminal
-            //check how many AA can be affected by this modification
-            int numberOfModifiableLocations = countModifiableLocations(precursor, modification);
-            if (numberOfModifiableLocations < occurances) {
-                //we have more modifications of this kind than we have modifiable AAs??
-                throw new IllegalStateException("Can not have more modifications than there are modifiable AAs.");
-                //LOGGER.warn("Can not have more modifications than there are modifiable AAs.");
-            } else if (numberOfModifiableLocations == occurances) {
-                //all the affectable locations are affected (easy solution)
-                //we only need to create one ModifiedPeptide were all the affectable AA are modified
-                ModifiedPeptide modifiedPeptide = new ModifiedPeptide(precursor);
-                for (int i = 0; i < precursor.length(); i++) {
-                    if (modification.getAffectedAminoAcids().contains(precursor.getAA(i))) {
-                        modifiedPeptide.setNTModification(i, modification);
-                    }
-                }
-                result.add(modifiedPeptide);
-            } else {
-                //we have more affectable locations than actual number of modifications
-                //so we have to compute the possible combinations.
-
-                //numberOfModifiableLocations (n) = number of modifiable locations for the current modification
-                //occurances (k)             = number of times the modification actually occurs
-                Integer[] positionIndexes = getPositionIndexes(precursor, modification, numberOfModifiableLocations);
-
-                //Number of possibilities:
-                //      n!
-                //-------------
-                //k! * (n - k)!
-                //the ChoiceIterable will iterate over the possibilities of above formular
-                ChoiceIterable<Integer> choice = new ChoiceIterable<>(occurances, positionIndexes);
-                for (Integer[] indexArray : choice) {
-                    //one possible combination of the modifications
-                    //create a new precursor variation with modificatios on all those locations
+        if (null != modification.getLocation()) //check if we have terminal modifications (they are easy, as they are either present or not)
+        {
+            switch (modification.getLocation()) {
+                case N_TERMINAL: {
                     ModifiedPeptide modifiedPeptide = new ModifiedPeptide(precursor);
-                    for (Integer index : indexArray) {
-                        modifiedPeptide.setNTModification(index, modification);
-                    }
+                    modifiedPeptide.setNTermMod(modification);
                     result.add(modifiedPeptide);
+                    break;
                 }
+                case C_TERMINAL: {
+                    ModifiedPeptide modifiedPeptide = new ModifiedPeptide(precursor);
+                    modifiedPeptide.setCTermMod(modification);
+                    result.add(modifiedPeptide);
+                    break;
+                }
+                default:
+                    //location is non-terminal
+                    //check how many AA can be affected by this modification
+                    int numberOfModifiableLocations = countModifiableLocations(precursor, modification);
+                    if (numberOfModifiableLocations < occurances) {
+                        //we have more modifications of this kind than we have modifiable AAs??
+                        throw new IllegalStateException("Can not have more modifications than there are modifiable AAs.");
+                        //LOGGER.warn("Can not have more modifications than there are modifiable AAs.");
+                    } else if (numberOfModifiableLocations == occurances) {
+                        //all the affectable locations are affected (easy solution)
+                        //we only need to create one ModifiedPeptide were all the affectable AA are modified
+                        ModifiedPeptide modifiedPeptide = new ModifiedPeptide(precursor);
+                        for (int i = 0; i < precursor.length(); i++) {
+                            if (modification.getAffectedAminoAcids().contains(precursor.getAA(i))) {
+                                modifiedPeptide.setNTModification(i, modification);
+                            }
+                        }
+                        result.add(modifiedPeptide);
+                    } else {
+                        //we have more affectable locations than actual number of modifications
+                        //so we have to compute the possible combinations.
 
-            } //end of munber of mod possible cases
+                        //numberOfModifiableLocations (n) = number of modifiable locations for the current modification
+                        //occurances (k)             = number of times the modification actually occurs
+                        Integer[] positionIndexes = getPositionIndexes(precursor, modification, numberOfModifiableLocations);
 
-        } //end of location cases
-
+                        //Number of possibilities:
+                        //      n!
+                        //-------------
+                        //k! * (n - k)!
+                        //the ChoiceIterable will iterate over the possibilities of above formular
+                        ChoiceIterable<Integer> choice = new ChoiceIterable<>(occurances, positionIndexes);
+                        for (Integer[] indexArray : choice) {
+                            //one possible combination of the modifications
+                            //create a new precursor variation with modificatios on all those locations
+                            ModifiedPeptide modifiedPeptide = new ModifiedPeptide(precursor);
+                            for (Integer index : indexArray) {
+                                modifiedPeptide.setNTModification(index, modification);
+                            }
+                            result.add(modifiedPeptide);
+                        }
+                        
+                    } //end of munber of mod possible cases
+                    break; //end of location cases
+            } //end of location cases
+        }
         return result;
     }
-
+    
     private int countModifiableLocations(Peptide precursor, Modification modification) {
         int counter = 0;
         //check all amino acids in the precursor sequence, and if they
@@ -261,10 +269,10 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         }
         return counter;
     }
-
+    
     private Integer[] getPositionIndexes(Peptide precursor, Modification modification, int modifiableLocations) {
         Integer[] positionIndexes = new Integer[modifiableLocations];
-
+        
         int counter = 0;
         for (int i = 0; i < precursor.getSequence().length(); i++) {
             if (modification.getAffectedAminoAcids().contains(precursor.getSequence().getAA(i))) {
@@ -272,7 +280,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                 counter++;
             }
         }
-
+        
         return positionIndexes;
     }
 }

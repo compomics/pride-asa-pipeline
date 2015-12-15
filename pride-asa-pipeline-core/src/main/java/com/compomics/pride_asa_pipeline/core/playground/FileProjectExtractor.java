@@ -39,7 +39,7 @@ public class FileProjectExtractor {
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
         File outputFolder = new File("C:\\Users\\compomics\\Documents\\Example_Files\\download");
-        File inputFile = new File("C:\\Users\\compomics\\Documents\\Example_Files\\PRIDE_Exp_Complete_Ac_3.xml");
+        File inputFile = new File("C:\\Users\\compomics\\Desktop\\33256\\temp\\F018451.dat-pride.xml");
         //File inputFile = new File("C:\\Users\\compomics\\Documents\\Example_Files\\PeptideShaker_Example.xml");
         System.out.println(new FileProjectExtractor(outputFolder).analyze(inputFile, inputFile.getName()));
     }

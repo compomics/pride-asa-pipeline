@@ -232,6 +232,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 //get other modifications
                 for (String aPTMName : annotatedModService.getAssayAnnotatedPTMs(assayAccession)) {
                     sortedAnnotatedModifications.add((Modification) PRIDEModificationFactory.getInstance().getModification(adapter, aPTMName));
+                
                 }
             }
             //order the annotated modifications to prevalence (in case there are more than the selected batch size)
@@ -241,9 +242,11 @@ public abstract class AbstractSpectrumAnnotator<T> {
             //get a queue of them
             BlockingQueue<Modification> modQueue = new ArrayBlockingQueue<>(sortedAllModifications.size());
             //first get the annotated modifications and order those as well?
-            for (Object mod : sortedAnnotatedModifications) {
-                modQueue.offer((Modification) mod);
-                sortedAllModifications.remove((Modification) mod);
+            for (Object modObject : sortedAnnotatedModifications) {
+                Modification mod = (Modification)modObject;
+                  LOGGER.info("Annotated mod : "+mod.getName());
+                modQueue.offer(mod);
+                sortedAllModifications.remove(mod);
             }
             //add the others
             for (Modification mod : sortedAllModifications) {
@@ -262,7 +265,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             int pass = 0;
             //subset the modQueue in x partitions
             LOGGER.info("Subsetting the modqueue (size=" + modQueue.size() + ") into " + (int) (modQueue.size() / 8) + " subsets");
-            while ((modQueue.drainTo(modPassSet, 8) > 0)) {
+            while ((modQueue.drainTo(modPassSet, 10) > 0)) {
                 //special cases such as oxidation, co-occurence of impossible mods,...
                 if (unexplainedIdentifications.isEmpty() && pass > 0) {
                     LOGGER.info("No more unexplained identifications !");

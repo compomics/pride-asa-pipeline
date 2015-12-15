@@ -92,80 +92,87 @@ public class ParameterExtractor {
 
     private void init(String assay) throws IOException, XmlPullParserException {
         //get assay
-        FileSpectrumRepository fileSpectrumRepository = new FileSpectrumRepository(assay);
-        ((DbSpectrumServiceImpl) spectrumAnnotator.getSpectrumService()).setSpectrumRepository(new FileSpectrumRepository(assay));
-        ((DbModificationServiceImpl) spectrumAnnotator.getModificationService()).setModificationRepository(new FileModificationRepository(assay));
+        try {
+            FileSpectrumRepository fileSpectrumRepository = new FileSpectrumRepository(assay);
+            ((DbSpectrumServiceImpl) spectrumAnnotator.getSpectrumService()).setSpectrumRepository(new FileSpectrumRepository(assay));
+            ((DbModificationServiceImpl) spectrumAnnotator.getModificationService()).setModificationRepository(new FileModificationRepository(assay));
 
-        spectrumAnnotator.initIdentifications(assay);
-        LOGGER.info("Spectrumannotator delivered was initialized");
-        spectrumAnnotator.annotate(assay);
-        //--------------------------------
+            spectrumAnnotator.initIdentifications(assay);
+            LOGGER.info("Spectrumannotator delivered was initialized");
+            spectrumAnnotator.annotate(assay);
+            //--------------------------------
 
-        // USE ALL THE IDENTIFICATIONS FOR THE PEPTIDE SEQUENCES AS THE ALL HAVE USEFUL INFORMATION
-        List<String> peptideSequences = new ArrayList<>();
-        List<Peptide> completePeptides = spectrumAnnotator.getIdentifications().getCompletePeptides();
-        if (completePeptides.isEmpty()) {
+            // USE ALL THE IDENTIFICATIONS FOR THE PEPTIDE SEQUENCES AS THE ALL HAVE USEFUL INFORMATION
+            List<String> peptideSequences = new ArrayList<>();
+            List<Peptide> completePeptides = spectrumAnnotator.getIdentifications().getCompletePeptides();
+            if (completePeptides.isEmpty()) {
+                LOGGER.error("There are no identifications to work with, using defaults...");
+                useDefaults(assay);
+            } else {
+
+                for (Peptide aPeptide : completePeptides) {
+                    peptideSequences.add(aPeptide.getSequenceString());
+                }
+
+                enzymePredictor = new EnzymePredictor(peptideSequences);
+
+                //--------------------------------
+                // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
+                modificationPredictor = new ModificationPredictor(assay, spectrumAnnotator.getSpectrumAnnotatorResult(), spectrumAnnotator.getModificationService());
+
+                //--------------------------------
+                //recalibrate errors
+                //precursor needs to be very accurate (considering mods / isotopes / etc)
+                LOGGER.info("Using the " + (100 - qualityPercentile) + " % best identifications for precursor accuracy estimation");
+                //USE ONLY THE HIGH QUALITY HITS FOR MASS ACCURACCIES, THESE WILL USUALLY NOT HAVE MISSING MODIFICATIONS ETC
+                List<Identification> experimentIdentifications = spectrumAnnotator.getIdentifications().getCompleteIdentifications();
+                IdentificationFilter filter = new IdentificationFilter(experimentIdentifications);
+                List<Identification> topPrecursorHits = filter.getTopPrecursorHits(90);
+
+                precursorIonErrorPredictor = new PrecursorIonErrorPredictor(topPrecursorHits);
+
+                //fragment ion is harder, more leanway should be given
+                HashMap<Peptide, double[]> mzValueMap = new HashMap<>();
+                //just use all of them
+                // List<Identification> topFragmentIonHits = filter.getTopFragmentIonHits(75);
+                for (Identification anExpIdentification : experimentIdentifications) {
+
+                    double[] mzValuesBySpectrumId = fileSpectrumRepository.getMzValuesBySpectrumId(anExpIdentification.getSpectrumId());
+                    Peptide peptide = anExpIdentification.getPeptide();
+                    mzValueMap.put(peptide, mzValuesBySpectrumId);
+
+                }
+                MassScanResult.scanFragmentIonContamination(topPrecursorHits);
+                //FragmentIonErrorPredictor fragmentIonErrorPredictor = new IterativeFragmentIonErrorPredictor(mzValueMap);
+                fragmentIonErrorPredictor = new FragmentIonErrorPredictor(mzValueMap);
+
+                //construct a parameter object
+                parameters = new SearchParameters();
+
+                parameters.setEnzyme(enzymePredictor.getMostLikelyEnzyme());
+                parameters.setnMissedCleavages(enzymePredictor.getMissedCleavages());
+
+                parameters.setPtmSettings(modificationPredictor.getPtmSettings());
+
+                double predictedPrecursorMassError = precursorIonErrorPredictor.getRecalibratedPrecursorAccuraccy();
+
+                parameters.setPrecursorAccuracy(predictedPrecursorMassError);
+                parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
+
+                parameters.setMinChargeSearched(new Charge(Charge.PLUS, precursorIonErrorPredictor.getRecalibratedMinCharge()));
+                parameters.setMaxChargeSearched(new Charge(Charge.PLUS, precursorIonErrorPredictor.getRecalibratedMaxCharge()));
+
+                double predictedFragmentMassError = fragmentIonErrorPredictor.getFragmentIonAccuraccy();
+
+                parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
+                parameters.setFragmentIonAccuracy(predictedFragmentMassError);
+                remediateParametersWithAnnotation(assay);
+                TotalReportGenerator.setFragmentAcc(parameters.getFragmentIonAccuracy());
+                TotalReportGenerator.setPrecursorAcc(parameters.getPrecursorAccuracy());
+            }
+        } catch (Exception e) {
+            LOGGER.error("Something went wrong : ", e);
             useDefaults(assay);
-        } else {
-            for (Peptide aPeptide : completePeptides) {
-                peptideSequences.add(aPeptide.getSequenceString());
-            }
-
-            enzymePredictor = new EnzymePredictor(peptideSequences);
-
-            //--------------------------------
-            // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
-            modificationPredictor = new ModificationPredictor(assay, spectrumAnnotator.getSpectrumAnnotatorResult(), spectrumAnnotator.getModificationService());
-
-            //--------------------------------
-            //recalibrate errors
-            //precursor needs to be very accurate (considering mods / isotopes / etc)
-            LOGGER.info("Using the " + (100 - qualityPercentile) + " % best identifications for precursor accuracy estimation");
-            //USE ONLY THE HIGH QUALITY HITS FOR MASS ACCURACCIES, THESE WILL USUALLY NOT HAVE MISSING MODIFICATIONS ETC
-            List<Identification> experimentIdentifications = spectrumAnnotator.getIdentifications().getCompleteIdentifications();
-            IdentificationFilter filter = new IdentificationFilter(experimentIdentifications);
-            List<Identification> topPrecursorHits = filter.getTopPrecursorHits(90);
-
-            precursorIonErrorPredictor = new PrecursorIonErrorPredictor(topPrecursorHits);
-
-            //fragment ion is harder, more leanway should be given
-            HashMap<Peptide, double[]> mzValueMap = new HashMap<>();
-            //just use all of them
-            // List<Identification> topFragmentIonHits = filter.getTopFragmentIonHits(75);
-            for (Identification anExpIdentification : experimentIdentifications) {
-
-                double[] mzValuesBySpectrumId = fileSpectrumRepository.getMzValuesBySpectrumId(anExpIdentification.getSpectrumId());
-                Peptide peptide = anExpIdentification.getPeptide();
-                mzValueMap.put(peptide, mzValuesBySpectrumId);
-
-            }
-            MassScanResult.scanFragmentIonContamination(topPrecursorHits);
-            //FragmentIonErrorPredictor fragmentIonErrorPredictor = new IterativeFragmentIonErrorPredictor(mzValueMap);
-            fragmentIonErrorPredictor = new FragmentIonErrorPredictor(mzValueMap);
-
-            //construct a parameter object
-            parameters = new SearchParameters();
-
-            parameters.setEnzyme(enzymePredictor.getMostLikelyEnzyme());
-            parameters.setnMissedCleavages(enzymePredictor.getMissedCleavages());
-
-            parameters.setPtmSettings(modificationPredictor.getPtmSettings());
-
-            double predictedPrecursorMassError = precursorIonErrorPredictor.getRecalibratedPrecursorAccuraccy();
-
-            parameters.setPrecursorAccuracy(predictedPrecursorMassError);
-            parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
-
-            parameters.setMinChargeSearched(new Charge(Charge.PLUS, precursorIonErrorPredictor.getRecalibratedMinCharge()));
-            parameters.setMaxChargeSearched(new Charge(Charge.PLUS, precursorIonErrorPredictor.getRecalibratedMaxCharge()));
-
-            double predictedFragmentMassError = fragmentIonErrorPredictor.getFragmentIonAccuraccy();
-
-            parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-            parameters.setFragmentIonAccuracy(predictedFragmentMassError);
-            remediateParametersWithAnnotation(assay);
-            TotalReportGenerator.setFragmentAcc(parameters.getFragmentIonAccuracy());
-            TotalReportGenerator.setPrecursorAcc(parameters.getPrecursorAccuracy());
         }
     }
 
@@ -284,8 +291,7 @@ public class ParameterExtractor {
         fileResultHandler.writeResult(new File(outputFolder, "complete_id.txt"), completeIdentifications);
     }
 
-    private void useDefaults(String assay) throws IOException, XmlPullParserException {
-        LOGGER.info("There are no identifications present, using broad spectrum parameters !");
+    public void useDefaults(String assay) throws IOException, XmlPullParserException {
         printableReports = false;
         parameters = new SearchParameters();
         parameters.setEnzyme(new EnzymePredictor().getMostLikelyEnzyme());

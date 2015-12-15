@@ -63,7 +63,7 @@ public class MGFExtractor {
         LOGGER.info("Getting parser for " + inputFile.getName());
         try {
             jMzReader = getJMzReader(inputFile);
-        } catch (ClassNotFoundException | MzXMLParsingException | JMzReaderException ex) {
+        } catch (Exception ex) {
             LOGGER.error("Could not initiate spectrum extraction !");
             ex.printStackTrace();
             throw new MGFExtractionException(ex.getMessage());

@@ -12,10 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 import org.geneontology.oboedit.dataadapter.GOBOParseException;
 import org.xmlpull.v1.XmlPullParserException;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
@@ -37,39 +34,34 @@ public class WebProjectExtractor {
     private static final Logger LOGGER = Logger.getLogger(WebProjectExtractor.class);
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
-        File outputFolder = new File("C:\\Users\\compomics\\Desktop\\21223");
+        File outputFolder = new File("C:\\Users\\compomics\\Desktop\\33256");
         if (outputFolder.exists()) {
             outputFolder.delete();
         }
         outputFolder.mkdirs();
-        String inputAssay = "21223";
+        String inputAssay = "33257";
         SearchParameters analyze = new WebProjectExtractor(outputFolder).analyze(inputAssay);
         System.out.println(analyze);
     }
     private final File tempFolder;
 
     public WebProjectExtractor(File outputFolder) throws IOException {
+        ParserCache.getInstance().clear();
         this.outputFolder = outputFolder;
         this.tempFolder = new File(outputFolder, "temp");
         tempFolder.mkdirs();
-        //add a logger specific to this file
-        String targetLog = outputFolder.getAbsolutePath() + "extraction.log";
-
-        FileAppender apndr = new FileAppender(new PatternLayout("%d %-5p [%c{1}] %m%n"), targetLog, true);
-        Logger.getRootLogger().addAppender(apndr);
-        Logger.getRootLogger().setLevel((Level) Level.DEBUG);
     }
 
-    public SearchParameters analyze(String assayAccession) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
+    public SearchParameters analyze(String assayAccession) throws Exception {
         LOGGER.info("Setting up experiment repository for assay " + assayAccession);
         WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository(tempFolder);
         experimentRepository.addAssay(assayAccession);
-        //the cache should only have one for now?
-        String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
-        LOGGER.info(entry + " was found in the parser cache");
+        if (!ParserCache.getInstance().getLoadedFiles().containsKey(assayAccession)) {
+            throw new MGFExtractionException("There is no suited parser in the cache !");
+        }
         //write an MGF with all peakfile information?
         LOGGER.info("Getting related spectrum files from the cache");
-        FileSpectrumRepository spectrumRepository = new FileSpectrumRepository(entry);
+        FileSpectrumRepository spectrumRepository = new FileSpectrumRepository(assayAccession);
         File mgf = spectrumRepository.writeToMGF(outputFolder);
         //zip the MGF file
         File zip = new File(mgf.getAbsolutePath() + ".zip");
@@ -78,7 +70,13 @@ public class WebProjectExtractor {
         //do the extraction
         LOGGER.info("Attempting to infer searchparameters");
         ParameterExtractor extractor = new ParameterExtractor(assayAccession);
-        SearchParameters parameters = extractor.getParameters();
+        SearchParameters parameters;
+        try {
+            parameters = extractor.getParameters();
+        } catch (Exception e) {
+            extractor.useDefaults(assayAccession);
+            parameters = extractor.getParameters();
+        }
         extractor.printReports(outputFolder);
         //remediate error
 
@@ -89,7 +87,5 @@ public class WebProjectExtractor {
     public void clearTempFolder() throws IOException {
         FileUtils.deleteDirectory(tempFolder);
     }
-
-
 
 }

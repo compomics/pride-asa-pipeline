@@ -5,6 +5,7 @@ import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -129,8 +130,12 @@ public class TotalReportGenerator extends InferenceReportGenerator {
         reportWriter.append("MODIFICATION STATISTICS").append(System.lineSeparator());
         reportWriter.append("Modification Method\t" + getPtmSettingsMethod()).append(System.lineSeparator());
         reportWriter.append("Annotated Mods\t");
+        HashSet<String> exportedMods = new HashSet<>();
         for (Modification mod : annotatedMods) {
-            reportWriter.append(mod.getName() + ",");
+            if (!exportedMods.contains(mod.getName())) {
+                exportedMods.add(mod.getName());
+                reportWriter.append(mod.getName() + ",");
+            }
         }
         reportWriter.append(System.lineSeparator()).append("Used Mods (utilities)\t");
         for (String mod : getPtmSettings().getAllModifications()) {

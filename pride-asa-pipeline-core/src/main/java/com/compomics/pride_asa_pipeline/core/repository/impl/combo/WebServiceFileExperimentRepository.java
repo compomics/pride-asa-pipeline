@@ -59,13 +59,31 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
      * @throws Exception if a file cannot be correctly obtained
      */
     public void addAssay(String assay) throws Exception {
-        File identFile = getIdentificationFile(assay);
-        if (identFile != null) {
-            if (!identFile.getName().toLowerCase().endsWith(".xml") & !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
-                List<File> peakFiles = getPeakFiles(assay);
-                super.addMzID(assay, identFile, peakFiles);
-            } else {
-                super.addPrideXMLFile(assay, identFile);
+        List<File> identFiles = getAssayFiles(assay, ProjectFileType.RESULT);
+        if (!identFiles.isEmpty()) {
+            for (File identFile : identFiles) {
+                if (!identFile.getName().toLowerCase().endsWith(".xml") & !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
+                    List<File> peakFiles = getAssayFiles(assay, ProjectFileType.PEAK);
+                    super.addMzID(assay, identFile, peakFiles);
+                } else {
+                    //@ToDo think of a better strategy for this, maybe include file name in assay identifier?
+                    //here we should check if the parser already has a value for this project. Problem occurs when multiple prideXML files are in a single assay?
+                    //default to the largest one for now ?
+                    boolean addToParsers = true;
+                    if (parserCache.containsParser(assay)) {
+                        if (identFile.getName().toUpperCase().contains("PRIDE_EXP_COMPLETE_")) {
+                            addToParsers = true;
+                        } else {
+                            long currentSize = new File(parserCache.getLoadedFiles().get(assay)).length();
+                            long newSize = identFile.length();
+                            addToParsers = newSize > currentSize;
+                        }
+                    }
+                    if (addToParsers) {
+                        super.addPrideXMLFile(assay, identFile);
+                    }
+                }
+
             }
         } else {
             throw new FileNotFoundException("No identification file was found for assay number " + assay);
@@ -89,6 +107,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
             gunzip(downloadFile, temp);
             downloadFile.delete();
         }
+        downloader.disconnect();
         return temp;
     }
 
@@ -106,28 +125,16 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
         }
     }
 
-    private File getIdentificationFile(String experimentAccession) throws Exception {
-        File identificationsFile = null;
+    private List<File> getAssayFiles(String experimentAccession, ProjectFileType type) throws Exception {
+        ArrayList<File> assayFiles = new ArrayList<>();
         FileDetailList assayFileDetails = PrideWebService.getAssayFileDetails(experimentAccession);
         //try to find existing result files online
         for (FileDetail assayFile : assayFileDetails.getList()) {
-            if (assayFile.getFileType().equals(ProjectFileType.RESULT)) {
-                identificationsFile = downloadFile(assayFile);
+            if (assayFile.getFileType().equals(type)) {
+                assayFiles.add(downloadFile(assayFile));
             }
         }
-        return identificationsFile;
-    }
-
-    private List<File> getPeakFiles(String experimentAccession) throws Exception {
-        ArrayList<File> peakFiles = new ArrayList<>();
-        FileDetailList assayFileDetails = PrideWebService.getAssayFileDetails(experimentAccession);
-        //try to find existing result files online
-        for (FileDetail assayFile : assayFileDetails.getList()) {
-            if (assayFile.getFileType().equals(ProjectFileType.PEAK)) {
-                peakFiles.add(downloadFile(assayFile));
-            }
-        }
-        return peakFiles;
+        return assayFiles;
     }
 
 }
