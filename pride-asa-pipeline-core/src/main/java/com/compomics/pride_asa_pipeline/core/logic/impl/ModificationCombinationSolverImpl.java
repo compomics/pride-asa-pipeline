@@ -46,7 +46,9 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
     @Override
     public Set<ModificationCombination> findModificationCombinations(Peptide peptide, int bagSize, double massToExplain, double deviation) {
         LOGGER.debug("Finding modifications for percursor: " + peptide.getSequenceString());
-
+        if(peptide.getSequenceString().equalsIgnoreCase("NFGIWLR")){
+            System.out.println("oooola");
+        }
         //check if we can increase the bag size (number of possible modifications) on this peptide
         //note: the max number of possible mods is: peptide length + 2, since each residue can hold
         //       one modification and there can be two additional terminal modifications.  
@@ -198,6 +200,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
      */
     private PeptideModificationHolder generatePeptideMoficationHolder(AminoAcidSequence sequence) {
         //check if the sequence modification selection of this amino acid sequence is found in the cache
+        
         PeptideModificationHolder peptideModificationHolder = peptideModificationHolderCache.getFromCache(sequence.toString());
 
         if (peptideModificationHolder == null) {
@@ -294,7 +297,8 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
             }
         } else //if there are no possible modifications at the current position (sequenceIndex)
         //then we have to prevent the recursion from breaking
-         if ((sequenceIndex + 1) < possibleModifications.size()) {
+        {
+            if ((sequenceIndex + 1) < possibleModifications.size()) {
                 calculateModificationCombinations(sequenceIndex + 1, possibleModifications, modificationCombinations, candidateModifications);
             } else {
                 //if end of list reached, store candidates as new solutions
@@ -306,6 +310,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
                     modificationCombinations.add(comb);
                 }
             }
+        }
     }
 
     /**
@@ -316,7 +321,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
     private void generateCandidateModificationCombinations(PeptideModificationHolder peptideModificationHolder) {
         HashSet<ModificationCombination> modificationCombinations = new HashSet<>();
         calculateModificationCombinations(0, peptideModificationHolder.getModifications(), modificationCombinations, new ArrayList<Modification>());
-       //store the possible modification combinations in the peptide modification holder
+        //store the possible modification combinations in the peptide modification holder
         peptideModificationHolder.setCandidateModificationCombinations(modificationCombinations);
     }
 

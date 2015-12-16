@@ -41,7 +41,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
     @Override
     public Map<Identification, Set<ModificationCombination>> explainCompleteIndentifications(List<Identification> identifications, MassRecalibrationResult massRecalibrationResult, AnalyzerData analyzerData) {
         Map<Identification, Set<ModificationCombination>> possibleExplainedIdentifications = new HashMap<>();
-        HashMap<Identification, Double> identificationsWithUnexplainedMass = new HashMap<Identification, Double>();
+        HashMap<Identification, Double> identificationsWithUnexplainedMass = new HashMap<>();
         //keep track of ratios determining the loop condition
         //initialized negative to the ratio difference will be positive!
         double previousExplainedRatio = -1D;
@@ -57,7 +57,6 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
             //try to explain all identifications
             for (Identification identification : identifications) {
                 Peptide peptide = identification.getPeptide();
-
                 //get the (reported) peptide mass delta
                 double precursorMassDelta = 0.0;
                 try {
@@ -98,6 +97,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                 //if the mass delta is larger than a possible mass error (deviation) then
                 //we might have modifications we need to explain (or at least try to)
                 if (Math.abs(precursorMassDelta) > deviation) {
+
                     combinations = modificationCombinationSolver.findModificationCombinations(peptide, modificationCombinationSizeLimit, precursorMassDelta, deviation);
                     //add all newly found combinations (if any) to the set of all modifications for this peptide
                     if (combinations != null && combinations.size() > 0) {
@@ -110,7 +110,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                         //we could not find a suitable modification combination
                         //so we don't add it to the map!
                         //check the precursor against the maps !
-                        identificationsWithUnexplainedMass.put(identification,precursorMassDelta);
+                        identificationsWithUnexplainedMass.put(identification, precursorMassDelta);
                     }
                 } else {
                     possibleExplainedIdentifications.put(identification, null);
