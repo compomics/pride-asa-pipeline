@@ -34,7 +34,7 @@ public class WebProjectExtractor {
     private static final Logger LOGGER = Logger.getLogger(WebProjectExtractor.class);
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
-        String inputAssay = "33257";
+        String inputAssay = " ";
         File outputFolder = new File("C:\\Users\\compomics\\Desktop\\" + inputAssay);
         if (outputFolder.exists()) {
             outputFolder.delete();
