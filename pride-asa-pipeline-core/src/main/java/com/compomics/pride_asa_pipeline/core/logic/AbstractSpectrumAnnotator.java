@@ -225,6 +225,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
     /**
      * Annotate the experiment identifications in multiple passes according to
      * the modification prevalence in PRIDE.
+     * @param identifier the identifiers for the assays that need to be processed
      */
     public void annotate(String... identifier) {
         if (identifier == null) {
@@ -235,6 +236,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             String assayAccession = identifier[0];
             LinkedHashSet<Modification> sortedAnnotatedModifications = new LinkedHashSet<>();
             //load the modifications from the PRIDE annotation
+            //if there is no file in the parsercache, use the webservice to get the modifications 
             if (ParserCache.getInstance().containsParser(assayAccession)) {
                 FileModificationRepository repository = new FileModificationRepository();
                 sortedAnnotatedModifications.addAll(repository.getModificationsByExperimentId(assayAccession));
@@ -244,7 +246,6 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 //get other modifications
                 for (String aPTMName : annotatedModService.getAssayAnnotatedPTMs(assayAccession)) {
                     sortedAnnotatedModifications.add((Modification) PRIDEModificationFactory.getInstance().getModification(adapter, aPTMName));
-
                 }
             }
             //order the annotated modifications to prevalence (in case there are more than the selected batch size)

@@ -1,5 +1,6 @@
-package com.compomics.pride_asa_pipeline.core.playground;
+package com.compomics.pride_asa_pipeline.core.data.extractor;
 
+import com.compomics.pride_asa_pipeline.core.playground.*;
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.data.extractor.ParameterExtractor;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
@@ -20,9 +21,10 @@ import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 
 /**
  *
- * @author Kenneth Verheggen
+ * @author Kenneth Verheggen This class is used to automatically download and
+ * process an assay through the PRIDE WS
  */
-public class WebProjectExtractor {
+public class WebServiceParameterExtractor {
 
     /**
      * The output folder for the extraction
@@ -31,28 +33,30 @@ public class WebProjectExtractor {
     /**
      * The Logger instance
      */
-    private static final Logger LOGGER = Logger.getLogger(WebProjectExtractor.class);
-
-    public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
-        String inputAssay = " ";
-        File outputFolder = new File("C:\\Users\\compomics\\Desktop\\" + inputAssay);
-        if (outputFolder.exists()) {
-            outputFolder.delete();
-        }
-        outputFolder.mkdirs();
-
-        SearchParameters analyze = new WebProjectExtractor(outputFolder).analyze(inputAssay);
-        System.out.println(analyze);
-    }
+    private static final Logger LOGGER = Logger.getLogger(WebServiceParameterExtractor.class);
+    /**
+     * The temporary folder where files should be downloaded to 
+     */
     private final File tempFolder;
 
-    public WebProjectExtractor(File outputFolder) throws IOException {
+    /**
+     * Default constructor for a WebProjectExtractor
+     * @param outputFolder the folder where the results will be stored in
+     * @throws IOException
+     */
+    public WebServiceParameterExtractor(File outputFolder) throws IOException {
         ParserCache.getInstance().clear();
         this.outputFolder = outputFolder;
         this.tempFolder = new File(outputFolder, "temp");
         tempFolder.mkdirs();
     }
 
+    /**
+     * Downloads, extracts and zips the results for the given assay
+     * @param assayAccession the assay identifier that needs to be run
+     * @return the inferred SearchParameters object
+     * @throws Exception
+     */
     public SearchParameters analyze(String assayAccession) throws Exception {
         LOGGER.info("Setting up experiment repository for assay " + assayAccession);
         WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository(tempFolder);
@@ -85,6 +89,10 @@ public class WebProjectExtractor {
         return parameters;
     }
 
+    /** 
+     * Deletes the temp folder
+     * @throws IOException the folder can not be deleted
+     */
     public void clearTempFolder() throws IOException {
         FileUtils.deleteDirectory(tempFolder);
     }
