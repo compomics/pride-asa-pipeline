@@ -154,11 +154,9 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                             break; //no need to check the other residues
                         }
                     } else //m2 not null, so the first modified peptide carries a modification here
-                    {
-                        if (m2 != null) {
+                     if (m2 != null) {
                             combinedModifiedPeptide.setNTModification(i, m2);
                         }
-                    }
                 }
 
                 //check that we have a sensible combination (e.g. not null and at least one modification)
@@ -227,7 +225,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                             }
                         }
                         result.add(modifiedPeptide);
-                    } else  {
+                    } else {
                         //we have more affectable locations than actual number of modifications
                         //so we have to compute the possible combinations.
 
