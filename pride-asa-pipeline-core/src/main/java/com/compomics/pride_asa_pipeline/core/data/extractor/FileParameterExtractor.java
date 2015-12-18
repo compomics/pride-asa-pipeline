@@ -6,6 +6,7 @@ import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperiment
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
 import com.compomics.util.io.compression.ZipUtils;
@@ -37,11 +38,18 @@ public class FileParameterExtractor {
     private FileExperimentRepository experimentRepository;
     private FileSpectrumRepository spectrumRepository;
     private FileModificationRepository modificationRepository;
+    private AnalyzerData analyzerData;
 
     public FileParameterExtractor(File outputFolder) throws IOException {
         this.outputFolder = outputFolder;
+        this.analyzerData = AnalyzerData.getAnalyzerDataByAnalyzerType("");
         init();
+    }
 
+    public FileParameterExtractor(File outputFolder, AnalyzerData analyzerData) throws IOException {
+        this.outputFolder = outputFolder;
+        this.analyzerData = analyzerData;
+        init();
     }
 
     private void init() {
@@ -55,7 +63,7 @@ public class FileParameterExtractor {
 
     private SearchParameters inferParameters(String assay) throws ParameterExtractionException, IOException {
         LOGGER.info("Attempting to infer searchparameters");
-        ParameterExtractor extractor = new ParameterExtractor(assay);
+        ParameterExtractor extractor = new ParameterExtractor(assay, analyzerData);
         SearchParameters parameters = extractor.getParameters();
         extractor.printReports(outputFolder);
         SearchParameters.saveIdentificationParameters(parameters, new File(outputFolder, assay + ".par"));

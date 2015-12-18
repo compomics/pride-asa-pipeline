@@ -4,16 +4,12 @@ import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics
 import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.massdeficit.logic.AminoAcidMassInference;
 import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.TotalReportGenerator;
-import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
-import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.util.experiment.identification.matches.ModificationMatch;
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;

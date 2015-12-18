@@ -1,6 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.parameters;
 
 import com.compomics.pride_asa_pipeline.core.data.extractor.FileParameterExtractor;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
@@ -51,7 +52,7 @@ public class ProjectExtractorTest extends TestCase {
         File temp = File.createTempFile("temp", ".tmp");
         temp.deleteOnExit();
         File outputFolder = File.createTempFile("temp", ".tmp").getParentFile();
-        FileParameterExtractor instance = new FileParameterExtractor(outputFolder);
+        FileParameterExtractor instance = new FileParameterExtractor(outputFolder,AnalyzerData.getAnalyzerDataByAnalyzerType("orbitrap"));
 
         // File inputFile = getFileFromResources("PRIDE_Exp_Complete_Ac_3.xml.zip");
         File inputFile = getFileFromResources("PeptideShaker_example.xml.zip");

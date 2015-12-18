@@ -2,6 +2,7 @@ package com.compomics.pride_asa_pipeline.core.logic.inference.modification;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
 import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.TotalReportGenerator;
+import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.UtilitiesPTMAdapter;
@@ -30,14 +31,6 @@ public class ModificationPredictor {
      * LOGGER
      */
     private static final Logger LOGGER = Logger.getLogger(ModificationPredictor.class);
-    /*
-     * The used SpectrumAnnotatorResult
-     */
-    private final SpectrumAnnotatorResult spectrumAnnotatorResult;
-    /*
-     * The used modificationService
-     */
-    private final ModificationService modificationService;
     /**
      * The consideration threshold for modifications. At least this value must
      * carry the modification for it to be considered in the extraction (default
@@ -63,58 +56,29 @@ public class ModificationPredictor {
      */
     private final List<Integer> quantAccessions = Arrays.asList(new Integer[]{258, 259, 267, 367, 687, 365, 866, 730, 532, 730, 533, 731, 739, 738, 737, 984, 985, 1341, 1342});
     private String assay;
+    private final ModificationHolder modificationHolder;
 
-    public ModificationPredictor(String assay, SpectrumAnnotatorResult spectrumAnnotatorResult, ModificationService modificationService) {
-        this.spectrumAnnotatorResult = spectrumAnnotatorResult;
-        this.modificationService = modificationService;
+    public ModificationPredictor(String assay,  ModificationHolder modificationHolder) {
         this.assay = assay;
+        this.modificationHolder = modificationHolder;
         inferModifications();
     }
 
     private void inferModifications() {
         LOGGER.info("Inferring modifications...");
-//annotate spectra
         HashMap<String, Boolean> asapMods = new HashMap<>();
-        Map<Modification, Integer> lPrideAsapModificationsMap = modificationService.getUsedModifications(spectrumAnnotatorResult);
-        LOGGER.info("Estimating modification rates");
-        modificationRates = modificationService.estimateModificationRate(lPrideAsapModificationsMap, spectrumAnnotatorResult, fixedThreshold);
-        boolean allowUnlimitedModifications = true;
-        if (lPrideAsapModificationsMap.size() > 6) {
-            considerationThreshold = calculateConsiderationThreshold();
-            LOGGER.warn("Warning, it is not recommended to search with more than 6 variable PTMs. A consideration threshold (" + considerationThreshold + ") will be applied to limit the combinations");
-            allowUnlimitedModifications = false;
-        }
 
-        for (Modification aMod : lPrideAsapModificationsMap.keySet()) {
-            //correct positions for oxidation and pyro-glu
-            String amodName = aMod.getName();
-            if (allowUnlimitedModifications || modificationRates.get(aMod) >= considerationThreshold) {
-                double modificationRate = modificationRates.get(aMod);
-                //check for quantmods
-                boolean isQuantMod = false;
-                for (Integer quantTerm : quantAccessions) {
-                    if (aMod.getName().toLowerCase().equalsIgnoreCase(PRIDEModificationFactory.getInstance().getModificationNameFromAccession("UNIMOD:" + quantTerm))) {
-                        isQuantMod = true;
-                        break;
-                    }
-                }
-                if (isQuantMod && modificationRate < (fixedThreshold)) {
-                    LOGGER.error(amodName + " is a quant mod, but was not fixed !");
-                } else {
-                    LOGGER.info(amodName + "\t" + modificationRate);
-                    asapMods.put(amodName, (modificationRate >= fixedThreshold));
-                }
-            }
-        }
         ModificationAdapter adapter = new UtilitiesPTMAdapter();
         ptmSettings = new PtmSettings();
         //make sure the annotated mods are in there as well
         FileModificationRepository repository = new FileModificationRepository();
         List<Modification> modificationsByExperimentId = repository.getModificationsByExperimentId(assay);
         TotalReportGenerator.setExperimentMods(modificationsByExperimentId);
-
         for (Modification annotatedMod : modificationsByExperimentId) {
             asapMods.put(annotatedMod.getName(), false);
+        }
+        for (Modification aMod : modificationHolder.getAllModifications()) {
+            asapMods.put(aMod.getName(), false);
         }
         //and add the new ones
         HashSet<Double> encounteredMasses = new HashSet<>();
@@ -142,11 +106,7 @@ public class ModificationPredictor {
         TotalReportGenerator.setPtmSettingsMethod("Fragment mass error analysis");
     }
 
-    private double calculateConsiderationThreshold() {
-        InferenceStatistics stats = new InferenceStatistics(modificationRates.values(), false);
-        double threshold = Math.max(0.005, stats.getPercentile(2.5));
-        return threshold;
-    }
+
 
     public double getConsiderationThreshold() {
         return considerationThreshold;

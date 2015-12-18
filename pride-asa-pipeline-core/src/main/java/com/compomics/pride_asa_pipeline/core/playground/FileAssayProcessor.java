@@ -24,7 +24,7 @@ public class FileAssayProcessor {
         }
         outputFolder.mkdirs();
         File inputFile = new File("C:\\Users\\compomics\\Desktop\\3\\temp\\PRIDE_Exp_Complete_Ac_3.xml");
-        SearchParameters parameters = new FileParameterExtractor(outputFolder).analyzePrideXML(inputFile, inputFile.getName());
+        SearchParameters parameters = new FileParameterExtractor(outputFolder).analyzePrideXML(inputFile, "3");
         System.out.println(parameters);
     }
 }

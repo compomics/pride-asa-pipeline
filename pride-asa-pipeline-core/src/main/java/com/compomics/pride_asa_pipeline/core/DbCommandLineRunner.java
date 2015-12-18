@@ -63,7 +63,7 @@ public class DbCommandLineRunner {
                     dbSpectrumAnnotator.clearPipeline();
                 } else {
                     //continue with the annotiation
-                    dbSpectrumAnnotator.annotate();
+                    dbSpectrumAnnotator.annotate(experimentAccession);
                     //write result to file
                     dbResultHandler.writeResultToFile(dbSpectrumAnnotator.getSpectrumAnnotatorResult());
                     dbResultHandler.writeUsedModificationsToFile(experimentAccession, dbSpectrumAnnotator.getModificationService().getUsedModifications(dbSpectrumAnnotator.getSpectrumAnnotatorResult()).keySet());

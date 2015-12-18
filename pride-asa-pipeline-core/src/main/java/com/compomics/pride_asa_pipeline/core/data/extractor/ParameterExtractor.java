@@ -72,7 +72,26 @@ public class ParameterExtractor {
     private ModificationPredictor modificationPredictor;
     private EnzymePredictor enzymePredictor;
     private boolean printableReports = true;
+    private AnalyzerData analyzerData;
 
+       /**
+     * An extractor for parameters
+     *
+     * @param assay the assay to extract
+     * @param analyzerData the type of instrument used when not available through the webservice
+     * @throws ParameterExtractionException when an error occurs
+     */
+    public ParameterExtractor(String assay,AnalyzerData analyzerData) throws ParameterExtractionException {
+        try {
+            //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
+            ApplicationContextProvider.getInstance().setDefaultApplicationContext();
+            spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
+            this.analyzerData=analyzerData;
+            init(assay);
+        } catch (IOException | XmlPullParserException e) {
+            throw new ParameterExtractionException(e.getMessage());
+        }
+    }
     /**
      * An extractor for parameters
      *
@@ -102,26 +121,7 @@ public class ParameterExtractor {
             spectrumAnnotator.annotate(assay);
             //--------------------------------
 
-            // USE ALL THE IDENTIFICATIONS FOR THE PEPTIDE SEQUENCES AS THE ALL HAVE USEFUL INFORMATION
-            List<String> peptideSequences = new ArrayList<>();
-            List<Peptide> completePeptides = spectrumAnnotator.getIdentifications().getCompletePeptides();
-            if (completePeptides.isEmpty()) {
-                LOGGER.error("There are no identifications to work with, using defaults...");
-                useDefaults(assay);
-            } else {
-
-                for (Peptide aPeptide : completePeptides) {
-                    peptideSequences.add(aPeptide.getSequenceString());
-                }
-
-                enzymePredictor = new EnzymePredictor(peptideSequences);
-
-                //--------------------------------
-                // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
-                modificationPredictor = new ModificationPredictor(assay, spectrumAnnotator.getSpectrumAnnotatorResult(), spectrumAnnotator.getModificationService());
-
-                //--------------------------------
-                //recalibrate errors
+             //recalibrate errors
                 //precursor needs to be very accurate (considering mods / isotopes / etc)
                 LOGGER.info("Using the " + (100 - qualityPercentile) + " % best identifications for precursor accuracy estimation");
                 //USE ONLY THE HIGH QUALITY HITS FOR MASS ACCURACCIES, THESE WILL USUALLY NOT HAVE MISSING MODIFICATIONS ETC
@@ -145,6 +145,27 @@ public class ParameterExtractor {
                 MassScanResult.scanFragmentIonContamination(topPrecursorHits);
                 //FragmentIonErrorPredictor fragmentIonErrorPredictor = new IterativeFragmentIonErrorPredictor(mzValueMap);
                 fragmentIonErrorPredictor = new FragmentIonErrorPredictor(mzValueMap);
+            
+            // USE ALL THE IDENTIFICATIONS FOR THE PEPTIDE SEQUENCES AS THE ALL HAVE USEFUL INFORMATION
+            List<String> peptideSequences = new ArrayList<>();
+            List<Peptide> completePeptides = spectrumAnnotator.getIdentifications().getCompletePeptides();
+            if (completePeptides.isEmpty()) {
+                LOGGER.error("There are no identifications to work with, using defaults...");
+                useDefaults(assay);
+            } else {
+
+                for (Peptide aPeptide : completePeptides) {
+                    peptideSequences.add(aPeptide.getSequenceString());
+                }
+
+                enzymePredictor = new EnzymePredictor(peptideSequences);
+
+                //--------------------------------
+                // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
+                modificationPredictor = new ModificationPredictor(assay, spectrumAnnotator.getModificationHolder());
+
+                //--------------------------------
+               
 
                 //construct a parameter object
                 parameters = new SearchParameters();
@@ -177,25 +198,26 @@ public class ParameterExtractor {
     }
 
     public void remediateParametersWithAnnotation(String assay) throws IOException {
-        AnalyzerData data = getAnalyzerData(assay);
-        if (data != null) {
+        if(analyzerData==null){
+        analyzerData = getAnalyzerData(assay);
+        }
+        if (analyzerData != null) {
             double minimalAccuracy = 0.001; //~5ppm for orbitrap family
-            if (data.getAnalyzerFamily().equals(AnalyzerData.ANALYZER_FAMILY.FT)
-                    | data.getAnalyzerFamily().equals(AnalyzerData.ANALYZER_FAMILY.TOF
+            if (analyzerData.getAnalyzerFamily().equals(AnalyzerData.ANALYZER_FAMILY.FT)
+                    | analyzerData.getAnalyzerFamily().equals(AnalyzerData.ANALYZER_FAMILY.TOF
                     )) {
                 minimalAccuracy = 0.010; // ~50ppm for others?;
             }
-
-            LOGGER.info("Remediating erronous estimations...");
+           LOGGER.info("Remediating erronous estimations...");
             if (parameters.getPrecursorAccuracy() < minimalAccuracy) {
-                TotalReportGenerator.setPrecursorAccMethod("Using default, minimal machine --> inferred accuracy (" + parameters.getFragmentIonAccuracy() + ") too high for " + data.getAnalyzerFamily().toString());
+                TotalReportGenerator.setPrecursorAccMethod("Using default, minimal machine --> inferred accuracy (" + parameters.getFragmentIonAccuracy() + ") too high for " + analyzerData.getAnalyzerFamily().toString());
                 parameters.setPrecursorAccuracy(minimalAccuracy);
                 parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
-            } else if (parameters.getPrecursorAccuracy() > data.getFragmentMassError()) {
-                LOGGER.info("Remediating fragment accuracy to match " + data.getAnalyzerFamily().toString() + " analyzers.");
-                parameters.setPrecursorAccuracy(data.getFragmentMassError());
+            } else if (parameters.getPrecursorAccuracy() > analyzerData.getFragmentMassError()) {
+                LOGGER.info("Remediating fragment accuracy to match " + analyzerData.getAnalyzerFamily().toString() + " analyzers.");
+                parameters.setPrecursorAccuracy(analyzerData.getFragmentMassError());
                 parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
-                TotalReportGenerator.setPrecursorAccMethod("Used annotated machine parameters : " + data.getAnalyzerFamily().toString());
+                TotalReportGenerator.setPrecursorAccMethod("Used annotated machine parameters : " + analyzerData.getAnalyzerFamily().toString());
             }
 
             if (parameters.getFragmentIonAccuracy() < parameters.getPrecursorAccuracy()) {
@@ -203,14 +225,14 @@ public class ParameterExtractor {
                 parameters.setFragmentIonAccuracy(parameters.getPrecursorAccuracy());
                 parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
             } else if (parameters.getFragmentIonAccuracy() < minimalAccuracy) {
-                TotalReportGenerator.setFragmentAccMethod("Using default, minimal machine --> inferred accuracy (" + parameters.getFragmentIonAccuracy() + ") too high for " + data.getAnalyzerFamily().toString());
+                TotalReportGenerator.setFragmentAccMethod("Using default, minimal machine --> inferred accuracy (" + parameters.getFragmentIonAccuracy() + ") too high for " + analyzerData.getAnalyzerFamily().toString());
                 parameters.setFragmentIonAccuracy(minimalAccuracy);
                 parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-            } else if (parameters.getFragmentIonAccuracy() > data.getFragmentMassError()) {
-                LOGGER.info("Remediating fragment accuracy to match " + data.getAnalyzerFamily().toString() + " analyzers.");
-                parameters.setFragmentIonAccuracy(data.getFragmentMassError());
+            } else if (parameters.getFragmentIonAccuracy() > analyzerData.getFragmentMassError()) {
+                LOGGER.info("Remediating fragment accuracy to match " + analyzerData.getAnalyzerFamily().toString() + " analyzers.");
+                parameters.setFragmentIonAccuracy(analyzerData.getFragmentMassError());
                 parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-                TotalReportGenerator.setFragmentAccMethod("Used annotated machine parameters : " + data.getAnalyzerFamily().toString());
+                TotalReportGenerator.setFragmentAccMethod("Used annotated machine parameters : " + analyzerData.getAnalyzerFamily().toString());
             }
 
         }
@@ -236,7 +258,6 @@ public class ParameterExtractor {
             LOGGER.warn("Could not retrieve analyzer data from pride webservice.");
         }
         return analyzerData;
-
     }
 
     /*

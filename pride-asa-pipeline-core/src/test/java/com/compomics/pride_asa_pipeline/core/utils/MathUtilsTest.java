@@ -104,8 +104,8 @@ public class MathUtilsTest {
 
     @Test
     public void testFactorial() {
-        long factorial = MathUtils.factorial(8);
-        assertEquals(40320, factorial);
+        BigInteger factorial = MathUtils.factorial(8);
+        assertEquals(40320, factorial.intValue());
     }
 
     @Test

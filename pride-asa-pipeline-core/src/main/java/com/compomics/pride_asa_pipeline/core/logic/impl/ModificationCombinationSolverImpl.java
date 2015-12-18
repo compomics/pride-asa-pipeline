@@ -46,9 +46,6 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
     @Override
     public Set<ModificationCombination> findModificationCombinations(Peptide peptide, int bagSize, double massToExplain, double deviation) {
         LOGGER.debug("Finding modifications for percursor: " + peptide.getSequenceString());
-        if(peptide.getSequenceString().equalsIgnoreCase("NFGIWLR")){
-            System.out.println("oooola");
-        }
         //check if we can increase the bag size (number of possible modifications) on this peptide
         //note: the max number of possible mods is: peptide length + 2, since each residue can hold
         //       one modification and there can be two additional terminal modifications.  

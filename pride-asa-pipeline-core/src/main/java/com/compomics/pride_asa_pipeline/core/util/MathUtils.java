@@ -34,7 +34,6 @@ public class MathUtils {
             return values.get(0);
         }
 
-
         double[] valueArray = toArray(values);
         return calculateMedian(valueArray);
     }
@@ -162,22 +161,17 @@ public class MathUtils {
      * @param n The integer number of which to compute the factorial.
      * @return The factorial number n!.
      */
-    public static long factorial(int n) {
-        // check that we have a number we can actually calculate the factorial for.
-        if (n < 0 || n > 20) {
-            throw new IllegalArgumentException("The factorial can only "
-                    + "be calculated for numbers n with 0 <= n <= 20 (currently n = " + n + "). Please try to consider less modifications.");
+    public static BigInteger factorial(int n) {
+        BigInteger f = BigInteger.ONE;              // long f = 1;
+        BigInteger g = BigInteger.valueOf(n);       // int n
+
+        while (g.compareTo(BigInteger.ONE) == 1) {  // while (n > 1) {
+            f = f.multiply(g);                      // f *= n;
+            g = g.subtract(BigInteger.ONE);         // n--;
         }
-        // handle the trivial cases
-        if (n == 0 || n == 1) {
-            return 1;
-        }
-        // calculate the factorial
-        long f = 1;
-        for (int i = 2; i <= n; i++) {
-            f *= i;
-        }
+
         return f;
+
     }
 
     /**

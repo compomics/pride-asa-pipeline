@@ -45,11 +45,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         for (Modification modification : modificationCombination.getUniqueModifications()) {
             //get the number of occurances of the current modification type in the ModificationCombination
             int occurances = getNumberOfOccurances(modificationCombination, modification);
-            try {
-                modifiedPeptidesByModifications.add(variateModification(precursor, modification, occurances));
-            } catch (IllegalStateException e) {
-                LOGGER.warn("Modification :" + modification.getName() + " will be skipped : ", e);
-            }
+            modifiedPeptidesByModifications.add(variateModification(precursor, modification, occurances));
         }
 
         //now combine the variation sets for each modification type into a set of variations
@@ -158,9 +154,11 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                             break; //no need to check the other residues
                         }
                     } else //m2 not null, so the first modified peptide carries a modification here
-                     if (m2 != null) {
+                    {
+                        if (m2 != null) {
                             combinedModifiedPeptide.setNTModification(i, m2);
                         }
+                    }
                 }
 
                 //check that we have a sensible combination (e.g. not null and at least one modification)
@@ -229,7 +227,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                             }
                         }
                         result.add(modifiedPeptide);
-                    } else {
+                    } else  {
                         //we have more affectable locations than actual number of modifications
                         //so we have to compute the possible combinations.
 

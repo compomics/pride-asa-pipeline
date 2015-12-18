@@ -1,14 +1,14 @@
 package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.util.MathUtils;
+import java.math.BigInteger;
 import java.util.Iterator;
 
 /**
- * A class providing an iterator over all choices of a certain number
- * of elements from a given set. For a set S with n = |S|, there are
- * n!/(k!*(n-k)!) ways of choosing k elements from the set. This is
- * the number of possible samples when doing sampling without
- * replacement. Example:<br />
+ * A class providing an iterator over all choices of a certain number of
+ * elements from a given set. For a set S with n = |S|, there are n!/(k!*(n-k)!)
+ * ways of choosing k elements from the set. This is the number of possible
+ * samples when doing sampling without replacement. Example:<br />
  * <pre>
  * S = { A,B,C,D }, n = |S| = 4
  * k = 2
@@ -23,19 +23,22 @@ import java.util.Iterator;
  * [C, D]
  * </pre>
  *
- * from: http://www.java-forum.org/codeschnipsel-u-projekte/81973-combinatorics.html
+ * from:
+ * http://www.java-forum.org/codeschnipsel-u-projekte/81973-combinatorics.html
+ *
  * @author http://www.java-forum.org/members/Marco13.html
  *
  * related info: http://answers.google.com/answers/threadview/id/734129.html
  */
 public class ChoiceIterable<T> implements Iterable<T[]> {
+
     private T input[];
     private int sampleSize;
-    private long numElements;
+    private BigInteger numElements;
 
     /**
-     * Creates an iterable over all choices of 'sampleSize'
-     * elements taken from the given array.
+     * Creates an iterable over all choices of 'sampleSize' elements taken from
+     * the given array.
      *
      * @param sampleSize
      * @param input
@@ -43,39 +46,38 @@ public class ChoiceIterable<T> implements Iterable<T[]> {
     public ChoiceIterable(int sampleSize, T... input) {
         this.sampleSize = sampleSize;
         this.input = input.clone();
-
-        numElements = MathUtils.factorial(input.length) /
-                (MathUtils.factorial(sampleSize) * MathUtils.factorial(input.length - sampleSize));
+        numElements = MathUtils.factorial(input.length).divide(
+                (MathUtils.factorial(sampleSize).multiply(MathUtils.factorial(input.length - sampleSize))));
     }
 
     @Override
     public Iterator<T[]> iterator() {
         return new Iterator<T[]>() {
-            private int current = 0;
-            private int chosen[] = new int[sampleSize];
+            private BigInteger current = BigInteger.valueOf(0);
+            private final int chosen[] = new int[sampleSize];
 
             // Initialization of first choice
             { // initializer block
-                for (int i = 0; i < sampleSize; i++){
+                for (int i = 0; i < sampleSize; i++) {
                     chosen[i] = i;
                 }
             }
 
             @Override
             public boolean hasNext() {
-                return current < numElements;
+                return current.compareTo(numElements) == -1;
             }
 
             @Override
             public T[] next() {
                 @SuppressWarnings("unchecked")
                 T result[] = (T[]) java.lang.reflect.Array.newInstance(
-                    input.getClass().getComponentType(), sampleSize);
+                        input.getClass().getComponentType(), sampleSize);
                 for (int i = 0; i < sampleSize; i++) {
                     result[i] = input[chosen[i]];
                 }
-                current++;
-                if (current < numElements) {
+                current = current.add(BigInteger.ONE);
+                if (current.compareTo(numElements) == -1) {
                     increase(sampleSize - 1, input.length - 1);
                 }
                 return result;
@@ -110,11 +112,10 @@ public class ChoiceIterable<T> implements Iterable<T[]> {
             }
 
             @Override
-            public void remove(){
+            public void remove() {
                 throw new UnsupportedOperationException("May not remove elements from a choice");
             }
         };
     }
-
 
 }

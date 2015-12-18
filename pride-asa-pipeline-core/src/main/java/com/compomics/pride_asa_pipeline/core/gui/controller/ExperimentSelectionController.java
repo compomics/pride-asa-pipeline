@@ -495,7 +495,7 @@ public class ExperimentSelectionController {
 
         @Override
         protected Void doInBackground() throws Exception {
-            mainController.getCurrentSpectrumAnnotator().annotate();
+            mainController.getCurrentSpectrumAnnotator().annotate(getExperimentAccesion());
             SpectrumAnnotatorResult spectrumAnnotatorResult = mainController.getCurrentSpectrumAnnotator().getSpectrumAnnotatorResult();
             boolean writeResultToFile;
             if (mainController.getCurrentSpectrumAnnotator() instanceof FileSpectrumAnnotator) {
