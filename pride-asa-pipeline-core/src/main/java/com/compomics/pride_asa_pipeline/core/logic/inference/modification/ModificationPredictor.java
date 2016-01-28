@@ -58,7 +58,7 @@ public class ModificationPredictor {
     private String assay;
     private final ModificationHolder modificationHolder;
 
-    public ModificationPredictor(String assay,  ModificationHolder modificationHolder) {
+    public ModificationPredictor(String assay, ModificationHolder modificationHolder) {
         this.assay = assay;
         this.modificationHolder = modificationHolder;
         inferModifications();
@@ -88,25 +88,26 @@ public class ModificationPredictor {
             if (!unknownPTM.isEmpty()) {
                 LOGGER.info(aMod.getKey() + " is not a standard modification. Converting to utilities object");
                 PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
-                if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
-                    encounteredMasses.add(aUtilitiesMod.getRoundedMass());
-                    if (aMod.getValue()) {
-                        ptmSettings.addFixedModification(aUtilitiesMod);
+                if (!aUtilitiesMod.getName().toLowerCase().contains("unknown")) {
+                    if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
+                        encounteredMasses.add(aUtilitiesMod.getRoundedMass());
+                        if (aMod.getValue()) {
+                            ptmSettings.addFixedModification(aUtilitiesMod);
+                        } else {
+                            ptmSettings.addVariableModification(aUtilitiesMod);
+                        }
+
                     } else {
-                        ptmSettings.addVariableModification(aUtilitiesMod);
+                        LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
                     }
                 } else {
-                    LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
+                    LOGGER.info(aMod.getKey() + " was found in the default PTMs");
                 }
-            } else {
-                LOGGER.info(aMod.getKey() + " was found in the default PTMs");
             }
         }
         TotalReportGenerator.setPtmSettings(ptmSettings);
         TotalReportGenerator.setPtmSettingsMethod("Fragment mass error analysis");
     }
-
-
 
     public double getConsiderationThreshold() {
         return considerationThreshold;
