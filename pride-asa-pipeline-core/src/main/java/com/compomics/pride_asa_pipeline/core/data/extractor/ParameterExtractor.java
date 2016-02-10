@@ -8,13 +8,13 @@ import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.Precurs
 import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.FragmentIonErrorPredictor;
 import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.logic.inference.modification.ModificationPredictor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.InferenceReportGenerator;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.ContaminationReportGenerator;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.EnzymeReportGenerator;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.FragmentIonReporter;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.ModificationReportGenerator;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.PrecursorIonReporter;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.TotalReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.ExtractionReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.impl.ContaminationReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.impl.EnzymeReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.impl.FragmentIonReporter;
+import com.compomics.pride_asa_pipeline.core.util.report.impl.ModificationReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.impl.PrecursorIonReporter;
+import com.compomics.pride_asa_pipeline.core.util.report.impl.TotalReportGenerator;
 import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.UtilitiesPTMAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
@@ -82,15 +82,11 @@ public class ParameterExtractor {
      * @throws ParameterExtractionException when an error occurs
      */
     public ParameterExtractor(String assay,AnalyzerData analyzerData) throws ParameterExtractionException {
-        try {
             //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
             ApplicationContextProvider.getInstance().setDefaultApplicationContext();
             spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
             this.analyzerData=analyzerData;
             init(assay);
-        } catch (IOException | XmlPullParserException e) {
-            throw new ParameterExtractionException(e.getMessage());
-        }
     }
     /**
      * An extractor for parameters
@@ -99,17 +95,17 @@ public class ParameterExtractor {
      * @throws ParameterExtractionException when an error occurs
      */
     public ParameterExtractor(String assay) throws ParameterExtractionException {
-        try {
+  
             //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
             ApplicationContextProvider.getInstance().setDefaultApplicationContext();
             spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
             init(assay);
-        } catch (IOException | XmlPullParserException e) {
-            throw new ParameterExtractionException(e.getMessage());
-        }
+      
+           
+        
     }
 
-    private void init(String assay) throws IOException, XmlPullParserException {
+    private void init(String assay) throws ParameterExtractionException {
         //get assay
         try {
             FileSpectrumRepository fileSpectrumRepository = new FileSpectrumRepository(assay);
@@ -192,8 +188,8 @@ public class ParameterExtractor {
                 TotalReportGenerator.setPrecursorAcc(parameters.getPrecursorAccuracy());
             }
         } catch (Exception e) {
-            LOGGER.error("Something went wrong : ", e);
-            useDefaults(assay);
+              // useDefaults(assay);
+                 throw new ParameterExtractionException(e);
         }
     }
 
@@ -267,8 +263,8 @@ public class ParameterExtractor {
         return parameters;
     }
 
-    public List<InferenceReportGenerator> getReportGenerators() {
-        List<InferenceReportGenerator> reportGenerators = new ArrayList<>();
+    public List<ExtractionReportGenerator> getReportGenerators() {
+        List<ExtractionReportGenerator> reportGenerators = new ArrayList<>();
         reportGenerators.add(new EnzymeReportGenerator(enzymePredictor));
         reportGenerators.add(new FragmentIonReporter(fragmentIonErrorPredictor));
         reportGenerators.add(new PrecursorIonReporter(precursorIonErrorPredictor));
@@ -280,14 +276,14 @@ public class ParameterExtractor {
     }
 
     public void printReports() throws IOException {
-        for (InferenceReportGenerator reportGenerator : getReportGenerators()) {
+        for (ExtractionReportGenerator reportGenerator : getReportGenerators()) {
             reportGenerator.writeReport(System.out);
         }
     }
 
     public void printReports(File outputFolder) throws IOException {
         if (printableReports) {
-            for (InferenceReportGenerator reportGenerator : getReportGenerators()) {
+            for (ExtractionReportGenerator reportGenerator : getReportGenerators()) {
                 LOGGER.info("Exporting " + reportGenerator.getReportName());
                 File outputFile = new File(outputFolder, reportGenerator.getReportName());
                 try (FileOutputStream out = new FileOutputStream(outputFile)) {

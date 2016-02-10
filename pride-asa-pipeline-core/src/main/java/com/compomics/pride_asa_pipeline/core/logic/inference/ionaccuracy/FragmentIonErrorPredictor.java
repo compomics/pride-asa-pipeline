@@ -3,7 +3,7 @@ package com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy;
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
 import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.massdeficit.logic.AminoAcidMassInference;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.TotalReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.impl.TotalReportGenerator;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.util.experiment.identification.matches.ModificationMatch;
 import java.io.IOException;

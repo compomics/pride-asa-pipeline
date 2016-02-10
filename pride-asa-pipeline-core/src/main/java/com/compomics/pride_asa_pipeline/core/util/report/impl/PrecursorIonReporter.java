@@ -1,7 +1,7 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.report.impl;
+package com.compomics.pride_asa_pipeline.core.util.report.impl;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.PrecursorIonErrorPredictor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.InferenceReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.ExtractionReportGenerator;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter;
  *
  * @author Kenneth
  */
-public class PrecursorIonReporter extends InferenceReportGenerator {
+public class PrecursorIonReporter extends ExtractionReportGenerator {
 
     private final PrecursorIonErrorPredictor predictor;
 

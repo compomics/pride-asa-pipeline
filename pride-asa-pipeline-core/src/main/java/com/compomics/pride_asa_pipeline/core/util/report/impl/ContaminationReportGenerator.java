@@ -1,8 +1,8 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.report.impl;
+package com.compomics.pride_asa_pipeline.core.util.report.impl;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants.Contamination;
 import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants.MassScanResult;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.InferenceReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.ExtractionReportGenerator;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
@@ -10,7 +10,7 @@ import java.io.OutputStreamWriter;
  *
  * @author compomics
  */
-public class ContaminationReportGenerator extends InferenceReportGenerator {
+public class ContaminationReportGenerator extends ExtractionReportGenerator {
 
     private final double precursorTolerance;
     private final double fragmentTolerance;

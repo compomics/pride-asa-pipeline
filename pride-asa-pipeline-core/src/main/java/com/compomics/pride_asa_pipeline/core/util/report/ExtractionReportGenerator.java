@@ -1,4 +1,4 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.report;
+package com.compomics.pride_asa_pipeline.core.util.report;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -8,7 +8,7 @@ import java.io.OutputStreamWriter;
  *
  * @author Kenneth
  */
-public abstract class InferenceReportGenerator {
+public abstract class ExtractionReportGenerator {
 
     public String getReportName(){
         return this.getClass().getName().replace("com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.","")+".report.tsv";

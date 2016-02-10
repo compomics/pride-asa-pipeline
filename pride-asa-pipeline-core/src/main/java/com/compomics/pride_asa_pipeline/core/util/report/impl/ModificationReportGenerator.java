@@ -1,7 +1,7 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.report.impl;
+package com.compomics.pride_asa_pipeline.core.util.report.impl;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.modification.ModificationPredictor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.InferenceReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.ExtractionReportGenerator;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author Kenneth
  */
-public class ModificationReportGenerator extends InferenceReportGenerator {
+public class ModificationReportGenerator extends ExtractionReportGenerator {
 
     private final ModificationPredictor predictor;
 

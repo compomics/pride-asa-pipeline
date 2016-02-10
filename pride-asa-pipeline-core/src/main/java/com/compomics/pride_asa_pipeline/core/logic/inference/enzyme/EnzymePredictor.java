@@ -1,7 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.logic.inference.enzyme;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.TotalReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.impl.TotalReportGenerator;
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;
 import java.io.File;

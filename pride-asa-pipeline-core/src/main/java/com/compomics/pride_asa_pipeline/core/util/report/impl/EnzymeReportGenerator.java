@@ -1,7 +1,7 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.report.impl;
+package com.compomics.pride_asa_pipeline.core.util.report.impl;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.enzyme.EnzymePredictor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.InferenceReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.ExtractionReportGenerator;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * @author Kenneth
  */
-public class EnzymeReportGenerator extends InferenceReportGenerator {
+public class EnzymeReportGenerator extends ExtractionReportGenerator {
 
     private final EnzymePredictor predictor;
 

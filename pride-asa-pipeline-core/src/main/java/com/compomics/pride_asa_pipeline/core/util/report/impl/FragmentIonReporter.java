@@ -1,9 +1,9 @@
-package com.compomics.pride_asa_pipeline.core.logic.inference.report.impl;
+package com.compomics.pride_asa_pipeline.core.util.report.impl;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.FragmentIonErrorPredictor;
 import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.massdeficit.logic.AminoAcidMassInference;
 import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.massdeficit.model.MassDeficitResult;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.InferenceReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.ExtractionReportGenerator;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter;
  *
  * @author Kenneth
  */
-public class FragmentIonReporter extends InferenceReportGenerator {
+public class FragmentIonReporter extends ExtractionReportGenerator {
 
     private final FragmentIonErrorPredictor predictor;
 

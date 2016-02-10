@@ -1,6 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.logic.inference;
 
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.TotalReportGenerator;
+import com.compomics.pride_asa_pipeline.core.util.report.impl.TotalReportGenerator;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

@@ -1,6 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.data.extractor;
 
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.core.util.report.impl.TotalReportGenerator;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -133,16 +134,20 @@ public class MGFExtractor {
                         asMgf(spectrum, bw);
                         rw.append("VALIDATED" + System.lineSeparator());
                         validSpectrumCount++;
+                        TotalReportGenerator.addSpectrum(spectrum);
                     } else {
+                        TotalReportGenerator.addFailedSpectrum(aSpectrumId, "Reported spectrum by reader not found in file");
                         rw.append("\tNOT FOUND" + System.lineSeparator()).flush();
                     }
                 } catch (MGFExtractionException | TimeoutException e) {
                     LOGGER.error(e);
+                    TotalReportGenerator.addFailedSpectrum(aSpectrumId, e.getMessage());
                     rw.append("\t" + e.getMessage() + System.lineSeparator()).flush();
                 }
             }
             rw.append("Total usable \t" + validSpectrumCount + System.lineSeparator()).flush();
         } catch (Exception ex) {
+            ex.printStackTrace();
             LOGGER.error(ex);
         }
         LOGGER.info("Extraction completed");
@@ -150,7 +155,8 @@ public class MGFExtractor {
     }
 
     /**
-     * Writes the given spectrum to the buffered writer.
+     * Writes the given spectrum to the buffered writer and adds it to a total
+     * report.
      *
      * @param spectrum the input spectrum object
      * @param bw the writer to export the mgf to
