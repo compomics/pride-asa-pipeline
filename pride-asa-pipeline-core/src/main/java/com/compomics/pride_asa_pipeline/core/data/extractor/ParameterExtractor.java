@@ -99,15 +99,13 @@ public class ParameterExtractor {
             //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
             ApplicationContextProvider.getInstance().setDefaultApplicationContext();
             spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
-            init(assay);
-      
-           
-        
+            init(assay);    
     }
 
     private void init(String assay) throws ParameterExtractionException {
         //get assay
         try {
+            TotalReportGenerator.setAssay(assay);
             FileSpectrumRepository fileSpectrumRepository = new FileSpectrumRepository(assay);
             ((DbSpectrumServiceImpl) spectrumAnnotator.getSpectrumService()).setSpectrumRepository(new FileSpectrumRepository(assay));
             ((DbModificationServiceImpl) spectrumAnnotator.getModificationService()).setModificationRepository(new FileModificationRepository(assay));
@@ -189,6 +187,7 @@ public class ParameterExtractor {
             }
         } catch (Exception e) {
               // useDefaults(assay);
+              e.printStackTrace();
                  throw new ParameterExtractionException(e);
         }
     }

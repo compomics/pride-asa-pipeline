@@ -2,13 +2,17 @@ package com.compomics.pride_asa_pipeline.core.model.modification.impl;
 
 import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.PRIDEModification;
+import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
 import com.compomics.util.experiment.biology.AminoAcidPattern;
 import com.compomics.util.experiment.biology.Atom;
 import com.compomics.util.experiment.biology.AtomChain;
 import com.compomics.util.experiment.biology.AtomImpl;
 import com.compomics.util.experiment.biology.PTM;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
@@ -35,17 +39,13 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
      */
     private AtomChain decreaseMassChain = new AtomChain();
     /**
-     * The regex pattern for atoms
+     * A standard pattern for chemical formula
      */
-    private static final Pattern atomPattern = Pattern.compile("[A-Z][a-z]*\\d*");
+    private static final Pattern pattern1 = Pattern.compile("\\s?\\(?[1-9]*\\)?[A-Z][a-z]?\\s?\\(?-?[1-9]*\\)?[1-9]*?.");
     /**
-     * The regex pattern for isotopes
+     * A standard pattern for unresolved atoms
      */
-    private static final Pattern isotopePattern = Pattern.compile("[0-9]*[^A-Z]*[0-9]");
-    /**
-     * The regex pattern for atypical pride formulatae
-     */
-    private static final Pattern prideFormatPattern = Pattern.compile("([A-Z][a-z]?[0-9]?\\s[0-9]*)");
+    private static final Pattern pattern2 = Pattern.compile("[A-Z][a-z]?\\s[A-Z][a-z]?");
     /**
      * A logger
      */
@@ -59,11 +59,16 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
         LOGGER.debug("Getting target residues");
         fetchTargetResidues(mod);
         LOGGER.debug("Parsing PTM composition");
-        parseFormula(mod.getFormula(), " ");
+        parseFormula(mod.getFormula());
         AminoAcidPattern pattern = new AminoAcidPattern(targetResiduesString);
         LOGGER.debug("Inferring modification type");
         int type = getModType(mod);
-        return new PTM(type, mod.getName(), mod.getAccession(), increaseMassChain, decreaseMassChain, pattern);
+        //check if the mass can be correctly retrieved, if not then throw a conversionexception???
+        PTM ptm = new PTM(type, mod.getName(), mod.getAccession(), increaseMassChain, decreaseMassChain, pattern);
+        ptm.getMass();
+        //check that the modifications are not just substitutions and remove the amino acid mass if applicable
+        checkSubstitutions(mod, ptm);
+        return ptm;
     }
 
     private void fetchTargetResidues(uk.ac.ebi.pridemod.model.PTM ptm) {
@@ -128,142 +133,163 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
         }
     }
 
-    public static void main(String[] args) {
-        UtilitiesPTMAdapter adapter = new UtilitiesPTMAdapter();
-        String formula = "H(2) C(2) O";
-        adapter.parseFormula(formula, " ");
-        System.out.println(adapter.increaseMassChain.getMass());
-        System.out.println(adapter.decreaseMassChain.getMass());
-        formula = "H C N O";
-        adapter.parseFormula(formula, " ");
-        System.out.println(adapter.increaseMassChain.getMass());
-        System.out.println(adapter.decreaseMassChain.getMass());
-        formula = "C6 H12 O6";
-        adapter.parseFormula(formula, " ");
-        System.out.println(adapter.increaseMassChain.getMass());
-        System.out.println(adapter.decreaseMassChain.getMass());
-    }
-
-    private void parseFormula(String formula, String atomSeparator) {
-        LOGGER.info("Converting " + formula);
-        if (formula != null && !formula.equalsIgnoreCase("none")) {
-            if (formula.length() == 1) {
-                AtomImpl atom;
-                atom = new AtomImpl(Atom.getAtom(formula), 0);
-                increaseMassChain.append(atom, 1);
-            } else if (!formula.contains("(")) {
-                parseFormulaPRIDEFormat(formula);
-            } else {
-                //preprocess formula...
-                formula = formula.toUpperCase()
-                        .replace("METH", "C(1)H(3)")
-                        .replace("ETH", "C(2)H(5)")
-                        .replace("PROP", "C(3)H(7)")
-                        .replace("BUT", "C(4)H(9)")
-                        .replace("PENT", "C(5)H(11)")
-                        .replace("HEX", "C(6)H(13)")
-                        .replace("HEPT", "C(7)H(15)")
-                        .replace("OCT", "C(8)H(17)")
-                        .replace("NON", "C(9)H(19)")
-                        .replace("DEC", "C(10)H(21)")
-                        .replace("(", "")
-                        .replace(")", "");
-                String[] compounds = formula.split(atomSeparator);
-
-                for (int compoundIndex = 0; compoundIndex < compounds.length; compoundIndex++) {
-                    //put the isotope ints seperatly
-                    String aCompound = compounds[compoundIndex];
-                    String isotope = "0";
-                    int i = 0;
-                    char currentChar;
-                    while (compoundIndex < aCompound.length()) {
-                        currentChar = aCompound.charAt(i);
-                        if (!Character.isDigit(currentChar)) {
-                            break;
-                        } else {
-                            isotope += currentChar;
-                        }
-                        i++;
-                    }
-                    //put the atom ints seperatly
-                    String currentAtom = "";
-                    while (i < aCompound.length()) {
-                        currentChar = aCompound.charAt(i);
-                        if (!Character.isAlphabetic(currentChar)) {
-                            break;
-                        } else {
-                            currentAtom += currentChar;
-                        }
-                        i++;
-                    }
-                    int compoundOccurence = 1;
-                    if (compoundIndex + 1 < compounds.length) {
-                        if (isInteger(compounds[compoundIndex + 1])) {
-                            compoundIndex++;
-                            compoundOccurence = Integer.parseInt(compounds[compoundIndex]);
-                        }
-                    }
-                    AtomImpl atom;
-                    if (!currentAtom.isEmpty()) {
-                        atom = new AtomImpl(Atom.getAtom(currentAtom), Integer.parseInt(isotope));
-                        if (compoundOccurence > 0) {
-                            increaseMassChain.append(atom, compoundOccurence);
-                        } else {
-                            decreaseMassChain.append(atom, Math.abs(compoundOccurence));
-                        }
-                    }
+    private void checkSubstitutions(PRIDEModification pridePTM, PTM convertedPTM) {
+        if (pridePTM.getSpecificityCollection().size() == 1) {
+            //this will only work if there is but a single amino acid target
+            String prideAminoAcidName = pridePTM.getSpecificityCollection().get(0).getName().toString();
+            com.compomics.util.experiment.biology.AminoAcid aminoAcid = com.compomics.util.experiment.biology.AminoAcid.getAminoAcid(prideAminoAcidName);
+            AtomChain newChain = new AtomChain();
+            AtomChain atomPTM = convertedPTM.getAtomChainAdded();
+            AtomChain atomAA = aminoAcid.getMonoisotopicAtomChain();
+            HashMap<String, Integer> occurenceMap = new HashMap<>();
+            for (AtomImpl atom : atomAA.getAtomChain()) {
+                occurenceMap.put(atom.getAtom().getLetter(), occurenceMap.getOrDefault(atom.getAtom().getLetter(), 0) - 1);
+            }
+            for (AtomImpl atom : atomPTM.getAtomChain()) {
+                occurenceMap.put(atom.getAtom().getLetter(), occurenceMap.getOrDefault(atom.getAtom().getLetter(), 0) + 1);
+            }
+            //then you're left with only the positive ones...(in theory)
+            for (Map.Entry<String, Integer> atom : occurenceMap.entrySet()) {
+                if (atom.getValue() > 0) {
+                    AtomImpl temp = new AtomImpl(Atom.getAtom(atom.getKey()), 0);
+                    newChain.append(temp, atom.getValue());
                 }
             }
-        } else {
-            throw new IllegalArgumentException("Could not find chemical formula for this modification");
+            convertedPTM.setAtomChainAdded(newChain);
         }
     }
 
-    private boolean isInteger(String compound) {
-        try {
-            Integer.parseInt(compound);
-        } catch (NumberFormatException | NullPointerException e) {
-            return false;
-        }
-        return true;
-    }   
-    
-    private void parseFormulaPRIDEFormat(String formula) {
-        //preprocess formula...
-        formula = formula.toUpperCase()
-                .replace("METH", "C 1 H 3")
-                .replace("ETH", "C 2 H 5")
-                .replace("PROP", "C 3 H 7")
-                .replace("BUT", "C 4 H 9")
-                .replace("PENT", "C 5 H 11")
-                .replace("HEX", "C 6 H 13")
-                .replace("HEPT", "C 7 H 15")
-                .replace("OCT", "C 8 H 17")
-                .replace("NON", "C 9 H 19")
-                .replace("DEC", "C 10 H 21");
-        Matcher atomMatcher = prideFormatPattern.matcher(formula);
-        if (atomMatcher.find()) {
-            String aCompound = atomMatcher.group();
-            String[] split = aCompound.split(" ");
-            Matcher isotopeMatcher = isotopePattern.matcher(split[0]);
-//check if it contains an isotope? (for example C1 or 2H)
-            int isotope = 0;
-            if (isotopeMatcher.matches()) {
-                isotope = Integer.parseInt(isotopeMatcher.group());
-            }
-            int compoundOccurence = 1;
-            if (aCompound.contains("(")) {
-                compoundOccurence = Integer.parseInt(split[1]);
-            }
-            AtomImpl atom;
-            atom = new AtomImpl(Atom.getAtom(split[0]), isotope);
-            if (compoundOccurence > 0) {
-                increaseMassChain.append(atom, compoundOccurence);
+    public static void main(String[] args) {
+        UtilitiesPTMAdapter adapter = new UtilitiesPTMAdapter();
+        PRIDEModificationFactory instance = PRIDEModificationFactory.getInstance();
+        LinkedHashMap<String, PRIDEModification> modificationMap = instance.getModificationMap();
+        double coverage = 0;
+        for (Map.Entry<String, PRIDEModification> aMod : modificationMap.entrySet()) {
+            if (aMod.getValue().getFormula().equals("none")) {
+                coverage++;
+            } else if (pattern1.matcher(aMod.getValue().getFormula()).find()) {
+                try {
+                    PTM convertModification = adapter.convertModification(aMod.getValue());
+                    System.out.println(aMod.getKey() + "\t" + aMod.getValue().getFormula() + "\tUniMod mass:" + aMod.getValue().getAveDeltaMass() + "\tCalculatedMass\t" + convertModification.getRoundedMass());
+                    coverage++;
+                } catch (UnsupportedOperationException | IllegalArgumentException | NullPointerException e) {
+                    System.out.println(aMod.getKey() + "\t" + aMod.getValue().getFormula() + " could be parsed, but is not compatible with utilities : " + e.getMessage()
+                    );
+                }
             } else {
-                decreaseMassChain.append(atom, Math.abs(compoundOccurence));
+                System.out.println(aMod.getKey() + "\t" + aMod.getValue().getFormula() + " can not be parsed");
             }
-        } else {
-            throw new IllegalArgumentException("Can not parse chemical formula :" + formula);
+        }
+        System.out.println(100 * coverage / modificationMap.size() + " %");
+    }
+
+    private void parseFormula(String formula) {
+        //replace the sugars in the formula?
+        formula = formula.toUpperCase()
+                .replace("METH", " C(1) H(3)")
+                .replace("ETH", " C(2) H(5)")
+                .replace("AC", " C(2) H(5)")
+                .replace("NAC", " N C(2) H(5)")
+                .replace("PROP", " C(3) H(7)")
+                .replace("BUT", " C(4) H(9)")
+                .replace("PENT", " C(5) H(11)")
+                .replace("HEX", " C(6) H(13)")
+                .replace("HEPT", " C(7) H(15)")
+                .replace("OCT", " C(8) H(17)")
+                .replace("NON", " C(9) H(19)")
+                .replace("DEC", " C(10) H(21)");
+        Matcher matcher = pattern1.matcher(formula);
+        while (matcher.find()) {
+            String atomSection = matcher.group(0);
+            Matcher subMatcher = pattern2.matcher(atomSection);
+            if (subMatcher.find()) {
+                String[] atomSections = subMatcher.group(0).split(" ");
+                for (String anAtomSection : atomSections) {
+                    constructMassForPTM(formula, anAtomSection);
+                }
+            } else {
+                constructMassForPTM(formula, atomSection);
+            }
         }
     }
+
+    private void constructMassForPTM(String formula, String atomSection) {
+        //check this atomSection against the other regex, split them up if it is the case...
+        int index = 0;
+        //any integer in front of the atom is an isotope
+        char[] toCharArray = atomSection.toCharArray();
+        int isotope = 0;
+        if (Character.isDigit(toCharArray[0]) || toCharArray[0] == '(') {
+            String isotopeString = "";
+            while (index < toCharArray.length && Character.isDigit(toCharArray[index])) {
+                isotopeString += toCharArray[index];
+                index++;
+            }
+            isotope = Integer.parseInt(isotopeString.trim().replace("(", ""));
+        }
+
+        //The atom can be multiple letters...
+        String atomString = "";
+        while (index < toCharArray.length && Character.isAlphabetic(toCharArray[index])) {
+            atomString += toCharArray[index];
+            index++;
+        }
+        //check for deuterium
+        if (atomString.equalsIgnoreCase("D")) {
+            atomString = "H";
+            isotope = 2;
+        }
+        //any number following (between brackets or after a space?) is the count
+        int count = 1;
+        if (index < toCharArray.length && (toCharArray[index] == ' ' || toCharArray[index] == '(')) {
+            String occurenceString = "";
+            index++;
+            if (index < toCharArray.length) {
+                if (toCharArray[index] == '-') {
+                    occurenceString += '-';
+                    index++;
+                }
+                while (index < toCharArray.length && Character.isDigit(toCharArray[index])) {
+                    occurenceString += toCharArray[index];
+                    index++;
+                }
+                if (!occurenceString.isEmpty()) {
+                    count = Integer.parseInt(occurenceString);
+                }
+            }
+        }
+        if (!atomString.isEmpty()) {
+            //append to the modification
+            //reformat atom after the replacement for sugars and organic short names
+            atomString = atomString.substring(0, 1).toUpperCase() + atomString.substring(1).toLowerCase();
+
+            Atom utilitiesAtom = Atom.getAtom(atomString);
+            //the utilities isotope is the difference of the noted isotope with the monoisotopic mass...
+            if (isotope != 0) {
+                isotope = Math.abs((int) (isotope - utilitiesAtom.getMonoisotopicMass()));
+            }
+            ArrayList<Integer> implementedIsotopes = utilitiesAtom.getImplementedIsotopes();
+            //check if the isotope is in the mapping?
+            if (isotope == 0 || implementedIsotopes.contains(isotope)) {
+                if (utilitiesAtom == null) {
+                    //how to handle this?
+                    System.out.println("Whoops");
+                } else {
+                    AtomImpl impl = new AtomImpl(utilitiesAtom, isotope);
+                    if (count > 0) {
+                        increaseMassChain.append(impl, count);
+                    } else {
+                        decreaseMassChain.append(impl, Math.abs(count));
+                    }
+                }
+            } else {
+                String isotopeMessage = "";
+                for (int s : implementedIsotopes) {
+                    isotopeMessage += s + ",\t";
+                }
+                throw new UnsupportedOperationException(formula + "\t : " + isotope + " is not a known isotope in the implementation :" + isotopeMessage.substring(0, isotopeMessage.length() - 2));
+            }
+        }
+    }
+
 }

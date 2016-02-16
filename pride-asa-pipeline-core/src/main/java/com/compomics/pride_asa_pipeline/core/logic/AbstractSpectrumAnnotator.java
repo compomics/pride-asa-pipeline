@@ -93,6 +93,8 @@ public abstract class AbstractSpectrumAnnotator<T> {
     protected PipelineModificationService pipelineModificationService;
     protected ModificationService modificationService;
     private int MAX_PASS_SIZE = 6;
+    private int MAX_PASSES = 6;
+    private double explanationCriterion = 0.60;
     private ArrayBlockingQueue<Modification> modQueue;
 
     /**
@@ -212,8 +214,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         int totalExplained = 0;
         int pass = 1;
         double explanationRatio = 0.0;
-
-        while ((nextModificationSet = getNextModificationSet()) != null) {
+        while (((nextModificationSet = getNextModificationSet()) != null) && pass <= MAX_PASSES) {
             SpectrumAnnotatorResult tempSpectrumAnnotatorResult = new SpectrumAnnotatorResult();
             tempSpectrumAnnotatorResult.setMassRecalibrationResult(spectrumAnnotatorResult.getMassRecalibrationResult());
             LOGGER.info("Going through " + pass + "th pass.");
@@ -222,11 +223,12 @@ public abstract class AbstractSpectrumAnnotator<T> {
             annotate(tempModificationHolder, completeIdentifications, identificationsToProcess, tempSpectrumAnnotatorResult);
             totalExplained = totalSize - identificationsToProcess.size();
             completeIdentifications = identificationsToProcess;
+            LOGGER.info("Still need to annotate " + completeIdentifications.size() + " identifications");
             identificationsToProcess = new ArrayList<>(completeIdentifications);
             explanationRatio = (double) totalExplained / totalSize;
             LOGGER.info("Explanationratio is currently " + explanationRatio);
-            if (explanationRatio > 0.9) {
-                LOGGER.info("90% of identifications were identified, moving on");
+            if (explanationRatio > explanationCriterion) {
+                LOGGER.info(100 * explanationCriterion + "% of identifications were identified, moving on");
                 break;
             } else {
                 Map<Modification, Double> estimateModificationRate = modificationService.estimateModificationRate(modificationService.getUsedModifications(tempSpectrumAnnotatorResult),
@@ -237,6 +239,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 }
                 pass++;
             }
+            System.out.println(tempSpectrumAnnotatorResult.getMassRecalibrationResult().toString());
         }
         //filter out only the ones that are most relevant (top 6 or using a consideration threshold)...
         InferenceStatistics stats = new InferenceStatistics(totalModificationRates.values(), false);
@@ -322,10 +325,10 @@ public abstract class AbstractSpectrumAnnotator<T> {
         ///////////////////////////////////////////////////////////////////////
         //SECOND STEP: find all the modification combinations that could
         //              explain a given mass delta (if there is one) -> Zen Archer
-        LOGGER.debug("finding modification combinations..;");
+        LOGGER.info("finding modification combinations..;");
         //set fragment mass error for the identification scorer
         Map<Identification, Set<ModificationCombination>> massDeltaExplanationsMap = findModificationCombinations(modificationHolder, spectrumAnnotatorResult.getMassRecalibrationResult(), completeIdentifications);
-        LOGGER.debug("Finished finding modification combinations");
+        LOGGER.info("Finished finding modification combinations");
 
         //the returned possibleExplanations map will contain all precursors for which a
         //possible explanation was found or which do not need to be explained (e.g. the
@@ -334,7 +337,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         //modification, but nevertheless could not be explained!
         int explainedIdentificationsSize = massDeltaExplanationsMap.size();
         int completeIdentificationsSize = completeIdentifications.size();
-        LOGGER.debug("Precursors for which no modification combination could be found: " + (completeIdentificationsSize - explainedIdentificationsSize));
+        LOGGER.info("Precursors for which no modification combination could be found: " + (completeIdentificationsSize - explainedIdentificationsSize));
         List<Identification> unexplainedIdentifications = getUnexplainedIdentifications(completeIdentifications, massDeltaExplanationsMap.keySet());
         spectrumAnnotatorResult.setUnexplainedIdentifications(unexplainedIdentifications);
         //create new map with only the precursors that carry a significant mass delta
@@ -356,8 +359,8 @@ public abstract class AbstractSpectrumAnnotator<T> {
             }
         }
         spectrumAnnotatorResult.setUnmodifiedPrecursors(unmodifiedPrecursors);
-        LOGGER.debug("Precursors with possible modification(s): " + significantMassDeltaExplanationsMap.size());
-        LOGGER.debug("Precursors with mass delta smaller than mass error (probably unmodified): " + unmodifiedPrecursors.size());
+        LOGGER.info("Precursors with possible modification(s): " + significantMassDeltaExplanationsMap.size());
+        LOGGER.info("Precursors with mass delta smaller than mass error (probably unmodified): " + unmodifiedPrecursors.size());
 
         ///////////////////////////////////////////////////////////////////////
         //THIRD STEP:  find all possible precursor variations (taking all
@@ -367,10 +370,10 @@ public abstract class AbstractSpectrumAnnotator<T> {
         //ToDo: is best suitable to explain a spectrum.
         //ToDo: Maybe looking at the spectrum early on to eliminate some combinations or
         //ToDo: to get ideas about likely explanations would help?
-        LOGGER.debug("finding precursor variations");
+        LOGGER.info("finding precursor variations");
 
         Map<Identification, Set<ModifiedPeptide>> modifiedPrecursorVariations = findPrecursorVariations(significantMassDeltaExplanationsMap);
-        LOGGER.debug("finished finding precursor variations");
+        LOGGER.info("finished finding precursor variations");
         //For each of these 'variations' we then calculate all possible fragment ions.
 
         ///////////////////////////////////////////////////////////////////////
@@ -379,7 +382,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         //               which one is the best 'explanation'
         LOGGER.info("finding best matches");
         List<Identification> modifiedPrecursors = findBestMatches(modifiedPrecursorVariations);
-        LOGGER.debug("finished finding best matches");
+        LOGGER.info("finished finding best matches");
         spectrumAnnotatorResult.setModifiedPrecursors(modifiedPrecursors);
         //remove all these from the list to process
         identificationsToProcess.removeAll(modifiedPrecursors);
@@ -463,7 +466,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             Set<ModifiedPeptide> precursorVariationsSet = peptideVariationsGenerator.generateVariations(identification.getPeptide(), modifications);
             precursorVariations.put(identification, precursorVariationsSet);
         }
-        LOGGER.debug("Peptide variations found for " + precursorVariations.size() + " peptides.");
+        LOGGER.info("Peptide variations found for " + precursorVariations.size() + " peptides.");
 
         return precursorVariations;
     }

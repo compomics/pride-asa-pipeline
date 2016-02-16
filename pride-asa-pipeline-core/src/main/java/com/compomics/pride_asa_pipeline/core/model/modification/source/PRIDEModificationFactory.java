@@ -136,9 +136,17 @@ public class PRIDEModificationFactory {
      * adapter
      */
     public Object getModification(ModificationAdapter adapter, String ptmName) {
-        return adapter.convertModification(modificationNameMap.get(ptmName));
+        return adapter.convertModification(modificationNameMap.get(refactorName(ptmName)));
     }
 
+    //THIS METHOD HAS TO DISSAPEAR OVER TIME, IT IS PURELY MAPPING THAT IS NOT YET IN COMPOMICS UTILITIES
+    private String refactorName(String ptmName) {
+        if (ptmName.equalsIgnoreCase("iodoacetamide -site C")) {
+            return "iodoacetamide - site C";
+        }
+        return ptmName;
+    }
+    
     /**
      * Returns an instance of a converted modification using the provided
      * adapter

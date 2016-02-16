@@ -42,7 +42,7 @@ public class ModificationPredictor {
      *
      * @ToDo everything should be variable?
      */
-    private final double fixedThreshold = 0.99;
+    private final double fixedThreshold = 0.90;
     /**
      * The rates in which modifications occur on the provided identifications
      */
@@ -57,17 +57,17 @@ public class ModificationPredictor {
     private final List<Integer> quantAccessions = Arrays.asList(new Integer[]{258, 259, 267, 367, 687, 365, 866, 730, 532, 730, 533, 731, 739, 738, 737, 984, 985, 1341, 1342});
     private String assay;
     private final ModificationHolder modificationHolder;
-
+    
     public ModificationPredictor(String assay, ModificationHolder modificationHolder) {
         this.assay = assay;
         this.modificationHolder = modificationHolder;
         inferModifications();
     }
-
+    
     private void inferModifications() {
         LOGGER.info("Inferring modifications...");
         HashMap<String, Boolean> asapMods = new HashMap<>();
-
+        
         ModificationAdapter adapter = new UtilitiesPTMAdapter();
         ptmSettings = new PtmSettings();
         //make sure the annotated mods are in there as well
@@ -83,46 +83,51 @@ public class ModificationPredictor {
         //and add the new ones
         HashSet<Double> encounteredMasses = new HashSet<>();
         for (Map.Entry<String, Boolean> aMod : asapMods.entrySet()) {
-            ArrayList<String> unknownPTM = new ArrayList<>();
-            PTMFactory.getInstance().convertPridePtm(aMod.getKey(), ptmSettings, unknownPTM, false);
-            if (!unknownPTM.isEmpty()) {
-                LOGGER.info(aMod.getKey() + " is not a standard modification. Converting to utilities object");
-                PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
-                if (!aUtilitiesMod.getName().toLowerCase().contains("unknown")) {
-                    if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
-                        encounteredMasses.add(aUtilitiesMod.getRoundedMass());
-                        if (aMod.getValue()) {
-                            ptmSettings.addFixedModification(aUtilitiesMod);
+            try {
+                ArrayList<String> unknownPTM = new ArrayList<>();
+                PTMFactory.getInstance().convertPridePtm(aMod.getKey(), ptmSettings, unknownPTM, false);
+                if (!unknownPTM.isEmpty()) {
+                    LOGGER.info(aMod.getKey() + " is not a standard modification. Converting to utilities object");
+                    PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
+                    if (!aUtilitiesMod.getName().toLowerCase().contains("unknown")) {
+                        if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
+                            encounteredMasses.add(aUtilitiesMod.getRoundedMass());
+                            if (aMod.getValue()) {
+                                ptmSettings.addFixedModification(aUtilitiesMod);
+                            } else {
+                                ptmSettings.addVariableModification(aUtilitiesMod);
+                            }
+                            
                         } else {
-                            ptmSettings.addVariableModification(aUtilitiesMod);
+                            LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
                         }
-
                     } else {
-                        LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
+                        LOGGER.info(aMod.getKey() + " was found in the default PTMs");
                     }
-                } else {
-                    LOGGER.info(aMod.getKey() + " was found in the default PTMs");
                 }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                LOGGER.error("MODIFICATION SKIPPED DUE TO COMPATIBILITY ISSUES WITH COMPOMICS UTILITIES LIBRARY - ISOTOPES NOT SUPPORTED " + aMod.getKey());
             }
         }
         TotalReportGenerator.setPtmSettings(ptmSettings);
         TotalReportGenerator.setPtmSettingsMethod("Fragment mass error analysis");
     }
-
+    
     public double getConsiderationThreshold() {
         return considerationThreshold;
     }
-
+    
     public double getFixedThreshold() {
         return fixedThreshold;
     }
-
+    
     public Map<Modification, Double> getModificationRates() {
         return modificationRates;
     }
-
+    
     public PtmSettings getPtmSettings() {
         return ptmSettings;
     }
-
+    
 }

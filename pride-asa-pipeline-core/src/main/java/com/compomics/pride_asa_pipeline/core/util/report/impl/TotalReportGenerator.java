@@ -5,7 +5,7 @@ import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +34,14 @@ public class TotalReportGenerator extends ExtractionReportGenerator {
     private static double missedCleavageRatio;
     private static List<Modification> annotatedMods;
     private static TreeMap<Integer, Integer> MSLevelCount = new TreeMap<>();
+    private static TreeMap<Integer, Integer> precChargeCount = new TreeMap<>();
     private static TreeMap<String, String> failedExtractionSpectra = new TreeMap<>();
     private static DescriptiveStatistics overallFragmentMzStat = new DescriptiveStatistics();
     private static DescriptiveStatistics overallPrecursorMzStat = new DescriptiveStatistics();
     private static DescriptiveStatistics overallFragmentIStat = new DescriptiveStatistics();
     private static DescriptiveStatistics overallPrecursorIStat = new DescriptiveStatistics();
     private static DescriptiveStatistics overallPrecursorChargeStat = new DescriptiveStatistics();
+    private static String assay;
 
     public static double getPrecursorAcc() {
         return precursorAcc;
@@ -133,6 +135,11 @@ public class TotalReportGenerator extends ExtractionReportGenerator {
      */
     public static void addSpectrum(Spectrum aSpectrum) {
         MSLevelCount.put(aSpectrum.getMsLevel(), MSLevelCount.getOrDefault(aSpectrum.getMsLevel(), 0) + 1);
+        try {
+            precChargeCount.put(aSpectrum.getPrecursorCharge(), precChargeCount.getOrDefault(aSpectrum.getPrecursorCharge(), 0) + 1);
+        } catch (NullPointerException e) {
+            addFailedSpectrum(aSpectrum.getId(), "WARNING : No precursor charge");
+        }
         if (aSpectrum.getMsLevel() == 2) {
             try {
                 overallPrecursorIStat.addValue(aSpectrum.getPrecursorIntensity());
@@ -169,11 +176,17 @@ public class TotalReportGenerator extends ExtractionReportGenerator {
         failedExtractionSpectra.put(spectrumId, message);
     }
 
+    public static void setAssay(String assay) {
+        TotalReportGenerator.assay = assay;
+
+    }
+
     @Override
     protected void writeReport(OutputStreamWriter reportWriter) throws IOException {
         reportWriter.append("---------------------").append(System.lineSeparator());
         reportWriter.append("SEARCH INPUT INFERENCE REPORT").append(System.lineSeparator());
-        reportWriter.append("---------------------").append(System.lineSeparator());
+        reportWriter.append("Date\t").append(new Date().toString()).append(System.lineSeparator());
+        reportWriter.append("Assay\t" + assay).append(System.lineSeparator());
         reportWriter.append("---------------------").append(System.lineSeparator());
         reportWriter.append("1.\tMASS ACCURACIES").append(System.lineSeparator());
         reportWriter.append("---------------------").append(System.lineSeparator());
@@ -190,6 +203,7 @@ public class TotalReportGenerator extends ExtractionReportGenerator {
         reportWriter.append("\t2.4.\tMC-Ration\t" + getMissedCleavageRatio()).append(System.lineSeparator());
         reportWriter.append("---------------------").append(System.lineSeparator());
         reportWriter.append("3.\tMODIFICATION STATISTICS").append(System.lineSeparator());
+        reportWriter.append("---------------------").append(System.lineSeparator());
         reportWriter.append("\t3.1.\tModification Method\t" + getPtmSettingsMethod()).append(System.lineSeparator());
         reportWriter.append("\t3.2.\tAnnotated Mods\t");
         HashSet<String> exportedMods = new HashSet<>();
@@ -219,38 +233,50 @@ public class TotalReportGenerator extends ExtractionReportGenerator {
         reportWriter.append(System.lineSeparator());
         reportWriter.append("---------------------").append(System.lineSeparator());
         reportWriter.append("4.\tMGF PROPERTIES").append(System.lineSeparator());
+        reportWriter.append("---------------------").append(System.lineSeparator());
 
         long totalSpectra = 0;
         for (Map.Entry<Integer, Integer> msLevelCount : MSLevelCount.entrySet()) {
             totalSpectra = +msLevelCount.getValue();
         }
 
-        reportWriter.append("\t4.1.\t#Spectra\t" + totalSpectra).append(System.lineSeparator());
-        reportWriter.append("\t4.2.\tMS-levels\tCount").append(System.lineSeparator());
+        reportWriter.append("\t4.1.\tGeneral Spectra Properties").append(System.lineSeparator());
+        reportWriter.append("\t\t4.1.1\t#Spectra\t" + totalSpectra).append(System.lineSeparator());
+        reportWriter.append("\t\t4.1.2.\tMS-levels\tCount").append(System.lineSeparator());
+
         reportWriter.append("\t\t\tLevel\tCount").append(System.lineSeparator());
         for (int msLevel : MSLevelCount.keySet()) {
             reportWriter.append("\t\t\t" + msLevel + "\t" + MSLevelCount.get(msLevel)).append(System.lineSeparator());
         }
         reportWriter.append(System.lineSeparator());
-        reportWriter.append("\t\t4.3.1.\tMax MS2 Precursor Intensity\t" + overallPrecursorIStat.getMax()).append(System.lineSeparator());
-        reportWriter.append("\t\t4.3.2.\tMedian MS2 Precursor Intensity\t" + overallPrecursorIStat.getPercentile(50)).append(System.lineSeparator());
-        reportWriter.append("\t\t4.3.3.\tMin MS2 Precursor Intensity\t" + overallPrecursorIStat.getMin()).append(System.lineSeparator());
 
-        reportWriter.append("\t\t4.4.1.\tMax MS2 Precursor MZ\t" + overallPrecursorMzStat.getMax()).append(System.lineSeparator());
-        reportWriter.append("\t\t4.4.2.\tMedian MS2 Precursor MZ\t" + overallPrecursorMzStat.getPercentile(50)).append(System.lineSeparator());
-        reportWriter.append("\t\t4.4.3.\tMin MS2 Precursor MZ\t" + overallPrecursorMzStat.getMin()).append(System.lineSeparator());
+        reportWriter.append("\t\t4.1.3.\tPrecursor charges\tCount").append(System.lineSeparator());
+        reportWriter.append("\t\t\tCharge\tCount").append(System.lineSeparator());
+        for (int precursorCharge : precChargeCount.keySet()) {
+            reportWriter.append("\t\t\t" + precursorCharge + "\t" + precChargeCount.get(precursorCharge)).append(System.lineSeparator());
+        }
+        reportWriter.append(System.lineSeparator());
 
-        reportWriter.append("\t\t4.5.1.\tMax MS2 Precursor Charge\t" + overallPrecursorChargeStat.getMax()).append(System.lineSeparator());
-        reportWriter.append("\t\t4.5.2.\tMedian MS2 Precursor Charge\t" + overallPrecursorChargeStat.getPercentile(50)).append(System.lineSeparator());
-        reportWriter.append("\t\t4.5.3.\tMin MS2 Precursor Charge\t" + overallPrecursorChargeStat.getMin()).append(System.lineSeparator());
+        reportWriter.append("\t4.2.\tMS2 Properties").append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.1.\tMax MS2 Precursor Intensity\t" + overallPrecursorIStat.getMax()).append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.2.\tMedian MS2 Precursor Intensity\t" + overallPrecursorIStat.getPercentile(50)).append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.3.\tMin MS2 Precursor Intensity\t" + overallPrecursorIStat.getMin()).append(System.lineSeparator());
 
-        reportWriter.append("\t\t4.6.1.\tMax MS2 Fragment Intensity\t" + overallFragmentIStat.getMax()).append(System.lineSeparator());
-        reportWriter.append("\t\t4.6.2.\tMedian MS2 Fragment Intensity\t" + overallFragmentIStat.getPercentile(50)).append(System.lineSeparator());
-        reportWriter.append("\t\t4.6.3.\tMin MS2 Fragment Intensity\t" + overallFragmentIStat.getMin()).append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.4.\tMax MS2 Precursor MZ\t" + overallPrecursorMzStat.getMax()).append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.5.\tMedian MS2 Precursor MZ\t" + overallPrecursorMzStat.getPercentile(50)).append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.6.\tMin MS2 Precursor MZ\t" + overallPrecursorMzStat.getMin()).append(System.lineSeparator());
 
-        reportWriter.append("\t\t4.7.1.\tMax MS2 Fragment Intensity\t" + overallFragmentMzStat.getMax()).append(System.lineSeparator());
-        reportWriter.append("\t\t4.7.2.\tMedian MS2 Fragment Intensity\t" + overallFragmentMzStat.getPercentile(50)).append(System.lineSeparator());
-        reportWriter.append("\t\t4.7.3.\tMin MS2 Fragment Intensity\t" + overallFragmentMzStat.getMin()).append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.7.\tMax MS2 Precursor Charge\t" + overallPrecursorChargeStat.getMax()).append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.8.\tMedian MS2 Precursor Charge\t" + overallPrecursorChargeStat.getPercentile(50)).append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.9.\tMin MS2 Precursor Charge\t" + overallPrecursorChargeStat.getMin()).append(System.lineSeparator());
+
+        reportWriter.append("\t\t4.2.10.\tMax MS2 Fragment Intensity\t" + overallFragmentIStat.getMax()).append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.11.\tMedian MS2 Fragment Intensity\t" + overallFragmentIStat.getPercentile(50)).append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.12.\tMin MS2 Fragment Intensity\t" + overallFragmentIStat.getMin()).append(System.lineSeparator());
+
+        reportWriter.append("\t\t4.2.13.\tMax MS2 Fragment Intensity\t" + overallFragmentMzStat.getMax()).append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.14.\tMedian MS2 Fragment Intensity\t" + overallFragmentMzStat.getPercentile(50)).append(System.lineSeparator());
+        reportWriter.append("\t\t4.2.15.\tMin MS2 Fragment Intensity\t" + overallFragmentMzStat.getMin()).append(System.lineSeparator());
         reportWriter.append(System.lineSeparator());
         reportWriter.append("---------------------").append(System.lineSeparator());
         if (!failedExtractionSpectra.isEmpty()) {
@@ -260,7 +286,6 @@ public class TotalReportGenerator extends ExtractionReportGenerator {
             for (Map.Entry<String, String> aSpectrumID : failedExtractionSpectra.entrySet()) {
                 reportWriter.append("\t\t\t" + aSpectrumID.getKey() + "\t" + aSpectrumID.getValue()).append(System.lineSeparator());
             }
-            reportWriter.append("---------------------").append(System.lineSeparator());
         }
     }
 

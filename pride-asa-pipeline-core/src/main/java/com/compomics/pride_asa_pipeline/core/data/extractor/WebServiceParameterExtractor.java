@@ -61,9 +61,9 @@ public class WebServiceParameterExtractor {
         ParameterExtractor extractor = null;
         SearchParameters parameters = null;
         try {
-            extractor = new ParameterExtractor(assayAccession);
             WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository(tempFolder);
             experimentRepository.addAssay(assayAccession);
+            extractor = new ParameterExtractor(assayAccession);
             if (!ParserCache.getInstance().getLoadedFiles().containsKey(assayAccession)) {
                 throw new MGFExtractionException("There is no suited parser in the cache !");
             }

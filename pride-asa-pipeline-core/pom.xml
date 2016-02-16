@@ -425,7 +425,8 @@
         
         <dependency>
             <groupId>com.compomics</groupId>
-            <artifactId>utilities</artifactId>        
+            <artifactId>utilities</artifactId>    
+            <version>4.3.22</version>    
         </dependency>
                  
         <dependency>
