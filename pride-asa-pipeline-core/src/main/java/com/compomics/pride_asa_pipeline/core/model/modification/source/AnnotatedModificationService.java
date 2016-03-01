@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.model.modification.source;
 
+import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
@@ -34,7 +35,7 @@ public class AnnotatedModificationService {
         return ptmNames;
     }
 
-    public List<Modification> convertToAsapMods(Set<String> ptmNames) {
+    public List<Modification> convertToAsapMods(Set<String> ptmNames) throws ParameterExtractionException {
         List<Modification> asapMods = new ArrayList<>();
         for (String aPTMName : ptmNames) {
             asapMods.add((Modification) PRIDEModificationFactory.getInstance().getModification(asapAdapter, aPTMName));
@@ -49,7 +50,7 @@ public class AnnotatedModificationService {
      * @return a list of annotated modifications for a given project
      * @throws IOException if the service returns an error
      */
-    public List<Modification> getProjectAnnotatedModifications(String projectAccession) throws IOException {
+    public List<Modification> getProjectAnnotatedModifications(String projectAccession) throws IOException, ParameterExtractionException {
         return convertToAsapMods(getProjectAnnotatedPTMs(projectAccession));
     }
 
@@ -60,7 +61,7 @@ public class AnnotatedModificationService {
      * @return a list of annotated modifications for a given assay
      * @throws IOException if the service returns an error
      */
-    public List<Modification> getAssayAnnotatedModifications(String assayAccession) throws IOException {
+    public List<Modification> getAssayAnnotatedModifications(String assayAccession) throws IOException, ParameterExtractionException {
         return convertToAsapMods(getAssayAnnotatedPTMs(assayAccession));
     }
 

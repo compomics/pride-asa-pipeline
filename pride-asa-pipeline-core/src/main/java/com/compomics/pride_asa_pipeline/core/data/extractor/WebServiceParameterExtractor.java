@@ -93,6 +93,10 @@ public class WebServiceParameterExtractor {
                     throw new ParameterExtractionException("Extractor failed for unknown reason");
                 }
             }
+        } finally {
+            if (extractor != null) {
+                extractor.clear();
+            }
         }
         return parameters;
     }

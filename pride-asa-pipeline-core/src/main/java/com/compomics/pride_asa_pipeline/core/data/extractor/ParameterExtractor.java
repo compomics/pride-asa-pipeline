@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import java.util.Set;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.xmlpull.v1.XmlPullParserException;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
@@ -121,7 +122,7 @@ public class ParameterExtractor {
                 //USE ONLY THE HIGH QUALITY HITS FOR MASS ACCURACCIES, THESE WILL USUALLY NOT HAVE MISSING MODIFICATIONS ETC
                 List<Identification> experimentIdentifications = spectrumAnnotator.getIdentifications().getCompleteIdentifications();
                 IdentificationFilter filter = new IdentificationFilter(experimentIdentifications);
-                List<Identification> topPrecursorHits = filter.getTopPrecursorHits(90);
+                List<Identification> topPrecursorHits = filter.getTopPrecursorHits(qualityPercentile);
 
                 precursorIonErrorPredictor = new PrecursorIonErrorPredictor(topPrecursorHits);
 
@@ -316,13 +317,18 @@ public class ParameterExtractor {
         ModificationAdapter adapter = new UtilitiesPTMAdapter();
         PRIDEModificationFactory ptmFactory = PRIDEModificationFactory.getInstance();
         //add carbamidomethyl c
-        com.compomics.util.experiment.biology.PTM carbamidomethylC
-                = (com.compomics.util.experiment.biology.PTM) ptmFactory.getModification(adapter, ptmFactory.getModificationNameFromAccession("UNIMOD:940"));
+        com.compomics.util.experiment.biology.PTM carbamidomethylC;
+        try {
+            carbamidomethylC = (com.compomics.util.experiment.biology.PTM) ptmFactory.getModification(adapter, ptmFactory.getModificationNameFromAccession("UNIMOD:940"));
+       
         ptmSettings.addFixedModification(carbamidomethylC);
         //add oxidation of m
         com.compomics.util.experiment.biology.PTM oxidationM
                 = (com.compomics.util.experiment.biology.PTM) ptmFactory.getModification(adapter, ptmFactory.getModificationNameFromAccession("UNIMOD:35"));
         ptmSettings.addVariableModification(oxidationM);
+        } catch (ParameterExtractionException ex) {
+              LOGGER.error("Could not load default modifications. Reason :" + ex);
+        }
         parameters.setPtmSettings(ptmSettings);
 
         //try to get from machine...
@@ -351,4 +357,19 @@ public class ParameterExtractor {
 
     }
 
+    public void clear(){
+        if(spectrumAnnotator!=null){
+            spectrumAnnotator.clearPipeline();
+            spectrumAnnotator.clearTmpResources();
+        }
+        
+        if(fragmentIonErrorPredictor!=null){
+            fragmentIonErrorPredictor.clear();
+        };
+    if(precursorIonErrorPredictor!=null)
+    {
+        precursorIonErrorPredictor.clear();
+    }}
+    
+    
 }

@@ -36,6 +36,7 @@ public class DbExperimentServiceImpl extends ExperimentServiceImpl implements Db
     private static final Logger LOGGER = Logger.getLogger(DbExperimentServiceImpl.class);
     private DbSpectrumService spectrumService;
     private boolean iFirstMfgFile;
+    private List<Identification> identificationsList;
 
     public DbSpectrumService getSpectrumService() {
         return spectrumService;
@@ -48,8 +49,10 @@ public class DbExperimentServiceImpl extends ExperimentServiceImpl implements Db
     @Override
     public Identifications loadExperimentIdentifications(String experimentAccession) {
         Identifications identifications = new Identifications();
-        List<Identification> identificationList = experimentRepository.loadExperimentIdentifications(experimentAccession);
-        for (Identification identification : identificationList) {
+        if (identificationsList == null) {
+            identificationsList = experimentRepository.loadExperimentIdentifications(experimentAccession);
+        }
+        for (Identification identification : identificationsList) {
             identifications.addIdentification(identification);
         }
         return identifications;
@@ -58,8 +61,10 @@ public class DbExperimentServiceImpl extends ExperimentServiceImpl implements Db
     @Override
     public void updateChargeStates(String experimentAccession, Set<Integer> chargeStates) {
         //go over the identifications and check their charges
-        List<Identification> loadExperimentIdentifications = experimentRepository.loadExperimentIdentifications(experimentAccession);
-        for (Identification ident : loadExperimentIdentifications) {
+        if (identificationsList == null) {
+            identificationsList = experimentRepository.loadExperimentIdentifications(experimentAccession);
+        }
+        for (Identification ident : identificationsList) {
             chargeStates.add(ident.getPeptide().getCharge());
         }
     }

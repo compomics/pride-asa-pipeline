@@ -4,13 +4,13 @@ import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 import uk.ac.ebi.pride.utilities.data.core.SpectrumIdentification;
@@ -102,5 +102,4 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    
 }

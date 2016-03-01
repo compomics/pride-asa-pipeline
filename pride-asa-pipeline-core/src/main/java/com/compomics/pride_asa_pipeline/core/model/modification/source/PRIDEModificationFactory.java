@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.model.modification.source;
 
+import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.PRIDEModification;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
@@ -23,6 +24,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import uk.ac.ebi.pridemod.ModReader;
@@ -56,6 +58,8 @@ public class PRIDEModificationFactory {
      * unimodmodification name
      */
     private static BidiMap modificationAccessionMap = new DualHashBidiMap();
+    private static double minimalModMass;
+    private static double maximalModMass;
     /**
      * The mode (online or offline)
      */
@@ -134,8 +138,10 @@ public class PRIDEModificationFactory {
      * @param ptmName the modification name
      * @return an instance of a converted modification using the provided
      * adapter
+     * @throws
+     * com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException
      */
-    public Object getModification(ModificationAdapter adapter, String ptmName) {
+    public Object getModification(ModificationAdapter adapter, String ptmName) throws ParameterExtractionException {
         return adapter.convertModification(modificationNameMap.get(refactorName(ptmName)));
     }
 
@@ -146,7 +152,7 @@ public class PRIDEModificationFactory {
         }
         return ptmName;
     }
-    
+
     /**
      * Returns an instance of a converted modification using the provided
      * adapter
@@ -156,7 +162,7 @@ public class PRIDEModificationFactory {
      * @return an instance of a converted modification using the provided
      * adapter
      */
-    public Object getModificationFromAccession(ModificationAdapter adapter, String ptmAccession) {
+    public Object getModificationFromAccession(ModificationAdapter adapter, String ptmAccession) throws ParameterExtractionException {
         String modName;
         Object convertModification = null;
         if ((modName = (String) modificationAccessionMap.get(ptmAccession)) != null) {
@@ -211,10 +217,23 @@ public class PRIDEModificationFactory {
      */
     public static LinkedList<Modification> getAsapMods() {
         LinkedList<Modification> pride_mods = new LinkedList<>();
+        DescriptiveStatistics massStats = new DescriptiveStatistics();
         for (PRIDEModification aMod : modificationNameMap.values()) {
-            pride_mods.add(new AsapModificationAdapter().convertModification(aMod));
+            Modification convertModification = new AsapModificationAdapter().convertModification(aMod);
+            pride_mods.add(convertModification);
+            massStats.addValue(aMod.getMonoDeltaMass());
         }
+        minimalModMass = massStats.getMin();
+        maximalModMass = massStats.getMax();
         return pride_mods;
+    }
+
+    public static double getMinimalModMass() {
+        return minimalModMass;
+    }
+
+    public static double getMaximalModMass() {
+        return maximalModMass;
     }
 
     private static TreeSet<PRIDEModification> getFromFile(File inputFile) throws IOException {
@@ -290,7 +309,7 @@ public class PRIDEModificationFactory {
         return mods;
     }
 
-    public static LinkedList<Object> orderModificationsToPrevalence(Collection<String> ptmNames, ModificationAdapter adapter) {
+    public static LinkedList<Object> orderModificationsToPrevalence(Collection<String> ptmNames, ModificationAdapter adapter) throws ParameterExtractionException {
         TreeSet<PRIDEModification> orderedModifications = orderModificationsToPrevalence(ptmNames);
         LinkedList<Object> orderedConvertedModifications = new LinkedList<>();
         for (PRIDEModification aModification : orderedModifications) {

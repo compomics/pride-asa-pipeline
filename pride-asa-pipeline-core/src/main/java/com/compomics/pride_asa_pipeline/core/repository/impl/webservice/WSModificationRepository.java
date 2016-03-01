@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.webservice;
 
+import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
@@ -8,6 +9,7 @@ import com.compomics.util.pride.PrideWebService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 
@@ -32,7 +34,11 @@ public class WSModificationRepository implements ModificationRepository {
         try {
             AssayDetail assayDetail = PrideWebService.getAssayDetail(String.valueOf(experimentId));
             for (String aPtmName : assayDetail.getPtmNames()) {
-                PRIDEModificationFactory.getInstance().getModification(adapter, aPtmName);
+                try {
+                    PRIDEModificationFactory.getInstance().getModification(adapter, aPtmName);
+                } catch (ParameterExtractionException ex) {
+                    LOGGER.error("Could not load " + aPtmName + " .Reason :" + ex);
+                }
             }
             LOGGER.debug("Finished loading modifications for pride experiment with id " + experimentId);
             return modifications;

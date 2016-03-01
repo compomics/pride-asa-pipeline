@@ -10,12 +10,13 @@ import com.compomics.util.experiment.biology.AtomChain;
 import com.compomics.util.experiment.biology.AtomImpl;
 import com.compomics.util.experiment.biology.PTM;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
@@ -44,47 +45,37 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
     /**
      * A standard pattern for chemical formula
      */
-    private static final Pattern pattern1 = Pattern.compile("([0-9]*)?\\s?[A-Z][a-z]*?(\\s?[0-9]*)?(\\(-?[0-9]*\\)?)?");
+    private static final Pattern pattern1 = Pattern.compile("([0-9]*)?\\s?([A-Z][a-z]?)(\\s?[0-9]*)?(\\(?-?[0-9]*\\)?)?");
     /**
      * A standard pattern for unresolved atoms
      */
     private static final Pattern pattern2 = Pattern.compile("[A-Z][a-z]?\\s[A-Z][a-z]?");
+    //private static final Pattern pattern2 = Pattern.compile("[A-Z][a-z]?\\s?(\\(\\-[0-9]*\\))?");
     /**
      * A logger
      */
     private static final Logger LOGGER = Logger.getLogger(UtilitiesPTMAdapter.class);
+    /**
+     * a map of amino acid synonyms according to IUPAC nomenclature
+     */
+    private HashMap<String, HashSet<String>> synonyms;
 
     public static void main(String[] args) {
-        //testPTM("2-methyl-L-glutamine");
-        // testPTM("1-thioglycine (internal)");
-        //testPTM("Biotin");
-        // testPTM("PEO-Iodoacetyl-LC-Biotin");
-        //   testPTM("L-3',4',5'-trihydroxyphenylalanine");
-        testCoverage();
+        System.out.println((100 * getPTMCoverage()) + "% of the ptms could be correctly extracted");
     }
 
-    public static void testPTM(String testMod) {
-        System.out.println(testMod);
-        UtilitiesPTMAdapter adapter = new UtilitiesPTMAdapter();
-        PRIDEModificationFactory instance = PRIDEModificationFactory.getInstance();
-        LinkedHashMap<String, PRIDEModification> modificationMap = instance.getModificationMap();
-        PRIDEModification get = modificationMap.get(testMod);
-        System.out.println(get.getFormula());
-        PTM convertModification;
-        try {
-            convertModification = adapter.convertModification(modificationMap.get(testMod));
-            LOGGER.info(testMod + "\t" + modificationMap.get(testMod).getMonoDeltaMass() + "\tvs\t" + convertModification.getMass());
-        } catch (ParameterExtractionException ex) {
-            LOGGER.error(ex);
-        }
-
+    public UtilitiesPTMAdapter() {
+        initAminoAcidSynonymHashMap();
     }
 
-    public static void testCoverage() {
+    public static double getPTMCoverage() {
         UtilitiesPTMAdapter adapter = new UtilitiesPTMAdapter();
         PRIDEModificationFactory instance = PRIDEModificationFactory.getInstance();
         LinkedHashMap<String, PRIDEModification> modificationMap = instance.getModificationMap();
         double coverage = 0;
+        double atomNI = 0;
+        double unparseable = 0;
+        double wrongMass = 0;
         for (Map.Entry<String, PRIDEModification> aMod : modificationMap.entrySet()) {
             if (aMod.getValue().getFormula().equals("none")) {
                 coverage++;
@@ -93,15 +84,30 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
                     PTM convertModification = adapter.convertModification(aMod.getValue());
                     LOGGER.info(aMod.getKey() + "\t" + aMod.getValue().getFormula() + "\tUniMod mass:" + aMod.getValue().getAveDeltaMass() + "\tCalculatedMass\t" + convertModification.getRoundedMass());
                     coverage++;
-                } catch (ParameterExtractionException | UnsupportedOperationException | IllegalArgumentException | NullPointerException e) {
+                } catch (ParameterExtractionException e) {
                     LOGGER.error(aMod.getKey() + "\t" + aMod.getValue().getFormula() + "error : " + e.getMessage()
                     );
+                    wrongMass++;
+                } catch (UnsupportedOperationException e2) {
+                    LOGGER.error(aMod.getKey() + "\t" + aMod.getValue().getFormula() + "error : " + e2.getMessage()
+                    );
+                    atomNI++;
+                } catch (NullPointerException | IllegalArgumentException e3) {
+                    LOGGER.error(aMod.getKey() + "\t" + aMod.getValue().getFormula() + "error : " + e3.getMessage()
+                    );
+                    unparseable++;
                 }
             } else {
-                System.out.println(aMod.getKey() + "\t" + aMod.getValue().getFormula() + " can not be parsed");
+                LOGGER.error(aMod.getKey() + "\t" + aMod.getValue().getFormula() + " can not be parsed");
+                unparseable++;
             }
         }
-        System.out.println(100 * coverage / modificationMap.size() + " %");
+        LOGGER.info("Atoms not implemented : " + (100 * atomNI / modificationMap.size()));
+        LOGGER.info("Wrong mass inference : " + (100 * wrongMass / modificationMap.size()));
+        LOGGER.info("Unparseable : " + (100 * unparseable / modificationMap.size()));
+        LOGGER.info("Total correct : " + (100 * coverage / modificationMap.size()));
+        LOGGER.info("Total incorrect :" + (100 * (atomNI + wrongMass + unparseable) / modificationMap.size()));
+        return (coverage / modificationMap.size());
     }
 
     @Override
@@ -119,10 +125,13 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
         //check if the mass can be correctly retrieved, if not then throw a conversionexception???
         PTM ptm = new PTM(type, mod.getName(), mod.getAccession(), increaseMassChain, decreaseMassChain, pattern);
         //check that the modifications are not just substitutions and remove the amino acid mass if applicable
+        //     System.out.println("Ptm mass is now " + ptm.getMass());
         checkSubstitutions(mod, ptm);
+        //  System.out.println("Ptm mass is now " + ptm.getMass());
         //check for reported differences with the original unimod mass (for example loss of H2O, addition of CO, ...)
         checkChemicalLosses(mod, ptm);
-        double massDifference = Math.abs(ptm.getMass() - mod.getMonoDeltaMass());
+        // System.out.println("Ptm mass is now " + ptm.getMass());
+        double massDifference = calculateMassDelta(ptm, mod);
         if (massDifference > 1) {
             throw new ParameterExtractionException(ptm.getName() + " differs more than 1 da from the reported mono-isotopic mass value (" + massDifference + ")");
         }
@@ -197,7 +206,22 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
             //this will only work if there is but a single amino acid target
             String prideAminoAcidName = pridePTM.getSpecificityCollection().get(0).getName().toString();
             com.compomics.util.experiment.biology.AminoAcid aminoAcid = com.compomics.util.experiment.biology.AminoAcid.getAminoAcid(prideAminoAcidName);
-            if (pridePTM.getName().toLowerCase().contains(aminoAcid.name.toLowerCase()) || pridePTM.getName().toLowerCase().contains(aminoAcid.threeLetterCode.toLowerCase())) {
+            //check if the name contains some synonyms?
+            boolean suspectedSubstitution = pridePTM.getName().toLowerCase().contains(aminoAcid.name.toLowerCase())
+                    || pridePTM.getName().toLowerCase().contains(aminoAcid.threeLetterCode.toLowerCase());
+            //if the amino acid name itself was not present, check for its synonyms and IUPAC names
+            if (!suspectedSubstitution) {
+                //check if the name contains some synonyms?
+                HashSet<String> aminoAcidSynonyms = synonyms.get(aminoAcid.singleLetterCode.toUpperCase());
+                for (String aSynonym : aminoAcidSynonyms) {
+                    if (pridePTM.getName().toLowerCase().contains(aSynonym)) {
+                        suspectedSubstitution = true;
+                        break;
+                    }
+                }
+            }
+            //if there now is a suspected substitution, remove the amino acid
+            if (suspectedSubstitution) {
                 if (aminoAcid.getMonoisotopicMass() < convertedPTM.getMass()) {
                     AtomChain atomAA = aminoAcid.getMonoisotopicAtomChain();
                     subtractAtomChain(convertedPTM, atomAA);
@@ -206,23 +230,156 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
         }
     }
 
+    private void initAminoAcidSynonymHashMap() {
+        synonyms = new HashMap<>();
+//Alanine
+        HashSet<String> alanineSynonyms = new HashSet<>();
+        alanineSynonyms.add("2-Aminopropanoic");
+        synonyms.put("A", alanineSynonyms);
+//Arginine
+        HashSet<String> arginineSynonyms = new HashSet<>();
+        alanineSynonyms.add("2-Amino-5-guanidinopentanoic");
+        synonyms.put("R", arginineSynonyms);
+//Asparagine
+        HashSet<String> asparagineSynonyms = new HashSet<>();
+        alanineSynonyms.add("2-Amino-3-carbamoylpropanoic");
+        synonyms.put("N", asparagineSynonyms);
+//Aspartic
+        HashSet<String> asparticAcidSynonyms = new HashSet<>();
+        asparticAcidSynonyms.add("2-Aminobutanedioic");
+        synonyms.put("D", asparticAcidSynonyms);
+//Cysteine
+        HashSet<String> cysteineSynonyms = new HashSet<>();
+        cysteineSynonyms.add("2-Amino-3-mercaptopropanoic");
+        synonyms.put("C", cysteineSynonyms);
+//Glutamine
+        HashSet<String> glutamineSynonyms = new HashSet<>();
+        glutamineSynonyms.add("2-Amino-4-carbamoylbutanoic");
+        synonyms.put("Q", glutamineSynonyms);
+//Glutamic
+        HashSet<String> glutamicAcidSynonyms = new HashSet<>();
+        glutamicAcidSynonyms.add("2-Aminopentanedioic");
+        synonyms.put("E", glutamicAcidSynonyms);
+//Glycine
+        HashSet<String> glycineSynonyms = new HashSet<>();
+        glycineSynonyms.add("Aminoethanoic");
+        synonyms.put("G", glycineSynonyms);
+//Histidine
+        HashSet<String> histidineSynonyms = new HashSet<>();
+        histidineSynonyms.add("2-Amino-3-(1H-imidazol-4-yl)-propanoic");
+        synonyms.put("H", histidineSynonyms);
+//Isoleucine
+        HashSet<String> isoLeucineSynonyms = new HashSet<>();
+        isoLeucineSynonyms.add("2-Amino-3-methylpentanoic");
+        synonyms.put("I", isoLeucineSynonyms);
+//Leucine
+        HashSet<String> leucineSynonyms = new HashSet<>();
+        leucineSynonyms.add("2-Amino-4-methylpentanoic");
+        synonyms.put("L", leucineSynonyms);
+//Lysine
+        HashSet<String> lysineSynonyms = new HashSet<>();
+        lysineSynonyms.add("2,6-Diaminohexanoic");
+        synonyms.put("K", lysineSynonyms);
+//Methionine
+        HashSet<String> methionineSynonyms = new HashSet<>();
+        methionineSynonyms.add("2-Amino-4-(methylthio)butanoic");
+        synonyms.put("M", methionineSynonyms);
+//Phenylalanine
+        HashSet<String> phenylAlanineSynonyms = new HashSet<>();
+        phenylAlanineSynonyms.add("2-Amino-3-phenylpropanoic");
+        phenylAlanineSynonyms.add("hydroxyphenylanaline");
+        synonyms.put("F", phenylAlanineSynonyms);
+//Proline
+        HashSet<String> prolineSynonyms = new HashSet<>();
+        prolineSynonyms.add("Pyrrolidine-2-carboxylic");
+        synonyms.put("P", prolineSynonyms);
+//Serine
+        HashSet<String> serineSynonyms = new HashSet<>();
+        serineSynonyms.add("2-Amino-3-hydroxypropanoic");
+        synonyms.put("S", serineSynonyms);
+//Threonine
+        HashSet<String> threonineSynonyms = new HashSet<>();
+        threonineSynonyms.add("2-Amino-3-hydroxybutanoic");
+        synonyms.put("T", threonineSynonyms);
+//Tryptophan
+        HashSet<String> tryptophanSynonyms = new HashSet<>();
+        tryptophanSynonyms.add("2-Amino-3-(lH-indol-3-yl)-propanoic");
+        synonyms.put("W", tryptophanSynonyms);
+//Tyrosine
+        HashSet<String> TyrosineSynonyms = new HashSet<>();
+        TyrosineSynonyms.add("2-Amino-3-(4-hydroxyphenyl)-propanoic");
+        TyrosineSynonyms.add("hydroxyphenylalanine");
+        synonyms.put("Y", TyrosineSynonyms);
+//Valine
+        HashSet<String> valineSynonyms = new HashSet<>();
+        valineSynonyms.add("2-Amino-3-methylbutanoic");
+        synonyms.put("V", valineSynonyms);
+
+//add all "allowed" alternatives according to IUPAC as well
+        HashMap<String, HashSet<String>> finalMap = new HashMap<>();
+        for (Map.Entry<String, HashSet<String>> synonymMap : synonyms.entrySet()) {
+            HashSet<String> tempSet = new HashSet<>();
+            HashSet<String> currentSet = synonymMap.getValue();
+            tempSet.addAll(currentSet);
+            for (String aSynonym : currentSet) {
+                String temp = aSynonym
+                        .replace("3-carbamoylpropanoic", "succinamic")
+                        .replace("pentanedioic", "glutaric")
+                        .replace("4-carbamoylbutanoic", "glutaramic")
+                        .replace("ethanoic", "acetic")
+                        .replace("propanoic", "propionic")
+                        .replace("butanoic", "butyric")
+                        .replace("pentanoic", "valeric")
+                        .replace("butanedioic", "succinic")
+                        .replace("3-carbamoylpropanoic", "succinamic")
+                        .replace("pentanedioic", "glutaric")
+                        .replace("4-carbamoylbutanoic", "glutaramic");
+                tempSet.add(temp);
+            }
+            finalMap.put(synonymMap.getKey(), tempSet);
+        }
+
+    }
+
+    private double calculateMassDelta(PTM convertedPTM, PRIDEModification pridePTM) {
+        double delta = pridePTM.getMonoDeltaMass() - (convertedPTM.getAtomChainAdded().getMass() + convertedPTM.getAtomChainRemoved().getMass());
+        return delta;
+    }
+
     private void checkChemicalLosses(PRIDEModification pridePTM, PTM convertedPTM) {
         //in case of a missmatch
-        double mass_delta = (convertedPTM.getRoundedMass() - pridePTM.getMonoDeltaMass());
-
+        //double mass_delta = (convertedPTM.getRoundedMass() - pridePTM.getMonoDeltaMass());
+        double mass_delta = calculateMassDelta(convertedPTM, pridePTM);
         if (Math.abs(mass_delta) > 1) {
-            //check the losses for the closest one?
-            TreeMap<Double, CommonMassLoss> smallestDifferenceMap = new TreeMap<>();
-            for (CommonMassLoss loss : CommonMassLoss.values()) {
-                smallestDifferenceMap.put(Math.abs(mass_delta - loss.getAtomChain().getMass()), loss);
-            }
             //check the compatible losses...
-            for (Map.Entry<Double, CommonMassLoss> loss : smallestDifferenceMap.entrySet()) {
+            String ptm = pridePTM.getName();
+            TreeMap<Double, CommonNeutralMassLoss> massMap = new TreeMap<>();
+            for (CommonNeutralMassLoss loss : CommonNeutralMassLoss.values()) {
+                String[] identifiers = loss.getIdentifiers().split(",");
+                for (String identifier : identifiers) {
+                    if (!identifier.trim().isEmpty() && ptm.toLowerCase().contains(identifier.trim())) {
+                        if (loss.isCompatible(convertedPTM.getAtomChainAdded())) {
+                            subtractAtomChain(convertedPTM, loss.getAtomChain());
+                            mass_delta = calculateMassDelta(convertedPTM, pridePTM);
+                            if (mass_delta <= 1) {
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //if there was no return yet , maybe check all of them?
+            //check the losses for the closest one?
+            for (CommonNeutralMassLoss loss : CommonNeutralMassLoss.values()) {
+                massMap.put(loss.getAtomChain().getMass(), loss);
+            }
+            for (Map.Entry<Double, CommonNeutralMassLoss> loss : massMap.descendingMap().entrySet()) {
                 if (Math.abs(mass_delta) < 1) {
                     return;
                 } else if (loss.getValue().isCompatible(convertedPTM.getAtomChainAdded())) {
                     double lostMass = loss.getValue().getAtomChain().getMass();
-                    if (Math.abs(lostMass - mass_delta) < 1) {
+                    if ((lostMass - Math.abs(mass_delta)) < 1) {
                         subtractAtomChain(convertedPTM, loss.getValue().getAtomChain());
                     }
                 }
@@ -231,7 +388,6 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
     }
 
     private void subtractAtomChain(PTM convertedPTM, AtomChain atomChain) {
-
         AtomChain atomChainAdded = convertedPTM.getAtomChainAdded();
         HashMap<String, Integer> atomCount = new HashMap<>();
         for (AtomImpl anAtom : atomChainAdded.getAtomChain()) {
@@ -260,7 +416,7 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
 
     private void parseFormula(String formula) {
         //replace the sugars in the formula?
-        formula = formula.toUpperCase()
+        formula = formula
                 .replace("METH", " C(1) H(3)")
                 .replace("ETH", " C(2) H(5)")
                 .replace("AC", " C(2) H(5)")
@@ -272,18 +428,38 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
                 .replace("HEPT", " C(7) H(15)")
                 .replace("OCT", " C(8) H(17)")
                 .replace("NON", " C(9) H(19)")
-                .replace("DEC", " C(10) H(21)");
+                .replace("DEC", " C(10) H(21)")
+                .replace("meth", " C(1) H(3)")
+                .replace("eth", " C(2) H(5)")
+                .replace("ac", " C(2) H(5)")
+                .replace("NAc", " N C(2) H(5)")
+                .replace("prop", " C(3) H(7)")
+                .replace("but", " C(4) H(9)")
+                .replace("pent", " C(5) H(11)")
+                .replace("hex", " C(6) H(13)")
+                .replace("hept", " C(7) H(15)")
+                .replace("oct", " C(8) H(17)")
+                .replace("non", " C(9) H(19)")
+                .replace("dec", " C(10) H(21)");
         Matcher matcher = pattern1.matcher(formula);
         while (matcher.find()) {
-            String atomSection = matcher.group(0);
-            Matcher subMatcher = pattern2.matcher(atomSection);
-            if (subMatcher.find()) {
-                String[] atomSections = subMatcher.group(0).split(" ");
-                for (String anAtomSection : atomSections) {
-                    constructMassForPTM(formula, anAtomSection);
+            //find the longest match of atoms
+            String atomSection = "";
+            for (int group = 0; group <= matcher.groupCount(); group++) {
+                if (matcher.group(group).trim().length() > atomSection.length()) {
+                    atomSection = matcher.group(group).trim();
                 }
-            } else {
-                constructMassForPTM(formula, atomSection);
+            }
+            if (!atomSection.isEmpty()) {
+                Matcher subMatcher = pattern2.matcher(atomSection.trim());
+                if (subMatcher.find()) {
+                    String[] atomSections = subMatcher.group(0).split(" ");
+                    for (String anAtomSection : atomSections) {
+                        constructMassForPTM(formula, anAtomSection);
+                    }
+                } else if (!atomSection.trim().isEmpty()) {
+                    constructMassForPTM(formula, atomSection);
+                }
             }
         }
     }

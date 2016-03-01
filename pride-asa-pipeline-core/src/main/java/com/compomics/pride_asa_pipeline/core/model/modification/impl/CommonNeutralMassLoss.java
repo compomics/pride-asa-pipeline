@@ -12,48 +12,40 @@ import java.util.regex.Pattern;
  *
  * @author compomics
  */
-public enum CommonMassLoss {
-    H,
-    CH3,
-    OH,
-    H2O,
-    //  F,
-    //  HF,
-    C2H3,
-    HCN,
-    C2H4,
-    CO,
-    CH2O,
-    CH3O,
-    CH4O,
-    S,
-    CH3_H2O,
-    HS,
-    H2S,
-    //  Cl,
-    //  HCl,
-    C3H6,
-    C2H2O,
-    C2H4N,
-    C3H7,
-    CH3CO,
-    CO2O,
-    CONH2,
-    C2H5O,
-    C4H7,
-    C4H9,
-    C2H3O2,
-    C2H4O2,
-    SO2,
-    // Br,
-    // HBr,
-    I,
-    HI,;
+public enum CommonNeutralMassLoss {
+    //   H35Cl(R-Cl),
+    //   H37Cl(R-Cl),
+    //  HF(R-F),
+    C2H2O("methyl ketone, aromatic acetate"),
+    CH3OH("methyl ester"),
+    C2H5OH("ethyl ester"),
+    C2H4("ethyl ester,aldehyde,ketone"),
+    C2H6(""),
+    C2HO("aromatic methyl ether"),
+    C3H6("butyl ketone,propyl ether"),
+    C4H10(""),
+    // C4H8("Ar-n-C5H11, ArO-n-C4H9, Ar-iso-C5H11, ArO-iso-C4H9, pentyl ketone"),
+    CH3COOH("acetate"),
+    CH4(""),
+    CO("aldehyde, ketone, carboxylic acid, ester, amide, phenol"),
+    CO2("carboxylic acid, ester, anhydride"),
+    H2(""),
+    H2O("alcohol, ol"),
+    S("thio"),
+    HCCH("aromatic"),
+    HCN("aromatic nitrile"),
+    NO(""),
+    NO2(""),
+    SO("sulphoxide,sulphox"),
+    H("");
 
     private AtomChain monoisotopicAtomChain;
-    private final Pattern sectionPattern = Pattern.compile("([1-9]*)?\\s?[A-Z][a-z]?\\s?(\\(?[1-9]*\\)?)?");
 
-    private CommonMassLoss() {
+    private final Pattern sectionPattern = Pattern.compile("([1-9]*)?\\s?[A-Z][a-z]?\\s?(\\(?[1-9]*\\)?)?");
+    private String identifiers;
+
+    private CommonNeutralMassLoss(String identifiers) {
+        this.identifiers = identifiers;
         monoisotopicAtomChain = new AtomChain();
         String formula = this.name().replace("_", "");
         Matcher matcher = sectionPattern.matcher(formula);
@@ -101,4 +93,9 @@ public enum CommonMassLoss {
         }
         return true;
     }
+
+    public String getIdentifiers() {
+        return identifiers;
+    }
+
 }

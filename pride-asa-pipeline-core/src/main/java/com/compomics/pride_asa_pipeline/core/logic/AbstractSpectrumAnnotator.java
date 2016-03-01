@@ -2,6 +2,7 @@ package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.logic.impl.MassDeltaExplainerImpl;
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
@@ -32,6 +33,8 @@ import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
 import com.compomics.util.pride.PrideWebService;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,9 +44,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
@@ -94,7 +97,9 @@ public abstract class AbstractSpectrumAnnotator<T> {
     protected ModificationService modificationService;
     private int MAX_PASS_SIZE = 6;
     private int MAX_PASSES = 6;
-    private double explanationCriterion = 0.60;
+    private double explanationCriterion = 0.50;
+    private double matchedPeakCriterion = 0.1;
+    private double maximumAllowedErrorDa = 1.0;
     private ArrayBlockingQueue<Modification> modQueue;
 
     /**
@@ -267,6 +272,53 @@ public abstract class AbstractSpectrumAnnotator<T> {
         }
     }
 
+    public List<Identification> filterIdentifications(List<Identification> completeIdentifications, ModificationHolder modificationHolder) {
+        //first remove all identifications that have a mass error smaller than the smallest modification
+        double smallestMass = modificationHolder.getAllModifications().iterator().next().getMonoIsotopicMassShift();
+        for (Modification aMod : modificationHolder.getAllModifications()) {
+            double deltaAbs = Math.abs(aMod.getMonoIsotopicMassShift());
+            if (smallestMass > deltaAbs) {
+                smallestMass = deltaAbs;
+            }
+        }
+        LOGGER.info("Looking for unexplained masses that are larger than " + smallestMass);
+        List<Identification> temp = new ArrayList<>();
+        for (Identification ident : completeIdentifications) {
+            try {
+                if (Math.abs(ident.getPeptide().calculateMassDelta()) < smallestMass) {
+                    temp.add(ident);
+                }
+            } catch (AASequenceMassUnknownException ex) {
+                LOGGER.warn(ex);
+            }
+        }
+        //sort identifications from worst to best, more chance to find a mod in a bad match !
+        Comparator comparator = new Comparator() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                if (o1 instanceof Identification && o2 instanceof Identification) {
+                    Identification ident1 = (Identification) o1;
+                    Identification ident2 = (Identification) o2;
+                    try {
+                        double mr1 = ident1.getPeptide().calculateMassDelta();
+                        double mr2 = ident2.getPeptide().calculateMassDelta();
+                        if (mr1 > mr2) {
+                            return 1;
+                        } else if (mr1 < mr2) {
+                            return -1;
+                        }
+                    } catch (AASequenceMassUnknownException e) {
+                        LOGGER.warn(e);
+                        return -1;
+                    }
+                }
+                return 0;
+            }
+        };
+        Collections.sort(temp, comparator);
+        return temp;
+    }
+
     public Set<Modification> initModifications(String assayAccession, Resource modificationsResource, InputType inputType) throws IOException {
         LOGGER.info("Loading modifications...");
         modificationHolder = new ModificationHolder();
@@ -281,7 +333,11 @@ public abstract class AbstractSpectrumAnnotator<T> {
             AsapModificationAdapter adapter = new AsapModificationAdapter();
             //get other modifications
             for (String aPTMName : annotatedModService.getAssayAnnotatedPTMs(assayAccession)) {
-                sortedAnnotatedModifications.add((Modification) PRIDEModificationFactory.getInstance().getModification(adapter, aPTMName));
+                try {
+                    sortedAnnotatedModifications.add((Modification) PRIDEModificationFactory.getInstance().getModification(adapter, aPTMName));
+                } catch (ParameterExtractionException ex) {
+                    LOGGER.error("Could not include " + aPTMName + ". Please verify ! Reason:" + ex);
+                }
             }
         }
         //order the annotated modifications to prevalence (in case there are more than the selected batch size)
@@ -300,6 +356,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         sortedAllModifications.stream().forEach((mod) -> {
             modQueue.offer(mod);
         });
+        LOGGER.info("Retrieved sorted modification map");
         return sortedAnnotatedModifications;
     }
 
@@ -327,6 +384,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         //              explain a given mass delta (if there is one) -> Zen Archer
         LOGGER.info("finding modification combinations..;");
         //set fragment mass error for the identification scorer
+
         Map<Identification, Set<ModificationCombination>> massDeltaExplanationsMap = findModificationCombinations(modificationHolder, spectrumAnnotatorResult.getMassRecalibrationResult(), completeIdentifications);
         LOGGER.info("Finished finding modification combinations");
 
@@ -440,7 +498,9 @@ public abstract class AbstractSpectrumAnnotator<T> {
         if (!modificationHolder.getAllModifications().isEmpty()) {
             massDeltaExplainer = new MassDeltaExplainerImpl(modificationHolder);
             //finally calculate the possible explanations
-            possibleExplanations = massDeltaExplainer.explainCompleteIndentifications(completeIdentifications, massRecalibrationResult, analyzerData);
+            //prefilter the identifications here...if it's smaller than the smallest mod, there's no point in keeping it
+            List<Identification> filterIdentifications = filterIdentifications(completeIdentifications, modificationHolder);
+            possibleExplanations = massDeltaExplainer.explainCompleteIndentifications(filterIdentifications, massRecalibrationResult, analyzerData);
         }
 
         return possibleExplanations;

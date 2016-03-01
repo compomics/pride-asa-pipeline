@@ -34,7 +34,7 @@ public class DbSpectrumAnnotator extends AbstractSpectrumAnnotator<String> {
 
     public void setExperimentService(DbExperimentService experimentService) {
         this.experimentService = experimentService;
-    }        
+    }
 
     /**
      * Public methods.
@@ -139,7 +139,9 @@ public class DbSpectrumAnnotator extends AbstractSpectrumAnnotator<String> {
     private void loadExperimentIdentifications(String experimentAccession) {
         //load the identifications for the given experiment
         identifications = experimentService.loadExperimentIdentifications(experimentAccession);
+        LOGGER.info("Retrieved identifications from the repository...");
         //update the considered charge states (if necessary)
         experimentService.updateChargeStates(experimentAccession, consideredChargeStates);
+        LOGGER.info("Updated charge states in the experiment service...");
     }
 }

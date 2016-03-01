@@ -1,14 +1,12 @@
 package com.compomics.pride_asa_pipeline.core.logic.inference.modification;
 
-import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
+import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.util.report.impl.TotalReportGenerator;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.UtilitiesPTMAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
-import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.experiment.biology.PTM;
 import com.compomics.util.experiment.biology.PTMFactory;
@@ -57,17 +55,17 @@ public class ModificationPredictor {
     private final List<Integer> quantAccessions = Arrays.asList(new Integer[]{258, 259, 267, 367, 687, 365, 866, 730, 532, 730, 533, 731, 739, 738, 737, 984, 985, 1341, 1342});
     private String assay;
     private final ModificationHolder modificationHolder;
-    
+
     public ModificationPredictor(String assay, ModificationHolder modificationHolder) {
         this.assay = assay;
         this.modificationHolder = modificationHolder;
         inferModifications();
     }
-    
+
     private void inferModifications() {
         LOGGER.info("Inferring modifications...");
         HashMap<String, Boolean> asapMods = new HashMap<>();
-        
+
         ModificationAdapter adapter = new UtilitiesPTMAdapter();
         ptmSettings = new PtmSettings();
         //make sure the annotated mods are in there as well
@@ -87,47 +85,56 @@ public class ModificationPredictor {
                 ArrayList<String> unknownPTM = new ArrayList<>();
                 PTMFactory.getInstance().convertPridePtm(aMod.getKey(), ptmSettings, unknownPTM, false);
                 if (!unknownPTM.isEmpty()) {
-                    LOGGER.info(aMod.getKey() + " is not a standard modification. Converting to utilities object");
-                    PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
-                    if (!aUtilitiesMod.getName().toLowerCase().contains("unknown")) {
-                        if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
-                            encounteredMasses.add(aUtilitiesMod.getRoundedMass());
-                            if (aMod.getValue()) {
-                                ptmSettings.addFixedModification(aUtilitiesMod);
+                    try {
+                        LOGGER.info(aMod.getKey() + " is not a standard modification. Converting to utilities object");
+                        PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
+                        if (!aUtilitiesMod.getName().toLowerCase().contains("unknown")) {
+                            if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
+                                encounteredMasses.add(aUtilitiesMod.getRoundedMass());
+                                if (aMod.getValue()) {
+                                    ptmSettings.addFixedModification(aUtilitiesMod);
+                                } else {
+                                    ptmSettings.addVariableModification(aUtilitiesMod);
+                                }
+
                             } else {
-                                ptmSettings.addVariableModification(aUtilitiesMod);
+                                LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
                             }
-                            
+
                         } else {
-                            LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
+                            LOGGER.info(aMod.getKey() + " was found in the default PTMs");
                         }
-                    } else {
-                        LOGGER.info(aMod.getKey() + " was found in the default PTMs");
+                    } catch (ParameterExtractionException e) {
+                        LOGGER.error("Skipping" + aMod.getKey() + " : reason : " + e);
                     }
                 }
+
             } catch (NullPointerException e) {
                 e.printStackTrace();
                 LOGGER.error("MODIFICATION SKIPPED DUE TO COMPATIBILITY ISSUES WITH COMPOMICS UTILITIES LIBRARY - ISOTOPES NOT SUPPORTED " + aMod.getKey());
             }
         }
+
         TotalReportGenerator.setPtmSettings(ptmSettings);
-        TotalReportGenerator.setPtmSettingsMethod("Fragment mass error analysis");
+
+        TotalReportGenerator.setPtmSettingsMethod(
+                "Fragment mass error analysis");
     }
-    
+
     public double getConsiderationThreshold() {
         return considerationThreshold;
     }
-    
+
     public double getFixedThreshold() {
         return fixedThreshold;
     }
-    
+
     public Map<Modification, Double> getModificationRates() {
         return modificationRates;
     }
-    
+
     public PtmSettings getPtmSettings() {
         return ptmSettings;
     }
-    
+
 }

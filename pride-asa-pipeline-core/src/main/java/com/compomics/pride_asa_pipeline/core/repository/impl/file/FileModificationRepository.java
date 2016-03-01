@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
+import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
@@ -7,6 +8,7 @@ import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 
@@ -56,7 +58,11 @@ public class FileModificationRepository extends ParserCacheConnector implements 
         for (Comparable proteinID : parser.getProteinIds()) {
             List<uk.ac.ebi.pride.utilities.data.core.Modification> mods = parser.getPTMs(proteinID, peptideID);
             for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : mods) {
-                modificationList.add((Modification) modFactory.getModification(adapter, aMod.getName()));
+                try {
+                    modificationList.add((Modification) modFactory.getModification(adapter, aMod.getName()));
+                } catch (ParameterExtractionException ex) {
+                     LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
+                }
             }
         }
         return modificationList;
@@ -71,7 +77,12 @@ public class FileModificationRepository extends ParserCacheConnector implements 
                 List<uk.ac.ebi.pride.utilities.data.core.Modification> mods = parser.getPTMs(proteinID, peptideID);
                 for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : mods) {
                     if (aMod != null && aMod.getName() != null) {
-                        Object modification = modFactory.getModification(adapter, aMod.getName());
+                        Object modification = null;
+                        try {
+                            modification = modFactory.getModification(adapter, aMod.getName());
+                        } catch (ParameterExtractionException ex) {
+                            LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
+                        }
                         if (modification != null) {
                             modificationList.add((Modification) modification);
                         } else {

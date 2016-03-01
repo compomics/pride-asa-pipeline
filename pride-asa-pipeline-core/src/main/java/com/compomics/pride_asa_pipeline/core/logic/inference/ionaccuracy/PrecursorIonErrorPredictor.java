@@ -150,4 +150,17 @@ public class PrecursorIonErrorPredictor {
         return C13IsotopeMass;
     }
 
+    public void clear() {
+        if (encounteredCharges != null) {
+            encounteredCharges.clear();
+        }
+        if (experimentIdentifications != null) {
+            experimentIdentifications.clear();
+        }
+        if (precursorIonStats != null) {
+            precursorIonStats.clear();
+        }
+
+    }
+
 }

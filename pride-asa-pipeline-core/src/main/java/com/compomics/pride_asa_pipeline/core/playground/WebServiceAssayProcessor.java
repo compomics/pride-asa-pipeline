@@ -25,7 +25,8 @@ public class WebServiceAssayProcessor {
             outputFolder.delete();
         }
         outputFolder.mkdirs();
-        SearchParameters analyze = new WebServiceParameterExtractor(outputFolder).analyze(inputAssay);
+        WebServiceParameterExtractor webServiceParameterExtractor = new WebServiceParameterExtractor(outputFolder);
+        SearchParameters analyze = webServiceParameterExtractor.analyze(inputAssay);
         System.out.println(analyze);
-    }
+     }
 }
