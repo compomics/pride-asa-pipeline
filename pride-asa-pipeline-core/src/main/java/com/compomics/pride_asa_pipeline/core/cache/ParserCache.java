@@ -7,9 +7,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.naming.ConfigurationException;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.MzIdentMLControllerImpl;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.PrideXmlControllerImpl;
+
 
 /**
  * A cache that holds the parsers so they don't have to be run again
@@ -72,9 +74,14 @@ public class ParserCache {
         }
         return parserCache.get(experimentAccession);
     }
-    public static void main(String args[]) {
-        ParserCache.getInstance().getParser("test", new File("C:\\Users\\compomics\\Desktop\\TEST_ASAP\\TCGA-AA-A00N-01A-32_W_VU_20121027_A0218_5D_R_FR02.mzid"), false);
+
+    public static void main(String args[]) throws ConfigurationException {
+        File identificationsFile = new File("C:\\Users\\compomics\\Desktop\\TEST_ASAP\\TCGA-AA-A00N-01A-32_W_VU_20121027_A0218_5D_R_FR02.mzid");
+        //   	MzIdentMLUnmarshaller test = new MzIdentMLUnmarshallerAdaptor(identificationsFile,false);
+        MzIdentMLControllerImpl mzIdentMlController = new MzIdentMLControllerImpl(identificationsFile, true,false);
+   //     uk.ac.ebi.jmzidml.xml.io.MzIdentMLUnmarshaller marsh = new MzIdentMLUnmarshaller();
     }
+
     /**
      * Returns an existing or creates a new FileParser for the given input file
      *
@@ -85,7 +92,7 @@ public class ParserCache {
      * @throws IOException if the fileparser can not be constructed
      */
     public CachedDataAccessController getParser(String experimentAccession, boolean inMemory) {
-         return getParser(experimentAccession, loadedFiles.get(experimentAccession), inMemory);
+        return getParser(experimentAccession, loadedFiles.get(experimentAccession), inMemory);
     }
 
     /**

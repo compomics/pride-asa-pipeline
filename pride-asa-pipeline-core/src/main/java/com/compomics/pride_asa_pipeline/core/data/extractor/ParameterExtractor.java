@@ -189,7 +189,7 @@ public class ParameterExtractor {
         } catch (Exception e) {
               // useDefaults(assay);
               e.printStackTrace();
-                 throw new ParameterExtractionException(e);
+                 throw new ParameterExtractionException(e.getMessage());
         }
     }
 

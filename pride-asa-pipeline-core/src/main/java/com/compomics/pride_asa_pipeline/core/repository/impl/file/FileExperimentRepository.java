@@ -54,11 +54,13 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
         //get all the peptide ids for the proteins
         long proteinCount = parser.getProteinIds().size();
         double completeRatio = 0.0;
+        double currentCount = 0;
         for (Comparable aProteinID : parser.getProteinIds()) {
-            completeRatio = 100 * (double) identifications.size() / (double) proteinCount;
+            completeRatio = 100 * currentCount / proteinCount;
             if (completeRatio % 10 < 1) {
                 LOGGER.info(completeRatio + "%");
             }
+
             for (Comparable aPeptideID : parser.getPeptideIds(aProteinID)) {
                 uk.ac.ebi.pride.utilities.data.core.Peptide aPeptide = parser.getPeptideByIndex(aProteinID, aPeptideID);
                 SpectrumIdentification spectrumIdentification = aPeptide.getSpectrumIdentification();
@@ -77,6 +79,7 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
                 } catch (UnknownAAException ex) {
                     LOGGER.error(ex);
                 }
+                currentCount++;
             }
         }
         //get all evidence for all peptide ids

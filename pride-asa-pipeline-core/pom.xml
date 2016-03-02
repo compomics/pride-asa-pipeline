@@ -303,21 +303,6 @@
     </build>
 
     <repositories>                                          
-
-        <!-- EBI SNAPSHOT repo -->
-        <repository>
-            <id>nexus-ebi-repo-snapshots</id>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
-        </repository> 
-
-        
-        <!-- EBI repo -->
-        <repository>
-            <id>nexus-ebi-repo</id>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</url>
-        </repository>
-
-   
         <repository>
             <id>genesis-maven2-repo</id>
             <name>Genesis maven2 repository</name>
@@ -353,35 +338,10 @@
         </dependency>
   
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-        </dependency>
-
-        <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-        </dependency>
         
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -401,17 +361,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>omssa-xsd</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom</artifactId>
         </dependency>       
-        
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>it.tidalwave.betterbeansbinding</groupId>
@@ -438,12 +388,7 @@
             <artifactId>glazedlists_java15</artifactId>
         </dependency>     
         
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>utilities</artifactId>    
-            <version>4.3.22</version>    
-        </dependency>
-                 
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
@@ -459,27 +404,37 @@
             <groupId>no.uib</groupId>
             <artifactId>ols-dialog</artifactId>
         </dependency>
-       
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.4</version>
-            <type>jar</type>
-        </dependency>
-        
         <dependency>
             <groupId>uk.ac.ebi.pride.tools</groupId>
             <artifactId>pride-mod</artifactId>
             <version>2.0.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
-
+        <dependency>
+            <groupId>uk.ac.ebi.pride.utilities</groupId>
+            <artifactId>pride-utilities</artifactId>
+            <version>2.0.6-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
         <dependency>
             <groupId>uk.ac.ebi.pride.utilities</groupId>
             <artifactId>ms-data-core-api</artifactId>
-            <version>2.0.0-SNAPSHOT</version>
-        </dependency> 
-
+            <version>2.0.6-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.jmzidml</groupId>
+            <artifactId>jmzidentml</artifactId>
+            <version>1.2.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     
  
