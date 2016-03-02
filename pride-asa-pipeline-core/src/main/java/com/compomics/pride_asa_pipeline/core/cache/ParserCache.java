@@ -66,13 +66,15 @@ public class ParserCache {
                 parserCache.put(experimentAccession, prideXmlControllerImpl);
                 peakFileCache.put(experimentAccession, Arrays.asList(new File[]{identificationsFile}));
             } else {
-                parserCache.put(experimentAccession, new MzIdentMLControllerImpl(identificationsFile, inMemory));
+                parserCache.put(experimentAccession, new MzIdentMLControllerImpl(identificationsFile, true));
             }
             loadedFiles.put(experimentAccession, identificationsFile);
         }
         return parserCache.get(experimentAccession);
     }
-
+    public static void main(String args[]) {
+        ParserCache.getInstance().getParser("test", new File("C:\\Users\\compomics\\Desktop\\TEST_ASAP\\TCGA-AA-A00N-01A-32_W_VU_20121027_A0218_5D_R_FR02.mzid"), false);
+    }
     /**
      * Returns an existing or creates a new FileParser for the given input file
      *

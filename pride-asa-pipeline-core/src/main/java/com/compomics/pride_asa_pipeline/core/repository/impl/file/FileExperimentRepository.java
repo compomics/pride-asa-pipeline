@@ -50,9 +50,15 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
     @Override
     public List<Identification> loadExperimentIdentifications(String experimentAccession) {
         List<Identification> identifications = new ArrayList<>();
-        CachedDataAccessController parser = parserCache.getParser(experimentAccession, true);
+        CachedDataAccessController parser = parserCache.getParser(experimentAccession, false);
         //get all the peptide ids for the proteins
+        long proteinCount = parser.getProteinIds().size();
+        double completeRatio = 0.0;
         for (Comparable aProteinID : parser.getProteinIds()) {
+            completeRatio = 100 * (double) identifications.size() / (double) proteinCount;
+            if (completeRatio % 10 < 1) {
+                LOGGER.info(completeRatio + "%");
+            }
             for (Comparable aPeptideID : parser.getPeptideIds(aProteinID)) {
                 uk.ac.ebi.pride.utilities.data.core.Peptide aPeptide = parser.getPeptideByIndex(aProteinID, aPeptideID);
                 SpectrumIdentification spectrumIdentification = aPeptide.getSpectrumIdentification();

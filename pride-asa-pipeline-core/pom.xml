@@ -303,6 +303,21 @@
     </build>
 
     <repositories>                                          
+
+        <!-- EBI SNAPSHOT repo -->
+        <repository>
+            <id>nexus-ebi-repo-snapshots</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
+        </repository> 
+
+        
+        <!-- EBI repo -->
+        <repository>
+            <id>nexus-ebi-repo</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</url>
+        </repository>
+
+   
         <repository>
             <id>genesis-maven2-repo</id>
             <name>Genesis maven2 repository</name>
@@ -463,8 +478,7 @@
             <groupId>uk.ac.ebi.pride.utilities</groupId>
             <artifactId>ms-data-core-api</artifactId>
             <version>2.0.0-SNAPSHOT</version>
-            <type>jar</type>
-        </dependency>
+        </dependency> 
 
     </dependencies>
     

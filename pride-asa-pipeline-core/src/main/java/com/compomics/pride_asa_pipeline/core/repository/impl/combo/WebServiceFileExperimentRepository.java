@@ -103,7 +103,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
         if (downloadFile.getName().endsWith(".gz")) {
             temp = new File(temp.getAbsolutePath().replace(".gz", ""));
         }
-        LOGGER.debug("Downloading : " + url.getPath());
+        LOGGER.info("Downloading : " + url.getPath());
         downloader.downloadFile(url.getPath(), downloadFile);
         if (downloadFile.getAbsolutePath().endsWith(".gz")) {
             gunzip(downloadFile, temp);
@@ -136,6 +136,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
                 assayFiles.add(downloadFile(assayFile));
             }
         }
+                LOGGER.info("Download for "+experimentAccession+" completed");
         return assayFiles;
     }
 
