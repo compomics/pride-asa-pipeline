@@ -7,11 +7,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.naming.ConfigurationException;
+import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.MzIdentMLControllerImpl;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.PrideXmlControllerImpl;
-
 
 /**
  * A cache that holds the parsers so they don't have to be run again
@@ -34,6 +33,11 @@ public class ParserCache {
      */
     private static final HashMap<String, List<File>> peakFileCache = new HashMap();
 
+    /**
+     * The Logging instance
+     */
+    private static final Logger LOGGER = Logger.getLogger(ParserCache.class);
+    
     /**
      * The ParserCache instance
      *
@@ -63,23 +67,18 @@ public class ParserCache {
      */
     public CachedDataAccessController getParser(String experimentAccession, File identificationsFile, boolean inMemory) {
         if (!parserCache.containsKey(experimentAccession)) {
+            LOGGER.info("Parsing file using PRIDE ms-data-core-api");
             if (identificationsFile.getName().toUpperCase().endsWith(".XML")) {
                 PrideXmlControllerImpl prideXmlControllerImpl = new PrideXmlControllerImpl(identificationsFile);
                 parserCache.put(experimentAccession, prideXmlControllerImpl);
                 peakFileCache.put(experimentAccession, Arrays.asList(new File[]{identificationsFile}));
             } else {
-                parserCache.put(experimentAccession, new MzIdentMLControllerImpl(identificationsFile, true));
+                parserCache.put(experimentAccession, new MzIdentMLControllerImpl(identificationsFile, false, true));
             }
             loadedFiles.put(experimentAccession, identificationsFile);
+            LOGGER.info("DataAccessController for " + experimentAccession + " : " + identificationsFile.getAbsolutePath() + " was cached");
         }
         return parserCache.get(experimentAccession);
-    }
-
-    public static void main(String args[]) throws ConfigurationException {
-        File identificationsFile = new File("C:\\Users\\compomics\\Desktop\\TEST_ASAP\\TCGA-AA-A00N-01A-32_W_VU_20121027_A0218_5D_R_FR02.mzid");
-        //   	MzIdentMLUnmarshaller test = new MzIdentMLUnmarshallerAdaptor(identificationsFile,false);
-        MzIdentMLControllerImpl mzIdentMlController = new MzIdentMLControllerImpl(identificationsFile, true,false);
-   //     uk.ac.ebi.jmzidml.xml.io.MzIdentMLUnmarshaller marsh = new MzIdentMLUnmarshaller();
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
+import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
 import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
@@ -55,10 +56,12 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
         long proteinCount = parser.getProteinIds().size();
         double completeRatio = 0.0;
         double currentCount = 0;
+        double currentPrint = 0;
         for (Comparable aProteinID : parser.getProteinIds()) {
             completeRatio = 100 * currentCount / proteinCount;
-            if (completeRatio % 10 < 1) {
-                LOGGER.info(completeRatio + "%");
+            if (completeRatio > currentPrint) {
+                LOGGER.info(InferenceStatistics.round(completeRatio, 0) + "%");
+                currentPrint += 10;
             }
 
             for (Comparable aPeptideID : parser.getPeptideIds(aProteinID)) {
@@ -79,10 +82,13 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
                 } catch (UnknownAAException ex) {
                     LOGGER.error(ex);
                 }
-                currentCount++;
+                aPeptide = null;
             }
+            currentCount++;
         }
+        LOGGER.info("100% Completion!");
         //get all evidence for all peptide ids
+        parser.close();
         return identifications;
     }
 

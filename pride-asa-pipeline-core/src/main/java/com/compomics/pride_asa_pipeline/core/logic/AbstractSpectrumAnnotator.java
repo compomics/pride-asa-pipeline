@@ -33,7 +33,6 @@ import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
 import com.compomics.util.pride.PrideWebService;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -44,12 +43,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
+import uk.ac.ebi.pride.utilities.data.controller.DataAccessException;
 
 /**
  *
@@ -588,7 +586,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
                     identification.setAnnotationData(annotationData);
                     identification.setPipelineExplanationType(PipelineExplanationType.UNEXPLAINED);
                     unexplainedIdentifications.add(identification);
-                } catch (NullPointerException e) {
+                } catch (NullPointerException | DataAccessException e) {
                     LOGGER.error("Something went wrong for " + identification.getPeptide().getSequenceString() + ":", e);
                 }
             }
