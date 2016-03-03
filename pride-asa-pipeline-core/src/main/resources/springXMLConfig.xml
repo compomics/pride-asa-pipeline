@@ -116,7 +116,7 @@
 
     <!-- repository beans -->
     <bean id="experimentRepository"
-          class="com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository">
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository">
         <!--    <property name="dataSource" ref="prideDataSource"/>-->
     </bean>
 
@@ -126,7 +126,7 @@
     </bean>
 
     <bean id="modificationRepository"
-          class="com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository">
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository">
         <!--    <property name="dataSource" ref="prideDataSource"/>-->
     </bean>
 

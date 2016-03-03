@@ -19,6 +19,7 @@ import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdap
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.UtilitiesPTMAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.impl.FileResultHandlerImpl3;
+import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.service.impl.DbModificationServiceImpl;
@@ -75,6 +76,23 @@ public class ParameterExtractor {
     private boolean printableReports = true;
     private AnalyzerData analyzerData;
 
+          /**
+     * An extractor for parameters
+     *
+     * @param assay the assay to extract
+     * @param analyzerData the type of instrument used when not available through the webservice
+     * @param modRepository an existing modification repository (mainly used to avoid reparsing of the file)
+     * @throws ParameterExtractionException when an error occurs
+     */
+    public ParameterExtractor(String assay,AnalyzerData analyzerData,FileExperimentModificationRepository modRepository) throws ParameterExtractionException {
+            //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
+            ApplicationContextProvider.getInstance().setDefaultApplicationContext();
+            spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
+            spectrumAnnotator.setModificationRepository(modRepository);
+            this.analyzerData=analyzerData;
+            init(assay);
+    }
+    
        /**
      * An extractor for parameters
      *
@@ -370,6 +388,10 @@ public class ParameterExtractor {
     {
         precursorIonErrorPredictor.clear();
     }}
+
+    void setModRepository(FileExperimentModificationRepository modificationRepository) {
+       spectrumAnnotator.setModificationRepository(modificationRepository);
+    }
     
     
 }

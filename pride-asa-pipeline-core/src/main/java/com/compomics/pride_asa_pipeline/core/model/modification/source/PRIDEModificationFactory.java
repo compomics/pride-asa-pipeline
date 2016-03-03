@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.TreeSet;
@@ -58,8 +59,19 @@ public class PRIDEModificationFactory {
      * unimodmodification name
      */
     private static BidiMap modificationAccessionMap = new DualHashBidiMap();
+    /**
+     * the minimal mass a modification can have
+     */
     private static double minimalModMass;
+    /**
+     * the maximal mass for a modification
+     */
     private static double maximalModMass;
+    /**
+     * The cache for converted modifications so they don't have to be converted
+     * every single time
+     */
+    private static HashMap<String, Object> modificationCache = new HashMap<>();
     /**
      * The mode (online or offline)
      */
@@ -142,7 +154,11 @@ public class PRIDEModificationFactory {
      * com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException
      */
     public Object getModification(ModificationAdapter adapter, String ptmName) throws ParameterExtractionException {
-        return adapter.convertModification(modificationNameMap.get(refactorName(ptmName)));
+        if (!modificationCache.containsKey(ptmName)) {
+            LOGGER.info(ptmName+" was cached");
+            modificationCache.put(ptmName, adapter.convertModification(modificationNameMap.get(refactorName(ptmName))));
+        }
+        return modificationCache.get(ptmName);
     }
 
     //THIS METHOD HAS TO DISSAPEAR OVER TIME, IT IS PURELY MAPPING THAT IS NOT YET IN COMPOMICS UTILITIES
@@ -216,12 +232,27 @@ public class PRIDEModificationFactory {
      * @return the ordened modification set
      */
     public static LinkedList<Modification> getAsapMods() {
+        return getAsapMods(modificationNameMap.size());
+    }
+    
+    /**
+     * Returns an ordened set of modifications from high prevalence to low
+     * prevalence
+     *
+     * @return the ordened modification set
+     */
+    public static LinkedList<Modification> getAsapMods(int nr) {
         LinkedList<Modification> pride_mods = new LinkedList<>();
         DescriptiveStatistics massStats = new DescriptiveStatistics();
+        int count = nr;
         for (PRIDEModification aMod : modificationNameMap.values()) {
             Modification convertModification = new AsapModificationAdapter().convertModification(aMod);
             pride_mods.add(convertModification);
             massStats.addValue(aMod.getMonoDeltaMass());
+            count--;
+            if(count==0){
+                break;
+            }
         }
         minimalModMass = massStats.getMin();
         maximalModMass = massStats.getMax();

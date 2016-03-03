@@ -17,6 +17,7 @@ import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.source.AnnotatedModificationService;
 import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
@@ -99,6 +100,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
     private double matchedPeakCriterion = 0.1;
     private double maximumAllowedErrorDa = 1.0;
     private ArrayBlockingQueue<Modification> modQueue;
+    private FileExperimentModificationRepository modRepository;
 
     /**
      * Getters and setters.
@@ -173,6 +175,10 @@ public abstract class AbstractSpectrumAnnotator<T> {
 
     public ModificationHolder getModificationHolder() {
         return modificationHolder;
+    }
+
+    public void setModificationRepository(FileExperimentModificationRepository modRepository) {
+        this.modRepository = modRepository;
     }
 
     /**
@@ -270,17 +276,18 @@ public abstract class AbstractSpectrumAnnotator<T> {
         }
     }
 
-    
-
     public Set<Modification> initModifications(String assayAccession, Resource modificationsResource, InputType inputType) throws IOException {
         LOGGER.info("Loading modifications...");
         modificationHolder = new ModificationHolder();
         LinkedHashSet<Modification> sortedAnnotatedModifications = new LinkedHashSet<>();
         //load the modifications from the PRIDE annotation
         //if there is no file in the parsercache, use the webservice to get the modifications 
-        if (ParserCache.getInstance().containsParser(assayAccession)) {
-            FileModificationRepository repository = new FileModificationRepository();
-            sortedAnnotatedModifications.addAll(repository.getModificationsByExperimentId(assayAccession));
+        if (modRepository != null) {
+            LOGGER.info("Using cached modifications");
+            sortedAnnotatedModifications.addAll(modRepository.getModificationsByExperimentId(assayAccession));
+        } else if (ParserCache.getInstance().containsParser(assayAccession)) {
+            modRepository = new FileExperimentModificationRepository(assayAccession);
+            sortedAnnotatedModifications.addAll(modRepository.getModificationsByExperimentId(assayAccession));
         } else {
             AnnotatedModificationService annotatedModService = new AnnotatedModificationService();
             AsapModificationAdapter adapter = new AsapModificationAdapter();
@@ -295,7 +302,9 @@ public abstract class AbstractSpectrumAnnotator<T> {
         }
         //order the annotated modifications to prevalence (in case there are more than the selected batch size)
         //get all asap mods
-        LinkedList<Modification> sortedAllModifications = PRIDEModificationFactory.getAsapMods();
+        LOGGER.info("Loading pride asap modifications");
+        //only load those for now that matter ? (6passes, 6 per set?)
+        LinkedList<Modification> sortedAllModifications = PRIDEModificationFactory.getAsapMods(MAX_PASS_SIZE * MAX_PASSES);
         //get a queue of them
         modQueue = new ArrayBlockingQueue<>(sortedAllModifications.size());
         //first get the annotated modifications and order those as well?
@@ -309,7 +318,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         sortedAllModifications.stream().forEach((mod) -> {
             modQueue.offer(mod);
         });
-        LOGGER.info("Retrieved sorted modification map");
+        LOGGER.info("Retrieved complete sorted modification map");
         return sortedAnnotatedModifications;
     }
 

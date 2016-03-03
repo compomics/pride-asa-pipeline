@@ -2,12 +2,13 @@ package com.compomics.pride_asa_pipeline.core.data.extractor;
 
 import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
-import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
+import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
+import com.compomics.util.experiment.identification.spectrum_annotation.SpectrumAnnotator;
 import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
 import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
@@ -35,9 +36,9 @@ public class FileParameterExtractor {
      */
     private static final Logger LOGGER = Logger.getLogger(FileParameterExtractor.class);
 
-    private FileExperimentRepository experimentRepository;
+    private FileExperimentModificationRepository experimentRepository;
     private FileSpectrumRepository spectrumRepository;
-    private FileModificationRepository modificationRepository;
+    private FileExperimentModificationRepository modificationRepository;
     private AnalyzerData analyzerData;
 
     public FileParameterExtractor(File outputFolder) throws IOException {
@@ -55,15 +56,17 @@ public class FileParameterExtractor {
     private void init() {
         //load into the spring setup
         ApplicationContextProvider.getInstance().setDefaultApplicationContext();
-        experimentRepository = (FileExperimentRepository) ApplicationContextProvider.getInstance().getBean("experimentRepository");
+
         spectrumRepository = (FileSpectrumRepository) ApplicationContextProvider.getInstance().getBean("spectrumRepository");
-        modificationRepository = (FileModificationRepository) ApplicationContextProvider.getInstance().getBean("modificationRepository");
+
         //add a logger specific to this file
     }
 
     private SearchParameters inferParameters(String assay) throws ParameterExtractionException, IOException {
+
         LOGGER.info("Attempting to infer searchparameters");
-        ParameterExtractor extractor = new ParameterExtractor(assay, analyzerData);
+        ParameterExtractor extractor = new ParameterExtractor(assay, analyzerData, modificationRepository);
+        //extractor.setExperimentRepository(experimentRepository);
         SearchParameters parameters = extractor.getParameters();
         extractor.printReports(outputFolder);
         SearchParameters.saveIdentificationParameters(parameters, new File(outputFolder, assay + ".par"));
@@ -81,6 +84,8 @@ public class FileParameterExtractor {
 
     public SearchParameters analyzePrideXML(File inputFile, String assay) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
         LOGGER.info("Setting up experiment repository for assay " + assay);
+        experimentRepository = new FileExperimentModificationRepository(assay);
+        modificationRepository = experimentRepository;
         //load the file into the repository
         experimentRepository.addPrideXMLFile(assay, inputFile);
         spectrumRepository.setExperimentIdentifier(assay);
@@ -91,6 +96,8 @@ public class FileParameterExtractor {
 
     public SearchParameters analyzeMzID(File inputFile, List<File> peakFiles, String assay) throws MGFExtractionException, ParameterExtractionException, IOException {
         LOGGER.info("Setting up experiment repository for assay " + assay);
+        experimentRepository = new FileExperimentModificationRepository(assay);
+        modificationRepository = experimentRepository;
         experimentRepository.addMzID(assay, inputFile, peakFiles);
         spectrumRepository.setExperimentIdentifier(assay);
         modificationRepository.setExperimentIdentifier(assay);
