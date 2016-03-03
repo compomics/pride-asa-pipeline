@@ -88,7 +88,7 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
         }
         LOGGER.info("100% Completion!");
         //get all evidence for all peptide ids
-        parser.close();
+   //     parser.close();
         return identifications;
     }
 

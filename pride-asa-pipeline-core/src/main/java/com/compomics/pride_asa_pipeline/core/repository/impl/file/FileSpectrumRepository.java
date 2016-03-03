@@ -50,13 +50,13 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
 
     @Override
     public double[] getMzValuesBySpectrumId(String spectrumId) {
-        Spectrum spectrumById = parserCache.getParser(experimentIdentifier, true).getSpectrumById(spectrumId);
+        Spectrum spectrumById = parserCache.getParser(experimentIdentifier, false).getSpectrumById(spectrumId);
         return spectrumById.getMassIntensityMap()[0];
     }
 
     @Override
     public double[] getIntensitiesBySpectrumId(String spectrumId) {
-        Spectrum spectrumById = parserCache.getParser(experimentIdentifier, true).getSpectrumById(spectrumId);
+        Spectrum spectrumById = parserCache.getParser(experimentIdentifier, false).getSpectrumById(spectrumId);
         return spectrumById.getMassIntensityMap()[1];
     }
 
@@ -64,7 +64,7 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
     public Map<String, List<Peak>> getPeakMapsBySpectrumIdList(List<String> spectrumIds) {
         Map<String, List<Peak>> peakMap = new HashMap<>();
         for (String aSpectrumID : spectrumIds) {
-            Spectrum spectrumById = parserCache.getParser(experimentIdentifier, true).getSpectrumById(aSpectrumID);
+            Spectrum spectrumById = parserCache.getParser(experimentIdentifier, false).getSpectrumById(aSpectrumID);
             List<Peak> peakList = new ArrayList<>();
             double[][] massIntensityMap = spectrumById.getMassIntensityMap();
             for (int i = 0; i < massIntensityMap.length; i++) {
