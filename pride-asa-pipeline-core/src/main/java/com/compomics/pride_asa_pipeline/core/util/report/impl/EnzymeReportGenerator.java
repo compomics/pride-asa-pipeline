@@ -31,8 +31,8 @@ public class EnzymeReportGenerator extends ExtractionReportGenerator {
         reportWriter.append("Amino Acid\t#C-term\t#N-term").append(System.lineSeparator());
         for (AminoAcid anAcid : AminoAcid.values()) {
             reportWriter.append(anAcid.letter()).append("\t");
-            reportWriter.append(String.valueOf(predictor.getC_TerminiCount().get(anAcid.letter()))).append("\t");
-            reportWriter.append(String.valueOf(predictor.getN_TerminiCount().get(anAcid.letter()))).append(System.lineSeparator());
+            reportWriter.append(String.valueOf(predictor.getCTerminiCount().get(anAcid.letter()))).append("\t");
+            reportWriter.append(String.valueOf(predictor.getNTerminiCount().get(anAcid.letter()))).append(System.lineSeparator());
         }
 
     }

@@ -79,6 +79,11 @@ public class AminoAcidMassInference {
         return massTolerance;
     }
 
+        /**
+         * Returns a list of mass errors originating from the input data
+         * @return a list of mass errors
+         * @throws IOException 
+         */
     public List<Double> getMassErrors() throws IOException {
         //get the list of measured MZ values
         LinkedList<BigDecimal> measuredMZList = new LinkedList<>();
@@ -87,7 +92,7 @@ public class AminoAcidMassInference {
             measuredMZList.add(new BigDecimal(mz));
         }
         //get the annotated matches per charge state
-        TreeMap<BigDecimal, MassMatch> annotateSpectrum = annotateSpectrum(precursorCharge, measuredMZList);
+        TreeMap<BigDecimal, MassMatch> annotateSpectrum = annotateMzValues(precursorCharge, measuredMZList);
         //iterate the annotated y-fragments
         Iterator<Map.Entry<BigDecimal, MassMatch>> iterator = annotateSpectrum.entrySet().iterator();
         //first match
@@ -98,6 +103,11 @@ public class AminoAcidMassInference {
         return reportedMassErrors;
     }
 
+    /**
+     *
+     * @return the mass deficits to the next position in the list
+     * @throws IOException
+     */
     public LinkedList<MassDeficitResult> getMassDeficits() throws IOException {
 //init the linkedList
         LinkedList<MassDeficitResult> resultList = new LinkedList<>();
@@ -109,7 +119,7 @@ public class AminoAcidMassInference {
         }
 
         //get the annotated matches per charge state
-        TreeMap<BigDecimal, MassMatch> annotateSpectrum = annotateSpectrum(precursorCharge, measuredMZList);
+        TreeMap<BigDecimal, MassMatch> annotateSpectrum = annotateMzValues(precursorCharge, measuredMZList);
         //iterate the annotated y-fragments
         Iterator<Map.Entry<BigDecimal, MassMatch>> iterator = annotateSpectrum.entrySet().iterator();
         //first match
@@ -165,7 +175,13 @@ public class AminoAcidMassInference {
         return product_ions_peptideA.get(ionIndex);
     }
 
-    public TreeMap<BigDecimal, MassMatch> annotateSpectrum(BigDecimal precursorCharge, LinkedList<BigDecimal> mzList) {
+    /**
+     * Attempts to annotate the given mz list
+     * @param precursorCharge the charge of the precursor
+     * @param mzList the list of mz values
+     * @return the matching masses and their position on the mz scale
+     */
+    public TreeMap<BigDecimal, MassMatch> annotateMzValues(BigDecimal precursorCharge, LinkedList<BigDecimal> mzList) {
         //hashmap of the best matches for an MZ value over all charges
         TreeMap<BigDecimal, MassMatch> bestMatches = new TreeMap<>();
         //put empty MassMatches in the sequence...

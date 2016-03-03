@@ -5,14 +5,13 @@ import com.compomics.pride_asa_pipeline.core.util.report.impl.TotalReportGenerat
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -62,6 +61,10 @@ public class EnzymePredictor {
      */
     private Enzyme mostLikelyEnzyme;
 
+    /**
+     * Determines whether the enzyme is suited for sequence database searching
+     * @return the suitability of the enzyme
+     */
     public boolean isSuitedForSearching() {
         return suitedForSearching;
     }
@@ -70,11 +73,17 @@ public class EnzymePredictor {
         this.suitedForSearching = suitedForSearching;
     }
 
+    
     public EnzymePredictor() throws IOException, XmlPullParserException {
         loadEnzymeFactory();
     }
-
-    public EnzymePredictor(List<String> peptideSequences) throws IOException, XmlPullParserException {
+    /**
+     * 
+     * @param peptideSequences a collection of peptidesequences to analyze
+     * @throws IOException
+     * @throws XmlPullParserException 
+     */
+    public EnzymePredictor(Collection<String> peptideSequences) throws IOException, XmlPullParserException {
         loadEnzymeFactory();
         this.peptideSequences.addAll(peptideSequences);
         estimateBestEnzyme();
@@ -182,11 +191,11 @@ public class EnzymePredictor {
         return mostLikelyEnzyme;
     }
 
-    public HashMap<Character, Integer> getN_TerminiCount() {
+    public HashMap<Character, Integer> getNTerminiCount() {
         return N_TerminiCount;
     }
 
-    public HashMap<Character, Integer> getC_TerminiCount() {
+    public HashMap<Character, Integer> getCTerminiCount() {
         return C_TerminiCount;
     }
 

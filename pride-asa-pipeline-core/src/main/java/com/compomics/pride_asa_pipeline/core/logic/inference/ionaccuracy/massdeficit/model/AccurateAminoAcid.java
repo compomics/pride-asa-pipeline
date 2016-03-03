@@ -3,6 +3,7 @@ package com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.massde
 import java.math.BigDecimal;
 
 /**
+ * This is an enum of the accurate amino acid masses
  *
  * @author Kenneth
  */

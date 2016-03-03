@@ -35,7 +35,13 @@ public class ModifiedAminoAcidMassInference {
     private final BigDecimal precursorCharge;
     //the used mass tolerance
     private final BigDecimal massTolerance;
-
+/**
+ * Returns the inference for modifications on amino acid masses
+ * @param peakList the list of peaks
+ * @param modifiedSequence the modified sequence
+ * @param precursorCharge the charge of the precursor
+ * @param massTolerance the allowed mass deviation
+ */
     public ModifiedAminoAcidMassInference(Collection<Peak> peakList, String modifiedSequence, BigDecimal precursorCharge, BigDecimal massTolerance) {
         this.massTolerance = massTolerance;
         this.peakList = peakList;

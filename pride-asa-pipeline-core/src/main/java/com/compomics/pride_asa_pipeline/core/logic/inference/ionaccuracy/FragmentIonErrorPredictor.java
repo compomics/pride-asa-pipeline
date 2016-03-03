@@ -35,7 +35,13 @@ public class FragmentIonErrorPredictor {
      * The logger
      */
     private static final Logger LOGGER = Logger.getLogger(FragmentIonErrorPredictor.class);
+    /**
+     * The amino acid mass inferences to calculate mass deficits from
+     */
     private final List<AminoAcidMassInference> aaInferences = new ArrayList<>();
+    /**
+     * The statistics object for fragmentation 
+     */
     private InferenceStatistics fragmentStats;
 
     public FragmentIonErrorPredictor(HashMap<Peptide, double[]> peptideMzMap) throws IOException {

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.massdeficit.logic;
 
 import com.compomics.util.experiment.biology.PTMFactory;
@@ -19,15 +14,9 @@ import java.util.regex.Pattern;
  */
 public class ModifiedSequenceConverter {
 
-    static String example = "NH2-HSHHHS<P>SSTPSAATPT<P>PTAGAR-COOH";
-    static PTMFactory ptmFactory = PTMFactory.getInstance();
+    private static PTMFactory ptmFactory = PTMFactory.getInstance();
 
     private static final Pattern TAG_REGEX = Pattern.compile("<(.+?)>");
-
-    public static void main(String[] args) {
-        init();
-        getModifiedPeptide(example);
-    }
 
     public static Peptide getModifiedPeptide(String modifiedSequence) {
         //   init();
@@ -58,7 +47,7 @@ public class ModifiedSequenceConverter {
         while (matcher.find()) {
             String mod = matcher.group().replace("<", "").replace(">", "");
             int modLocation = matcher.start();
-            char modifiedAminoAcid = tempSeq.charAt(modLocation-1);
+            char modifiedAminoAcid = tempSeq.charAt(modLocation - 1);
             modificationMatches.add(new ModificationMatch(getUtilitiesPTMName(String.valueOf(modifiedAminoAcid), mod), true, modLocation));
         }
         //check for termini

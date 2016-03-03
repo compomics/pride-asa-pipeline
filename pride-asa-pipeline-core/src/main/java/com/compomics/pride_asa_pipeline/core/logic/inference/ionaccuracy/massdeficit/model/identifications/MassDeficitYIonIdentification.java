@@ -7,12 +7,15 @@ import java.util.Collection;
  *
  * @author Kenneth
  */
-public class YIdentification extends Identification{
+public class MassDeficitYIonIdentification extends MassDeficitIdentification{
+    /**
+     * The peaks for the given peptide
+     */
     private final Collection<Peak> peaks;
     
     
     
-   public YIdentification(String modifiedSequence, String precursorCharge, String scan_identifier, String score,Collection<Peak> annotatedPeaks) {
+   public MassDeficitYIonIdentification(String modifiedSequence, String precursorCharge, String scan_identifier, String score,Collection<Peak> annotatedPeaks) {
        super(modifiedSequence, precursorCharge, scan_identifier, score);
        this.peaks = annotatedPeaks;
    }
