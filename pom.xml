@@ -134,17 +134,6 @@
     </build>    
 
     <repositories>                 
-        <repository>
-            <id>ebi-repo</id>
-            <name>The EBI Maven 2 repository</name>
-            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
         <!-- EBI repo -->
         <repository>
             <id>nexus-ebi-repo</id>
@@ -155,7 +144,7 @@
         <repository>
             <id>nexus-ebi-repo-snapshots</id>
             <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
-        </repository>   
+        </repository>
         <repository>
             <id>genesis-maven-repo</id>
             <name>Genesis maven repository</name>
@@ -256,7 +245,7 @@
             <dependency>
                 <groupId>com.compomics</groupId>
                 <artifactId>utilities</artifactId>
-                <version>4.2.15</version>
+                <version>4.4.2</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>derby</artifactId>
@@ -325,7 +314,7 @@
                 </exclusions>
             </dependency>
 
-              <dependency>
+            <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-frontend-jaxws</artifactId>
                 <version>2.7.5</version>
@@ -342,7 +331,6 @@
                 <artifactId>ols-dialog</artifactId>
                 <version>3.4.0</version>
             </dependency>
-
   
         </dependencies>
     </dependencyManagement>

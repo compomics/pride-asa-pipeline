@@ -9,4 +9,8 @@ public class ParameterExtractionException extends Exception {
     public ParameterExtractionException(String message) {
         super(message);
     }
+
+    public ParameterExtractionException(Exception e) {
+        super(e);
+    }
 }
