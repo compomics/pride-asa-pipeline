@@ -134,9 +134,13 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
         for (FileDetail assayFile : assayFileDetails.getList()) {
             if (assayFile.getFileType().equals(type)) {
                 assayFiles.add(downloadFile(assayFile));
+            } else if (type.equals(ProjectFileType.PEAK)) {
+                if (assayFile.getFileName().contains(".dat")) {
+                    assayFiles.add(downloadFile(assayFile));
+                }
             }
         }
-                LOGGER.info("Download for "+experimentAccession+" completed");
+        LOGGER.info("Download for " + experimentAccession + " completed");
         return assayFiles;
     }
 

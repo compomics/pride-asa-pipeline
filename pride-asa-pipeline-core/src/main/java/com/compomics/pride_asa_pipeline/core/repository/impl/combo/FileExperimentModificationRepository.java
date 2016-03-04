@@ -20,6 +20,9 @@ import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataA
 import uk.ac.ebi.pride.utilities.data.core.SpectrumIdentification;
 
 /**
+ * This class combines a FileExperimentRepository and a
+ * FileModificationRepository to help cache the file contents in memory and
+ * reduce the need to reparse the file
  *
  * @author Kenneth Verheggen
  */
@@ -46,10 +49,10 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
      */
     private final HashMap<Comparable, List<Modification>> modMapping = new HashMap<>();
 
-    public FileExperimentModificationRepository(){
-        
+    public FileExperimentModificationRepository() {
+
     }
-    
+
     public FileExperimentModificationRepository(String experimentIdentifier) {
         this.experimentIdentifier = experimentIdentifier;
     }
@@ -87,6 +90,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
                 }
                 //do the identification
                 SpectrumIdentification spectrumIdentification = aPeptide.getSpectrumIdentification();
+
                 try {
                     int charge = spectrumIdentification.getChargeState();
                     double mz = spectrumIdentification.getExperimentalMassToCharge();
@@ -95,7 +99,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
                     Identification identification = new Identification(
                             //@TODO is this correct?
                             peptide,
-                            String.valueOf(spectrumIdentification.getSpectrum().getIndex()),
+                            String.valueOf(aPeptideID),
                             String.valueOf(spectrumIdentification.getSpectrum().getId()),
                             spectrumIdentification.getName());
                     identifications.add(identification);
