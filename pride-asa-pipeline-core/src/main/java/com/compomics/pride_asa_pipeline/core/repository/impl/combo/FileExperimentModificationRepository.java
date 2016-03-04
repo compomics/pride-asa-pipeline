@@ -44,8 +44,12 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
     /**
      * In memory list of peptides and modifications
      */
-    private final HashMap<Integer, List<Modification>> modMapping = new HashMap<>();
+    private final HashMap<Comparable, List<Modification>> modMapping = new HashMap<>();
 
+    public FileExperimentModificationRepository(){
+        
+    }
+    
     public FileExperimentModificationRepository(String experimentIdentifier) {
         this.experimentIdentifier = experimentIdentifier;
     }
@@ -69,7 +73,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
             for (Comparable aPeptideID : parser.getPeptideIds(aProteinID)) {
                 uk.ac.ebi.pride.utilities.data.core.Peptide aPeptide = parser.getPeptideByIndex(aProteinID, aPeptideID);
                 // do the mods
-                List<Modification> modificationList = modMapping.getOrDefault(aPeptide.getId(), new ArrayList<Modification>());
+                List<Modification> modificationList = modMapping.getOrDefault(aPeptideID, new ArrayList<>());
                 for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : aPeptide.getModifications()) {
                     try {
                         modificationList.add((Modification) modFactory.getModification(adapter, aMod.getName()));
@@ -79,7 +83,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
                 }
                 //don't put empty lists in the mapping to lower stress on memory 
                 if (!modificationList.isEmpty()) {
-                    modMapping.put(aPeptide.getId(), modificationList);
+                    modMapping.put(aPeptideID, modificationList);
                 }
                 //do the identification
                 SpectrumIdentification spectrumIdentification = aPeptide.getSpectrumIdentification();
@@ -155,7 +159,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
                 }
             }
         } else {
-            for (Map.Entry<Integer, List<Modification>> aPeptide : modMapping.entrySet()) {
+            for (Map.Entry<Comparable, List<Modification>> aPeptide : modMapping.entrySet()) {
                 modificationList.addAll(aPeptide.getValue());
             }
         }

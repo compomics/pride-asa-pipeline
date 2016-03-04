@@ -55,7 +55,7 @@ public class FileParameterExtractor {
 
     private void init() {
         //load into the spring setup
-        ApplicationContextProvider.getInstance().setDefaultApplicationContext();
+       ApplicationContextProvider.getInstance().setDefaultApplicationContext();
 
         spectrumRepository = (FileSpectrumRepository) ApplicationContextProvider.getInstance().getBean("spectrumRepository");
 

@@ -8,7 +8,7 @@ import java.io.OutputStreamWriter;
 
 /**
  *
- * @author compomics
+ * @author Kenneth Verheggen
  */
 public class ContaminationReportGenerator extends ExtractionReportGenerator {
 

@@ -17,7 +17,7 @@ import org.junit.Test;
 
 /**
  *
- * @author compomics
+ * @author Kenneth Verheggen
  */
 public class UtilitiesPTMAdapterTest {
 

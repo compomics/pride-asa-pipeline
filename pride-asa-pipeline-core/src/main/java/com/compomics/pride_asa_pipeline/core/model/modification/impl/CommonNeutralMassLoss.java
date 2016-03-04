@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 /**
  *
- * @author compomics
+ * @author Kenneth Verheggen
  */
 public enum CommonNeutralMassLoss {
     //   H35Cl(R-Cl),
