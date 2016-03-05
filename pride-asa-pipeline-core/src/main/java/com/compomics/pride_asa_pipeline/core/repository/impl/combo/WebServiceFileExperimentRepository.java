@@ -1,7 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.combo;
 
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
-import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.util.io.FTPDownloader;
 import com.compomics.util.pride.PrideWebService;
 import java.io.File;
@@ -12,11 +11,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileType;
-import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
 
@@ -97,7 +94,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
             tempFolder.mkdirs();
         }
         URL url = detail.getDownloadLink();
-        FTPDownloader downloader = new FTPDownloader(url.getHost());
+        FTPDownloader downloader = new FTPDownloader(url.getHost(),true);
         File downloadFile = new File(tempFolder, detail.getFileName());
         File temp = new File(tempFolder, downloadFile.getName());
         if (downloadFile.getName().endsWith(".gz")) {

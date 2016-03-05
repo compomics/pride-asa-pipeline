@@ -19,13 +19,15 @@ import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 public class WebServiceAssayProcessor {
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
-        String inputAssay = "47797";
+        String inputAssay = "42095";
         File outputFolder = new File("C:\\Users\\compomics\\Desktop\\Complete\\" + inputAssay);
         if (outputFolder.exists()) {
             outputFolder.delete();
         }
         outputFolder.mkdirs();
-        WebServiceParameterExtractor webServiceParameterExtractor = new WebServiceParameterExtractor(outputFolder);
+        WebServiceParameterExtractor 
+                
+                webServiceParameterExtractor = new WebServiceParameterExtractor(outputFolder);
         SearchParameters analyze = webServiceParameterExtractor.analyze(inputAssay);
         System.out.println(analyze);
      }

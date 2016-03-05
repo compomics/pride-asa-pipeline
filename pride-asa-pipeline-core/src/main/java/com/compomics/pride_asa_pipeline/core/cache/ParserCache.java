@@ -7,6 +7,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.MzIdentMLControllerImpl;
@@ -37,7 +44,7 @@ public class ParserCache {
      * The Logging instance
      */
     private static final Logger LOGGER = Logger.getLogger(ParserCache.class);
-    
+
     /**
      * The ParserCache instance
      *
@@ -65,18 +72,28 @@ public class ParserCache {
      * @return a fileparser for the file
      * @throws IOException if the fileparser can not be constructed
      */
-    public CachedDataAccessController getParser(String experimentAccession, File identificationsFile, boolean inMemory) {
+    public CachedDataAccessController getParser(String experimentAccession, File identificationsFile, boolean inMemory) throws TimeoutException, InterruptedException, ExecutionException {
+
         if (!parserCache.containsKey(experimentAccession)) {
-            LOGGER.info("Parsing file using PRIDE ms-data-core-api");
-            if (identificationsFile.getName().toUpperCase().endsWith(".XML")) {
-                PrideXmlControllerImpl prideXmlControllerImpl = new PrideXmlControllerImpl(identificationsFile);
-                parserCache.put(experimentAccession, prideXmlControllerImpl);
-                peakFileCache.put(experimentAccession, Arrays.asList(new File[]{identificationsFile}));
-            } else {
-                parserCache.put(experimentAccession, new MzIdentMLControllerImpl(identificationsFile, false, true));
-            }
+            ExecutorService service = Executors.newSingleThreadExecutor();
+            Future<CachedDataAccessController> future = service.submit(new Callable<CachedDataAccessController>() {
+                @Override
+                public CachedDataAccessController call() throws Exception {
+                    LOGGER.info("Parsing file using PRIDE ms-data-core-api");
+                    CachedDataAccessController parser;
+                    if (identificationsFile.getName().toUpperCase().endsWith(".XML")) {
+                        parser = new PrideXmlControllerImpl(identificationsFile);
+                        peakFileCache.put(experimentAccession, Arrays.asList(new File[]{identificationsFile}));
+                    } else {
+                        parser = new MzIdentMLControllerImpl(identificationsFile, false, true);
+                    }
+                    LOGGER.info("DataAccessController for " + experimentAccession + " : " + identificationsFile.getAbsolutePath() + " was cached");
+                    return parser;
+                }
+            });
+            //time limit for parsing is?
+            parserCache.put(experimentAccession, future.get(15, TimeUnit.MINUTES));
             loadedFiles.put(experimentAccession, identificationsFile);
-            LOGGER.info("DataAccessController for " + experimentAccession + " : " + identificationsFile.getAbsolutePath() + " was cached");
         }
         return parserCache.get(experimentAccession);
     }
@@ -84,13 +101,17 @@ public class ParserCache {
     /**
      * Returns an existing or creates a new FileParser for the given input file
      *
+     * @param experimentAccession
      * @param identificationsFileName the input identifications file name
      * @param boolean indicating if the file is to be parsed in memory (only for
      * mzid)
      * @return a fileparser for the file
+     * @throws java.util.concurrent.TimeoutException
+     * @throws java.lang.InterruptedException
+     * @throws java.util.concurrent.ExecutionException
      * @throws IOException if the fileparser can not be constructed
      */
-    public CachedDataAccessController getParser(String experimentAccession, boolean inMemory) {
+    public CachedDataAccessController getParser(String experimentAccession, boolean inMemory) throws TimeoutException, InterruptedException, ExecutionException {
         return getParser(experimentAccession, loadedFiles.get(experimentAccession), inMemory);
     }
 

@@ -18,17 +18,17 @@ import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
  */
 public class FileAssayProcessor {
 
-    public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
+    public static void main(String[] args) throws Exception {
         File outputFolder = new File("C:\\Users\\compomics\\Desktop\\TEST_ASAP\\output");
         if (outputFolder.exists()) {
             outputFolder.delete();
         }
         outputFolder.mkdirs();
-        File inputFile = new File("C:\\Users\\compomics\\Desktop\\TEST_ASAP\\TCGA-AA-A00N-01A-32_W_VU_20121027_A0218_5D_R_FR02.mzid");
-        File peakFile = new File("C:\\Users\\compomics\\Desktop\\TEST_ASAP\\TCGA-AA-A00N-01A-32_W_VU_20121027_A0218_5D_R_FR02.mzml");
+        File inputFile = new File("C:\\Users\\compomics\\Desktop\\Complete\\42095\\temp\\iTRAQ86_20120928b.mzid");
+        File peakFile = new File("C:\\Users\\compomics\\Desktop\\Complete\\42095\\temp\\iTRAQ86_20120928b.mzid_Mudpit_iTRAQ86_CoutureP_1a14_completeproteome_MGFPeaklist_(F046704).MGF");
         ArrayList<File> peakFiles = new ArrayList<>();
         peakFiles.add(peakFile);
-        SearchParameters parameters = new FileParameterExtractor(outputFolder).analyzeMzID(inputFile, peakFiles,"51098");
+        SearchParameters parameters = new FileParameterExtractor(outputFolder).analyzeMzID(inputFile, peakFiles,"42095");
         System.out.println(parameters);
     }
 }
