@@ -66,7 +66,6 @@ public class MGFExtractor {
             jMzReader = getJMzReader(inputFile);
         } catch (Exception ex) {
             LOGGER.error("Could not initiate spectrum extraction !");
-            ex.printStackTrace();
             throw new MGFExtractionException(ex.getMessage());
         }
     }
@@ -111,7 +110,7 @@ public class MGFExtractor {
      * @throws JMzReaderException
      */
     public File extractMGF(File outputFile, OutputStream reportStream, long timeout) throws MGFExtractionException {
-        LOGGER.info("Extraction of mgf started...");
+        LOGGER.debug("Extraction of mgf started...");
         try (FileWriter w = new FileWriter(outputFile);
                 BufferedWriter bw = new BufferedWriter(w);
                 OutputStreamWriter rw = new OutputStreamWriter(reportStream);) {
@@ -150,7 +149,7 @@ public class MGFExtractor {
             ex.printStackTrace();
             LOGGER.error(ex);
         }
-        LOGGER.info("Extraction completed");
+        LOGGER.info("MGF extraction completed");
         return outputFile;
     }
 
@@ -261,35 +260,35 @@ public class MGFExtractor {
         String extension = FilenameUtils.getExtension(inputFile.getAbsolutePath());
         switch (extension.toLowerCase()) {
             case "mzxml":
-                LOGGER.info("Detected mzXml file extension.");
+                LOGGER.debug("Detected mzXml file extension.");
                 parser = new MzXMLFile(inputFile);
                 break;
             case "mzml":
-                LOGGER.info("Detected mzml file extension.");
+                LOGGER.debug("Detected mzml file extension.");
                 parser = new MzMlWrapper(inputFile);
                 break;
             case "dta":
-                LOGGER.info("Detected dta file extension.");
+                LOGGER.debug("Detected dta file extension.");
                 parser = new DtaFile(inputFile);
                 break;
             case "mgf":
-                LOGGER.info("Detected mgf file extension.");
+                LOGGER.debug("Detected mgf file extension.");
                 parser = new MgfFile(inputFile);
                 break;
             case "ms2":
-                LOGGER.info("Detected ms2 file extension.");
+                LOGGER.debug("Detected ms2 file extension.");
                 parser = new Ms2File(inputFile);
                 break;
             case "mzData":
-                LOGGER.info("Detected mzData file extension.");
+                LOGGER.debug("Detected mzData file extension.");
                 parser = new MzDataFile(inputFile);
                 break;
             case "xml":
-                LOGGER.info("Detected xml file extension.");
+                LOGGER.debug("Detected xml file extension.");
                 parser = new PRIDEXmlWrapper(inputFile);
                 break;
             case "pkl":
-                LOGGER.info("Detected pkl file extension.");
+                LOGGER.debug("Detected pkl file extension.");
                 parser = new PklFile(inputFile);
                 break;
             default:

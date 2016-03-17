@@ -94,12 +94,36 @@ public abstract class AbstractSpectrumAnnotator<T> {
     protected SpectrumService spectrumService;
     protected PipelineModificationService pipelineModificationService;
     protected ModificationService modificationService;
+
+    /**
+     * The maximal size a single pass can have
+     */
     private int MAX_PASS_SIZE = 6;
+    /**
+     * The maximal amount of passes
+     */
     private int MAX_PASSES = 6;
+    /**
+     * The threshold explanation ratio (50% of all unexplained masses has to be
+     * explained)
+     */
     private double explanationCriterion = 0.50;
+    /**
+     * The criterion for matched peaks (for example, 10% has to be matched)
+     */
     private double matchedPeakCriterion = 0.1;
+    /**
+     * The maximal allowed error (should be 1 da, the minimal resolution of any
+     * machine)
+     */
     private double maximumAllowedErrorDa = 1.0;
+    /**
+     * A queue of modifications
+     */
     private ArrayBlockingQueue<Modification> modQueue;
+    /**
+     * The modification repository
+     */
     private FileExperimentModificationRepository modRepository;
 
     /**
@@ -181,6 +205,10 @@ public abstract class AbstractSpectrumAnnotator<T> {
         this.modRepository = modRepository;
     }
 
+    public FileExperimentModificationRepository getModRepository() {
+        return modRepository;
+    }
+
     /**
      * Abstract methods.
      */
@@ -211,6 +239,12 @@ public abstract class AbstractSpectrumAnnotator<T> {
      */
     public abstract void clearTmpResources();
 
+    /**
+     * Annotates the spectra for the given accession
+     *
+     * @param assayAccession the input assay identifier
+     * @throws IOException
+     */
     public void annotate(String assayAccession) throws IOException {
         initModifications(assayAccession, null, null);
         initAnalyzerData(assayAccession);
@@ -232,10 +266,10 @@ public abstract class AbstractSpectrumAnnotator<T> {
             annotate(tempModificationHolder, completeIdentifications, identificationsToProcess, tempSpectrumAnnotatorResult);
             totalExplained = totalSize - identificationsToProcess.size();
             completeIdentifications = identificationsToProcess;
-            LOGGER.info("Still need to annotate " + completeIdentifications.size() + " identifications");
+            LOGGER.debug("Still need to annotate " + completeIdentifications.size() + " identifications");
             identificationsToProcess = new ArrayList<>(completeIdentifications);
             explanationRatio = (double) totalExplained / totalSize;
-            LOGGER.info("Explanationratio is currently " + explanationRatio);
+            LOGGER.debug("Explanationratio is currently " + explanationRatio);
             if (explanationRatio > explanationCriterion) {
                 LOGGER.info(100 * explanationCriterion + "% of identifications were identified, moving on");
                 break;
@@ -248,7 +282,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 }
                 pass++;
             }
-            System.out.println(tempSpectrumAnnotatorResult.getMassRecalibrationResult().toString());
+            //   System.out.println(tempSpectrumAnnotatorResult.getMassRecalibrationResult().toString());
         }
         //filter out only the ones that are most relevant (top 6 or using a consideration threshold)...
         InferenceStatistics stats = new InferenceStatistics(totalModificationRates.values(), false);
@@ -263,17 +297,11 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 .stream()
                 .sorted(byValue.reversed()).filter((anEntry) -> (anEntry.getValue() >= threshold)).forEach((anEntry) -> {
             if (modificationHolder.getAllModifications().size() <= 6) {
-                LOGGER.info("Considering " + anEntry.getKey() + "\t" + anEntry.getValue());
+                LOGGER.debug("Considering " + anEntry.getKey() + "\t" + anEntry.getValue());
                 modificationHolder.addModification(anEntry.getKey());
             }
         });
 
-    }
-
-    private void consider(Entry<Modification, Double> entry, double threshold) {
-        if (entry.getValue() >= threshold) {
-            modificationHolder.addModification(entry.getKey());
-        }
     }
 
     public Set<Modification> initModifications(String assayAccession, Resource modificationsResource, InputType inputType) throws IOException {
@@ -283,7 +311,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         //load the modifications from the PRIDE annotation
         //if there is no file in the parsercache, use the webservice to get the modifications 
         if (modRepository != null) {
-            LOGGER.info("Using cached modifications");
+            LOGGER.debug("Using cached modifications");
             sortedAnnotatedModifications.addAll(modRepository.getModificationsByExperimentId(assayAccession));
         } else if (ParserCache.getInstance().containsParser(assayAccession)) {
             modRepository = new FileExperimentModificationRepository(assayAccession);
@@ -302,7 +330,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         }
         //order the annotated modifications to prevalence (in case there are more than the selected batch size)
         //get all asap mods
-        LOGGER.info("Loading pride asap modifications");
+        LOGGER.debug("Loading pride asap modifications");
         //only load those for now that matter ? (6passes, 6 per set?)
         LinkedList<Modification> sortedAllModifications = PRIDEModificationFactory.getAsapMods(MAX_PASS_SIZE * MAX_PASSES);
         //get a queue of them
@@ -346,7 +374,6 @@ public abstract class AbstractSpectrumAnnotator<T> {
         //              explain a given mass delta (if there is one) -> Zen Archer
         LOGGER.info("finding modification combinations..;");
         //set fragment mass error for the identification scorer
-
         Map<Identification, Set<ModificationCombination>> massDeltaExplanationsMap = findModificationCombinations(modificationHolder, spectrumAnnotatorResult.getMassRecalibrationResult(), completeIdentifications);
         LOGGER.info("Finished finding modification combinations");
 
@@ -391,7 +418,6 @@ public abstract class AbstractSpectrumAnnotator<T> {
         //ToDo: Maybe looking at the spectrum early on to eliminate some combinations or
         //ToDo: to get ideas about likely explanations would help?
         LOGGER.info("finding precursor variations");
-
         Map<Identification, Set<ModifiedPeptide>> modifiedPrecursorVariations = findPrecursorVariations(significantMassDeltaExplanationsMap);
         LOGGER.info("finished finding precursor variations");
         //For each of these 'variations' we then calculate all possible fragment ions.
@@ -461,7 +487,8 @@ public abstract class AbstractSpectrumAnnotator<T> {
             massDeltaExplainer = new MassDeltaExplainerImpl(modificationHolder);
             //finally calculate the possible explanations
             //prefilter the identifications here...if it's smaller than the smallest mod, there's no point in keeping it
-            List<Identification> filterIdentifications = IdentificationFilter.filterIdentifications(completeIdentifications, modificationHolder);
+            List<Identification> filterIdentifications = IdentificationFilter.filterIdentifications(completeIdentifications, modificationHolder, true);
+            //@ToDo figure out how to MT this with a queue of identifications?...
             possibleExplanations = massDeltaExplainer.explainCompleteIndentifications(filterIdentifications, massRecalibrationResult, analyzerData);
         }
 

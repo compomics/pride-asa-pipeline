@@ -8,6 +8,8 @@ import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
@@ -54,16 +56,20 @@ public class FileModificationRepository extends ParserCacheConnector implements 
     @Override
     public List<Modification> getModificationsByPeptideId(long peptideID) {
         List<Modification> modificationList = new ArrayList<>();
-        CachedDataAccessController parser = parserCache.getParser(experimentIdentifier, true);
-        for (Comparable proteinID : parser.getProteinIds()) {
-            List<uk.ac.ebi.pride.utilities.data.core.Modification> mods = parser.getPTMs(proteinID, peptideID);
-            for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : mods) {
-                try {
-                    modificationList.add((Modification) modFactory.getModification(adapter, aMod.getName()));
-                } catch (ParameterExtractionException ex) {
-                     LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
+        try {
+            CachedDataAccessController parser = parserCache.getParser(experimentIdentifier, true);
+            for (Comparable proteinID : parser.getProteinIds()) {
+                List<uk.ac.ebi.pride.utilities.data.core.Modification> mods = parser.getPTMs(proteinID, peptideID);
+                for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : mods) {
+                    try {
+                        modificationList.add((Modification) modFactory.getModification(adapter, aMod.getName()));
+                    } catch (ParameterExtractionException ex) {
+                        LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
+                    }
                 }
             }
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            LOGGER.error("The parser timed out before it could deliver all the modifications");
         }
         return modificationList;
     }
@@ -71,29 +77,33 @@ public class FileModificationRepository extends ParserCacheConnector implements 
     @Override
     public List<Modification> getModificationsByExperimentId(String experimentId) {
         List<Modification> modificationList = new ArrayList<>();
-        CachedDataAccessController parser = parserCache.getParser(experimentId, true);
-        for (Comparable proteinID : parser.getProteinIds()) {
-            for (Comparable peptideID : parser.getPeptideIds(proteinID)) {
-                List<uk.ac.ebi.pride.utilities.data.core.Modification> mods = parser.getPTMs(proteinID, peptideID);
-                for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : mods) {
-                    if (aMod != null && aMod.getName() != null) {
-                        Object modification = null;
-                        try {
-                            modification = modFactory.getModification(adapter, aMod.getName());
-                        } catch (ParameterExtractionException ex) {
-                            LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
-                        }
-                        if (modification != null) {
-                            modificationList.add((Modification) modification);
-                        } else {
-                            LOGGER.warn(aMod.getName() + " was not found in the modifications");
+        try {
+            CachedDataAccessController parser = parserCache.getParser(experimentId, true);
+            for (Comparable proteinID : parser.getProteinIds()) {
+                for (Comparable peptideID : parser.getPeptideIds(proteinID)) {
+                    List<uk.ac.ebi.pride.utilities.data.core.Modification> mods = parser.getPTMs(proteinID, peptideID);
+                    for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : mods) {
+                        if (aMod != null && aMod.getName() != null) {
+                            Object modification = null;
+                            try {
+                                modification = modFactory.getModification(adapter, aMod.getName());
+                            } catch (ParameterExtractionException ex) {
+                                LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
+                            }
+                            if (modification != null) {
+                                modificationList.add((Modification) modification);
+                            } else {
+                                LOGGER.warn(aMod.getName() + " was not found in the modifications");
+                            }
                         }
                     }
                 }
             }
+            //@TODO handle peptideshaker projects
+            //peptideshaker projects are a special case as it stores some mods in the user params...how can we deal with this? do a complete text parsing of the file?
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            LOGGER.error("The parser timed out before it could deliver all the peptides");
         }
-        //@TODO handle peptideshaker projects
-        //peptideshaker projects are a special case as it stores some mods in the user params...how can we deal with this? do a complete text parsing of the file?
         return modificationList;
     }
 

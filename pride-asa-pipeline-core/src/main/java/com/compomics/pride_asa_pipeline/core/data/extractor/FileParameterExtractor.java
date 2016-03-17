@@ -3,17 +3,17 @@ package com.compomics.pride_asa_pipeline.core.data.extractor;
 import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
-import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
-import com.compomics.util.experiment.identification.spectrum_annotation.SpectrumAnnotator;
 import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
 import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import org.apache.log4j.Logger;
 import org.geneontology.oboedit.dataadapter.GOBOParseException;
 import org.xmlpull.v1.XmlPullParserException;
@@ -55,7 +55,7 @@ public class FileParameterExtractor {
 
     private void init() {
         //load into the spring setup
-       ApplicationContextProvider.getInstance().setDefaultApplicationContext();
+        ApplicationContextProvider.getInstance().setDefaultApplicationContext();
 
         spectrumRepository = (FileSpectrumRepository) ApplicationContextProvider.getInstance().getBean("spectrumRepository");
 
@@ -74,7 +74,7 @@ public class FileParameterExtractor {
     }
 
     private void processSpectra() throws IOException, MGFExtractionException {
-        LOGGER.info("Getting related spectrum files from the cache");
+        LOGGER.debug("Getting related spectrum files from the cache");
         File mgf = spectrumRepository.writeToMGF(outputFolder);
         //zip the MGF file
         File zip = new File(mgf.getAbsolutePath() + ".zip");
@@ -83,7 +83,7 @@ public class FileParameterExtractor {
     }
 
     public SearchParameters analyzePrideXML(File inputFile, String assay) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
-        LOGGER.info("Setting up experiment repository for assay " + assay);
+        LOGGER.debug("Setting up experiment repository for assay " + assay);
         experimentRepository = new FileExperimentModificationRepository(assay);
         modificationRepository = experimentRepository;
         //load the file into the repository
@@ -94,8 +94,8 @@ public class FileParameterExtractor {
         return inferParameters(assay);
     }
 
-    public SearchParameters analyzeMzID(File inputFile, List<File> peakFiles, String assay) throws MGFExtractionException, ParameterExtractionException, IOException {
-        LOGGER.info("Setting up experiment repository for assay " + assay);
+    public SearchParameters analyzeMzID(File inputFile, List<File> peakFiles, String assay) throws MGFExtractionException, ParameterExtractionException, IOException, TimeoutException, InterruptedException, ExecutionException {
+        LOGGER.debug("Setting up experiment repository for assay " + assay);
         experimentRepository = new FileExperimentModificationRepository(assay);
         modificationRepository = experimentRepository;
         experimentRepository.addMzID(assay, inputFile, peakFiles);

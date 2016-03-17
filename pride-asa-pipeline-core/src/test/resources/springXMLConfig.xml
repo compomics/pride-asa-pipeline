@@ -116,7 +116,7 @@
 
     <!-- repository beans -->
     <bean id="experimentRepository"
-          class="com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository">
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository">
     <!--     <property name="dataSource" ref="prideDataSource"/>-->
     </bean>
 

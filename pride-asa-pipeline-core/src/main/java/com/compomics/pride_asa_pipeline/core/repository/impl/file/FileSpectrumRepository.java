@@ -14,7 +14,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.io.FileUtils;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.utilities.data.core.Spectrum;
 
 /**
@@ -27,6 +30,10 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
      * The identifier for the current repository (filename or assay accession)
      */
     private String experimentIdentifier;
+    /**
+     * Logging instance
+     */
+    private Logger LOGGER = Logger.getLogger(FileSpectrumRepository.class);
 
     public FileSpectrumRepository() {
 
@@ -50,27 +57,41 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
 
     @Override
     public double[] getMzValuesBySpectrumId(String spectrumId) {
-        Spectrum spectrumById = parserCache.getParser(experimentIdentifier, false).getSpectrumById(spectrumId);
-        return spectrumById.getMassIntensityMap()[0];
+        try {
+            Spectrum spectrumById = parserCache.getParser(experimentIdentifier, false).getSpectrumById(spectrumId);
+            return spectrumById.getMassIntensityMap()[0];
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            LOGGER.error("The parser timed out before it could deliver the spectrum");
+        }
+        return new double[0];
     }
 
     @Override
     public double[] getIntensitiesBySpectrumId(String spectrumId) {
-        Spectrum spectrumById = parserCache.getParser(experimentIdentifier, false).getSpectrumById(spectrumId);
-        return spectrumById.getMassIntensityMap()[1];
+        try {
+            Spectrum spectrumById = parserCache.getParser(experimentIdentifier, false).getSpectrumById(spectrumId);
+            return spectrumById.getMassIntensityMap()[1];
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            LOGGER.error("The parser timed out before it could deliver the spectrum");
+        }
+        return new double[0];
     }
 
     @Override
     public Map<String, List<Peak>> getPeakMapsBySpectrumIdList(List<String> spectrumIds) {
         Map<String, List<Peak>> peakMap = new HashMap<>();
         for (String aSpectrumID : spectrumIds) {
-            Spectrum spectrumById = parserCache.getParser(experimentIdentifier, false).getSpectrumById(aSpectrumID);
-            List<Peak> peakList = new ArrayList<>();
-            double[][] massIntensityMap = spectrumById.getMassIntensityMap();
-            for (int i = 0; i < massIntensityMap.length; i++) {
-                peakList.add(new Peak(massIntensityMap[0][i], massIntensityMap[1][i]));
+            try {
+                Spectrum spectrumById = parserCache.getParser(experimentIdentifier, false).getSpectrumById(aSpectrumID);
+                List<Peak> peakList = new ArrayList<>();
+                double[][] massIntensityMap = spectrumById.getMassIntensityMap();
+                for (int i = 0; i < massIntensityMap.length; i++) {
+                    peakList.add(new Peak(massIntensityMap[0][i], massIntensityMap[1][i]));
+                }
+                peakMap.put(aSpectrumID, peakList);
+            } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+                       LOGGER.error("The parser timed out before it could deliver the peaks");
             }
-            peakMap.put(aSpectrumID, peakList);
         }
         return peakMap;
     }

@@ -7,6 +7,7 @@ import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import junit.framework.TestCase;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -43,7 +44,7 @@ public class ProjectExtractorTest extends TestCase {
         return testResource;
     }
 
-    /**
+       /**
      * Test of getSearchParametersFileForProject method, of class
      * PrideAsapSearchParamExtractor.
      */
@@ -52,14 +53,14 @@ public class ProjectExtractorTest extends TestCase {
         File temp = File.createTempFile("temp", ".tmp");
         temp.deleteOnExit();
         File outputFolder = File.createTempFile("temp", ".tmp").getParentFile();
-        FileParameterExtractor instance = new FileParameterExtractor(outputFolder,AnalyzerData.getAnalyzerDataByAnalyzerType("orbitrap"));
+        FileParameterExtractor instance = new FileParameterExtractor(outputFolder, AnalyzerData.getAnalyzerDataByAnalyzerType("orbitrap"));
 
         // File inputFile = getFileFromResources("PRIDE_Exp_Complete_Ac_3.xml.zip");
         File inputFile = getFileFromResources("PeptideShaker_example.xml.zip");
 
         SearchParameters identificationParameters = instance.analyzePrideXML(inputFile, "test_" + inputFile.getName().replace(".xml", ""));
-        
-        assertEquals(0.006, identificationParameters.getPrecursorAccuracy());
+
+        assertTrue(identificationParameters.getPrecursorAccuracy() > 0 && identificationParameters.getPrecursorAccuracy() <= 0.007);
         assertEquals(0.027, identificationParameters.getFragmentIonAccuracy());
 
         assertEquals(identificationParameters.getPrecursorAccuracyType(), SearchParameters.MassAccuracyType.DA);

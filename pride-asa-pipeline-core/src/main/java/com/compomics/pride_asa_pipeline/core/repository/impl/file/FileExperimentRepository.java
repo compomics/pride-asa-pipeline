@@ -11,7 +11,8 @@ import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 import uk.ac.ebi.pride.utilities.data.core.SpectrumIdentification;
@@ -51,65 +52,86 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
     @Override
     public List<Identification> loadExperimentIdentifications(String experimentAccession) {
         List<Identification> identifications = new ArrayList<>();
-        CachedDataAccessController parser = parserCache.getParser(experimentAccession, false);
-        //get all the peptide ids for the proteins
-        long proteinCount = parser.getProteinIds().size();
-        double completeRatio = 0.0;
-        double currentCount = 0;
-        double currentPrint = 0;
-        for (Comparable aProteinID : parser.getProteinIds()) {
-            completeRatio = 100 * currentCount / proteinCount;
-            if (completeRatio > currentPrint) {
-                LOGGER.info(InferenceStatistics.round(completeRatio, 0) + "%");
-                currentPrint += 10;
-            }
-
-            for (Comparable aPeptideID : parser.getPeptideIds(aProteinID)) {
-                uk.ac.ebi.pride.utilities.data.core.Peptide aPeptide = parser.getPeptideByIndex(aProteinID, aPeptideID);
-                SpectrumIdentification spectrumIdentification = aPeptide.getSpectrumIdentification();
-                try {
-                    int charge = spectrumIdentification.getChargeState();
-                    double mz = spectrumIdentification.getExperimentalMassToCharge();
-                    AminoAcidSequence aaSequence = new AminoAcidSequence(aPeptide.getPeptideSequence().getSequence());
-                    Peptide peptide = new Peptide(charge, mz, aaSequence);
-                    Identification identification = new Identification(
-                            //@TODO is this correct?
-                            peptide,
-                            String.valueOf(spectrumIdentification.getSpectrum().getIndex()),
-                            String.valueOf(spectrumIdentification.getSpectrum().getId()),
-                            spectrumIdentification.getName());
-                    identifications.add(identification);
-                } catch (UnknownAAException ex) {
-                    LOGGER.error(ex);
+        try {
+            CachedDataAccessController parser = parserCache.getParser(experimentAccession, false);
+            //get all the peptide ids for the proteins
+            long proteinCount = parser.getProteinIds().size();
+            double completeRatio = 0.0;
+            double currentCount = 0;
+            double currentPrint = 0;
+            for (Comparable aProteinID : parser.getProteinIds()) {
+                completeRatio = 100 * currentCount / proteinCount;
+                if (completeRatio > currentPrint) {
+                    LOGGER.info(InferenceStatistics.round(completeRatio, 0) + "%");
+                    currentPrint += 10;
                 }
-                aPeptide = null;
+
+                for (Comparable aPeptideID : parser.getPeptideIds(aProteinID)) {
+                    uk.ac.ebi.pride.utilities.data.core.Peptide aPeptide = parser.getPeptideByIndex(aProteinID, aPeptideID);
+                    SpectrumIdentification spectrumIdentification = aPeptide.getSpectrumIdentification();
+                    try {
+                        int charge = spectrumIdentification.getChargeState();
+                        double mz = spectrumIdentification.getExperimentalMassToCharge();
+                        AminoAcidSequence aaSequence = new AminoAcidSequence(aPeptide.getPeptideSequence().getSequence());
+                        Peptide peptide = new Peptide(charge, mz, aaSequence);
+                        Identification identification = new Identification(
+                                //@TODO is this correct?
+                                peptide,
+                                String.valueOf(spectrumIdentification.getSpectrum().getIndex()),
+                                String.valueOf(spectrumIdentification.getSpectrum().getId()),
+                                spectrumIdentification.getName());
+                        identifications.add(identification);
+                    } catch (UnknownAAException ex) {
+                        LOGGER.error(ex);
+                    }
+                    aPeptide = null;
+                }
+                currentCount++;
             }
-            currentCount++;
+            LOGGER.info("100% Completion!");
+            //get all evidence for all peptide ids
+            //     parser.close();
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            LOGGER.error("The parser timed out before it could deliver all the identifications");
         }
-        LOGGER.info("100% Completion!");
-        //get all evidence for all peptide ids
-   //     parser.close();
         return identifications;
     }
 
     @Override
     public long getNumberOfSpectra(String experimentAccession) {
-        return parserCache.getParser(experimentAccession, true).getSpectrumIds().size();
+        int spectra = 0;
+        try {
+            spectra = parserCache.getParser(experimentAccession, true).getSpectrumIds().size();
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            LOGGER.error("The parser timed out before it could deliver all the identifications");
+        }
+        return spectra;
     }
 
     @Override
     public List<String> getProteinAccessions(String experimentAccession) {
         List<String> proteinAccessions = new ArrayList<>();
-        CachedDataAccessController parser = parserCache.getParser(experimentAccession, true);
-        for (Comparable aProteinId : parser.getProteinIds()) {
-            proteinAccessions.add(parser.getProteinAccession(aProteinId));
+        try {
+
+            CachedDataAccessController parser = parserCache.getParser(experimentAccession, true);
+            for (Comparable aProteinId : parser.getProteinIds()) {
+                proteinAccessions.add(parser.getProteinAccession(aProteinId));
+            }
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            LOGGER.error("The parser timed out before it could deliver all the proteins");
         }
         return proteinAccessions;
     }
 
     @Override
     public long getNumberOfPeptides(String experimentAccession) {
-        return parserCache.getParser(experimentAccession, true).getNumberOfPeptides();
+        int peptides = 0;
+        try {
+            peptides = parserCache.getParser(experimentAccession, true).getNumberOfPeptides();
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            LOGGER.error("The parser timed out before it could deliver all the peptides");
+        }
+        return peptides;
     }
 
     @Override

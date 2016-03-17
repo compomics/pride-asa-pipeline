@@ -49,7 +49,7 @@ public class IdentificationsExtractor implements ResultSetExtractor<List<Identif
                 
                 identifications.add(new Identification(peptide, accession, spectrumId, spectrumRef));
             } catch (UnknownAAException ex) {
-                LOGGER.info("Got peptide with unknown amino acid!");
+                LOGGER.warn("Got peptide with unknown amino acid!");
             }
         }
 

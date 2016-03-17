@@ -3,11 +3,12 @@ package com.compomics.pride_asa_pipeline.core.logic.inference.modification;
 import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.util.report.impl.TotalReportGenerator;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
-import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.UtilitiesPTMAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
+
 import com.compomics.util.experiment.biology.PTM;
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
@@ -61,10 +62,35 @@ public class ModificationPredictor {
      * The complete modification holder
      */
     private final ModificationHolder modificationHolder;
+    /**
+     * The mod repository
+     */
+    private ModificationRepository repository;
 
+    /**
+     * A predictor for the modification profile
+     *
+     * @param assay the assay
+     * @param modificationHolder the modification holder
+     */
     public ModificationPredictor(String assay, ModificationHolder modificationHolder) {
         this.assay = assay;
         this.modificationHolder = modificationHolder;
+        repository = new FileModificationRepository();
+        inferModifications();
+    }
+
+    /**
+     * A predictor for the modification profile
+     *
+     * @param assay the assay
+     * @param modificationHolder the modification holder
+     * @param repository an initialized modification repository
+     */
+    public ModificationPredictor(String assay, ModificationHolder modificationHolder, ModificationRepository repository) {
+        this.assay = assay;
+        this.modificationHolder = modificationHolder;
+        this.repository = repository;
         inferModifications();
     }
 
@@ -72,10 +98,9 @@ public class ModificationPredictor {
         LOGGER.info("Inferring modifications...");
         HashMap<String, Boolean> asapMods = new HashMap<>();
 
-        ModificationAdapter adapter = new UtilitiesPTMAdapter();
+        UtilitiesPTMAdapter adapter = new UtilitiesPTMAdapter();
         ptmSettings = new PtmSettings();
         //make sure the annotated mods are in there as well
-        FileModificationRepository repository = new FileModificationRepository();
         List<Modification> modificationsByExperimentId = repository.getModificationsByExperimentId(assay);
         TotalReportGenerator.setExperimentMods(modificationsByExperimentId);
         for (Modification annotatedMod : modificationsByExperimentId) {
@@ -89,10 +114,10 @@ public class ModificationPredictor {
         for (Map.Entry<String, Boolean> aMod : asapMods.entrySet()) {
             try {
                 ArrayList<String> unknownPTM = new ArrayList<>();
-                PTMFactory.getInstance().convertPridePtm(aMod.getKey(), ptmSettings, unknownPTM, false);
+                String convertPridePtm = PTMFactory.getInstance().convertPridePtm(aMod.getKey(), ptmSettings, unknownPTM, false);
                 if (!unknownPTM.isEmpty()) {
                     try {
-                        LOGGER.info(aMod.getKey() + " is not a standard modification. Converting to utilities object");
+                        LOGGER.debug(aMod.getKey() + " is not a standard modification. Converting to utilities object");
                         PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
                         if (!aUtilitiesMod.getName().toLowerCase().contains("unknown")) {
                             if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
@@ -108,16 +133,16 @@ public class ModificationPredictor {
                             }
 
                         } else {
-                            LOGGER.info(aMod.getKey() + " was found in the default PTMs");
+                            LOGGER.debug(aMod.getKey() + " was found in the default PTMs");
                         }
                     } catch (ParameterExtractionException e) {
                         LOGGER.error("Skipping" + aMod.getKey() + " : reason : " + e);
                     }
                 }
 
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-                LOGGER.error("MODIFICATION SKIPPED DUE TO COMPATIBILITY ISSUES WITH COMPOMICS UTILITIES LIBRARY - ISOTOPES NOT SUPPORTED " + aMod.getKey());
+            } catch (Exception e) {
+                LOGGER.error(e);
+                LOGGER.error("Modification could not be passed : " + aMod.getKey());
             }
         }
 

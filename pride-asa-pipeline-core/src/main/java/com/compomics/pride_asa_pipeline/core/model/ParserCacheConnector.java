@@ -3,6 +3,8 @@ package com.compomics.pride_asa_pipeline.core.model;
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import org.apache.log4j.Logger;
 
 /**
@@ -27,8 +29,8 @@ public abstract class ParserCacheConnector {
      *
      * @param identificationsFile the prideXML file
      */
-    public void addPrideXMLFile(String experimentAccession,File identificationsFile) {
-        parserCache.getParser(experimentAccession,identificationsFile, true).getName();
+    public void addPrideXMLFile(String experimentAccession, File identificationsFile) throws TimeoutException, InterruptedException, ExecutionException {
+        parserCache.getParser(experimentAccession, identificationsFile, true).getName();
     }
 
     /**
@@ -37,9 +39,9 @@ public abstract class ParserCacheConnector {
      * @param identificationsFile the mzID
      * @param peakFiles the peak files
      */
-    public void addMzID(String experimentAccession,File identificationsFile, List<File> peakFiles) {
-        parserCache.getParser(experimentAccession,identificationsFile, false).getName();
-        parserCache.addPeakFiles(experimentAccession,identificationsFile, peakFiles);
-    }    
+    public void addMzID(String experimentAccession, File identificationsFile, List<File> peakFiles) throws TimeoutException, InterruptedException, ExecutionException {
+        parserCache.getParser(experimentAccession, identificationsFile, false).getName();
+        parserCache.addPeakFiles(experimentAccession, identificationsFile, peakFiles);
+    }
 
 }

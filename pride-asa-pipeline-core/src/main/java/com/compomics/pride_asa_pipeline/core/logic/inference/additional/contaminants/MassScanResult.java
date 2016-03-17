@@ -58,6 +58,7 @@ public class MassScanResult {
      * corresponding unexplained precursor mass difference
      */
     public static void scanForPrecursorIonContamination(HashMap<Identification, Double> unexplainedPrecursorMasses) {
+        LOGGER.info("Scanning for precursor contamination");
         for (Map.Entry<Identification, Double> identification : unexplainedPrecursorMasses.entrySet()) {
             String sequence = identification.getKey().getPeptide().getSequenceString();
             double observedMassDifference = identification.getValue();
@@ -68,6 +69,7 @@ public class MassScanResult {
                 }
             }
         }
+        LOGGER.info("Scan complete !");
     }
 
     /**

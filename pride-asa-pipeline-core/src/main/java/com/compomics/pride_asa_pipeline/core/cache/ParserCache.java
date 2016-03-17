@@ -85,9 +85,9 @@ public class ParserCache {
                         parser = new PrideXmlControllerImpl(identificationsFile);
                         peakFileCache.put(experimentAccession, Arrays.asList(new File[]{identificationsFile}));
                     } else {
-                        parser = new MzIdentMLControllerImpl(identificationsFile, false, true);
+                        parser = new MzIdentMLControllerImpl(identificationsFile, true, true);
                     }
-                    LOGGER.info("DataAccessController for " + experimentAccession + " : " + identificationsFile.getAbsolutePath() + " was cached");
+                    LOGGER.debug("DataAccessController for " + experimentAccession + " : " + identificationsFile.getAbsolutePath() + " was cached");
                     return parser;
                 }
             });

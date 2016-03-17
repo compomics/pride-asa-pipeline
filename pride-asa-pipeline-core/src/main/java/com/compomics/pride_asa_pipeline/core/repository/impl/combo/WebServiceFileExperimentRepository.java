@@ -21,7 +21,7 @@ import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
  *
  * @author Kenneth Verheggen
  */
-public class WebServiceFileExperimentRepository extends FileExperimentRepository {
+public class WebServiceFileExperimentRepository extends FileExperimentModificationRepository {
 
     /**
      * A logger instance
@@ -47,6 +47,10 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
      */
     public WebServiceFileExperimentRepository(File tempFolder) {
         this.tempFolder = tempFolder;
+    }
+
+    public WebServiceFileExperimentRepository(File tempFolder, int i) {
+       this.tempFolder = tempFolder;
     }
 
     /**

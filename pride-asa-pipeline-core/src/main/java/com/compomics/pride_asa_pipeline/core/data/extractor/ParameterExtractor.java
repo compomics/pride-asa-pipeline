@@ -68,12 +68,30 @@ public class ParameterExtractor {
     /*
      * The quality percentile
      */
-    private double qualityPercentile = 90;
+    private final double QUALITY_PERCENTILE = 90;
+    /**
+     * Predictor for fragment ion errors
+     */
     private FragmentIonErrorPredictor fragmentIonErrorPredictor;
+        /**
+     * Predictor for precursor ion errors
+     */
     private PrecursorIonErrorPredictor precursorIonErrorPredictor;
+        /**
+     * Predictor for modifications
+     */
     private ModificationPredictor modificationPredictor;
+        /**
+     * Predictor for enzyme information
+     */
     private EnzymePredictor enzymePredictor;
+        /**
+     * boolean indicating if there are results to be printed
+     */
     private boolean printableReports = true;
+        /**
+     * Information on the used instrumentation
+     */
     private AnalyzerData analyzerData;
 
           /**
@@ -130,17 +148,17 @@ public class ParameterExtractor {
             ((DbModificationServiceImpl) spectrumAnnotator.getModificationService()).setModificationRepository(new FileModificationRepository(assay));
 
             spectrumAnnotator.initIdentifications(assay);
-            LOGGER.info("Spectrumannotator delivered was initialized");
+            LOGGER.debug("Spectrumannotator delivered was initialized");
             spectrumAnnotator.annotate(assay);
             //--------------------------------
 
              //recalibrate errors
                 //precursor needs to be very accurate (considering mods / isotopes / etc)
-                LOGGER.info("Using the " + (100 - qualityPercentile) + " % best identifications for precursor accuracy estimation");
+                LOGGER.debug("Using the " + (100 - QUALITY_PERCENTILE) + " % best identifications for precursor accuracy estimation");
                 //USE ONLY THE HIGH QUALITY HITS FOR MASS ACCURACCIES, THESE WILL USUALLY NOT HAVE MISSING MODIFICATIONS ETC
                 List<Identification> experimentIdentifications = spectrumAnnotator.getIdentifications().getCompleteIdentifications();
                 IdentificationFilter filter = new IdentificationFilter(experimentIdentifications);
-                List<Identification> topPrecursorHits = filter.getTopPrecursorHits(qualityPercentile);
+                List<Identification> topPrecursorHits = filter.getTopPrecursorHits(QUALITY_PERCENTILE);
 
                 precursorIonErrorPredictor = new PrecursorIonErrorPredictor(topPrecursorHits);
 
@@ -175,7 +193,7 @@ public class ParameterExtractor {
 
                 //--------------------------------
                 // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
-                modificationPredictor = new ModificationPredictor(assay, spectrumAnnotator.getModificationHolder());
+                modificationPredictor = new ModificationPredictor(assay, spectrumAnnotator.getModificationHolder(),spectrumAnnotator.getModRepository());
 
                 //--------------------------------
                
@@ -301,8 +319,9 @@ public class ParameterExtractor {
 
     public void printReports(File outputFolder) throws IOException {
         if (printableReports) {
+            LOGGER.info("Exporting reports...");
             for (ExtractionReportGenerator reportGenerator : getReportGenerators()) {
-                LOGGER.info("Exporting " + reportGenerator.getReportName());
+                LOGGER.debug("Exporting " + reportGenerator.getReportName());
                 File outputFile = new File(outputFolder, reportGenerator.getReportName());
                 try (FileOutputStream out = new FileOutputStream(outputFile)) {
                     reportGenerator.writeReport(out);
@@ -310,12 +329,12 @@ public class ParameterExtractor {
             }
             printPRIDEAsapIdentificationResult(outputFolder);
         } else {
-            LOGGER.info("Printing of reports was skipped : no inference performed");
+            LOGGER.info("Printing of reports was skipped : no metadata inference performed");
         }
     }
 
     public void printPRIDEAsapIdentificationResult(File outputFolder) {
-        LOGGER.info("Exporting PRIDE Asap identification reports");
+        LOGGER.debug("Exporting PRIDE Asap identification reports");
         FileResultHandlerImpl3 fileResultHandler = new FileResultHandlerImpl3();
         List<Identification> completeIdentifications = spectrumAnnotator.getIdentifications().getCompleteIdentifications();
         for (Identification ident : completeIdentifications) {
@@ -355,7 +374,7 @@ public class ParameterExtractor {
         double predictedPrecursorMassError = 1.0;
         double predictedFragmentMassError = 1.0;
         if (data != null) {
-            LOGGER.info("Getting mass errors from machine type : " + data.getAnalyzerFamily());
+            LOGGER.debug("Getting mass errors from machine type : " + data.getAnalyzerFamily());
             predictedPrecursorMassError = data.getPrecursorMassError();
             predictedFragmentMassError = data.getFragmentMassError();
         }

@@ -57,18 +57,18 @@ public class WebServiceParameterExtractor {
      * @throws Exception
      */
     public SearchParameters analyze(String assayAccession) throws FileNotFoundException, IOException, XmlPullParserException, ParameterExtractionException {
-        LOGGER.info("Setting up experiment repository for assay " + assayAccession);
+        LOGGER.debug("Setting up experiment repository for assay " + assayAccession);
         ParameterExtractor extractor = null;
         SearchParameters parameters = null;
         try {
-            WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository(tempFolder);
+            WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository(tempFolder,1000);
             experimentRepository.addAssay(assayAccession);
             extractor = new ParameterExtractor(assayAccession);
             if (!ParserCache.getInstance().getLoadedFiles().containsKey(assayAccession)) {
                 throw new MGFExtractionException("There is no suited parser in the cache !");
             }
             //write an MGF with all peakfile information?
-            LOGGER.info("Getting related spectrum files from the cache");
+            LOGGER.debug("Getting related spectrum files from the cache");
             FileSpectrumRepository spectrumRepository = new FileSpectrumRepository(assayAccession);
             File mgf = spectrumRepository.writeToMGF(outputFolder);
             //zip the MGF file
@@ -84,6 +84,7 @@ public class WebServiceParameterExtractor {
         } catch (Exception e) {
             File errorFile = new File(outputFolder, "extraction_error.log");
             errorFile.getParentFile().mkdirs();
+            e.printStackTrace();
             try (PrintStream ps = new PrintStream(errorFile)) {
                 e.printStackTrace(ps);
                 if (extractor != null) {
