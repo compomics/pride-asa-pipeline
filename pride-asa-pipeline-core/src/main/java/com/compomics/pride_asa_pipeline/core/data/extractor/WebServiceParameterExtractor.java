@@ -35,6 +35,8 @@ public class WebServiceParameterExtractor {
      * The temporary folder where files should be downloaded to
      */
     private final File tempFolder;
+    private File parameterFile;
+    private File mgf;
 
     /**
      * Default constructor for a WebProjectExtractor
@@ -61,7 +63,7 @@ public class WebServiceParameterExtractor {
         ParameterExtractor extractor = null;
         SearchParameters parameters = null;
         try {
-            WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository(tempFolder,1000);
+            WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository(tempFolder, 1000);
             experimentRepository.addAssay(assayAccession);
             extractor = new ParameterExtractor(assayAccession);
             if (!ParserCache.getInstance().getLoadedFiles().containsKey(assayAccession)) {
@@ -70,7 +72,7 @@ public class WebServiceParameterExtractor {
             //write an MGF with all peakfile information?
             LOGGER.debug("Getting related spectrum files from the cache");
             FileSpectrumRepository spectrumRepository = new FileSpectrumRepository(assayAccession);
-            File mgf = spectrumRepository.writeToMGF(outputFolder);
+            mgf = spectrumRepository.writeToMGF(outputFolder);
             //zip the MGF file
             File zip = new File(mgf.getAbsolutePath() + ".zip");
             ZipUtils.zip(mgf, zip, new WaitingHandlerCLIImpl(), mgf.length());
@@ -80,7 +82,8 @@ public class WebServiceParameterExtractor {
             parameters = extractor.getParameters();
             extractor.printReports(outputFolder);
             //remediate error
-            SearchParameters.saveIdentificationParameters(parameters, new File(outputFolder, assayAccession + ".par"));
+            parameterFile = new File(outputFolder, assayAccession + ".par");
+            SearchParameters.saveIdentificationParameters(parameters, parameterFile);
         } catch (Exception e) {
             File errorFile = new File(outputFolder, "extraction_error.log");
             errorFile.getParentFile().mkdirs();
@@ -109,6 +112,22 @@ public class WebServiceParameterExtractor {
      */
     public void clearTempFolder() throws IOException {
         FileUtils.deleteDirectory(tempFolder);
+    }
+
+    public File getParameterFile() {
+        return parameterFile;
+    }
+
+    public void setParameterFile(File parameterFile) {
+        this.parameterFile = parameterFile;
+    }
+
+    public File getMgf() {
+        return mgf;
+    }
+
+    public void setMgf(File mgf) {
+        this.mgf = mgf;
     }
 
 }

@@ -10,7 +10,11 @@ import com.compomics.util.pride.PrideWebService;
 import com.compomics.util.pride.prideobjects.webservice.query.PrideFilter;
 import com.google.gson.reflect.TypeToken;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,8 +27,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
@@ -76,6 +82,7 @@ public class PRIDEModificationFactory {
      * The mode (online or offline)
      */
     private final INIT_MODE mode;
+    private File modFile;
 
     protected static enum INIT_MODE {
 
@@ -96,13 +103,45 @@ public class PRIDEModificationFactory {
         return instance;
     }
 
+    public static PRIDEModificationFactory getInstance(File modFile) {
+        if (instance == null) {
+            instance = new PRIDEModificationFactory(modFile);
+        }
+        return instance;
+    }
+
+    private PRIDEModificationFactory(File modFile) {
+        this.mode = INIT_MODE.OFFLINE;
+        LOGGER.info("Loading modification configuration");
+        try (InputStream jsonLib = new FileInputStream(modFile);
+                OutputStream out = new FileOutputStream(modFile);) {
+            IOUtils.copy(jsonLib, out);
+            init(modFile);
+        } catch (IOException ex) {
+            LOGGER.error(ex);
+        }
+    }
+
+    public static void main(String[] args) {
+        PRIDEModificationFactory instance1 = PRIDEModificationFactory.getInstance(INIT_MODE.OFFLINE);
+        System.out.println("Found " + instance1.getModificationMap().size() + " mods");
+    }
+
     private PRIDEModificationFactory(INIT_MODE mode) {
         this.mode = mode;
         try {
             if (mode.equals(INIT_MODE.OFFLINE)) {
-                //TODO TURN THIS INTO A STREAM
-                File jsonLib = new ClassPathResource("resources/pride_mods.json").getFile();
-                init(jsonLib);
+                LOGGER.info("Loading modification configuration");
+                if (modFile == null) {
+                    modFile = File.createTempFile("pride_mods", ".tsv");
+                    modFile.deleteOnExit();
+                }
+                try (InputStream jsonLib = getClass().getResourceAsStream("/resources/pride_mods.json");
+                        OutputStream out = new FileOutputStream(modFile);) {
+                    IOUtils.copy(jsonLib, out);
+                    init(modFile);
+                }
+                //  jsonLib.delete();
                 //  jsonLib.delete();
             } else {
                 init();
@@ -155,7 +194,7 @@ public class PRIDEModificationFactory {
      */
     public Object getModification(ModificationAdapter adapter, String ptmName) throws ParameterExtractionException {
         if (!modificationCache.containsKey(ptmName)) {
-            LOGGER.info(ptmName+" was cached");
+            LOGGER.info(ptmName + " was cached");
             modificationCache.put(ptmName, adapter.convertModification(modificationNameMap.get(refactorName(ptmName))));
         }
         return modificationCache.get(ptmName);
@@ -234,7 +273,7 @@ public class PRIDEModificationFactory {
     public static LinkedList<Modification> getAsapMods() {
         return getAsapMods(modificationNameMap.size());
     }
-    
+
     /**
      * Returns an ordened set of modifications from high prevalence to low
      * prevalence
@@ -250,7 +289,7 @@ public class PRIDEModificationFactory {
             pride_mods.add(convertModification);
             massStats.addValue(aMod.getMonoDeltaMass());
             count--;
-            if(count==0){
+            if (count == 0) {
                 break;
             }
         }
