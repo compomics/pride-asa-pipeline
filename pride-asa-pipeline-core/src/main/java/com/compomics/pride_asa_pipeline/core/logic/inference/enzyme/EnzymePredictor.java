@@ -63,6 +63,7 @@ public class EnzymePredictor {
 
     /**
      * Determines whether the enzyme is suited for sequence database searching
+     *
      * @return the suitability of the enzyme
      */
     public boolean isSuitedForSearching() {
@@ -73,15 +74,15 @@ public class EnzymePredictor {
         this.suitedForSearching = suitedForSearching;
     }
 
-    
     public EnzymePredictor() throws IOException, XmlPullParserException {
         loadEnzymeFactory();
     }
+
     /**
-     * 
+     *
      * @param peptideSequences a collection of peptidesequences to analyze
      * @throws IOException
-     * @throws XmlPullParserException 
+     * @throws XmlPullParserException
      */
     public EnzymePredictor(Collection<String> peptideSequences) throws IOException, XmlPullParserException {
         loadEnzymeFactory();
@@ -92,10 +93,11 @@ public class EnzymePredictor {
     private void loadEnzymeFactory() throws IOException, XmlPullParserException {
         if (tempEnzymeFile == null) {
             tempEnzymeFile = File.createTempFile("searchGUI_enzymes", ".xml");
-            InputStream inputStream = new ClassPathResource("searchGUI_enzymes.xml").getInputStream();
-            OutputStream outputStream = new FileOutputStream(tempEnzymeFile);
-            IOUtils.copy(inputStream, outputStream);
-            tempEnzymeFile.deleteOnExit();
+            try (InputStream inputStream = new ClassPathResource("searchGUI_enzymes.xml").getInputStream();
+                    OutputStream outputStream = new FileOutputStream(tempEnzymeFile);) {
+                IOUtils.copy(inputStream, outputStream);
+                tempEnzymeFile.deleteOnExit();
+            }
         }
         enzymeFactory = EnzymeFactory.getInstance();
         enzymeFactory.importEnzymes(tempEnzymeFile);

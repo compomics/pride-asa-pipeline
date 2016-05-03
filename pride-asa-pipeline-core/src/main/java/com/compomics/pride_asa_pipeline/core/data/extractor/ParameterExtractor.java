@@ -155,8 +155,9 @@ public class ParameterExtractor {
              //recalibrate errors
                 //precursor needs to be very accurate (considering mods / isotopes / etc)
                 LOGGER.debug("Using the " + (100 - QUALITY_PERCENTILE) + " % best identifications for precursor accuracy estimation");
-                //USE ONLY THE HIGH QUALITY HITS FOR MASS ACCURACCIES, THESE WILL USUALLY NOT HAVE MISSING MODIFICATIONS ETC
                 List<Identification> experimentIdentifications = spectrumAnnotator.getIdentifications().getCompleteIdentifications();
+               
+                //USE ONLY THE HIGH QUALITY HITS FOR MASS ACCURACCIES, THESE WILL USUALLY NOT HAVE MISSING MODIFICATIONS ETC
                 IdentificationFilter filter = new IdentificationFilter(experimentIdentifications);
                 List<Identification> topPrecursorHits = filter.getTopPrecursorHits(QUALITY_PERCENTILE);
 
@@ -167,7 +168,6 @@ public class ParameterExtractor {
                 //just use all of them
                 // List<Identification> topFragmentIonHits = filter.getTopFragmentIonHits(75);
                 for (Identification anExpIdentification : experimentIdentifications) {
-
                     double[] mzValuesBySpectrumId = fileSpectrumRepository.getMzValuesBySpectrumId(anExpIdentification.getSpectrumId());
                     Peptide peptide = anExpIdentification.getPeptide();
                     mzValueMap.put(peptide, mzValuesBySpectrumId);
