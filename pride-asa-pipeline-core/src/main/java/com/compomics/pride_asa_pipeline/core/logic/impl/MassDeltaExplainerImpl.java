@@ -126,8 +126,6 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
             //increase the number of considered modifications for the next round in case we are not reaching the convergence
             modificationCombinationSizeLimit++;
         }
-        LOGGER.debug("Scanning for contaminants...");
-        MassScanResult.scanForPrecursorIonContamination(identificationsWithUnexplainedMass);
         //finally return the map of precursors with their possible explantions
         return possibleExplainedIdentifications;
     }

@@ -9,6 +9,9 @@ import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.experiment.biology.Atom;
+import com.compomics.util.experiment.biology.AtomChain;
+import com.compomics.util.experiment.biology.AtomImpl;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.TreeSet;
@@ -44,10 +47,6 @@ public class PrecursorIonErrorPredictor {
     /**
      * The mass difference of a carbon isotope
      */
-    private final double C13IsotopeMass = Atom.C.getMonoisotopicMass() / 12;
-    /**
-     * The mass difference of a carbon isotope
-     */
     private final Collection<Identification> experimentIdentifications;
 
     public PrecursorIonErrorPredictor(Collection<Identification> identifications) {
@@ -56,61 +55,80 @@ public class PrecursorIonErrorPredictor {
     }
 
     private void inferMachineSettings() {
+        inferMachineSettings(experimentIdentifications);
+    }
+
+    private void inferMachineSettings(Collection<Identification> identifications) {
         precursorIonStats.clear();
         LinkedList<Modification> asapMods = PRIDEModificationFactory.getAsapMods();
-
-        for (Identification anIdentification : experimentIdentifications) {
+        double defaultPrecursorError = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance");
+        for (Identification anIdentification : identifications) {
             try {
-                //only use the top 25% identifications?
-                anIdentification.getAnnotationData().getIdentificationScore().getAverageAminoAcidScore();
-                int charge = anIdentification.getPeptide().getCharge();
                 encounteredCharges.add(anIdentification.getPeptide().getCharge());
                 if (anIdentification.getPipelineExplanationType() != null) {
                     double precursor_mass_error;
                     try {
                         precursor_mass_error = Math.abs(anIdentification.getPeptide().calculateMassDelta());
-                        if (precursor_mass_error <= C13IsotopeMass) {
-                            boolean add = true;
-                            for (Modification aMod : asapMods) {
-                                //if it matches to 2 digits...
-                                if (Math.abs(aMod.getAverageMassShift() - precursor_mass_error) < 0.01) {
-                                    add = false;
-                                    break;
-                                }
-                            }
-                            if (precursor_mass_error > 0 && add) {
-                                precursorIonStats.addValue(precursor_mass_error);
+
+                        //eliminate precursor errors that are due to neutral losses?
+                        for (Double aNeutralLossMass : getCommonNeutralLosses()) {
+                            //if it matches to 2 digits...
+                            if (Math.abs(aNeutralLossMass - precursor_mass_error) < 0.01) {
+                                precursor_mass_error -= Math.abs(aNeutralLossMass);
+                                break;
                             }
                         }
+
+                        //eliminate precursor errors that are due to potential modification shifts?
+                        for (Modification aMod : asapMods) {
+                            if (Math.abs(aMod.getMonoIsotopicMassShift() - precursor_mass_error) < 0.01) {
+                                precursor_mass_error -= Math.abs(aMod.getMonoIsotopicMassShift());
+                                break;
+                            }
+                        }
+
+                        /*    //try to account for a C13 isotope?
+                        double C13_isotopeMass = new AtomImpl(Atom.C, 0).getMass() - new AtomImpl(Atom.C, 1).getMass();
+                        if (precursor_mass_error >= C13_isotopeMass) {
+                            precursor_mass_error -= C13_isotopeMass;
+                        }*/
+                        //if it is still bigger, then there's no use...
+                        if (Math.abs(precursor_mass_error) <= defaultPrecursorError) {
+                            //add this real error to the pool
+                            precursorIonStats.addValue(Math.abs(precursor_mass_error));
+                            // System.out.println(precursor_mass_error);
+                        }
+
                     } catch (AASequenceMassUnknownException ex) {
                         LOGGER.warn(anIdentification.getPeptide().getSequenceString() + " contains unknown amino acids and will be skipped");
                     }
-                    //C13 peaks
                 }
             } catch (NullPointerException e) {
                 //this can happen if there are no unmodified and identified peptides?
                 //  LOGGER.error("Not able to extract for " + anIdentification);
             }
         }
-
         double acc = InferenceStatistics.round(precursorIonStats.calculateOptimalMassError(), 3);
+        //System.out.println("Current prec accuracy is " + acc + " da");
         mostLikelyPrecursorError = Math.min(1.0, acc);
-
         TotalReportGenerator.setPrecursorAcc(mostLikelyPrecursorError);
         TotalReportGenerator.setPrecursorAccMethod(precursorIonStats.getMethodUsed());
 
-        if (mostLikelyPrecursorError == Double.NaN
-                || mostLikelyPrecursorError == Double.NEGATIVE_INFINITY
-                || mostLikelyPrecursorError == Double.POSITIVE_INFINITY) {
-            mostLikelyPrecursorError = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.default_error_tolerance");
-            TotalReportGenerator.setPrecursorAccMethod("Default value from properties");
-        }
-        LOGGER.info("Estimated precursor accuracy at " + mostLikelyPrecursorError);
+        //if the error is still larger than the max tolerance of 1 dalton, try to infer it through known contaminants
         if (mostLikelyPrecursorError == 0 || mostLikelyPrecursorError >= 1.0) {
-            mostLikelyPrecursorError = MassScanResult.estimatePrecursorIonToleranceBasedOnContaminants();
+            MassScanResult.inspectIdentifications(identifications);
+            mostLikelyPrecursorError = MassScanResult.getContaminantBasedMassError();
             TotalReportGenerator.setPrecursorAccMethod("Estimated based on known mass spectrometry related contaminants");
         }
-
+        // System.out.println("Current prec accuracy is " + mostLikelyPrecursorError + " da");
+        if (mostLikelyPrecursorError == Double.NaN
+                || mostLikelyPrecursorError == Double.NEGATIVE_INFINITY
+                || mostLikelyPrecursorError == Double.POSITIVE_INFINITY
+                || mostLikelyPrecursorError > defaultPrecursorError) {
+            mostLikelyPrecursorError = defaultPrecursorError;
+            TotalReportGenerator.setPrecursorAccMethod("Default value from properties");
+        }
+        LOGGER.info("Estimated precursor accuracy at " + mostLikelyPrecursorError + "(" + TotalReportGenerator.getPrecursorAccMethod().toLowerCase() + ")");
     }
 
     public double getRecalibratedPrecursorAccuraccy() {
@@ -146,10 +164,6 @@ public class PrecursorIonErrorPredictor {
         return experimentIdentifications;
     }
 
-    public double getC13IsotopeMass() {
-        return C13IsotopeMass;
-    }
-
     public void clear() {
         if (encounteredCharges != null) {
             encounteredCharges.clear();
@@ -161,6 +175,34 @@ public class PrecursorIonErrorPredictor {
             precursorIonStats.clear();
         }
 
+    }
+
+    private Collection<Double> getCommonNeutralLosses() {
+        ArrayList<Double> neutralLosses = new ArrayList<>();
+        //ammonia
+        AtomChain NH3chain = new AtomChain();
+        NH3chain.append(new AtomImpl(Atom.H, 0), 3);
+        NH3chain.append(new AtomImpl(Atom.N, 0), 1);
+        neutralLosses.add(NH3chain.getMass());
+        //water
+        AtomChain H2Ochain = new AtomChain();
+        H2Ochain.append(new AtomImpl(Atom.H, 0), 2);
+        H2Ochain.append(new AtomImpl(Atom.O, 0), 1);
+        neutralLosses.add(H2Ochain.getMass());
+        //phosphate
+        AtomChain H3PO4Chain = new AtomChain();
+        H3PO4Chain.append(new AtomImpl(Atom.H, 0), 3);
+        H3PO4Chain.append(new AtomImpl(Atom.P, 0), 1);
+        H3PO4Chain.append(new AtomImpl(Atom.O, 0), 4);
+        neutralLosses.add(H3PO4Chain.getMass());
+        //sulphate
+        AtomChain H2SO4Chain = new AtomChain();
+        H2SO4Chain.append(new AtomImpl(Atom.H, 0), 2);
+        H2SO4Chain.append(new AtomImpl(Atom.S, 0), 1);
+        H2SO4Chain.append(new AtomImpl(Atom.O, 0), 4);
+        neutralLosses.add(H2SO4Chain.getMass());
+        //add the masses
+        return neutralLosses;
     }
 
 }

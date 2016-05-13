@@ -5,6 +5,7 @@ import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contamin
 import com.compomics.pride_asa_pipeline.core.util.report.ExtractionReportGenerator;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Map.Entry;
 
 /**
  *
@@ -23,18 +24,11 @@ public class ContaminationReportGenerator extends ExtractionReportGenerator {
     @Override
     protected void writeReport(OutputStreamWriter writer) throws IOException {
         writer.append("Contamination report").append(System.lineSeparator());
-        writer.append("Precursor accuracy based on contaminants\t: "+MassScanResult.estimatePrecursorIonToleranceBasedOnContaminants()).append(System.lineSeparator());
-        writer.append("Fragment accuracy based on contaminants\t: "+MassScanResult.estimateFragmentIonToleranceBasedOnContaminants()).append(System.lineSeparator());
-        writer.append(Contamination.getHeader()).append(System.lineSeparator()).flush();
-        writer.append("Validated against " + precursorTolerance + " da precursor tolerance and " + fragmentTolerance + " da fragment ion tolerance").append(System.lineSeparator()).flush();
-        writer.append(Contamination.getHeader()).append(System.lineSeparator());
-        for (Contamination aContaminant : MassScanResult.getPrecursorContamination()) {
-            writer.append(aContaminant.toString(precursorTolerance)).append(System.lineSeparator()).flush();
+        writer.append("Estimated tolerance based on contaminants : " + MassScanResult.getContaminantBasedMassError());
+        writer.append("Name\tCount").append(System.lineSeparator());
+        for (Entry<String, Integer> countMap : MassScanResult.getMassCounts().entrySet()) {
+            writer.append(countMap.getKey() + "\t" + countMap.getValue()).append(System.lineSeparator()).flush();
         }
-        for (Contamination aContaminant : MassScanResult.getFragmentContamination()) {
-            writer.append(aContaminant.toString(fragmentTolerance)).append(System.lineSeparator()).flush();
-        }
-        writer.flush();
     }
 
     @Override

@@ -41,11 +41,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import java.util.Set;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.xmlpull.v1.XmlPullParserException;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
-import uk.ac.ebi.pridemod.model.PTM;
 
 /**
  *
@@ -173,7 +171,7 @@ public class ParameterExtractor {
                     mzValueMap.put(peptide, mzValuesBySpectrumId);
 
                 }
-                MassScanResult.scanFragmentIonContamination(topPrecursorHits);
+       
                 //FragmentIonErrorPredictor fragmentIonErrorPredictor = new IterativeFragmentIonErrorPredictor(mzValueMap);
                 fragmentIonErrorPredictor = new FragmentIonErrorPredictor(mzValueMap);
             

@@ -66,13 +66,6 @@ public class FragmentIonErrorPredictor {
         double acc = InferenceStatistics.round(fragmentStats.calculateOptimalMassError(), 3);
         System.out.println(fragmentStats);
         this.fragmentIonAccuraccy = Math.min(1.0, acc);
-        LOGGER.info("Estimated fragment ion accuraccy at " + fragmentIonAccuraccy);
-        TotalReportGenerator.setFragmentAccMethod(fragmentStats.getMethodUsed());
-        if (fragmentIonAccuraccy == 0.0
-                || fragmentIonAccuraccy >= 1.0) {
-            fragmentIonAccuraccy = MassScanResult.estimateFragmentIonToleranceBasedOnContaminants();
-            TotalReportGenerator.setFragmentAccMethod("Estimated based on known mass spectrometry related contaminants");
-        }
     }
 
     public double getFragmentIonAccuraccy() {

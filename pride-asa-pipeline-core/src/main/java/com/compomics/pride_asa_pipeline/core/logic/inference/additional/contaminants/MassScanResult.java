@@ -1,21 +1,19 @@
 package com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants;
 
-import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
-import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
+import com.compomics.pride_asa_pipeline.core.repository.SpectrumRepository;
+import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.model.Identification;
-import java.io.File;
-import java.io.FileWriter;
+import com.compomics.util.experiment.biology.Atom;
+import com.compomics.util.experiment.biology.AtomImpl;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 
 import org.springframework.core.io.ClassPathResource;
-import uk.ac.ebi.pride.utilities.mol.Atom;
 
 /**
  * This class represents the result of a scan across all unexplained mass
@@ -26,138 +24,10 @@ import uk.ac.ebi.pride.utilities.mol.Atom;
 public class MassScanResult {
 
     private static final Logger LOGGER = Logger.getLogger(MassScanResult.class);
-    /**
-     * The allowed range surrounding a "hit". This defaults to 1.0, but can also
-     * be set to the actual accuracies in the report.
-     */
-    private static final double tolerance = 1.0;
-    /**
-     * The percentile of peaks to use for this analysis. This is to eliminate
-     * contaminants being found in the noise.
-     */
-    private static final double peakFiltrationPercentile = 70;
-    /**
-     * A list of contaminations on the precursor level
-     */
-    private static final List<Contamination> precursorContamination = new ArrayList<>();
-    /**
-     * A list of contaminations on the fragment ion level
-     */
-    private static final List<Contamination> fragmentContamination = new ArrayList<>();
-    /**
-     * A hashmap of known mass shifts caused by technical contaminations. More
-     * can be added to the property file
-     */
-    private static final HashMap<String, Double> knownMassShifts = getKnownMassShifts();
-
-    /**
-     * Scans the given hashmap of identifications with their corresponding
-     * unexplained delta mass for contaminants on the precursor level
-     *
-     * @param unexplainedPrecursorMasses a hashmap of identifications and the
-     * corresponding unexplained precursor mass difference
-     */
-    public static void scanForPrecursorIonContamination(HashMap<Identification, Double> unexplainedPrecursorMasses) {
-        LOGGER.info("Scanning for precursor contamination");
-        for (Map.Entry<Identification, Double> identification : unexplainedPrecursorMasses.entrySet()) {
-            String sequence = identification.getKey().getPeptide().getSequenceString();
-            double observedMassDifference = identification.getValue();
-            for (Map.Entry<String, Double> shift : knownMassShifts.entrySet()) {
-                double aQueryMass = shift.getValue();
-                if (aQueryMass - tolerance <= observedMassDifference && observedMassDifference <= aQueryMass + tolerance) {
-                    precursorContamination.add(new Contamination(shift.getKey(), sequence, observedMassDifference, aQueryMass, false));
-                }
-            }
-        }
-        LOGGER.info("Scan complete !");
-    }
-
-    /**
-     * Scans the given collection of identifications for unexplained masses in
-     * between peaks on the fragment ion level
-     *
-     * @param identifications a collection of identifications
-     */
-    public static void scanFragmentIonContamination(Collection<Identification> identifications) {
-        for (Identification identification : identifications) {
-            String sequence = identification.getPeptide().getSequenceString();
-            try {
-                List<FragmentIonAnnotation> fragmentIonAnnotations = (identification.getAnnotationData().getFragmentIonAnnotations());
-                double[] masses = new double[fragmentIonAnnotations.size()];
-                int i = 0;
-                for (FragmentIonAnnotation anIon : fragmentIonAnnotations) {
-                    masses[i] = anIon.getMz() * anIon.getIon_charge();
-                    i++;
-                }
-                for (int j = 0; j < masses.length; j++) {
-                    double[] temp = new double[masses.length];
-                    System.arraycopy(masses, i, temp, 0, temp.length - i);
-                    for (int k = 0; k < temp.length; k++) {
-                        for (Map.Entry<String, Double> shift : knownMassShifts.entrySet()) {
-                            double observedMassDifference = Math.abs(masses[j] - temp[k]);
-                            double aQueryMass = shift.getValue();
-                            if (aQueryMass - tolerance <= observedMassDifference && observedMassDifference <= aQueryMass + tolerance) {
-                                fragmentContamination.add(new Contamination(shift.getKey(), sequence, observedMassDifference, aQueryMass, true));
-                            }
-                        }
-                    }
-                }
-            } catch (NullPointerException e) {
-                //no annotations?
-            }
-        }
-    }
-
-    public static double estimateFragmentIonToleranceBasedOnContaminants() {
-        InferenceStatistics stat = new InferenceStatistics(true);
-        for (Contamination contamination : fragmentContamination) {
-            stat.addValue(contamination.getObserved() - contamination.getTheoretical());
-        }
-        double calculateOptimalMassError = Math.abs(stat.calculateOptimalMassError());
-        double isotopeMass = Atom.C_12.getMonoMass() / 12;
-        if (calculateOptimalMassError > isotopeMass) {
-            calculateOptimalMassError -= isotopeMass;
-        }
-        return InferenceStatistics.round(calculateOptimalMassError, 3);
-    }
-
-    public static double estimatePrecursorIonToleranceBasedOnContaminants() {
-        InferenceStatistics stat = new InferenceStatistics(true);
-        for (Contamination contamination : precursorContamination) {
-            stat.addValue(contamination.getObserved() - contamination.getTheoretical());
-        }
-        double calculateOptimalMassError = Math.abs(stat.calculateOptimalMassError());
-        double isotopeMass = Atom.C_12.getMonoMass() / 12;
-        if (calculateOptimalMassError > isotopeMass) {
-            calculateOptimalMassError -= isotopeMass;
-        }
-        return InferenceStatistics.round(calculateOptimalMassError, 3);
-    }
-
-    /**
-     * Prints the report of the scan(s) to a file
-     *
-     * @param outputFile the output file
-     * @param precursorTolerance the actual precursor tolerance
-     * @param fragmentIonTolerance the actual fragment ion tolerance
-     */
-    public static void printToFile(File outputFile, double precursorTolerance, double fragmentIonTolerance) {
-
-        try (FileWriter writer = new FileWriter(outputFile)) {
-            writer.append("Validated against " + precursorTolerance + " da precursor tolerance and " + fragmentIonTolerance + " da fragment ion tolerance").append(System.lineSeparator()).flush();
-            writer.append(Contamination.getHeader()).append(System.lineSeparator());
-            for (Contamination aContaminant : precursorContamination) {
-                writer.append(aContaminant.toString(precursorTolerance)).append(System.lineSeparator()).flush();
-            }
-            for (Contamination aContaminant : fragmentContamination) {
-                writer.append(aContaminant.toString(fragmentIonTolerance)).append(System.lineSeparator()).flush();
-            }
-            writer.flush();
-        } catch (IOException ex) {
-            LOGGER.error(ex);
-        }
-    }
-
+    private static final DescriptiveStatistics errorEstimation = new DescriptiveStatistics();
+    private static final HashMap<String, Integer> massCount = new HashMap<>();
+    private static SpectrumRepository spectrumRepository;
+    private static final double C13Mass = new AtomImpl(Atom.C, 1).getMass() - new AtomImpl(Atom.C, 0).getMass();
     /**
      * Loads the known mass shifts with their corresponding name into the
      * scanner
@@ -185,12 +55,77 @@ public class MassScanResult {
         return shifts;
     }
 
-    public static Iterable<Contamination> getPrecursorContamination() {
-        return precursorContamination;
+    /**
+     * Scans the provided identifications and related spectra for mz values that
+     * correspond to a known mass contaminant
+     *
+     * @param identifications the collection of identifications that need to be scanned
+     */
+    public static void inspectIdentifications(Collection<Identification> identifications) {
+        for (Identification ident : identifications) {
+            double[] mzValuesBySpectrumId = spectrumRepository.getMzValuesBySpectrumId(ident.getSpectrumId());
+            double[] intensityValuesBySpectrumId = spectrumRepository.getMzValuesBySpectrumId(ident.getSpectrumId());
+            DescriptiveStatistics intensityFilter = new DescriptiveStatistics(intensityValuesBySpectrumId);
+            double intensityThreshold = intensityFilter.getPercentile(90);
+
+            for (int i = 0; i < mzValuesBySpectrumId.length; i++) {
+                if (intensityValuesBySpectrumId[i] >= intensityThreshold) {
+                    for (Map.Entry<String, Double> massShift : getKnownMassShifts().entrySet()) {
+                        double mzError = calculateMassError(massShift.getValue(), ident.getPeptide().getCharge(), mzValuesBySpectrumId[i]);
+                        if (mzError != -1) {
+                            errorEstimation.addValue(mzError);
+                            massCount.put(massShift.getKey(), massCount.getOrDefault(massShift.getKey(), 0) + 1);
+                        }
+                    }
+                }
+            }
+
+        }
     }
 
-    public static Iterable<Contamination> getFragmentContamination() {
-        return fragmentContamination;
+
+    /**
+     * Calculates the mass error for a peak
+     * @param mass the reference mass
+     * @param charge the assumed charge for the spectrum
+     * @param mz the query mz value
+     * @return  the mass error between reference and experiment
+     */
+    private static double calculateMassError(double mass, int charge, double mz) {
+        double experimentalPeakMass = mz * charge;
+        double error = Math.abs(experimentalPeakMass - mass);
+        //consider isotope
+        if (error >= C13Mass) {
+            error -= C13Mass;
+        }
+        if (error < 1) {
+            return error;
+        }
+        return -1;
+    }
+
+    /**
+     * Gets the median mass error based on the contaminant profile
+     * @return 
+     */
+    public static double getContaminantBasedMassError() {
+        return errorEstimation.getPercentile(50);
+    }
+
+    /**
+     * Sets the spectrum repository for the mass scanner
+     * @param fileSpectrumRepository 
+     */
+    public static void setSpectrumRepository(SpectrumRepository spectrumRepository) {
+        MassScanResult.spectrumRepository = spectrumRepository;
+    }
+
+    /**
+     * Gets the binned counts per discovered mass
+     * @return the mass counts
+     */
+    public static HashMap<String, Integer> getMassCounts() {
+        return massCount;
     }
 
 }

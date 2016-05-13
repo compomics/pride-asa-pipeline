@@ -4,6 +4,8 @@ import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.Precurs
 import com.compomics.pride_asa_pipeline.core.util.report.ExtractionReportGenerator;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.Identification;
+import com.compomics.util.experiment.biology.Atom;
+import com.compomics.util.experiment.biology.AtomImpl;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
@@ -34,7 +36,7 @@ public class PrecursorIonReporter extends ExtractionReportGenerator {
             reportWriter.append(ident.getPeptide().getCharge() + "+").append("\t");
             try {
                 double mD = ident.getPeptide().calculateMassDelta();
-                boolean consider = mD > predictor.getC13IsotopeMass();
+                boolean consider = mD > new AtomImpl(Atom.C, 1).getMass() - new AtomImpl(Atom.C, 0).getMass();
                 reportWriter.append(String.valueOf(mD)).append("\t");
                 reportWriter.append(String.valueOf(consider));
             } catch (AASequenceMassUnknownException ex) {
