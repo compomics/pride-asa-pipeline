@@ -20,7 +20,8 @@ public class WebServiceAssayProcessor {
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
   //      String inputAssay = "51178";
-        String inputAssay = "3";
+        String inputAssay = "11954";
+      // String inputAssay="3";
    
         File outputFolder = new File("C:\\Users\\Kenneth\\Desktop\\Complete\\" + inputAssay);
         if (outputFolder.exists()) {
@@ -28,8 +29,7 @@ public class WebServiceAssayProcessor {
         }
         outputFolder.mkdirs();
         new File(outputFolder+"/temp").mkdir();
-        WebServiceParameterExtractor 
-                
+        WebServiceParameterExtractor               
                 webServiceParameterExtractor = new WebServiceParameterExtractor(outputFolder);
         SearchParameters analyze = webServiceParameterExtractor.analyze(inputAssay);
         System.out.println(analyze);

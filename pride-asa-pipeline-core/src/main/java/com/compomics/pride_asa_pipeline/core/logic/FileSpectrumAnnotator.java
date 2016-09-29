@@ -1,7 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.logic;
 
 
-import com.compomics.pride_asa_pipeline.core.logic.AbstractSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.io.File;
@@ -36,6 +35,10 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
 
     @Override
     public void clearTmpResources() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void annotate() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

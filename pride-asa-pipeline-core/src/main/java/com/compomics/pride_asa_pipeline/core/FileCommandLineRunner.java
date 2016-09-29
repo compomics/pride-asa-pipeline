@@ -1,7 +1,7 @@
 package com.compomics.pride_asa_pipeline.core;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.core.logic.impl.FileSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.service.ResultHandler;
 import java.io.BufferedReader;
 import java.io.File;

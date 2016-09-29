@@ -44,7 +44,7 @@ public class ProjectExtractorTest extends TestCase {
         return testResource;
     }
 
-       /**
+    /**
      * Test of getSearchParametersFileForProject method, of class
      * PrideAsapSearchParamExtractor.
      */
@@ -60,17 +60,25 @@ public class ProjectExtractorTest extends TestCase {
 
         SearchParameters identificationParameters = instance.analyzePrideXML(inputFile, "test_" + inputFile.getName().replace(".xml", ""));
 
-        assertTrue(identificationParameters.getPrecursorAccuracy() > 0 && identificationParameters.getPrecursorAccuracy() <= 0.007);
-        assertEquals(0.027, identificationParameters.getFragmentIonAccuracy());
+        System.out.println();
+        System.out.println("# ------------------------------------------------------------------");
+        System.out.println("FINAL VERDICT");
+        System.out.println("# ------------------------------------------------------------------");
+        System.out.println(identificationParameters.toString());
 
-        assertEquals(identificationParameters.getPrecursorAccuracyType(), SearchParameters.MassAccuracyType.DA);
+        //it has to be better than these reported values
+        assertTrue(identificationParameters.getPrecursorAccuracy() > 0 && identificationParameters.getPrecursorAccuracy() <= 10);
+        assertEquals(identificationParameters.getPrecursorAccuracyType(), SearchParameters.MassAccuracyType.PPM);
+        System.out.println("Precursor ion acc check");
+        assertTrue(identificationParameters.getFragmentIonAccuracy() > 0 && identificationParameters.getFragmentIonAccuracy() <= 1);
+        System.out.println("Fragment ion acc check");
 
         assertTrue(identificationParameters.getEnzyme().getName().toLowerCase().contains("tryp"));
+        System.out.println("Enzyme check");
         assertEquals(2, identificationParameters.getMinChargeSearched().value);
         assertEquals(4, identificationParameters.getMaxChargeSearched().value);
-
+        System.out.println("Charges check");
         ArrayList<String> modifications = identificationParameters.getPtmSettings().getAllModifications();
-
         assertTrue(modifications.contains("Phosphorylation of S"));
         assertTrue(modifications.contains("Phosphorylation of T"));
         assertTrue(modifications.contains("Phosphorylation of Y"));
@@ -79,12 +87,7 @@ public class ProjectExtractorTest extends TestCase {
         assertTrue(modifications.contains("Acetylation of peptide N-term"));
         assertTrue(modifications.contains("Carbamidomethylation of C"));
         assertTrue(modifications.contains("Pyrolidone from Q"));
-        System.out.println();
-        System.out.println("# ------------------------------------------------------------------");
-        System.out.println("FINAL VERDICT");
-        System.out.println("# ------------------------------------------------------------------");
-        System.out.println(identificationParameters.toString());
-
+        System.out.println("Reported modifications check");
     }
 
 }

@@ -508,7 +508,12 @@
             <version>beta8</version>
             <type>jar</type>
         </dependency>
- 
+        <dependency>
+            <groupId>uk.ac.ebi.pride.tools</groupId>
+            <artifactId>pride-mod</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     
     <distributionManagement>        
