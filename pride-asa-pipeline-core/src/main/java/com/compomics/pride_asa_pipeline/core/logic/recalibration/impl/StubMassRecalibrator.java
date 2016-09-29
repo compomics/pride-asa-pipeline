@@ -1,9 +1,9 @@
 package com.compomics.pride_asa_pipeline.core.logic.recalibration.impl;
 
 import com.compomics.pride_asa_pipeline.core.logic.recalibration.AbstractMassRecalibrator;
+import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
-import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import java.util.Collection;
 

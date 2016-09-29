@@ -1,12 +1,10 @@
 package com.compomics.pride_asa_pipeline.core.data.extractor;
 
-import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.logic.inference.IdentificationFilter;
 import com.compomics.pride_asa_pipeline.core.logic.inference.enzyme.EnzymePredictor;
 import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.PrecursorIonErrorPredictor;
 import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.FragmentIonErrorPredictor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.logic.inference.modification.ModificationPredictor;
 import com.compomics.pride_asa_pipeline.core.util.report.ExtractionReportGenerator;
 import com.compomics.pride_asa_pipeline.core.util.report.impl.ContaminationReportGenerator;
@@ -15,9 +13,9 @@ import com.compomics.pride_asa_pipeline.core.util.report.impl.FragmentIonReporte
 import com.compomics.pride_asa_pipeline.core.util.report.impl.ModificationReportGenerator;
 import com.compomics.pride_asa_pipeline.core.util.report.impl.PrecursorIonReporter;
 import com.compomics.pride_asa_pipeline.core.util.report.impl.TotalReportGenerator;
-import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.model.modification.impl.UtilitiesPTMAdapter;
-import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.model.modification.ModificationAdapter;
+import com.compomics.pride_asa_pipeline.model.modification.impl.UtilitiesPTMAdapter;
+import com.compomics.pride_asa_pipeline.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.impl.FileResultHandlerImpl3;
 import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
@@ -27,6 +25,7 @@ import com.compomics.pride_asa_pipeline.core.service.impl.DbSpectrumServiceImpl;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
+import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
@@ -41,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import java.util.Set;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.xmlpull.v1.XmlPullParserException;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
@@ -344,51 +344,48 @@ public class ParameterExtractor {
     }
 
     public void useDefaults(String assay) throws IOException, XmlPullParserException {
-        printableReports = false;
-        parameters = new SearchParameters();
-        parameters.setEnzyme(new EnzymePredictor().getMostLikelyEnzyme());
-        parameters.setnMissedCleavages(2);
-        PtmSettings ptmSettings = new PtmSettings();
-        ModificationAdapter adapter = new UtilitiesPTMAdapter();
-        PRIDEModificationFactory ptmFactory = PRIDEModificationFactory.getInstance();
-        //add carbamidomethyl c
-        com.compomics.util.experiment.biology.PTM carbamidomethylC;
         try {
+            printableReports = false;
+            parameters = new SearchParameters();
+            parameters.setEnzyme(new EnzymePredictor().getMostLikelyEnzyme());
+            parameters.setnMissedCleavages(2);
+            PtmSettings ptmSettings = new PtmSettings();
+            ModificationAdapter adapter = new UtilitiesPTMAdapter();
+            PRIDEModificationFactory ptmFactory = PRIDEModificationFactory.getInstance();
+            com.compomics.util.experiment.biology.PTM carbamidomethylC;
             carbamidomethylC = (com.compomics.util.experiment.biology.PTM) ptmFactory.getModification(adapter, ptmFactory.getModificationNameFromAccession("UNIMOD:940"));
-       
-        ptmSettings.addFixedModification(carbamidomethylC);
-        //add oxidation of m
-        com.compomics.util.experiment.biology.PTM oxidationM
-                = (com.compomics.util.experiment.biology.PTM) ptmFactory.getModification(adapter, ptmFactory.getModificationNameFromAccession("UNIMOD:35"));
-        ptmSettings.addVariableModification(oxidationM);
+            ptmSettings.addFixedModification(carbamidomethylC);
+            com.compomics.util.experiment.biology.PTM oxidationM
+                    = (com.compomics.util.experiment.biology.PTM) ptmFactory.getModification(adapter, ptmFactory.getModificationNameFromAccession("UNIMOD:35"));
+            ptmSettings.addVariableModification(oxidationM);
+            parameters.setPtmSettings(ptmSettings);
+            
+            //try to get from machine...
+            AnalyzerData data = getAnalyzerData(assay);
+            
+            double predictedPrecursorMassError = 1.0;
+            double predictedFragmentMassError = 1.0;
+            if (data != null) {
+                LOGGER.debug("Getting mass errors from machine type : " + data.getAnalyzerFamily());
+                predictedPrecursorMassError = data.getPrecursorMassError();
+                predictedFragmentMassError = data.getFragmentMassError();
+            }
+            
+            parameters.setPrecursorAccuracy(predictedPrecursorMassError);
+            parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
+            parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
+            parameters.setFragmentIonAccuracy(predictedFragmentMassError);
+            
+            parameters.setMinChargeSearched(new Charge(Charge.PLUS, 2));
+            parameters.setMaxChargeSearched(new Charge(Charge.PLUS, 5));
+            
+            TotalReportGenerator.setEnzymeMethod("Defaulted");
+            TotalReportGenerator.setFragmentAccMethod("Defaulted");
+            TotalReportGenerator.setPrecursorAccMethod("Defaulted");
+            TotalReportGenerator.setPtmSettingsMethod("Defaulted");
         } catch (ParameterExtractionException ex) {
-              LOGGER.error("Could not load default modifications. Reason :" + ex);
+            java.util.logging.Logger.getLogger(ParameterExtractor.class.getName()).log(Level.SEVERE, null, ex);
         }
-        parameters.setPtmSettings(ptmSettings);
-
-        //try to get from machine...
-        AnalyzerData data = getAnalyzerData(assay);
-
-        double predictedPrecursorMassError = 1.0;
-        double predictedFragmentMassError = 1.0;
-        if (data != null) {
-            LOGGER.debug("Getting mass errors from machine type : " + data.getAnalyzerFamily());
-            predictedPrecursorMassError = data.getPrecursorMassError();
-            predictedFragmentMassError = data.getFragmentMassError();
-        }
-
-        parameters.setPrecursorAccuracy(predictedPrecursorMassError);
-        parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
-        parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-        parameters.setFragmentIonAccuracy(predictedFragmentMassError);
-
-        parameters.setMinChargeSearched(new Charge(Charge.PLUS, 2));
-        parameters.setMaxChargeSearched(new Charge(Charge.PLUS, 5));
-
-        TotalReportGenerator.setEnzymeMethod("Defaulted");
-        TotalReportGenerator.setFragmentAccMethod("Defaulted");
-        TotalReportGenerator.setPrecursorAccMethod("Defaulted");
-        TotalReportGenerator.setPtmSettingsMethod("Defaulted");
 
     }
 

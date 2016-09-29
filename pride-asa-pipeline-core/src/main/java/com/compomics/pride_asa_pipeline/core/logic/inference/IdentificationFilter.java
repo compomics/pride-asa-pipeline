@@ -1,6 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.logic.inference;
 
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
+import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.IdentificationScore;

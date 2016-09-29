@@ -5,14 +5,14 @@
 package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
+import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.impl.ModificationCombinationSolverImpl;
-import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
+import com.compomics.pride_asa_pipeline.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import java.io.IOException;

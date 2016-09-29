@@ -1,7 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.playground;
 
 import com.compomics.pride_asa_pipeline.core.data.extractor.WebServiceParameterExtractor;
-import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.model.MGFExtractionException;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import java.io.File;
 import java.io.IOException;
@@ -22,11 +22,12 @@ public class WebServiceAssayProcessor {
   //      String inputAssay = "51178";
         String inputAssay = "3";
    
-        File outputFolder = new File("C:\\Users\\compomics\\Desktop\\Complete\\" + inputAssay);
+        File outputFolder = new File("C:\\Users\\Kenneth\\Desktop\\Complete\\" + inputAssay);
         if (outputFolder.exists()) {
             outputFolder.delete();
         }
         outputFolder.mkdirs();
+        new File(outputFolder+"/temp").mkdir();
         WebServiceParameterExtractor 
                 
                 webServiceParameterExtractor = new WebServiceParameterExtractor(outputFolder);

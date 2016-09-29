@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.gui.controller;
 
+
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -12,6 +13,7 @@ import com.compomics.pride_asa_pipeline.core.gui.SpectrumPanelFactory;
 import com.compomics.pride_asa_pipeline.core.gui.view.IdentificationsPanel;
 import com.compomics.pride_asa_pipeline.core.gui.view.SummaryPanel;
 import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.core.logic.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
 import com.compomics.pride_asa_pipeline.model.Identification;
@@ -19,7 +21,6 @@ import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ModificationFacade;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peptide;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.model.comparator.IdentificationSequenceComparator;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import java.awt.Color;

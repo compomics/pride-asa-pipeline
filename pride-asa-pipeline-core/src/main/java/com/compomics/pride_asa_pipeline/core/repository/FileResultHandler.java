@@ -4,8 +4,8 @@
  */
 package com.compomics.pride_asa_pipeline.core.repository;
 
+import com.compomics.pride_asa_pipeline.core.logic.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.model.Identification;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import java.io.File;
 import java.util.List;
 

@@ -3,7 +3,7 @@
 package com.compomics.pride_asa_pipeline.core.gui.controller;
 
 import com.compomics.pride_asa_pipeline.core.gui.view.ModificationsMergeDialog;
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
+import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.util.GuiUtils;
 import java.awt.Component;

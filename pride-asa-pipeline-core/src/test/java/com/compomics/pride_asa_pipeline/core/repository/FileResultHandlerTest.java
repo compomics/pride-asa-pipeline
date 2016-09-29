@@ -4,7 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.repository;
 
-import com.compomics.pride_asa_pipeline.core.repository.FileResultHandler;
+import com.compomics.pride_asa_pipeline.core.logic.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
@@ -16,7 +16,6 @@ import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import com.compomics.pride_asa_pipeline.core.util.MathUtils;
 import java.io.BufferedReader;

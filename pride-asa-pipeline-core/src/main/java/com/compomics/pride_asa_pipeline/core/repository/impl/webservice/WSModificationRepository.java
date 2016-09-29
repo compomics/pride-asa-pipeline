@@ -1,15 +1,14 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.webservice;
 
-import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
-import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
-import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.model.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.model.modification.impl.AsapModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.util.pride.PrideWebService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 

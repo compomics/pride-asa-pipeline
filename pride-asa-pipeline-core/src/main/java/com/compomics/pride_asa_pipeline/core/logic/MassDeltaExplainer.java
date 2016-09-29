@@ -5,8 +5,8 @@
 package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
-import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
-import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
+import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrationResult;
+import com.compomics.pride_asa_pipeline.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import java.util.List;

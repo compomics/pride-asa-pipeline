@@ -1,11 +1,11 @@
 package com.compomics.pride_asa_pipeline.core.data.extractor;
 
-import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
-import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
+import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
 import com.compomics.util.io.compression.ZipUtils;

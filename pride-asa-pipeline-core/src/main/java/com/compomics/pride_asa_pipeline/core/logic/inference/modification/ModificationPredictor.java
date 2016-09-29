@@ -1,13 +1,13 @@
 package com.compomics.pride_asa_pipeline.core.logic.inference.modification;
 
-import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.util.report.impl.TotalReportGenerator;
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
-import com.compomics.pride_asa_pipeline.core.model.modification.impl.UtilitiesPTMAdapter;
-import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.model.ModificationHolder;
+import com.compomics.pride_asa_pipeline.model.modification.impl.UtilitiesPTMAdapter;
+import com.compomics.pride_asa_pipeline.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 
 import com.compomics.util.experiment.biology.PTM;
 import com.compomics.util.experiment.biology.PTMFactory;

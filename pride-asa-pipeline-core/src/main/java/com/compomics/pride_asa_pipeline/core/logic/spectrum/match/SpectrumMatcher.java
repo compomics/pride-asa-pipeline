@@ -2,7 +2,7 @@ package com.compomics.pride_asa_pipeline.core.logic.spectrum.match;
 
 import com.compomics.pride_asa_pipeline.model.AnnotationData;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
-import com.compomics.pride_asa_pipeline.core.model.ModifiedPeptidesMatchResult;
+import com.compomics.pride_asa_pipeline.model.ModifiedPeptidesMatchResult;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.score.IdentificationScorer;

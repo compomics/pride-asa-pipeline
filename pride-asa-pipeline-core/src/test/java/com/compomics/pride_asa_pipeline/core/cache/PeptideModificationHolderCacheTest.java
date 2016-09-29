@@ -7,7 +7,7 @@ package com.compomics.pride_asa_pipeline.core.cache;
 import com.compomics.pride_asa_pipeline.core.cache.Cache;
 import com.compomics.pride_asa_pipeline.core.cache.impl.PeptideModificationHolderCache;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
-import com.compomics.pride_asa_pipeline.core.model.PeptideModificationHolder;
+import com.compomics.pride_asa_pipeline.model.PeptideModificationHolder;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import static org.junit.Assert.*;
 import org.junit.Test;

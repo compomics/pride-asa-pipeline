@@ -4,7 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.service.impl;
 
-import com.compomics.pride_asa_pipeline.core.model.MascotGenericFile;
+import com.compomics.pride_asa_pipeline.model.MascotGenericFile;
 import com.compomics.pride_asa_pipeline.core.service.DbExperimentService;
 import com.compomics.pride_asa_pipeline.core.service.DbSpectrumService;
 import com.compomics.pride_asa_pipeline.model.Identification;

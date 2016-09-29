@@ -2,12 +2,11 @@ package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
-import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.service.DbExperimentService;
 import com.compomics.pride_asa_pipeline.core.service.DbModificationService;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;

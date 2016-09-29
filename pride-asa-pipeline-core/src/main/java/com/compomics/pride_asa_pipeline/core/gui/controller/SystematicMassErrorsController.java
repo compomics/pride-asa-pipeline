@@ -5,7 +5,7 @@
 package com.compomics.pride_asa_pipeline.core.gui.controller;
 
 import com.compomics.pride_asa_pipeline.core.gui.view.SystematicMassErrorsDialog;
-import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
+import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.util.GuiUtils;
 import com.compomics.pride_asa_pipeline.core.util.MathUtils;
 import java.awt.event.ActionEvent;

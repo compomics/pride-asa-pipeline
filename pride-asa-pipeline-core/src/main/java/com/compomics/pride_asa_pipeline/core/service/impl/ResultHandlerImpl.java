@@ -5,10 +5,10 @@
 package com.compomics.pride_asa_pipeline.core.service.impl;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.core.logic.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.logic.modification.ModificationMarshaller;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.model.comparator.IdentificationSpectrumIdComparator;
 import com.compomics.pride_asa_pipeline.core.repository.FileResultHandler;
 import com.compomics.pride_asa_pipeline.core.service.ResultHandler;

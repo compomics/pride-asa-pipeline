@@ -2,23 +2,18 @@ package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
+
 import com.compomics.pride_asa_pipeline.core.logic.impl.MassDeltaExplainerImpl;
 import com.compomics.pride_asa_pipeline.core.logic.inference.IdentificationFilter;
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
+import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.match.SpectrumMatcher;
-import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
-import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
-import com.compomics.pride_asa_pipeline.core.model.ModifiedPeptidesMatchResult;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
-import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.model.modification.source.AnnotatedModificationService;
-import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.model.modification.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.model.modification.source.AnnotatedModificationService;
+import com.compomics.pride_asa_pipeline.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
-import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.service.SpectrumService;
@@ -28,7 +23,11 @@ import com.compomics.pride_asa_pipeline.model.AnnotationData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Identifications;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.ModificationCombination;
+import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
+import com.compomics.pride_asa_pipeline.model.ModifiedPeptidesMatchResult;
+import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
@@ -244,8 +243,9 @@ public abstract class AbstractSpectrumAnnotator<T> {
      *
      * @param assayAccession the input assay identifier
      * @throws IOException
+     * @throws com.compomics.pride_asa_pipeline.model.ParameterExtractionException
      */
-    public void annotate(String assayAccession) throws IOException {
+    public void annotate(String assayAccession) throws IOException, ParameterExtractionException {
         initModifications(assayAccession, null, null);
         initAnalyzerData(assayAccession);
         List<Identification> completeIdentifications = identifications.getCompleteIdentifications();
@@ -304,7 +304,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
 
     }
 
-    public Set<Modification> initModifications(String assayAccession, Resource modificationsResource, InputType inputType) throws IOException {
+    public Set<Modification> initModifications(String assayAccession, Resource modificationsResource, InputType inputType) throws IOException, ParameterExtractionException {
         LOGGER.info("Loading modifications...");
         modificationHolder = new ModificationHolder();
         LinkedHashSet<Modification> sortedAnnotatedModifications = new LinkedHashSet<>();
@@ -321,11 +321,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             AsapModificationAdapter adapter = new AsapModificationAdapter();
             //get other modifications
             for (String aPTMName : annotatedModService.getAssayAnnotatedPTMs(assayAccession)) {
-                try {
-                    sortedAnnotatedModifications.add((Modification) PRIDEModificationFactory.getInstance().getModification(adapter, aPTMName));
-                } catch (ParameterExtractionException ex) {
-                    LOGGER.error("Could not include " + aPTMName + ". Please verify ! Reason:" + ex);
-                }
+                sortedAnnotatedModifications.add((Modification) PRIDEModificationFactory.getInstance().getModification(adapter, aPTMName));
             }
         }
         //order the annotated modifications to prevalence (in case there are more than the selected batch size)

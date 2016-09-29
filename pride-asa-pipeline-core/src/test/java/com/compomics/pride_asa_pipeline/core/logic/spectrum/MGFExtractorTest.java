@@ -1,7 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.logic.spectrum;
 
 import com.compomics.pride_asa_pipeline.core.data.extractor.MGFExtractor;
-import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.model.MGFExtractionException;
 import com.compomics.util.experiment.massspectrometry.SpectrumFactory;
 import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;

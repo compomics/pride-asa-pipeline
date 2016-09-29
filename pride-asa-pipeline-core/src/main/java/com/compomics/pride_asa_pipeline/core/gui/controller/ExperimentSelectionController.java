@@ -1,19 +1,20 @@
 package com.compomics.pride_asa_pipeline.core.gui.controller;
 
+
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.gui.view.IdentificationsFileSelectionPanel;
 import com.compomics.pride_asa_pipeline.core.gui.view.PrideSelectionPanel;
 import com.compomics.pride_asa_pipeline.core.gui.view.ResultFileSelectionPanel;
 import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.core.logic.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
-import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.core.service.ResultHandler;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;

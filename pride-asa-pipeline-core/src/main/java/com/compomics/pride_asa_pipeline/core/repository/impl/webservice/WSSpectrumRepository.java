@@ -1,8 +1,8 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.webservice;
 
 import com.compomics.pride_asa_pipeline.core.data.extractor.MGFExtractor;
-import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
-import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
+import com.compomics.pride_asa_pipeline.core.repository.ParserCacheConnector;
+import com.compomics.pride_asa_pipeline.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.repository.SpectrumRepository;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import java.io.File;
@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.utilities.data.core.Spectrum;

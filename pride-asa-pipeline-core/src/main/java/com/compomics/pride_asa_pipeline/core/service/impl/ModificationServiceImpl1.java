@@ -1,9 +1,9 @@
 package com.compomics.pride_asa_pipeline.core.service.impl;
 
 import com.compomics.omssa.xsd.UserModCollection;
+import com.compomics.pride_asa_pipeline.core.logic.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.logic.modification.OmssaModificationMarshaller;
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import static com.compomics.pride_asa_pipeline.core.service.ModificationService.MASS_DELTA_TOLERANCE;
 import com.compomics.pride_asa_pipeline.core.util.MathUtils;

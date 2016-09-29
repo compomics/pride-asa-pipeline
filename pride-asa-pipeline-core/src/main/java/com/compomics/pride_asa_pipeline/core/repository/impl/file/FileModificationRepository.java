@@ -1,16 +1,15 @@
 package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
-import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
-import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
-import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
-import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.model.modification.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
+import com.compomics.pride_asa_pipeline.core.repository.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 

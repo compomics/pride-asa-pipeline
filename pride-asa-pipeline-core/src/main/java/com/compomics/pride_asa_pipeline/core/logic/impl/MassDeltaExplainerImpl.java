@@ -4,13 +4,12 @@ import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolde
 import com.compomics.pride_asa_pipeline.core.logic.MassDeltaExplainer;
 import com.compomics.pride_asa_pipeline.core.logic.ModificationCombinationSolver;
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
-import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants.MassScanResult;
-import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
-import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
+import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
+import com.compomics.pride_asa_pipeline.model.ModificationCombination;
+import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +18,8 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.utilities.mol.Atom;
+
+
 
 /**
  * @author Florian Reisinger Date: 04-Sep-2009

@@ -1,6 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.data.extractor;
 
-import com.compomics.pride_asa_pipeline.core.model.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.core.util.report.impl.TotalReportGenerator;
 import java.io.BufferedWriter;
 import java.io.File;

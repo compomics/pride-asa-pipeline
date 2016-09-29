@@ -1,7 +1,7 @@
 package com.compomics.pride_asa_pipeline.core.gui;
 
+import com.compomics.pride_asa_pipeline.core.logic.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.util.GuiUtils;
 import com.compomics.pride_asa_pipeline.core.util.MathUtils;
 import com.google.common.primitives.Doubles;

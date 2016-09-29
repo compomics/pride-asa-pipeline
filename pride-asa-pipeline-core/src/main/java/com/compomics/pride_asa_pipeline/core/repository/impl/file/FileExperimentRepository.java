@@ -2,8 +2,8 @@ package com.compomics.pride_asa_pipeline.core.repository.impl.file;
 
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
-import com.compomics.pride_asa_pipeline.core.model.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
+import com.compomics.pride_asa_pipeline.core.repository.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Peptide;

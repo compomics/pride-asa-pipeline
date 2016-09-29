@@ -5,7 +5,7 @@ import com.compomics.pride_asa_pipeline.core.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.core.logic.AbstractSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.core.logic.SpectrumAnnotatorResult;
 import com.compomics.util.examples.BareBonesBrowserLaunch;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

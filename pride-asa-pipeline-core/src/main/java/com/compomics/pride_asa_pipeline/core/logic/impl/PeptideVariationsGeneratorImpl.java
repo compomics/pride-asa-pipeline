@@ -2,7 +2,7 @@ package com.compomics.pride_asa_pipeline.core.logic.impl;
 
 import com.compomics.pride_asa_pipeline.core.logic.ChoiceIterable;
 import com.compomics.pride_asa_pipeline.core.logic.PeptideVariationsGenerator;
-import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
+import com.compomics.pride_asa_pipeline.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ModificationFacade;

@@ -6,7 +6,7 @@ package com.compomics.pride_asa_pipeline.core.cache.impl;
 
 import com.compomics.pride_asa_pipeline.core.cache.Cache;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
-import com.compomics.pride_asa_pipeline.core.model.PeptideModificationHolder;
+import com.compomics.pride_asa_pipeline.model.PeptideModificationHolder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

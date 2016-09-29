@@ -5,8 +5,8 @@
 package com.compomics.pride_asa_pipeline.core.service;
 
 import com.compomics.omssa.xsd.UserModCollection;
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
-import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.core.logic.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.Map;
 import java.util.Set;

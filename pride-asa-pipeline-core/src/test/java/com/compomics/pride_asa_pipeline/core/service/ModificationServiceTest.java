@@ -4,7 +4,7 @@ package com.compomics.pride_asa_pipeline.core.service;
 
 import com.compomics.pride_asa_pipeline.core.logic.modification.ModificationMarshaller;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
+import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import java.util.Set;
 import static org.junit.Assert.*;
