@@ -43,7 +43,7 @@ public class FileSpectrumAnnotator extends AbstractSpectrumAnnotator<File> {
     /**
      * Beans
      */
-    private FileExperimentService experimentService;
+    public FileExperimentService experimentService;
     /**
      * Boolean indicating if the file should be loaded in memory
      */

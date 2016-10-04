@@ -97,33 +97,33 @@ public abstract class AbstractSpectrumAnnotator<T> {
     /**
      * The maximal size a single pass can have
      */
-    private int MAX_PASS_SIZE = 6;
+    protected int MAX_PASS_SIZE = 6;
     /**
      * The maximal amount of passes
      */
-    private int MAX_PASSES = 6;
+    protected int MAX_PASSES = 6;
     /**
      * The threshold explanation ratio (50% of all unexplained masses has to be
      * explained)
      */
-    private double explanationCriterion = 0.50;
+    protected double explanationCriterion = 0.50;
     /**
      * The criterion for matched peaks (for example, 10% has to be matched)
      */
-    private double matchedPeakCriterion = 0.1;
+    protected double matchedPeakCriterion = 0.1;
     /**
      * The maximal allowed error (should be 1 da, the minimal resolution of any
      * machine)
      */
-    private double maximumAllowedErrorDa = 1.0;
+    protected double maximumAllowedErrorDa = 1.0;
     /**
      * A queue of modifications
      */
-    private ArrayBlockingQueue<Modification> modQueue;
+    protected ArrayBlockingQueue<Modification> modQueue;
     /**
      * The modification repository
      */
-    private FileExperimentModificationRepository modRepository;
+    protected FileExperimentModificationRepository modRepository;
 
     /**
      * Getters and setters.
@@ -346,7 +346,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         return sortedAnnotatedModifications;
     }
 
-    private Set<Modification> getNextModificationSet() throws IOException {
+    protected Set<Modification> getNextModificationSet() throws IOException {
         //drain the queue in subset parts
         Set<Modification> modPassSet = new HashSet<>();
         //subset the modQueue in x partitions
@@ -581,7 +581,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         return unexplainedIdentifications;
     }
 
-    private void initAnalyzerData(String assay) throws IOException {
+    protected void initAnalyzerData(String assay) throws IOException {
         if (analyzerData == null) {
 
             try {
