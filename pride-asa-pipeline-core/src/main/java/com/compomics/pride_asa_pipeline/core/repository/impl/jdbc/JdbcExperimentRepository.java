@@ -8,6 +8,7 @@ import com.compomics.pride_asa_pipeline.core.data.extractor.ExperimentAccessionR
 import com.compomics.pride_asa_pipeline.core.data.extractor.IdentificationsExtractor;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -238,5 +239,15 @@ public class JdbcExperimentRepository extends JdbcDaoSupport implements Experime
             }
         }
         return retval.toString();
+    }
+
+    @Override
+    public Map<String, String> getAnalyzerSources(String experimentAccession) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<AnalyzerData> getAnalyzerData(String assayIdentifier) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

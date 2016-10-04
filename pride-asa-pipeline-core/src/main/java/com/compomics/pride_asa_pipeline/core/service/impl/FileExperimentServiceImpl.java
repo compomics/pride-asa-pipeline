@@ -1,18 +1,16 @@
 package com.compomics.pride_asa_pipeline.core.service.impl;
 
-import com.compomics.pride_asa_pipeline.core.repository.FileParser;
+import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Identifications;
 import com.compomics.pride_asa_pipeline.core.service.FileExperimentService;
-import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
-import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
+import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 
 /**
  *
@@ -21,17 +19,19 @@ import uk.ac.ebi.pride.tools.mzxml_parser.MzXMLParsingException;
 public class FileExperimentServiceImpl extends ExperimentServiceImpl implements FileExperimentService {
 
     private static final Logger LOGGER = Logger.getLogger(FileExperimentServiceImpl.class);
-    private FileParser fileParser;
+    private CachedDataAccessController fileParser;
+    private String assayIdentifier;
 
     public FileExperimentServiceImpl() {
     }
 
     @Override
-    public void setFileParser(FileParser fileParser) {
-        this.fileParser = fileParser;
+    public void setActiveAssay(String assayIdentifier) {
+        experimentRepository = new FileExperimentModificationRepository(assayIdentifier);
+        this.assayIdentifier=assayIdentifier;
     }
 
-    public FileParser getFileParser() {
+    public CachedDataAccessController getFileParser() {
         return fileParser;
     }
 
@@ -48,8 +48,7 @@ public class FileExperimentServiceImpl extends ExperimentServiceImpl implements 
     @Override
     public Identifications loadExperimentIdentifications() {
         Identifications identifications = new Identifications();
-        //@todo check if the parser is initialized
-        List<Identification> identificationList = fileParser.getExperimentIdentifications();
+        List<Identification> identificationList = experimentRepository.loadExperimentIdentifications(assayIdentifier);
         for (Identification identification : identificationList) {
             identifications.addIdentification(identification);
         }
@@ -58,7 +57,7 @@ public class FileExperimentServiceImpl extends ExperimentServiceImpl implements 
 
     @Override
     public void updateChargeStates(Set<Integer> chargeStates) {
-        Map<String, String> analyzerSources = fileParser.getAnalyzerSources();
+        Map<String, String> analyzerSources = experimentRepository.getAnalyzerSources(assayIdentifier);
         if (analyzerSources.containsKey(MALDI_SOURCE_ACCESSION)) {
             LOGGER.debug("Found MALDI source, setting charge state to 1.");
             chargeStates.clear();
@@ -78,7 +77,7 @@ public class FileExperimentServiceImpl extends ExperimentServiceImpl implements 
     @Override
     public AnalyzerData getAnalyzerData() {
         //@ToDo: for the moment, only take the first result into account, check the other results
-        List<AnalyzerData> analyzerDataList = fileParser.getAnalyzerData();
+        List<AnalyzerData> analyzerDataList = experimentRepository.getAnalyzerData(assayIdentifier);
         AnalyzerData analyzerData = null;
         if (!analyzerDataList.isEmpty()) {
             analyzerData = analyzerDataList.get(0);
@@ -102,7 +101,7 @@ public class FileExperimentServiceImpl extends ExperimentServiceImpl implements 
     @Override
     public Set<String> getProteinAccessions() {
         Set<String> proteinAccessions = new HashSet<>();
-        List<String> proteinAccessionList = fileParser.getProteinAccessions();
+        List<String> proteinAccessionList = experimentRepository.getProteinAccessions(assayIdentifier);
         for (String proteinAccession : proteinAccessionList) {
             proteinAccessions.add(proteinAccession);
         }
@@ -114,17 +113,10 @@ public class FileExperimentServiceImpl extends ExperimentServiceImpl implements 
         return fileParser.getNumberOfPeptides();
     }
 
-    @Override
-    public void init(File identificationsFile) {
-        try {
-            fileParser.init(identificationsFile);
-        } catch (ClassNotFoundException | MzXMLParsingException | JMzReaderException ex) {
-           LOGGER.error(ex);
-        }
-    }
+
 
     @Override
     public void clear() {
-        fileParser.clear();
+      
     }
 }

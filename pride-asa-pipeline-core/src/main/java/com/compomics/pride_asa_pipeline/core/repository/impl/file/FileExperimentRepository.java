@@ -5,17 +5,25 @@ import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics
 import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.core.repository.ParserCacheConnector;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
+import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.MzXmlControllerImpl;
+import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.PrideXmlControllerImpl;
+import uk.ac.ebi.pride.utilities.data.core.CvParam;
+import uk.ac.ebi.pride.utilities.data.core.InstrumentComponent;
+import uk.ac.ebi.pride.utilities.data.core.InstrumentConfiguration;
 import uk.ac.ebi.pride.utilities.data.core.SpectrumIdentification;
+import uk.ac.ebi.pride.utilities.term.CvTermReference;
 
 /**
  *
@@ -137,6 +145,87 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
     @Override
     public List<Map<String, Object>> getSpectraMetadata(String experimentAccession) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Map<String, String> getAnalyzerSources(String experimentAccession) {
+        CvTermReference cvReference = CvTermReference.MS_INSTRUMENT_SOURCE;
+        HashMap<String, String> analyzerSources = new HashMap<>();
+        try {
+            CachedDataAccessController parser = parserCache.getParser(experimentAccession, false);
+            List<InstrumentConfiguration> instrumentConfigurations = null;
+            if (parser instanceof MzXmlControllerImpl) {
+                instrumentConfigurations = ((MzXmlControllerImpl) parser).getInstrumentConfigurations();
+            } else if (parser instanceof PrideXmlControllerImpl) {
+                instrumentConfigurations = ((PrideXmlControllerImpl) parser).getInstrumentConfigurations();
+            }
+            if (instrumentConfigurations != null && !instrumentConfigurations.isEmpty()) {
+                for (InstrumentConfiguration anInstrumentConfiguration : instrumentConfigurations) {
+                    for (InstrumentComponent source : anInstrumentConfiguration.getSource()) {
+                        for (CvParam aParam : source.getCvParams()) {
+                            if (aParam.getCvLookupID().equalsIgnoreCase(cvReference.getAccession())) {
+                                analyzerSources.put(aParam.getAccession(), aParam.getValue());
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            LOGGER.error("Error occurred reading analyzer sources : " + ex);
+        }
+        if (analyzerSources.isEmpty()) {
+            analyzerSources.put("unknown", "unknown");
+        }
+        return analyzerSources;
+    }
+
+    @Override
+    public List<AnalyzerData> getAnalyzerData(String experimentAccession) {
+        CvTermReference cvReference = CvTermReference.MS_INSTRUMENT_MODEL;
+        List<AnalyzerData> analyzerData = new ArrayList<>();
+        try {
+            CachedDataAccessController parser = parserCache.getParser(experimentAccession, false);
+            List<InstrumentConfiguration> instrumentConfigurations = null;
+            if (parser instanceof MzXmlControllerImpl) {
+                instrumentConfigurations = ((MzXmlControllerImpl) parser).getInstrumentConfigurations();
+            } else if (parser instanceof PrideXmlControllerImpl) {
+                instrumentConfigurations = ((PrideXmlControllerImpl) parser).getInstrumentConfigurations();
+            }
+            if (instrumentConfigurations != null && !instrumentConfigurations.isEmpty()) {
+                for (InstrumentConfiguration anInstrumentConfiguration : instrumentConfigurations) {
+                    for (InstrumentComponent source : anInstrumentConfiguration.getSource()) {
+                        for (CvParam aParam : source.getCvParams()) {
+                            if (aParam.getCvLookupID().equalsIgnoreCase(cvReference.getAccession())) {
+                                addInstrument(aParam.getValue(),analyzerData);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            LOGGER.error("Error occurred reading analyzer sources : " + ex);
+        }
+        if (analyzerData.isEmpty()) {
+            addInstrument("unknown", analyzerData);
+        }
+        return analyzerData;
+    }
+
+    private void addInstrument(String value, List<AnalyzerData> data) {
+        if (value.toLowerCase().contains("orbi")) {
+            data.add(new AnalyzerData(AnalyzerData.ANALYZER_FAMILY.IONTRAP));
+        } else if (value.toLowerCase().contains("tof")) {
+            data.add(new AnalyzerData(AnalyzerData.ANALYZER_FAMILY.TOF));
+        } else if (value.toLowerCase().contains("q")) {
+            data.add(new AnalyzerData(AnalyzerData.ANALYZER_FAMILY.QEXACTIVE));
+        } else if (value.toLowerCase().contains("trap")) {
+            data.add(new AnalyzerData(AnalyzerData.ANALYZER_FAMILY.IONTRAP));
+        } else if (value.toLowerCase().contains("ft")) {
+            data.add(new AnalyzerData(AnalyzerData.ANALYZER_FAMILY.FT));
+        } else {
+            data.add(new AnalyzerData(AnalyzerData.ANALYZER_FAMILY.UNKNOWN));
+        }
+
     }
 
 }

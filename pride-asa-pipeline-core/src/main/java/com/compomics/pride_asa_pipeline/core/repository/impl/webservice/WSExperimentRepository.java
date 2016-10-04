@@ -2,6 +2,7 @@ package com.compomics.pride_asa_pipeline.core.repository.impl.webservice;
 
 import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
@@ -12,7 +13,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetailList;
@@ -22,6 +27,13 @@ import uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummary;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummaryList;
 import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetail;
 import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetailList;
+import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
+import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.MzXmlControllerImpl;
+import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.PrideXmlControllerImpl;
+import uk.ac.ebi.pride.utilities.data.core.CvParam;
+import uk.ac.ebi.pride.utilities.data.core.InstrumentComponent;
+import uk.ac.ebi.pride.utilities.data.core.InstrumentConfiguration;
+import uk.ac.ebi.pride.utilities.term.CvTermReference;
 
 /**
  *
@@ -129,4 +141,45 @@ public class WSExperimentRepository implements ExperimentRepository {
         throw new UnsupportedOperationException("No longer supported through the webservice");
     }
 
+    @Override
+    public Map<String, String> getAnalyzerSources(String experimentAccession) {
+        throw new UnsupportedOperationException("Not yet supported through the webservice");
+    }
+
+    @Override
+    public List<AnalyzerData> getAnalyzerData(String experimentAccession) {
+        List<AnalyzerData> analyzerData = new ArrayList<>();
+        try {
+            String project = PrideWebService.getAssayDetail(experimentAccession).getProjectAccession();
+            Set<String> instrumentNames = PrideWebService.getProjectDetail(project).getInstrumentNames();
+            for (String instrument : instrumentNames) {
+                addInstrument(instrument, analyzerData);
+            }
+            if (analyzerData.isEmpty()) {
+                addInstrument("unknown", analyzerData);
+            }
+        } catch (IOException ex) {
+            LOGGER.error(ex);
+        }
+        if (analyzerData.isEmpty()) {
+            addInstrument("unknown", analyzerData);
+        }
+        return analyzerData;
+    }
+
+    private void addInstrument(String value, List<AnalyzerData> data) {
+        if (value.toLowerCase().contains("orbi")) {
+            data.add(new AnalyzerData(AnalyzerData.ANALYZER_FAMILY.IONTRAP));
+        } else if (value.toLowerCase().contains("tof")) {
+            data.add(new AnalyzerData(AnalyzerData.ANALYZER_FAMILY.TOF));
+        } else if (value.toLowerCase().contains("q")) {
+            data.add(new AnalyzerData(AnalyzerData.ANALYZER_FAMILY.QEXACTIVE));
+        } else if (value.toLowerCase().contains("trap")) {
+            data.add(new AnalyzerData(AnalyzerData.ANALYZER_FAMILY.IONTRAP));
+        } else if (value.toLowerCase().contains("ft")) {
+            data.add(new AnalyzerData(AnalyzerData.ANALYZER_FAMILY.FT));
+        } else {
+            data.add(new AnalyzerData(AnalyzerData.ANALYZER_FAMILY.UNKNOWN));
+        }
+    }
 }

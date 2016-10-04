@@ -2,22 +2,37 @@
  *
 
  */
-package com.compomics.pride_asa_pipeline.core.service;
+package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.repository.FileParser;
+import com.compomics.pride_asa_pipeline.core.service.ExperimentService;
+import com.compomics.pride_asa_pipeline.core.service.ResultHandler;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identifications;
 import java.io.File;
 import java.util.Set;
-import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 
 /**
  * @author Niels Hulstaert
  */
 public interface FileExperimentService extends ExperimentService {
 
+    /**
+     * Inits the service; indexes the given identifications file
+     *
+     * @param identificationsFile the experiment identifications file
+     */
+    void init(File identificationsFile);    
+    
+    /**
+     * Set the FileParser
+     *
+     * @param fileParser
+     */
+    void setFileParser(FileParser fileParser);
+    
     ResultHandler getResultHandler();
-
+    
     /**
      * Clears the tmp resources.
      */
@@ -66,10 +81,4 @@ public interface FileExperimentService extends ExperimentService {
      * @return the number of peptides
      */
     long getNumberOfPeptides();
-
-    /**
-     * Sets the active assay
-     *
-     */
-    void setActiveAssay(String assayIdentifier);
 }

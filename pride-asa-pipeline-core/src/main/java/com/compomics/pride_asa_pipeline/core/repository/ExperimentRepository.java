@@ -4,6 +4,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.repository;
 
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public interface ExperimentRepository {
      */
     List<Identification> loadExperimentIdentifications(String experimentAccession);
 
-     /**
+    /**
      * Gets the number of spectra for a given experiment
      *
      * @param experimentAccession the experiment accession number
@@ -71,4 +72,14 @@ public interface ExperimentRepository {
      * @return the spectra metadata
      */
     List<Map<String, Object>> getSpectraMetadata(String experimentAccession);
+
+    /**
+     * Gets the different analyzer sources in the input file
+     *
+     *     * @param experimentAccession the experiment accession
+     * @return a map of the sources
+     */
+    Map<String, String> getAnalyzerSources(String experimentAccession);
+
+    List<AnalyzerData> getAnalyzerData(String assayIdentifier);
 }

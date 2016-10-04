@@ -88,7 +88,7 @@ public class FileCommandLineRunner {
                     FileSpectrumAnnotator.clearTmpResources();
                 } else {
                     //continue with the annotiation
-                    FileSpectrumAnnotator.annotate();
+                    FileSpectrumAnnotator.annotate(experimentAccession);
                     //write result to file
                     fileResultHandler.writeResultToFile(FileSpectrumAnnotator.getSpectrumAnnotatorResult());
                     fileResultHandler.writeUsedModificationsToFile(experimentAccession, FileSpectrumAnnotator.getModificationService().getUsedModifications(FileSpectrumAnnotator.getSpectrumAnnotatorResult()).keySet());

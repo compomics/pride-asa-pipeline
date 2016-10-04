@@ -7,6 +7,7 @@ package com.compomics.pride_asa_pipeline.core.service;
 import com.compomics.pride_asa_pipeline.core.repository.FileParser;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.Set;
+import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 
 /**
  *
@@ -21,10 +22,10 @@ public interface FileModificationService extends ModificationService {
      */
     Set<Modification> loadExperimentModifications();
 
-    /**
-     * Set the FileParser
-     * 
-     * @param fileParser 
+
+        /**
+     * Sets the active assay
+     *
      */
-    void setFileParser(FileParser fileParser);
+    void setActiveAssay(String assayIdentifier);
 }

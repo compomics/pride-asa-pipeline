@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 
 /**
  *
@@ -16,6 +17,7 @@ import java.util.Set;
 public class FileModificationServiceImpl extends ModificationServiceImpl implements FileModificationService {
 
     private FileParser fileParser;
+    private String assayIdentifier;
 
     public FileModificationServiceImpl() {
     }
@@ -38,7 +40,9 @@ public class FileModificationServiceImpl extends ModificationServiceImpl impleme
     }
 
     @Override
-    public void setFileParser(FileParser fileParser) {
-        this.fileParser = fileParser;
+    public void setActiveAssay(String assayIdentifier) {
+       this.assayIdentifier=assayIdentifier;
     }
+
+
 }

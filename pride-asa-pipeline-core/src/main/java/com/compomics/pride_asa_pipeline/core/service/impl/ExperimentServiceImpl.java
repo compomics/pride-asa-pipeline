@@ -5,6 +5,7 @@
 package com.compomics.pride_asa_pipeline.core.service.impl;
 
 import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
+import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
 import com.compomics.pride_asa_pipeline.core.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.core.service.ResultHandler;
 import java.util.*;
@@ -34,7 +35,7 @@ public abstract class ExperimentServiceImpl implements ExperimentService {
 
     public void setResultHandler(ResultHandler resultHandler) {
         this.resultHandler = resultHandler;
-    }        
+    }
 
     @Override
     public Map<String, String> findAllExperimentAccessions() {
@@ -44,5 +45,5 @@ public abstract class ExperimentServiceImpl implements ExperimentService {
     @Override
     public Map<String, String> findExperimentAccessionsByTaxonomy(int taxonomyId) {
         return experimentRepository.findExperimentAccessionsByTaxonomy(taxonomyId);
-    }        
+    }
 }

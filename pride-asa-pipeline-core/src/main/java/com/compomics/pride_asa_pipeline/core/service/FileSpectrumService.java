@@ -4,9 +4,6 @@
  */
 package com.compomics.pride_asa_pipeline.core.service;
 
-import com.compomics.pride_asa_pipeline.core.repository.FileParser;
-
-
 
 /**
  *
@@ -15,10 +12,9 @@ import com.compomics.pride_asa_pipeline.core.repository.FileParser;
 public interface FileSpectrumService extends SpectrumService {
 
     /**
-     * Set the FileParser
+     * Sets the active assay
      *
-     * @param fileParser
      */
-    void setFileParser(FileParser fileParser);
+    void setActiveAssay(String assayIdentifier);
 
 }
