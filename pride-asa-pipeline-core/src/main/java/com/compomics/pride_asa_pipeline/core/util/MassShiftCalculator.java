@@ -50,7 +50,7 @@ public class MassShiftCalculator {
             }
         }
         //multiply by two to cover the fact we've used absolutes?
-        double shift = Math.abs(stat.getPercentile(50))* (Math.sqrt(3) / 2);
+        double shift = Math.abs(stat.getPercentile(50)) * (Math.sqrt(3) / 2);
         if (shift > 50) {
             shift = 50;
         } else if (shift < 0.01) {
@@ -83,6 +83,25 @@ public class MassShiftCalculator {
             }
         }
         return 2 * stat.getPercentile(50) * (Math.sqrt(3) / 2);
+    }
+
+    public static double findBestAlignmentShift(double[] mzValues, double maxError, double increment) {
+        double error = Math.max(0.01, increment);
+        double[] theoretical = new double[mzValues.length];
+        double averageCorrelation = 0;
+        double bestShift = 0;
+        while (error < maxError) {
+            for (int i = 0; i < mzValues.length; i++) {
+                theoretical[i] = mzValues[i] + error;
+            }
+            DescriptiveStatistics correlationStats = getCorrelationStats(mzValues, theoretical);
+            if (averageCorrelation <= correlationStats.getMean()) {
+                averageCorrelation = correlationStats.getMean();
+                bestShift = error;
+            }
+            error += increment;
+        }
+        return bestShift;
     }
 
     private static double findOptimalShift(double[] theoreticalMasses, double[] experimentalMasses) {
@@ -127,7 +146,7 @@ public class MassShiftCalculator {
         return (second[maxIndex] - first[maxIndex]);
     }
 
-    private static double getBestCorrelation(double[] first, double[] second) {
+    private static DescriptiveStatistics getCorrelationStats(double[] first, double[] second) {
         //the optimal shift is found where the maximal correlation is
         Complex[] corr = calculateXCorr(first, second);
         DescriptiveStatistics stat = new DescriptiveStatistics();
@@ -135,7 +154,7 @@ public class MassShiftCalculator {
             stat.addValue(corr[i].getReal());
         }
         System.out.println(stat);
-        return stat.getMax();
+        return stat;
     }
 
     private static double[] doZeroPadding(double[] values, int padding) {

@@ -55,7 +55,7 @@ import uk.ac.ebi.pride.utilities.data.controller.DataAccessException;
  * @author Niels Hulstaert
  */
 public abstract class AbstractSpectrumAnnotator<T> {
-
+    
     private static final Logger LOGGER = Logger.getLogger(AbstractSpectrumAnnotator.class);
 
     /**
@@ -131,79 +131,79 @@ public abstract class AbstractSpectrumAnnotator<T> {
     public MassRecalibrator getMassRecalibrator() {
         return massRecalibrator;
     }
-
+    
     public void setMassRecalibrator(MassRecalibrator massRecalibrator) {
         this.massRecalibrator = massRecalibrator;
     }
-
+    
     public SpectrumMatcher getSpectrumMatcher() {
         return spectrumMatcher;
     }
-
+    
     public void setSpectrumMatcher(SpectrumMatcher spectrumMatcher) {
         this.spectrumMatcher = spectrumMatcher;
     }
-
+    
     public MassDeltaExplainer getMassDeltaExplainer() {
         return massDeltaExplainer;
     }
-
+    
     public void setMassDeltaExplainer(MassDeltaExplainer massDeltaExplainer) {
         this.massDeltaExplainer = massDeltaExplainer;
     }
-
+    
     public PeptideVariationsGenerator getPeptideVariationsGenerator() {
         return peptideVariationsGenerator;
     }
-
+    
     public void setPeptideVariationsGenerator(PeptideVariationsGenerator peptideVariationsGenerator) {
         this.peptideVariationsGenerator = peptideVariationsGenerator;
     }
-
+    
     public SpectrumService getSpectrumService() {
         return spectrumService;
     }
-
+    
     public void setSpectrumService(SpectrumService spectrumService) {
         this.spectrumService = spectrumService;
     }
-
+    
     public PipelineModificationService getPipelineModificationService() {
         return pipelineModificationService;
     }
-
+    
     public void setPipelineModificationService(PipelineModificationService pipelineModificationService) {
         this.pipelineModificationService = pipelineModificationService;
     }
-
+    
     public ModificationService getModificationService() {
         return modificationService;
     }
-
+    
     public void setModificationService(ModificationService modificationService) {
         this.modificationService = modificationService;
     }
-
+    
     public Identifications getIdentifications() {
         return identifications;
     }
-
+    
     public SpectrumAnnotatorResult getSpectrumAnnotatorResult() {
         return spectrumAnnotatorResult;
     }
-
+    
     public void setSpectrumAnnotatorResult(SpectrumAnnotatorResult spectrumAnnotatorResult) {
         this.spectrumAnnotatorResult = spectrumAnnotatorResult;
     }
-
+    
     public ModificationHolder getModificationHolder() {
         return modificationHolder;
     }
-
+    
     public void setModificationRepository(FileExperimentModificationRepository modRepository) {
         this.modRepository = modRepository;
     }
-
+    
     public FileExperimentModificationRepository getModRepository() {
         return modRepository;
     }
@@ -243,7 +243,8 @@ public abstract class AbstractSpectrumAnnotator<T> {
      *
      * @param assayAccession the input assay identifier
      * @throws IOException
-     * @throws com.compomics.pride_asa_pipeline.model.ParameterExtractionException
+     * @throws
+     * com.compomics.pride_asa_pipeline.model.ParameterExtractionException
      */
     public void annotate(String assayAccession) throws IOException, ParameterExtractionException {
         initModifications(assayAccession, null, null);
@@ -252,7 +253,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         List<Identification> identificationsToProcess = new ArrayList<>(completeIdentifications);
         HashMap<Modification, Double> totalModificationRates = new HashMap<>();
         Set<Modification> nextModificationSet;
-
+        
         int totalSize = completeIdentifications.size();
         int totalExplained = 0;
         int pass = 1;
@@ -282,6 +283,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 }
                 pass++;
             }
+            mergeAnnotatorResults(spectrumAnnotatorResult,tempSpectrumAnnotatorResult);
             //   System.out.println(tempSpectrumAnnotatorResult.getMassRecalibrationResult().toString());
         }
         //filter out only the ones that are most relevant (top 6 or using a consideration threshold)...
@@ -291,7 +293,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
 
         Comparator<Entry<Modification, Double>> byValue = (entry1, entry2) -> entry1.getValue().compareTo(
                 entry2.getValue());
-
+        
         totalModificationRates
                 .entrySet()
                 .stream()
@@ -301,9 +303,15 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 modificationHolder.addModification(anEntry.getKey());
             }
         });
-
+        
     }
-
+    
+    private void mergeAnnotatorResults(SpectrumAnnotatorResult first, SpectrumAnnotatorResult second) {
+        for (Identification ident : second.getIdentifications()) {
+            first.addIdentification(ident);
+        }
+    }
+    
     public Set<Modification> initModifications(String assayAccession, Resource modificationsResource, InputType inputType) throws IOException, ParameterExtractionException {
         LOGGER.info("Loading modifications...");
         modificationHolder = new ModificationHolder();
@@ -345,7 +353,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         LOGGER.info("Retrieved complete sorted modification map");
         return sortedAnnotatedModifications;
     }
-
+    
     protected Set<Modification> getNextModificationSet() throws IOException {
         //drain the queue in subset parts
         Set<Modification> modPassSet = new HashSet<>();
@@ -364,7 +372,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
      * @param unexplainedIdentifications the list of identifications without an
      * explanation (initially this is the same as the complete identifications)
      */
-    private void annotate(ModificationHolder modificationHolder, List<Identification> completeIdentifications, List<Identification> identificationsToProcess, SpectrumAnnotatorResult spectrumAnnotatorResult) {
+    protected void annotate(ModificationHolder modificationHolder, List<Identification> completeIdentifications, List<Identification> identificationsToProcess, SpectrumAnnotatorResult spectrumAnnotatorResult) {
         ///////////////////////////////////////////////////////////////////////
         //SECOND STEP: find all the modification combinations that could
         //              explain a given mass delta (if there is one) -> Zen Archer
@@ -444,7 +452,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
     protected MassRecalibrationResult findSystematicMassError(List<Peptide> completePeptides) {
         //set considered charge states
         massRecalibrator.setConsideredChargeStates(consideredChargeStates);
-
+        
         MassRecalibrationResult massRecalibrationResult = null;
         try {
             massRecalibrationResult = massRecalibrator.recalibrate(analyzerData, completePeptides);
@@ -456,7 +464,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         }
         return massRecalibrationResult;
     }
-
+    
     protected void initChargeStates() {
         //load default values for considered charge states
         consideredChargeStates = new HashSet<>();
@@ -487,7 +495,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             //@ToDo figure out how to MT this with a queue of identifications?...
             possibleExplanations = massDeltaExplainer.explainCompleteIndentifications(filterIdentifications, massRecalibrationResult, analyzerData);
         }
-
+        
         return possibleExplanations;
     }
 
@@ -512,7 +520,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             precursorVariations.put(identification, precursorVariationsSet);
         }
         LOGGER.info("Peptide variations found for " + precursorVariations.size() + " peptides.");
-
+        
         return precursorVariations;
     }
 
@@ -550,7 +558,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 spectrumAnnotatorResult.getUnexplainedIdentifications().add(identification);
             }
         }
-
+        
         return bestMatches;
     }
 
@@ -574,16 +582,17 @@ public abstract class AbstractSpectrumAnnotator<T> {
                     identification.setPipelineExplanationType(PipelineExplanationType.UNEXPLAINED);
                     unexplainedIdentifications.add(identification);
                 } catch (NullPointerException | DataAccessException e) {
-                    LOGGER.error("Something went wrong for " + identification.getPeptide().getSequenceString() + ":", e);
+                    e.printStackTrace();
+                    //    LOGGER.error("Something went wrong for " + identification.getPeptide().getSequenceString() + ":", e);
                 }
             }
         }
         return unexplainedIdentifications;
     }
-
+    
     protected void initAnalyzerData(String assay) throws IOException {
         if (analyzerData == null) {
-
+            
             try {
                 AssayDetail assayDetail = PrideWebService.getAssayDetail(assay);
                 Set<String> instrumentNames = assayDetail.getInstrumentNames();

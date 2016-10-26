@@ -65,6 +65,16 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
         return new double[0];
     }
 
+    public double[][] getMzValuesMapBySpectrumId(String spectrumId) {
+        try {
+            Spectrum spectrumById = parserCache.getParser(experimentIdentifier, false).getSpectrumById(spectrumId);
+            return spectrumById.getMassIntensityMap();
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            LOGGER.error("The parser timed out before it could deliver the spectrum");
+        }
+        return new double[0][0];
+    }
+
     @Override
     public double[] getIntensitiesBySpectrumId(String spectrumId) {
         try {
@@ -89,7 +99,7 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
                 }
                 peakMap.put(aSpectrumID, peakList);
             } catch (TimeoutException | InterruptedException | ExecutionException ex) {
-                       LOGGER.error("The parser timed out before it could deliver the peaks");
+                LOGGER.error("The parser timed out before it could deliver the peaks");
             }
         }
         return peakMap;
