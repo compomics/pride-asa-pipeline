@@ -105,7 +105,11 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
             temp = new File(temp.getAbsolutePath().replace(".gz", ""));
         }
         LOGGER.info("Downloading : " + url.getPath());
+        try{
         downloader.downloadFile(url.getPath(), downloadFile);
+        }catch(org.apache.commons.net.io.CopyStreamException e){
+            e.getIOException().printStackTrace();
+        }
         if (downloadFile.getAbsolutePath().endsWith(".gz")) {
             gunzip(downloadFile, temp);
             downloadFile.delete();
@@ -136,9 +140,9 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
             if (assayFile.getFileType().equals(type)) {
                 assayFiles.add(downloadFile(assayFile));
             } else if (type.equals(ProjectFileType.PEAK)) {
-                if (assayFile.getFileName().contains(".dat")) {
+             //   if (assayFile.getFileName().contains(".dat")) {
                     assayFiles.add(downloadFile(assayFile));
-                }
+             //   }
             }
         }
         LOGGER.info("Download for " + experimentAccession + " completed");

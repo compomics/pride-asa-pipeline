@@ -72,7 +72,7 @@ public class WebServiceParameterExtractor {
             //write an MGF with all peakfile information?
             LOGGER.debug("Getting related spectrum files from the cache");
             FileSpectrumRepository spectrumRepository = new FileSpectrumRepository(assayAccession);
-            mgf = spectrumRepository.writeToMGF(outputFolder);
+            mgf = spectrumRepository.writeToMGF(outputFolder, false);
             //zip the MGF file
             File zip = new File(mgf.getAbsolutePath() + ".zip");
             ZipUtils.zip(mgf, zip, new WaitingHandlerCLIImpl(), mgf.length());

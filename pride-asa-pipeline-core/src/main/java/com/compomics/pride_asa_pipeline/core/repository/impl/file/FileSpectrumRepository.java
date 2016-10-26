@@ -105,6 +105,24 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
         return peakMap;
     }
 
+      /**
+     * Writes an mgf file with the contents of all cached peak files
+     *
+     * @param experimentID the assay identifier
+     * @param merge boolean indicating if the MGF should be merged into a single mgf
+     * @param outputFolder the output folder for mgf files
+     * @throws IOException when something goes wrong in the reading or writing
+     */
+    public File writeToMGF(File outputFolder, boolean merge) throws IOException, MGFExtractionException {
+        File mgf;
+        if (merge) {
+            mgf = writeToMergedMGF(outputFolder);
+        } else {
+            mgf = writeToMGFFolder(outputFolder);
+        }
+        return mgf;
+    }
+
     /**
      * Writes an mgf file with the contents of all cached peak files
      *
@@ -112,7 +130,7 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
      * @param outputFile the output folder for mgf files
      * @throws IOException when something goes wrong in the reading or writing
      */
-    public File writeToMGF(File outputFolder) throws IOException, MGFExtractionException {
+    public File writeToMergedMGF(File outputFolder) throws IOException, MGFExtractionException {
         final long timeout = 30000;
         File mgf = new File(outputFolder, experimentIdentifier + ".mgf");
         if (!mgf.exists()) {
@@ -138,4 +156,27 @@ public class FileSpectrumRepository extends ParserCacheConnector implements Spec
         }
         return mgf;
     }
+
+    /**
+     * Writes an mgf file with the contents of all cached peak files
+     *
+     * @param outputFolder the output folder for mgf files
+     * @return the folder containing mgf formatted spectrum files
+     * @throws IOException when something goes wrong in the reading or writing
+     * @throws com.compomics.pride_asa_pipeline.model.MGFExtractionException
+     */
+    public File writeToMGFFolder(File outputFolder) throws IOException, MGFExtractionException {
+        final long timeout = 30000;
+        File target = new File(outputFolder, "spectra");
+        for (File aPeakFile : parserCache.getPeakFiles(experimentIdentifier)) {
+            File mgf = new File(target, aPeakFile.getName() + ".mgf");
+            if (!mgf.exists()) {
+                mgf.getParentFile().mkdirs();
+                mgf.createNewFile();
+            }
+            new MGFExtractor(aPeakFile).extractMGF(mgf, timeout);
+        }
+        return target;
+    }
+
 }

@@ -75,7 +75,7 @@ public class FileParameterExtractor {
 
     private void processSpectra() throws IOException, MGFExtractionException {
         LOGGER.debug("Getting related spectrum files from the cache");
-        File mgf = spectrumRepository.writeToMGF(outputFolder);
+        File mgf = spectrumRepository.writeToMGF(outputFolder, false);
         //zip the MGF file
         File zip = new File(mgf.getAbsolutePath() + ".zip");
         ZipUtils.zip(mgf, zip, new WaitingHandlerCLIImpl(), mgf.length());
