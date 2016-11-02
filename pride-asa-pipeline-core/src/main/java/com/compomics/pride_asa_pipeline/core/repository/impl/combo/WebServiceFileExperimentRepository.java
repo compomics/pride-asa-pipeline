@@ -50,7 +50,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
     }
 
     public WebServiceFileExperimentRepository(File tempFolder, int i) {
-       this.tempFolder = tempFolder;
+        this.tempFolder = tempFolder;
     }
 
     /**
@@ -98,16 +98,16 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
             tempFolder.mkdirs();
         }
         URL url = detail.getDownloadLink();
-        FTPDownloader downloader = new FTPDownloader(url.getHost(),true);
+        FTPDownloader downloader = new FTPDownloader(url.getHost(), true);
         File downloadFile = new File(tempFolder, detail.getFileName());
         File temp = new File(tempFolder, downloadFile.getName());
         if (downloadFile.getName().endsWith(".gz")) {
             temp = new File(temp.getAbsolutePath().replace(".gz", ""));
         }
         LOGGER.info("Downloading : " + url.getPath());
-        try{
-        downloader.downloadFile(url.getPath(), downloadFile);
-        }catch(org.apache.commons.net.io.CopyStreamException e){
+        try {
+            downloader.downloadFile(url.getPath(), downloadFile);
+        } catch (org.apache.commons.net.io.CopyStreamException e) {
             e.getIOException().printStackTrace();
         }
         if (downloadFile.getAbsolutePath().endsWith(".gz")) {
@@ -137,12 +137,17 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
         FileDetailList assayFileDetails = PrideWebService.getAssayFileDetails(experimentAccession);
         //try to find existing result files online
         for (FileDetail assayFile : assayFileDetails.getList()) {
-            if (assayFile.getFileType().equals(type)) {
-                assayFiles.add(downloadFile(assayFile));
-            } else if (type.equals(ProjectFileType.PEAK)) {
-             //   if (assayFile.getFileName().contains(".dat")) {
+            //skip raw files for now?
+            if (!assayFile.getFileName().endsWith(".raw")) {
+                if (assayFile.getFileType().equals(type)) {
                     assayFiles.add(downloadFile(assayFile));
-             //   }
+                } else if (type.equals(ProjectFileType.PEAK)) {
+                    //   if (assayFile.getFileName().contains(".dat")) {
+                    assayFiles.add(downloadFile(assayFile));
+                    //   }
+                }
+            } else {
+                LOGGER.info("Skipping RAW files [might change in future update]");
             }
         }
         LOGGER.info("Download for " + experimentAccession + " completed");

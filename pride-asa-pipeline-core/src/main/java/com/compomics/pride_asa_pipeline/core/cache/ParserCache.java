@@ -46,6 +46,10 @@ public class ParserCache {
     private static final Logger LOGGER = Logger.getLogger(ParserCache.class);
 
     /**
+     *  The Timeout Variable
+     */
+    public static int TIME_OUT_MINUTES = 15;
+    /**
      * The ParserCache instance
      *
      */
@@ -92,7 +96,7 @@ public class ParserCache {
                 }
             });
             //time limit for parsing is?
-            parserCache.put(experimentAccession, future.get(15, TimeUnit.MINUTES));
+            parserCache.put(experimentAccession, future.get(TIME_OUT_MINUTES, TimeUnit.MINUTES));
             loadedFiles.put(experimentAccession, identificationsFile);
         }
         return parserCache.get(experimentAccession);
