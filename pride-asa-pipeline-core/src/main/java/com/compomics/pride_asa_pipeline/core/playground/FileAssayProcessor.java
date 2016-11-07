@@ -17,8 +17,8 @@ public class FileAssayProcessor {
             outputFolder.delete();
         }
         outputFolder.mkdirs();
-        File inputFile = new File("C:\\Users\\compomics\\Desktop\\Complete\\PS\\peptideshaker_example.mzid");
-        File peakFile = new File("C:\\Users\\compomics\\Desktop\\Complete\\PS\\peptideshaker_example.mgf");
+        File inputFile = new File("C:\\Users\\compomics\\Desktop\\test\\peptideshaker_example.mzid");
+        File peakFile = new File("C:\\Users\\compomics\\Desktop\\test\\peptideshaker_example.mgf");
         ArrayList<File> peakFiles = new ArrayList<>();
         peakFiles.add(peakFile);
         SearchParameters parameters = new FileParameterExtractor(outputFolder).analyzeMzID(inputFile, peakFiles,"peptideshaker");

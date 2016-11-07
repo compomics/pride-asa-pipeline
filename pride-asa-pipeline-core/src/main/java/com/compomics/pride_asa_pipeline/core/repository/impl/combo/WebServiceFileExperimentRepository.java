@@ -26,7 +26,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
     /**
      * A logger instance
      */
-    private static final Logger LOGGER = Logger.getLogger(FileExperimentRepository.class);
+    private static final Logger LOGGER = Logger.getLogger(WebServiceFileExperimentRepository.class);
     /**
      * A temporary folder to store downloaded identification files
      */
@@ -64,7 +64,13 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
         if (!identFiles.isEmpty()) {
             for (File identFile : identFiles) {
                 if (!identFile.getName().toLowerCase().endsWith(".xml") & !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
-                    List<File> peakFiles = getAssayFiles(assay, ProjectFileType.PEAK);
+                    List<File> peakFiles = new ArrayList<>();
+                    //@ToDo check why mzid is considered a peakfile here?
+                    for (File aFile : getAssayFiles(assay, ProjectFileType.PEAK)) {
+                        if (!aFile.getName().toLowerCase().endsWith(".mzid") &&! aFile.getName().toLowerCase().endsWith(".mzid.zip") &&! aFile.getName().toLowerCase().endsWith(".mzid.gz")) {
+                            peakFiles.add(aFile);
+                        }
+                    }
                     super.addMzID(assay, identFile, peakFiles);
                 } else {
                     //@ToDo think of a better strategy for this, maybe include file name in assay identifier?

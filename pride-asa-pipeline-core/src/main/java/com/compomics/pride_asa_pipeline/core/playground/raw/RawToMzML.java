@@ -30,12 +30,15 @@ import org.apache.log4j.PatternLayout;
 public class RawToMzML {
 
     private static final Logger LOGGER = Logger.getLogger(RawToMzML.class);
-    private static String PATH_TO_MSCONVERT = "C:/Program Files/ProteoWizard/ProteoWizard 3.0.10107/msconvert.exe";
+    private static String PATH_TO_MSCONVERT = "C:/Program Files/ProteoWizard/ProteoWizard 3.0.9172/msconvert.exe";
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        PATH_TO_MSCONVERT = args[0];
-        File inputFolder = new File(args[1]);
-        File outputFolder = new File(args[2]);
+        //PATH_TO_MSCONVERT = args[0];
+        //File inputFolder = new File(args[1]);
+        //File outputFolder = new File(args[2]);
+        File inputFolder = new File("C:\\Users\\compomics\\Desktop\\Putty\\Putty");
+        File outputFolder = new File("C:\\Users\\compomics\\Desktop\\Putty\\Putty\\OUT");
+      
         initLogging(inputFolder);
         List<File> processingFilesList = findRawFiles(inputFolder);
         LOGGER.info("Starting conversion");

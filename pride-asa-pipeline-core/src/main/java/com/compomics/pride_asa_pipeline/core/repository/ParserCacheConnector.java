@@ -1,6 +1,5 @@
 package com.compomics.pride_asa_pipeline.core.repository;
 
-
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import java.io.File;
 import java.util.List;
@@ -42,7 +41,7 @@ public abstract class ParserCacheConnector {
      */
     public void addMzID(String experimentAccession, File identificationsFile, List<File> peakFiles) throws TimeoutException, InterruptedException, ExecutionException {
         parserCache.getParser(experimentAccession, identificationsFile, false).getName();
-        parserCache.addPeakFiles(experimentAccession, identificationsFile, peakFiles);
+        parserCache.addPeakFiles(experimentAccession, peakFiles);
     }
 
 }

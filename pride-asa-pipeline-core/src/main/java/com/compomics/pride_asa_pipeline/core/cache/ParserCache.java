@@ -46,7 +46,7 @@ public class ParserCache {
     private static final Logger LOGGER = Logger.getLogger(ParserCache.class);
 
     /**
-     *  The Timeout Variable
+     * The Timeout Variable
      */
     public static int TIME_OUT_MINUTES = 15;
     /**
