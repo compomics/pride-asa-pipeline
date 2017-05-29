@@ -4,10 +4,11 @@ import com.compomics.pride_asa_pipeline.core.data.extractor.FileParameterExtract
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.io.compression.ZipUtils;
+import com.compomics.util.io.json.JsonMarshaller;
+import com.compomics.util.io.json.marshallers.IdentificationParametersMarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import junit.framework.TestCase;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -65,7 +66,8 @@ public class ProjectExtractorTest extends TestCase {
 
         assertEquals(identificationParameters.getPrecursorAccuracyType(), SearchParameters.MassAccuracyType.DA);
 
-        assertTrue(identificationParameters.getEnzyme().getName().toLowerCase().contains("tryp"));
+        //TODO check if this can be handled better
+        assertTrue(identificationParameters.getDigestionPreferences().getEnzymes().get(0).getName().toLowerCase().contains("tryp"));
         assertEquals(2, identificationParameters.getMinChargeSearched().value);
         assertEquals(4, identificationParameters.getMaxChargeSearched().value);
 
@@ -83,7 +85,8 @@ public class ProjectExtractorTest extends TestCase {
         System.out.println("# ------------------------------------------------------------------");
         System.out.println("FINAL VERDICT");
         System.out.println("# ------------------------------------------------------------------");
-        System.out.println(identificationParameters.toString());
+        JsonMarshaller marsh = new IdentificationParametersMarshaller();
+        System.out.println(marsh.toJson(identificationParameters));
 
     }
 

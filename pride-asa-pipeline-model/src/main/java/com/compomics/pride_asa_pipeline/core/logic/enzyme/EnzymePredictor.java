@@ -64,15 +64,15 @@ public class EnzymePredictor {
     }
 
     private void loadEnzymeFactory() throws IOException, XmlPullParserException {
-        if (tempEnzymeFile == null) {
+ /*       if (tempEnzymeFile == null) {
             tempEnzymeFile = File.createTempFile("searchGUI_enzymes", ".xml");
             InputStream inputStream = new ClassPathResource("searchGUI_enzymes.xml").getInputStream();
             OutputStream outputStream = new FileOutputStream(tempEnzymeFile);
             IOUtils.copy(inputStream, outputStream);
             tempEnzymeFile.deleteOnExit();
-        }
+        }*/
         enzymeFactory = EnzymeFactory.getInstance();
-        enzymeFactory.importEnzymes(tempEnzymeFile);
+    //    enzymeFactory.importEnzymes(tempEnzymeFile);
     }
 
     public List<String> getPeptideSequences() {

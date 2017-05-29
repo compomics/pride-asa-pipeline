@@ -133,7 +133,23 @@
         </plugins>
     </build>    
 
-    <repositories>                 
+    <repositories>    
+                <!-- Compomics repo -->
+
+        
+        <repository>
+            <id>genesis-maven2-repository</id>
+            <name>Genesis maven2 repository</name>
+            <url>http://genesis.UGent.be/maven2</url>
+            <layout>default</layout>
+        </repository>    
+        
+                         <repository>
+            <id>genesis-maven-repo</id>
+            <name>Genesis maven repository</name>
+            <url>http://genesis.UGent.be/maven</url>
+            <layout>default</layout>
+        </repository>         
         <!-- EBI repo -->
         <repository>
             <id>nexus-ebi-repo</id>
@@ -145,18 +161,8 @@
             <id>nexus-ebi-repo-snapshots</id>
             <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
         </repository>
-        <repository>
-            <id>genesis-maven-repo</id>
-            <name>Genesis maven repository</name>
-            <url>http://genesis.UGent.be/maven</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>genesis-maven2-repository</id>
-            <name>Genesis maven2 repository</name>
-            <url>http://genesis.UGent.be/maven2</url>
-            <layout>default</layout>
-        </repository>
+        
+
     </repositories>
 
     <distributionManagement>
@@ -245,7 +251,7 @@
             <dependency>
                 <groupId>com.compomics</groupId>
                 <artifactId>utilities</artifactId>
-                <version>4.4.2</version>
+                <version>4.11.12</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>derby</artifactId>

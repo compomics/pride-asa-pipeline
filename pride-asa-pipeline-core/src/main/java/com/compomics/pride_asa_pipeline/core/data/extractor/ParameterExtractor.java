@@ -6,7 +6,6 @@ import com.compomics.pride_asa_pipeline.core.logic.inference.IdentificationFilte
 import com.compomics.pride_asa_pipeline.core.logic.inference.enzyme.EnzymePredictor;
 import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.PrecursorIonErrorPredictor;
 import com.compomics.pride_asa_pipeline.core.logic.inference.ionaccuracy.FragmentIonErrorPredictor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.additional.contaminants.MassScanResult;
 import com.compomics.pride_asa_pipeline.core.logic.inference.modification.ModificationPredictor;
 import com.compomics.pride_asa_pipeline.core.util.report.ExtractionReportGenerator;
 import com.compomics.pride_asa_pipeline.core.util.report.impl.ContaminationReportGenerator;
@@ -29,9 +28,11 @@ import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
+import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
+import com.compomics.util.preferences.DigestionPreferences;
 import com.compomics.util.pride.PrideWebService;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -198,9 +199,10 @@ public class ParameterExtractor {
 
                 //construct a parameter object
                 parameters = new SearchParameters();
-
-                parameters.setEnzyme(enzymePredictor.getMostLikelyEnzyme());
-                parameters.setnMissedCleavages(enzymePredictor.getMissedCleavages());
+                parameters.setDigestionPreferences(new DigestionPreferences());
+                Enzyme enzyme =enzymePredictor.getMostLikelyEnzyme();
+                parameters.getDigestionPreferences().addEnzyme(enzyme);
+                parameters.getDigestionPreferences().setnMissedCleavages(enzyme.getName(),enzymePredictor.getMissedCleavages());
 
                 parameters.setPtmSettings(modificationPredictor.getPtmSettings());
 
@@ -346,8 +348,10 @@ public class ParameterExtractor {
     public void useDefaults(String assay) throws IOException, XmlPullParserException {
         printableReports = false;
         parameters = new SearchParameters();
-        parameters.setEnzyme(new EnzymePredictor().getMostLikelyEnzyme());
-        parameters.setnMissedCleavages(2);
+        Enzyme enzyme =enzymePredictor.getMostLikelyEnzyme();
+        parameters.getDigestionPreferences().addEnzyme(enzyme);
+        parameters.getDigestionPreferences().setnMissedCleavages(enzyme.getName(),2);
+
         PtmSettings ptmSettings = new PtmSettings();
         ModificationAdapter adapter = new UtilitiesPTMAdapter();
         PRIDEModificationFactory ptmFactory = PRIDEModificationFactory.getInstance();
