@@ -130,4 +130,8 @@ public class WebServiceParameterExtractor {
         this.mgf = mgf;
     }
 
+    public File getTempFolder(){
+        return tempFolder;
+    }
+    
 }

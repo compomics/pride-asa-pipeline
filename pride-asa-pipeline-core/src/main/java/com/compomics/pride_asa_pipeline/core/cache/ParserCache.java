@@ -50,6 +50,7 @@ public class ParserCache {
      *
      */
     private static ParserCache instance;
+    public static int TIME_OUT_MINUTES;
 
     public static ParserCache getInstance() {
         if (instance == null) {
@@ -92,7 +93,10 @@ public class ParserCache {
                 }
             });
             //time limit for parsing is?
-            parserCache.put(experimentAccession, future.get(15, TimeUnit.MINUTES));
+            if(TIME_OUT_MINUTES==0){
+            TIME_OUT_MINUTES=15;
+        }
+            parserCache.put(experimentAccession, future.get(TIME_OUT_MINUTES, TimeUnit.MINUTES));
             loadedFiles.put(experimentAccession, identificationsFile);
         }
         return parserCache.get(experimentAccession);

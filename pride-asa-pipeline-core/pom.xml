@@ -302,7 +302,42 @@
         
     </build>
 
-    <repositories>                                          
+    <distributionManagement>        
+        <repository>
+            <id>genesis-maven2-repo</id>
+            <name>Genesis Maven Repository</name>
+            <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
+        </repository>
+    </distributionManagement>
+    
+ 
+    <repositories>
+        
+        <!-- EBI SNAPSHOT repo -->
+        <repository>
+            <id>nexus-ebi-repo-snapshots</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
+        </repository>  
+        
+        <!-- EBI repo -->
+        <repository>
+            <id>ebi-repo</id>
+            <name>The EBI internal repository</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>  
+            
+        <!-- nexus EBI repo -->
+        <repository>
+            <id>nexus-ebi-repo</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</url>
+        </repository>
+                                            
         <repository>
             <id>genesis-maven2-repo</id>
             <name>Genesis maven2 repository</name>
@@ -316,20 +351,12 @@
             <url>http://genesis.UGent.be/maven</url>
             <layout>default</layout>
         </repository> 
-        
-        <repository>
-            <id>ebi-repo</id>
-            <name>The EBI internal repository</name>
-            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>                                              
+                    
+ 
+                         
     </repositories>
 
+ 
     <dependencies>
         <dependency>
             <groupId>com.compomics.pride-asa-pipeline</groupId>
@@ -410,16 +437,16 @@
             <version>2.0.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>uk.ac.ebi.pride.utilities</groupId>
             <artifactId>pride-utilities</artifactId>
-            <version>2.0.6-SNAPSHOT</version>
+            <version>2.0.6</version>
             <type>jar</type>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>uk.ac.ebi.pride.utilities</groupId>
             <artifactId>ms-data-core-api</artifactId>
-            <version>2.0.6-SNAPSHOT</version>
+            <version>2.0.15-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -439,13 +466,7 @@
     
  
     
-    <distributionManagement>        
-        <repository>
-            <id>genesis-maven2-repo</id>
-            <name>Genesis Maven Repository</name>
-            <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
-        </repository>
-    </distributionManagement>
+
     
     <profiles>
         <profile>

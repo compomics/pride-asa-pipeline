@@ -45,7 +45,11 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
         for (Modification modification : modificationCombination.getUniqueModifications()) {
             //get the number of occurances of the current modification type in the ModificationCombination
             int occurances = getNumberOfOccurances(modificationCombination, modification);
+            try{
             modifiedPeptidesByModifications.add(variateModification(precursor, modification, occurances));
+            }catch(IllegalStateException e){
+                LOGGER.debug(e);
+            }
         }
 
         //now combine the variation sets for each modification type into a set of variations
