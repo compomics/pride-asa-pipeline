@@ -84,7 +84,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
                     for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : aPeptide.getModifications()) {
                         try {
                             modificationList.add((Modification) modFactory.getModification(adapter, aMod.getName()));
-                        } catch (ParameterExtractionException ex) {
+                        } catch (NullPointerException |ParameterExtractionException ex) {
                             LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
                         }
                     }
@@ -135,7 +135,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
                     for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : mods) {
                         try {
                             modificationList.add((Modification) modFactory.getModification(adapter, aMod.getName()));
-                        } catch (ParameterExtractionException ex) {
+                        } catch (NullPointerException |ParameterExtractionException ex) {
                             LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
                         }
                     }
@@ -163,7 +163,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
                                 Object modification = null;
                                 try {
                                     modification = modFactory.getModification(adapter, aMod.getName());
-                                } catch (ParameterExtractionException ex) {
+                                } catch (NullPointerException |ParameterExtractionException ex) {
                                     LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
                                 }
                                 if (modification != null) {

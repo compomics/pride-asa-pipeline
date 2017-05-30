@@ -93,6 +93,12 @@ public class ParameterExtractor {
      */
     private AnalyzerData analyzerData;
 
+    /**
+     * boolean preventing the export of parameter log
+     */
+    private boolean exportReports = true;
+            
+            
           /**
      * An extractor for parameters
      *
@@ -141,6 +147,7 @@ public class ParameterExtractor {
     private void init(String assay) throws ParameterExtractionException {
         //get assay
         try {
+            exportReports=true;
             TotalReportGenerator.setAssay(assay);
             FileSpectrumRepository fileSpectrumRepository = new FileSpectrumRepository(assay);
             ((DbSpectrumServiceImpl) spectrumAnnotator.getSpectrumService()).setSpectrumRepository(new FileSpectrumRepository(assay));
@@ -225,7 +232,10 @@ public class ParameterExtractor {
         } catch (Exception e) {
               // useDefaults(assay);
               e.printStackTrace();
-                 throw new ParameterExtractionException(e.getMessage());
+              //set default parameters instead
+              parameters = new SearchParameters();
+              exportReports=false;
+              //  throw new ParameterExtractionException(e.getMessage());
         }
     }
 
@@ -301,24 +311,27 @@ public class ParameterExtractor {
 
     public List<ExtractionReportGenerator> getReportGenerators() {
         List<ExtractionReportGenerator> reportGenerators = new ArrayList<>();
+        if(exportReports){
         reportGenerators.add(new EnzymeReportGenerator(enzymePredictor));
         reportGenerators.add(new FragmentIonReporter(fragmentIonErrorPredictor));
         reportGenerators.add(new PrecursorIonReporter(precursorIonErrorPredictor));
         reportGenerators.add(new ModificationReportGenerator(modificationPredictor));
         reportGenerators.add(new ContaminationReportGenerator(precursorIonErrorPredictor.getRecalibratedPrecursorAccuraccy(), fragmentIonErrorPredictor.getFragmentIonAccuraccy()));
         reportGenerators.add(new TotalReportGenerator());
-
+        }
         return reportGenerators;
     }
 
     public void printReports() throws IOException {
+        if(exportReports){
         for (ExtractionReportGenerator reportGenerator : getReportGenerators()) {
             reportGenerator.writeReport(System.out);
+        }
         }
     }
 
     public void printReports(File outputFolder) throws IOException {
-        if (printableReports) {
+        if (printableReports &exportReports) {
             LOGGER.info("Exporting reports...");
             for (ExtractionReportGenerator reportGenerator : getReportGenerators()) {
                 LOGGER.debug("Exporting " + reportGenerator.getReportName());

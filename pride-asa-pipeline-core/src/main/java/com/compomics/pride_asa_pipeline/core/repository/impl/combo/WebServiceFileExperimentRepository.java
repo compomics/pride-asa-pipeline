@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import org.apache.log4j.Logger;
+import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileSource;
 import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileType;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
@@ -60,11 +61,11 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
      * @throws Exception if a file cannot be correctly obtained
      */
     public void addAssay(String assay) throws Exception {
-        List<File> identFiles = getAssayFiles(assay, ProjectFileType.RESULT);
+        List<File> identFiles = getAssayFiles(assay, ProjectFileType.RESULT,true);
         if (!identFiles.isEmpty()) {
             for (File identFile : identFiles) {
                 if (!identFile.getName().toLowerCase().endsWith(".xml") & !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
-                    List<File> peakFiles = getAssayFiles(assay, ProjectFileType.PEAK);
+                    List<File> peakFiles = getAssayFiles(assay, ProjectFileType.PEAK,true);
                     super.addMzID(assay, identFile, peakFiles);
                 } else {
                     //@ToDo think of a better strategy for this, maybe include file name in assay identifier?
@@ -128,19 +129,21 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
         }
     }
 
-    private List<File> getAssayFiles(String experimentAccession, ProjectFileType type) throws Exception {
+    private List<File> getAssayFiles(String experimentAccession, ProjectFileType type,boolean onlySubmitted) throws Exception {
         ArrayList<File> assayFiles = new ArrayList<>();
         FileDetailList assayFileDetails = PrideWebService.getAssayFileDetails(experimentAccession);
         //try to find existing result files online
         for (FileDetail assayFile : assayFileDetails.getList()) {
-            if (assayFile.getFileType().equals(type)) {
-                assayFiles.add(downloadFile(assayFile));
-            } else if (type.equals(ProjectFileType.PEAK)) {
-                if (assayFile.getFileName().contains(".dat")) {
+            if(onlySubmitted){
+                if (assayFile.getFileType().equals(type)&assayFile.getFileSource()==ProjectFileSource.SUBMITTED) {
                     assayFiles.add(downloadFile(assayFile));
                 }
-            }
-        }
+            }else{
+                    if (assayFile.getFileType().equals(type)) {
+                    assayFiles.add(downloadFile(assayFile));
+                    }
+                }           
+            } 
         LOGGER.info("Download for " + experimentAccession + " completed");
         return assayFiles;
     }
