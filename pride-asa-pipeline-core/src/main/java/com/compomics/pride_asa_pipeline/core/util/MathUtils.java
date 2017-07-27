@@ -250,4 +250,60 @@ public class MathUtils {
         BigDecimal bigDecimal = new BigDecimal(d).setScale(numberOfDecimals, BigDecimal.ROUND_HALF_UP);
         return bigDecimal;
     }
+
+    /**
+     * Calculate required samplesize
+     */
+    public static int calculateRequiredSampleSize(double confidence, double marginOfError) {
+        double z = getZValue(confidence);
+        double stdev = 0.5;
+        int sampleSize = (int) ((z * z) * stdev * (1 - stdev) / (marginOfError * marginOfError));
+        return sampleSize;
+    }
+
+    public static double getZValue(double confidence) {
+        return getZValue((int) (confidence * 100));
+
+    }
+
+    public static float getZValue(int confidence) {
+        float z;
+
+        switch (confidence) {
+            case 70:
+                z = 1.04f;
+                break;
+            case 75:
+                z = 1.15f;
+                break;
+            case 80:
+                z = 1.28f;
+                break;
+            case 85:
+                z = 1.44f;
+                break;
+            case 90:
+                z = 1.645f;
+                break;
+            case 92:
+                z = 1.75f;
+                break;
+            case 95:
+                z = 1.96f;
+                break;
+            case 96:
+                z = 2.05f;
+                break;
+            case 98:
+                z = 2.33f;
+                break;
+            case 99:
+                z = 2.58f;
+                break;
+            default:
+                z = 1.96f;
+        }
+        return z;
+    }
+
 }

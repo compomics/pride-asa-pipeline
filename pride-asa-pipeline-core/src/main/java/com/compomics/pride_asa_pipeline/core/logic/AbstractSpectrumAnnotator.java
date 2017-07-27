@@ -17,6 +17,7 @@ import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimen
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.service.SpectrumService;
+import com.compomics.pride_asa_pipeline.core.util.MathUtils;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.AnnotationData;
@@ -34,6 +35,7 @@ import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
 import com.compomics.util.pride.PrideWebService;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,6 +44,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.log4j.Logger;
@@ -58,6 +61,8 @@ public abstract class AbstractSpectrumAnnotator<T> {
     
     private static final Logger LOGGER = Logger.getLogger(AbstractSpectrumAnnotator.class);
 
+    private static final Random random = new Random(29071988);
+    
     /**
      * The considered charge states.
      */
@@ -102,11 +107,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
      * The maximal amount of passes
      */
     protected int MAX_PASSES = 6;
-    /**
-     * The threshold explanation ratio (50% of all unexplained masses has to be
-     * explained)
-     */
-    protected double explanationCriterion = 0.50;
+
     /**
      * The criterion for matched peaks (for example, 10% has to be matched)
      */
@@ -257,8 +258,11 @@ public abstract class AbstractSpectrumAnnotator<T> {
         int totalSize = completeIdentifications.size();
         int totalExplained = 0;
         int pass = 1;
-        double explanationRatio = 0.0;
+        
+        int sampleSize = Math.min(completeIdentifications.size(),MathUtils.calculateRequiredSampleSize(0.99, 0.005));
+        
         while (((nextModificationSet = getNextModificationSet()) != null) && pass <= MAX_PASSES) {
+            Collections.shuffle(completeIdentifications,random);
             SpectrumAnnotatorResult tempSpectrumAnnotatorResult = new SpectrumAnnotatorResult();
             tempSpectrumAnnotatorResult.setMassRecalibrationResult(spectrumAnnotatorResult.getMassRecalibrationResult());
             LOGGER.info("Going through " + pass + "th pass.");
@@ -267,12 +271,8 @@ public abstract class AbstractSpectrumAnnotator<T> {
             annotate(tempModificationHolder, completeIdentifications, identificationsToProcess, tempSpectrumAnnotatorResult);
             totalExplained = totalSize - identificationsToProcess.size();
             completeIdentifications = identificationsToProcess;
-            LOGGER.debug("Still need to annotate " + completeIdentifications.size() + " identifications");
-            identificationsToProcess = new ArrayList<>(completeIdentifications);
-            explanationRatio = (double) totalExplained / totalSize;
-            LOGGER.debug("Explanationratio is currently " + explanationRatio);
-            if (explanationRatio > explanationCriterion) {
-                LOGGER.info(100 * explanationCriterion + "% of identifications were identified, moving on");
+            if (totalExplained>=sampleSize) {
+                LOGGER.info(totalExplained+" identifications were explained, moving on");
                 break;
             } else {
                 Map<Modification, Double> estimateModificationRate = modificationService.estimateModificationRate(modificationService.getUsedModifications(tempSpectrumAnnotatorResult),

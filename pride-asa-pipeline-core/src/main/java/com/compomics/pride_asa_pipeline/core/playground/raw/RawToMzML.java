@@ -111,7 +111,7 @@ public class RawToMzML {
     private static Process startCommand(File inputFile, File outputFolder) throws IOException {
         String cmd = "\"" + PATH_TO_MSCONVERT + "\" "
                 + "\"" + inputFile.getAbsolutePath() + "\" "
-                + "--32 "
+                + "--64 "
                 + "--zlib "
                 + "--filter "
                 + "\"peakPicking true 1-\" "

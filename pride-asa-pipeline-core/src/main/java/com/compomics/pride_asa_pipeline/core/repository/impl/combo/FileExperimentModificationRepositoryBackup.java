@@ -5,7 +5,6 @@ import com.compomics.pride_asa_pipeline.model.modification.impl.AsapModification
 import com.compomics.pride_asa_pipeline.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
-import com.compomics.pride_asa_pipeline.core.util.MathUtils;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
@@ -13,8 +12,6 @@ import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +28,7 @@ import uk.ac.ebi.pride.utilities.data.core.SpectrumIdentification;
  *
  * @author Kenneth Verheggen
  */
-public class FileExperimentModificationRepository extends FileExperimentRepository implements ModificationRepository {
+public class FileExperimentModificationRepositoryBackup extends FileExperimentRepository implements ModificationRepository {
 
     /**
      * The identifier for the current repository (filename or assay accession)
@@ -40,7 +37,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
     /**
      * A logger instance
      */
-    private static final Logger LOGGER = Logger.getLogger(FileExperimentModificationRepository.class);
+    private static final Logger LOGGER = Logger.getLogger(FileExperimentModificationRepositoryBackup.class);
     /**
      * The modification adapter to return pride asap modificaitons
      */
@@ -54,46 +51,32 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
      */
     private final HashMap<Comparable, List<Modification>> modMapping = new HashMap<>();
 
-    
-    private  List<Comparable> sample;
-    
-    public FileExperimentModificationRepository() {
+    public FileExperimentModificationRepositoryBackup() {
 
     }
 
-    public FileExperimentModificationRepository(String experimentIdentifier) {
+    public FileExperimentModificationRepositoryBackup(String experimentIdentifier) {
         this.experimentIdentifier = experimentIdentifier;
     }
 
     @Override
     public List<Identification> loadExperimentIdentifications(String experimentAccession) {
-
         List<Identification> identifications = new ArrayList<>();
         try {
-            CachedDataAccessController parser = parserCache.getParser(experimentAccession, true);
+            CachedDataAccessController parser = parserCache.getParser(experimentAccession, false);
             //get all the peptide ids for the proteins
             long proteinCount = parser.getProteinIds().size();
             double completeRatio = 0.0;
             double currentCount = 0;
             double currentPrint = 0;
-            Collection<Comparable> proteinIds = parser.getProteinIds();
-
-            //At this point, the mgf was extracted already...
-            int sampleSize = Math.min(proteinIds.size(),MathUtils.calculateRequiredSampleSize(0.90, 0.01));
-            ArrayList<Comparable> tmp = new ArrayList<>();
-            tmp.addAll(proteinIds);
-            sample = new ArrayList<>();
-            Collections.shuffle(tmp);
-            sample = tmp.subList(0,sampleSize-1);
-            LOGGER.info("Sampling "+sample.size()+" protein identifications");
-            for (Comparable aProteinID : sample) {
-                completeRatio = 100 * currentCount / sample.size();
+            for (Comparable aProteinID : parser.getProteinIds()) {
+                completeRatio = 100 * currentCount / proteinCount;
                 if (completeRatio > currentPrint) {
                     LOGGER.info(InferenceStatistics.round(completeRatio, 0) + "%");
                     currentPrint += 10;
                 }
-                Collection<Comparable> peptideIDs = parser.getPeptideIds(aProteinID);
-                for (Comparable aPeptideID : peptideIDs) {
+
+                for (Comparable aPeptideID : parser.getPeptideIds(aProteinID)) {
                     uk.ac.ebi.pride.utilities.data.core.Peptide aPeptide = parser.getPeptideByIndex(aProteinID, aPeptideID);
                     // do the mods
                     List<Modification> modificationList = modMapping.getOrDefault(aPeptideID, new ArrayList<>());

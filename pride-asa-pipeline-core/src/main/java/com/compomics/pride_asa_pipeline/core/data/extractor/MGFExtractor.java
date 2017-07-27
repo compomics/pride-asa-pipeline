@@ -218,7 +218,7 @@ public class MGFExtractor {
             }
         } else {
             //TODO not being MS2 is not really an exception...
-            throw new MGFExtractionException(spectrum.getId() + "\t" + "Not ms2 :" + msLevel);
+       //     throw new MGFExtractionException(spectrum.getId() + "\t" + "Not ms2 :" + msLevel);
         }
     }
 
