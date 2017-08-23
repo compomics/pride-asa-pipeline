@@ -48,15 +48,15 @@ public class DbSpectrumAnnotator extends AbstractSpectrumAnnotator<String> {
     public void initIdentifications(String experimentAccession) {
         areModificationsLoaded = false;
 
-        LOGGER.debug("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
+        LOGGER.info("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
         spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
 
-        LOGGER.debug("Loading charge states for experiment " + experimentAccession);
+        LOGGER.info("Loading charge states for experiment " + experimentAccession);
         initChargeStates();
 
         LOGGER.info("loading identifications for experiment " + experimentAccession);
         loadExperimentIdentifications(experimentAccession);
-        LOGGER.debug("Finished loading identifications for experiment " + experimentAccession);
+        LOGGER.info("Finished loading identifications for experiment " + experimentAccession);
 
         ///////////////////////////////////////////////////////////////////////
         //FIRST STEP: find the systematic mass error (if there is one)

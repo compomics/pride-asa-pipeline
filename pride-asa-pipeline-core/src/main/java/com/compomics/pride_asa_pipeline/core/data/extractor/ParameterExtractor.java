@@ -128,9 +128,9 @@ public class ParameterExtractor {
         //get assay
         try {
             TotalReportGenerator.setAssay(assay);
-            FileSpectrumRepository fileSpectrumRepository = new FileSpectrumRepository(assay);
+           // FileSpectrumRepository fileSpectrumRepository = new FileSpectrumRepository(assay);
             ((DbSpectrumServiceImpl) spectrumAnnotator.getSpectrumService()).setSpectrumRepository(new FileSpectrumRepository(assay));
-            ((DbModificationServiceImpl) spectrumAnnotator.getModificationService()).setModificationRepository(new FileModificationRepository(assay));
+      //      ((DbModificationServiceImpl) spectrumAnnotator.getModificationService()).setModificationRepository(new FileExperimentModificationRepository(assay));
 
             spectrumAnnotator.initIdentifications(assay);
             LOGGER.debug("Spectrumannotator delivered was initialized");

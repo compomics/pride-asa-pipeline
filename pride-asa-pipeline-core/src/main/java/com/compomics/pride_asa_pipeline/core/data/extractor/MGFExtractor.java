@@ -140,7 +140,7 @@ public class MGFExtractor {
                         rw.append("\tNOT FOUND" + System.lineSeparator()).flush();
                     }
                 } catch (MGFExtractionException | TimeoutException e) {
-                    LOGGER.error(e);
+                    //LOGGER.error(e);
                     TotalReportGenerator.addFailedSpectrum(aSpectrumId, e.getMessage());
                     rw.append("\t" + e.getMessage() + System.lineSeparator()).flush();
                 }

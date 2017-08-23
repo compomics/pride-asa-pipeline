@@ -42,6 +42,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.log4j.Logger;
@@ -55,7 +56,7 @@ import uk.ac.ebi.pride.utilities.data.controller.DataAccessException;
  * @author Niels Hulstaert
  */
 public abstract class AbstractSpectrumAnnotator<T> {
-    
+
     private static final Logger LOGGER = Logger.getLogger(AbstractSpectrumAnnotator.class);
 
     /**
@@ -131,79 +132,79 @@ public abstract class AbstractSpectrumAnnotator<T> {
     public MassRecalibrator getMassRecalibrator() {
         return massRecalibrator;
     }
-    
+
     public void setMassRecalibrator(MassRecalibrator massRecalibrator) {
         this.massRecalibrator = massRecalibrator;
     }
-    
+
     public SpectrumMatcher getSpectrumMatcher() {
         return spectrumMatcher;
     }
-    
+
     public void setSpectrumMatcher(SpectrumMatcher spectrumMatcher) {
         this.spectrumMatcher = spectrumMatcher;
     }
-    
+
     public MassDeltaExplainer getMassDeltaExplainer() {
         return massDeltaExplainer;
     }
-    
+
     public void setMassDeltaExplainer(MassDeltaExplainer massDeltaExplainer) {
         this.massDeltaExplainer = massDeltaExplainer;
     }
-    
+
     public PeptideVariationsGenerator getPeptideVariationsGenerator() {
         return peptideVariationsGenerator;
     }
-    
+
     public void setPeptideVariationsGenerator(PeptideVariationsGenerator peptideVariationsGenerator) {
         this.peptideVariationsGenerator = peptideVariationsGenerator;
     }
-    
+
     public SpectrumService getSpectrumService() {
         return spectrumService;
     }
-    
+
     public void setSpectrumService(SpectrumService spectrumService) {
         this.spectrumService = spectrumService;
     }
-    
+
     public PipelineModificationService getPipelineModificationService() {
         return pipelineModificationService;
     }
-    
+
     public void setPipelineModificationService(PipelineModificationService pipelineModificationService) {
         this.pipelineModificationService = pipelineModificationService;
     }
-    
+
     public ModificationService getModificationService() {
         return modificationService;
     }
-    
+
     public void setModificationService(ModificationService modificationService) {
         this.modificationService = modificationService;
     }
-    
+
     public Identifications getIdentifications() {
         return identifications;
     }
-    
+
     public SpectrumAnnotatorResult getSpectrumAnnotatorResult() {
         return spectrumAnnotatorResult;
     }
-    
+
     public void setSpectrumAnnotatorResult(SpectrumAnnotatorResult spectrumAnnotatorResult) {
         this.spectrumAnnotatorResult = spectrumAnnotatorResult;
     }
-    
+
     public ModificationHolder getModificationHolder() {
         return modificationHolder;
     }
-    
+
     public void setModificationRepository(FileExperimentModificationRepository modRepository) {
         this.modRepository = modRepository;
     }
-    
+
     public FileExperimentModificationRepository getModRepository() {
         return modRepository;
     }
@@ -253,7 +254,18 @@ public abstract class AbstractSpectrumAnnotator<T> {
         List<Identification> identificationsToProcess = new ArrayList<>(completeIdentifications);
         HashMap<Modification, Double> totalModificationRates = new HashMap<>();
         Set<Modification> nextModificationSet;
-        
+
+        //sample?
+        int sampleSize = 1000;
+        if (identificationsToProcess.size() > sampleSize) {
+            LOGGER.info("Too many identifications to process, sampling " + sampleSize + " identifications");
+            Random rand = new Random();
+            identificationsToProcess.clear();
+            for (int i = 0; i < sampleSize; i++) {
+                identificationsToProcess.add(completeIdentifications.get(rand.nextInt(completeIdentifications.size())));
+            }
+        }
+
         int totalSize = completeIdentifications.size();
         int totalExplained = 0;
         int pass = 1;
@@ -283,7 +295,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 }
                 pass++;
             }
-            mergeAnnotatorResults(spectrumAnnotatorResult,tempSpectrumAnnotatorResult);
+            mergeAnnotatorResults(spectrumAnnotatorResult, tempSpectrumAnnotatorResult);
             //   System.out.println(tempSpectrumAnnotatorResult.getMassRecalibrationResult().toString());
         }
         //filter out only the ones that are most relevant (top 6 or using a consideration threshold)...
@@ -293,7 +305,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
 
         Comparator<Entry<Modification, Double>> byValue = (entry1, entry2) -> entry1.getValue().compareTo(
                 entry2.getValue());
-        
+
         totalModificationRates
                 .entrySet()
                 .stream()
@@ -303,26 +315,28 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 modificationHolder.addModification(anEntry.getKey());
             }
         });
-        
+
     }
-    
+
     private void mergeAnnotatorResults(SpectrumAnnotatorResult first, SpectrumAnnotatorResult second) {
         for (Identification ident : second.getIdentifications()) {
             first.addIdentification(ident);
         }
     }
-    
+
     public Set<Modification> initModifications(String assayAccession, Resource modificationsResource, InputType inputType) throws IOException, ParameterExtractionException {
         LOGGER.info("Loading modifications...");
         modificationHolder = new ModificationHolder();
         LinkedHashSet<Modification> sortedAnnotatedModifications = new LinkedHashSet<>();
         //load the modifications from the PRIDE annotation
         //if there is no file in the parsercache, use the webservice to get the modifications 
-        if (modRepository != null) {
+        modRepository = FileExperimentModificationRepository.getInstance();
+        if (modRepository.isExperimentLoaded(assayAccession)) {
             LOGGER.debug("Using cached modifications");
             sortedAnnotatedModifications.addAll(modRepository.getModificationsByExperimentId(assayAccession));
         } else if (ParserCache.getInstance().containsParser(assayAccession)) {
-            modRepository = new FileExperimentModificationRepository(assayAccession);
+            modRepository.setExperimentIdentifier(assayAccession);
+            modRepository.loadExperimentIdentifications(assayAccession);
             sortedAnnotatedModifications.addAll(modRepository.getModificationsByExperimentId(assayAccession));
         } else {
             AnnotatedModificationService annotatedModService = new AnnotatedModificationService();
@@ -353,7 +367,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         LOGGER.info("Retrieved complete sorted modification map");
         return sortedAnnotatedModifications;
     }
-    
+
     protected Set<Modification> getNextModificationSet() throws IOException {
         //drain the queue in subset parts
         Set<Modification> modPassSet = new HashSet<>();
@@ -452,7 +466,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
     protected MassRecalibrationResult findSystematicMassError(List<Peptide> completePeptides) {
         //set considered charge states
         massRecalibrator.setConsideredChargeStates(consideredChargeStates);
-        
+
         MassRecalibrationResult massRecalibrationResult = null;
         try {
             massRecalibrationResult = massRecalibrator.recalibrate(analyzerData, completePeptides);
@@ -464,7 +478,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         }
         return massRecalibrationResult;
     }
-    
+
     protected void initChargeStates() {
         //load default values for considered charge states
         consideredChargeStates = new HashSet<>();
@@ -495,7 +509,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             //@ToDo figure out how to MT this with a queue of identifications?...
             possibleExplanations = massDeltaExplainer.explainCompleteIndentifications(filterIdentifications, massRecalibrationResult, analyzerData);
         }
-        
+
         return possibleExplanations;
     }
 
@@ -520,7 +534,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
             precursorVariations.put(identification, precursorVariationsSet);
         }
         LOGGER.info("Peptide variations found for " + precursorVariations.size() + " peptides.");
-        
+
         return precursorVariations;
     }
 
@@ -558,7 +572,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
                 spectrumAnnotatorResult.getUnexplainedIdentifications().add(identification);
             }
         }
-        
+
         return bestMatches;
     }
 
@@ -589,10 +603,10 @@ public abstract class AbstractSpectrumAnnotator<T> {
         }
         return unexplainedIdentifications;
     }
-    
+
     protected void initAnalyzerData(String assay) throws IOException {
         if (analyzerData == null) {
-            
+
             try {
                 AssayDetail assayDetail = PrideWebService.getAssayDetail(assay);
                 Set<String> instrumentNames = assayDetail.getInstrumentNames();

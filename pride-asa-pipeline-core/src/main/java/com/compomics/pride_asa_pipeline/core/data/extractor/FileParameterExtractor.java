@@ -84,7 +84,8 @@ public class FileParameterExtractor {
 
     public SearchParameters analyzePrideXML(File inputFile, String assay) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
         LOGGER.debug("Setting up experiment repository for assay " + assay);
-        experimentRepository = new FileExperimentModificationRepository(assay);
+        experimentRepository = FileExperimentModificationRepository.getInstance();
+        experimentRepository.setExperimentIdentifier(assay);
         modificationRepository = experimentRepository;
         //load the file into the repository
         experimentRepository.addPrideXMLFile(assay, inputFile);
@@ -96,7 +97,8 @@ public class FileParameterExtractor {
 
     public SearchParameters analyzeMzID(File inputFile, List<File> peakFiles, String assay) throws MGFExtractionException, ParameterExtractionException, IOException, TimeoutException, InterruptedException, ExecutionException {
         LOGGER.debug("Setting up experiment repository for assay " + assay);
-        experimentRepository = new FileExperimentModificationRepository(assay);
+        experimentRepository = FileExperimentModificationRepository.getInstance();
+        experimentRepository.setExperimentIdentifier(assay);
         modificationRepository = experimentRepository;
         experimentRepository.addMzID(assay, inputFile, peakFiles);
         spectrumRepository.setExperimentIdentifier(assay);

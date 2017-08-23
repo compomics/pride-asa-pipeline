@@ -12,6 +12,7 @@ import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,111 +48,137 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
      */
     private final PRIDEModificationFactory modFactory = PRIDEModificationFactory.getInstance();
     /**
-     * In memory list of peptides and modifications
+     * In memory list of mod occurences
      */
-    private final HashMap<Comparable, List<Modification>> modMapping = new HashMap<>();
+    private final HashMap<uk.ac.ebi.pride.utilities.data.core.Modification, Integer> modMapping = new HashMap<>();
+    /**
+     * boolean indicating experiments have been loaded before
+     */
+    private boolean experimentLoaded = false;
+    //make a singleton to fix multi passing
 
-    public FileExperimentModificationRepository() {
+    public static FileExperimentModificationRepository INSTANCE = new FileExperimentModificationRepository();
+
+    private List<Identification> identifications = new ArrayList<>();
+
+    public static FileExperimentModificationRepository getInstance() {
+        return INSTANCE;
+    }
+
+    protected FileExperimentModificationRepository() {
 
     }
 
-    public FileExperimentModificationRepository(String experimentIdentifier) {
+    /*private FileExperimentModificationRepository(String experimentIdentifier) {
         this.experimentIdentifier = experimentIdentifier;
-    }
-
+    }*/
     @Override
     public List<Identification> loadExperimentIdentifications(String experimentAccession) {
-        List<Identification> identifications = new ArrayList<>();
-        try {
-            CachedDataAccessController parser = parserCache.getParser(experimentAccession, false);
-            //get all the peptide ids for the proteins
-            long proteinCount = parser.getProteinIds().size();
-            double completeRatio = 0.0;
-            double currentCount = 0;
-            double currentPrint = 0;
-            for (Comparable aProteinID : parser.getProteinIds()) {
-                completeRatio = 100 * currentCount / proteinCount;
-                if (completeRatio > currentPrint) {
-                    LOGGER.info(InferenceStatistics.round(completeRatio, 0) + "%");
-                    currentPrint += 10;
-                }
-
-                for (Comparable aPeptideID : parser.getPeptideIds(aProteinID)) {
-                    uk.ac.ebi.pride.utilities.data.core.Peptide aPeptide = parser.getPeptideByIndex(aProteinID, aPeptideID);
-                    // do the mods
-                    List<Modification> modificationList = modMapping.getOrDefault(aPeptideID, new ArrayList<>());
-                    for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : aPeptide.getModifications()) {
-                        try {
-                            modificationList.add((Modification) modFactory.getModification(adapter, aMod.getName()));
-                        } catch (ParameterExtractionException ex) {
-                            LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
+        if (!isExperimentLoaded(experimentAccession)) {
+            setExperimentIdentifier(experimentAccession);
+            identifications.clear();
+            try {
+                CachedDataAccessController parser = parserCache.getParser(experimentAccession, false);
+                //get all the peptide ids for the proteins
+                long proteinCount = parser.getProteinIds().size();
+                double completeRatio = 0.0;
+                double currentCount = 0;
+                double currentPrint = 0;
+                Collection<Comparable> proteinIds = parser.getProteinIds();
+                for (Comparable aProteinID : proteinIds) {
+                    completeRatio = 100 * currentCount / proteinCount;
+                    if (completeRatio > currentPrint) {
+                        LOGGER.info(InferenceStatistics.round(completeRatio, 0) + "%");
+                        currentPrint += 10;
+                    }
+                    Collection<Comparable> peptideIds = parser.getPeptideIds(aProteinID);
+                    for (Comparable aPeptideID : peptideIds) {
+                        uk.ac.ebi.pride.utilities.data.core.Peptide aPeptide = parser.getPeptideByIndex(aProteinID, aPeptideID);
+                        // do the mods
+                        for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : aPeptide.getModifications()) {
+                            modMapping.put(aMod, modMapping.getOrDefault(aMod, 0) + 1);
                         }
-                    }
-                    //don't put empty lists in the mapping to lower stress on memory
-                    if (!modificationList.isEmpty()) {
-                        modMapping.put(aPeptideID, modificationList);
-                    }
-                    //do the identification
-                    SpectrumIdentification spectrumIdentification = aPeptide.getSpectrumIdentification();
 
-                    try {
-                        int charge = spectrumIdentification.getChargeState();
-                        double mz = spectrumIdentification.getExperimentalMassToCharge();
-                        AminoAcidSequence aaSequence = new AminoAcidSequence(aPeptide.getPeptideSequence().getSequence());
-                        Peptide peptide = new Peptide(charge, mz, aaSequence);
-                        Identification identification = new Identification(
-                                //@TODO is this correct?
-                                peptide,
-                                String.valueOf(aPeptideID),
-                                String.valueOf(spectrumIdentification.getSpectrum().getId()),
-                                spectrumIdentification.getName());
-                        identifications.add(identification);
-                    } catch (UnknownAAException ex) {
-                        LOGGER.error(ex);
+                        //do the identification
+                        SpectrumIdentification spectrumIdentification = aPeptide.getSpectrumIdentification();
+                        try {
+                            int charge = spectrumIdentification.getChargeState();
+                            double mz = spectrumIdentification.getExperimentalMassToCharge();
+                            AminoAcidSequence aaSequence = new AminoAcidSequence(aPeptide.getPeptideSequence().getSequence());
+                            Peptide peptide = new Peptide(charge, mz, aaSequence);
+                            Identification identification = new Identification(
+                                    //@TODO is this correct?
+                                    peptide,
+                                    String.valueOf(aPeptideID),
+                                    String.valueOf(spectrumIdentification.getSpectrum().getId()),
+                                    spectrumIdentification.getName());
+                            identifications.add(identification);
+                        } catch (UnknownAAException ex) {
+                            LOGGER.error(ex);
+                        }
+                        aPeptide = null;
                     }
-                    aPeptide = null;
+                    currentCount++;
                 }
-                currentCount++;
-            }
-            LOGGER.info("100% Completion!");
-            //get all evidence for all peptide ids
-            //     parser.close();
+                LOGGER.info("100% Completion!");
+                //get all evidence for all peptide ids
+                //     parser.close();
 
-        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
-            LOGGER.error("The parser timed out before it could deliver all identifications !");
+            } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+                LOGGER.error("The parser timed out before it could deliver all identifications !");
+            }
         }
+        experimentLoaded = true;
         return identifications;
     }
 
     @Override
     public List<Modification> getModificationsByPeptideId(long peptideID) {
         List<Modification> modificationList = new ArrayList<>();
-        if (modMapping.isEmpty()) {
-            try {
-                CachedDataAccessController parser = parserCache.getParser(experimentIdentifier, true);
-                for (Comparable proteinID : parser.getProteinIds()) {
-                    List<uk.ac.ebi.pride.utilities.data.core.Modification> mods = parser.getPTMs(proteinID, peptideID);
-                    for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : mods) {
-                        try {
-                            modificationList.add((Modification) modFactory.getModification(adapter, aMod.getName()));
-                        } catch (ParameterExtractionException ex) {
-                            LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
-                        }
+        try {
+            CachedDataAccessController parser = parserCache.getParser(experimentIdentifier, true);
+            for (Comparable proteinID : parser.getProteinIds()) {
+                List<uk.ac.ebi.pride.utilities.data.core.Modification> mods = parser.getPTMs(proteinID, peptideID);
+                for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : mods) {
+                    try {
+                        modificationList.add((Modification) modFactory.getModification(adapter, aMod.getName()));
+                    } catch (ParameterExtractionException ex) {
+                        LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
                     }
                 }
-            } catch (TimeoutException | InterruptedException | ExecutionException ex) {
-                LOGGER.error("The parser timed out before it could deliver all the modifications");
             }
-        } else {
-            modificationList.addAll(modMapping.getOrDefault(peptideID, new ArrayList<Modification>()));
+        } catch (TimeoutException | InterruptedException | ExecutionException ex) {
+            LOGGER.error("The parser timed out before it could deliver all the modifications");
         }
         return modificationList;
     }
 
     @Override
     public List<Modification> getModificationsByExperimentId(String experimentId) {
+
         List<Modification> modificationList = new ArrayList<>();
-        if (modMapping.isEmpty()) {
+        if (!experimentLoaded) {
+            loadExperimentIdentifications(experimentId);
+        }
+        for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : modMapping.keySet()) {
+            if (aMod != null && aMod.getName() != null) {
+                Object modification = null;
+                try {
+                    modification = modFactory.getModification(adapter, aMod.getName());
+                } catch (ParameterExtractionException ex) {
+                    LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
+                }
+                if (modification != null) {
+                    modificationList.add((Modification) modification);
+                } else {
+                    LOGGER.warn(aMod.getName() + " was not found in the modifications");
+                }
+            }
+        }
+        return modificationList;
+
+
+        /*         if (modMapping.isEmpty()) {
             try {
                 CachedDataAccessController parser = parserCache.getParser(experimentId, true);
                 for (Comparable proteinID : parser.getProteinIds()) {
@@ -186,11 +213,19 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
                 }
             }
         }
-        return modificationList;
+                return modificationList;*/
     }
 
     public void setExperimentIdentifier(String assay) {
-        this.experimentIdentifier = assay;
+        if (experimentIdentifier != assay) {
+            experimentLoaded = false;
+            this.experimentIdentifier = assay;
+            INSTANCE = this;
+        }
+    }
+
+    public boolean isExperimentLoaded(String assay) {
+        return assay == this.experimentIdentifier && experimentLoaded;
     }
 
 }

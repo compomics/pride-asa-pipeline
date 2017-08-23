@@ -27,8 +27,9 @@ public class FileExperimentServiceImpl extends ExperimentServiceImpl implements 
 
     @Override
     public void setActiveAssay(String assayIdentifier) {
-        experimentRepository = new FileExperimentModificationRepository(assayIdentifier);
-        this.assayIdentifier=assayIdentifier;
+        experimentRepository = FileExperimentModificationRepository.getInstance();
+        ((FileExperimentModificationRepository)experimentRepository).setExperimentIdentifier(assayIdentifier);
+        this.assayIdentifier = assayIdentifier;
     }
 
     public CachedDataAccessController getFileParser() {
@@ -113,10 +114,8 @@ public class FileExperimentServiceImpl extends ExperimentServiceImpl implements 
         return fileParser.getNumberOfPeptides();
     }
 
-
-
     @Override
     public void clear() {
-      
+
     }
 }

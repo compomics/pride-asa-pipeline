@@ -164,7 +164,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                     combinedModifiedPeptides.add(combinedModifiedPeptide);
                 } else {
                     //ToDo: maybe report the rubbish result
-                    LOGGER.warn("Non-sensical modification combination in ModifiedPeptide.");
+             //       LOGGER.warn("Non-sensical modification combination in ModifiedPeptide.");
                 }
                 //go on to the next combination
 
