@@ -66,12 +66,12 @@ public class EnzymePredictorTest extends TestCase {
         sequenceFactory = SequenceFactory.getInstance();
         sequenceFactory.loadFastaFile(fastaFile, null);
         enzymeFactory = EnzymeFactory.getInstance();
-        enzymeFactory.importEnzymes(enzymeFile);
+//        enzymeFactory.importEnzymes(enzymeFile);
         testingEnzyme = enzymeFactory.getEnzyme("Trypsin");
         testingEnzyme2 = enzymeFactory.getEnzyme("Arg-C");
         testingEnzyme3 = enzymeFactory.getEnzyme("Lys-C");
         testingEnzyme4 = enzymeFactory.getEnzyme("Pepsin A");
-        testingEnzyme5 = enzymeFactory.getEnzyme("Chymotrypsin (FYWL)");
+        testingEnzyme5 = enzymeFactory.getEnzyme("Chymotrypsin");
     }
 
     public void testTrypsin() throws Exception {

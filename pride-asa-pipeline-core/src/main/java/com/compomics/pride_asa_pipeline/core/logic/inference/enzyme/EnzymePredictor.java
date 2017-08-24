@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -100,7 +101,7 @@ public class EnzymePredictor {
             }
         }
         enzymeFactory = EnzymeFactory.getInstance();
-        enzymeFactory.importEnzymes(tempEnzymeFile);
+//        enzymeFactory.importEnzymes(tempEnzymeFile);
     }
 
     /**
@@ -123,8 +124,8 @@ public class EnzymePredictor {
         //calculate "correctness" for all enzymes
         for (Enzyme anEnzyme : enzymeFactory.getEnzymes()) {
             double correctHits = 0;
-            ArrayList<Character> aminoAcidAfter = anEnzyme.getAminoAcidAfter();
-            ArrayList<Character> aminoAcidBefore = anEnzyme.getAminoAcidBefore();
+            HashSet<Character> aminoAcidAfter = anEnzyme.getAminoAcidAfter();
+            HashSet<Character> aminoAcidBefore = anEnzyme.getAminoAcidBefore();
             for (Character anAminoAcid : aminoAcidAfter) {
                 correctHits += N_TerminiCount.getOrDefault(anAminoAcid, 0);
             }

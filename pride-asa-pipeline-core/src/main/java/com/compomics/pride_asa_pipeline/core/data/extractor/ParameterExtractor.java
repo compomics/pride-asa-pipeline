@@ -25,9 +25,11 @@ import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
+import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
+import com.compomics.util.preferences.DigestionPreferences;
 import com.compomics.util.pride.PrideWebService;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -178,9 +180,15 @@ public class ParameterExtractor {
 
                 //construct a parameter object
                 parameters = new SearchParameters();
+                             ArrayList<Enzyme> enzymes = new ArrayList<>();
 
-                parameters.setEnzyme(enzymePredictor.getMostLikelyEnzyme());
-                parameters.setnMissedCleavages(enzymePredictor.getMissedCleavages());
+                Enzyme bestFitEnzyme=             enzymePredictor.getMostLikelyEnzyme();
+                enzymes.add(bestFitEnzyme);
+                DigestionPreferences digestionPreferences = new DigestionPreferences();
+                digestionPreferences.setEnzymes(enzymes);
+                digestionPreferences.setnMissedCleavages(bestFitEnzyme.getName(),enzymePredictor.getMissedCleavages() );
+                parameters.setDigestionPreferences(digestionPreferences);
+
 
                 parameters.setPtmSettings(modificationPredictor.getPtmSettings());
 
@@ -321,8 +329,14 @@ public class ParameterExtractor {
     public void useDefaults(String assay) throws IOException, XmlPullParserException {
         printableReports = false;
         parameters = new SearchParameters();
-        parameters.setEnzyme(new EnzymePredictor().getMostLikelyEnzyme());
-        parameters.setnMissedCleavages(2);
+        ArrayList<Enzyme> enzymes = new ArrayList<>();
+        Enzyme bestFitEnzyme=             enzymePredictor.getMostLikelyEnzyme();
+                enzymes.add(bestFitEnzyme);
+                DigestionPreferences digestionPreferences = new DigestionPreferences();
+                digestionPreferences.setEnzymes(enzymes);
+                digestionPreferences.setnMissedCleavages(bestFitEnzyme.getName(),enzymePredictor.getMissedCleavages() );
+                parameters.setDigestionPreferences(digestionPreferences);
+
         PtmSettings ptmSettings = new PtmSettings();
         ModificationAdapter adapter = new UtilitiesPTMAdapter();
         PRIDEModificationFactory ptmFactory = PRIDEModificationFactory.getInstance();
