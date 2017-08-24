@@ -75,6 +75,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
     @Override
     public List<Identification> loadExperimentIdentifications(String experimentAccession) {
         if (!isExperimentLoaded(experimentAccession)) {
+            LOGGER.info("Setting "+experimentAccession+" as the active project");
             setExperimentIdentifier(experimentAccession);
             identifications.clear();
             try {

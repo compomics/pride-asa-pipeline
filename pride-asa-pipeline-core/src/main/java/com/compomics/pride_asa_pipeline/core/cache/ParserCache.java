@@ -83,7 +83,7 @@ public class ParserCache {
             Future<CachedDataAccessController> future = service.submit(new Callable<CachedDataAccessController>() {
                 @Override
                 public CachedDataAccessController call() throws Exception {
-                    LOGGER.info("Parsing file using PRIDE ms-data-core-api");
+                    LOGGER.info("Parsing "+identificationsFile.getName()+" using PRIDE ms-data-core-api");
                     CachedDataAccessController parser;
                     if (identificationsFile.getName().toUpperCase().endsWith(".XML")) {
                         parser = new PrideXmlControllerImpl(identificationsFile);
@@ -163,6 +163,7 @@ public class ParserCache {
         CachedDataAccessController controller = parserCache.get(experimentName);
         if (controller instanceof MzIdentMLControllerImpl) {
             MzIdentMLControllerImpl temp = (MzIdentMLControllerImpl) controller;
+            
             temp.addMSController(peakFiles);
             List<File> peakFileList = peakFileCache.getOrDefault(experimentName, new ArrayList<File>());
             peakFileList.addAll(peakFiles);

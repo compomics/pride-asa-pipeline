@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import org.apache.log4j.Logger;
@@ -32,6 +33,11 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
      */
     private File tempFolder;
 
+    /**
+     * List with allowed peakfiles (other ones do not have a parseer in ms-data-core api)
+     */
+    private List<String> extensions = new ArrayList<>(Arrays.asList("mzxml", "mzml","mgf","dta","pkl","ms2"));
+    
     /**
      * Creates a new File experiment repository
      */
@@ -67,7 +73,8 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
                     List<File> peakFiles = new ArrayList<>();
                     //@ToDo check why mzid is considered a peakfile here?
                     for (File aFile : getAssayFiles(assay, ProjectFileType.PEAK)) {
-                        if (!aFile.getName().toLowerCase().endsWith(".mzid") &&! aFile.getName().toLowerCase().endsWith(".mzid.zip") &&! aFile.getName().toLowerCase().endsWith(".mzid.gz")) {
+                        if (!aFile.getName().toLowerCase().endsWith(".mzid") && !aFile.getName().toLowerCase().endsWith(".mzid.zip") && !aFile.getName().toLowerCase().endsWith(".mzid.gz")) {
+                            LOGGER.info("Added a peakFile : " + aFile);
                             peakFiles.add(aFile);
                         }
                     }
@@ -149,8 +156,14 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
                     assayFiles.add(downloadFile(assayFile));
                 } else if (type.equals(ProjectFileType.PEAK)) {
                     //   if (assayFile.getFileName().contains(".dat")) {
+                    //FILTER OUT UNSUPPORTED PEAKFILES
+                    String extension = assayFile.getFileName().replace(".gz","").replace(".zip","");
+                    extension = extension.substring(extension.lastIndexOf(".")+1).toLowerCase();
+                    if(extensions.contains(extension)){
                     assayFiles.add(downloadFile(assayFile));
-                    //   }
+                    }else{
+                     LOGGER.info(assayFile.getFileName()+" has an unsupported file type : "+extension);  
+                    }//   }
                 }
             } else {
                 LOGGER.info("Skipping RAW files [might change in future update]");
