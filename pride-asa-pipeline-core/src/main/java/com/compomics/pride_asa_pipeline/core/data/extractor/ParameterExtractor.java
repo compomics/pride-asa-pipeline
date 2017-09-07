@@ -26,6 +26,7 @@ import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
 import com.compomics.util.experiment.biology.Enzyme;
+import com.compomics.util.experiment.biology.EnzymeFactory;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
@@ -187,8 +188,11 @@ public class ParameterExtractor {
                 DigestionPreferences digestionPreferences = new DigestionPreferences();
                 digestionPreferences.setEnzymes(enzymes);
                 digestionPreferences.setnMissedCleavages(bestFitEnzyme.getName(),enzymePredictor.getMissedCleavages() );
+                               
+                digestionPreferences.setCleavagePreference(DigestionPreferences.CleavagePreference.enzyme);
+                
                 parameters.setDigestionPreferences(digestionPreferences);
-
+               digestionPreferences.getShortDescription();
 
                 parameters.setPtmSettings(modificationPredictor.getPtmSettings());
 
@@ -330,11 +334,18 @@ public class ParameterExtractor {
         printableReports = false;
         parameters = new SearchParameters();
         ArrayList<Enzyme> enzymes = new ArrayList<>();
-        Enzyme bestFitEnzyme=             enzymePredictor.getMostLikelyEnzyme();
-                enzymes.add(bestFitEnzyme);
+         
+        Enzyme bestFitEnzyme;
                 DigestionPreferences digestionPreferences = new DigestionPreferences();
-                digestionPreferences.setEnzymes(enzymes);
+                if(enzymePredictor==null){
+                bestFitEnzyme = EnzymeFactory.getDefault().getEnzyme("Trypsin");
+                digestionPreferences.setnMissedCleavages("Trypsin",2 );
+                }else{
+                bestFitEnzyme = enzymePredictor.getMostLikelyEnzyme();
                 digestionPreferences.setnMissedCleavages(bestFitEnzyme.getName(),enzymePredictor.getMissedCleavages() );
+                }
+                enzymes.add(bestFitEnzyme);
+                digestionPreferences.setEnzymes(enzymes);
                 parameters.setDigestionPreferences(digestionPreferences);
 
         PtmSettings ptmSettings = new PtmSettings();

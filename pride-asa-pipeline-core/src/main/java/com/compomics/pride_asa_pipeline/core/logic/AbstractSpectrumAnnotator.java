@@ -239,6 +239,39 @@ public abstract class AbstractSpectrumAnnotator<T> {
      */
     public abstract void clearTmpResources();
 
+    public void annotate(String assayAccession) throws IOException, ParameterExtractionException {
+        //Check if there is an annotation for mods in the file, if there is we do not need to do anything extra
+        Set<Modification> consideredMods = new LinkedHashSet<>();
+        boolean assayHasAnnotation = initModifications(assayAccession, null, InputType.PRIDE_ASAP, consideredMods);
+        initAnalyzerData(assayAccession);
+        List<Identification> completeIdentifications = identifications.getCompleteIdentifications();
+        List<Identification> identificationsToProcess = new ArrayList<>(completeIdentifications);
+        HashMap<Modification, Double> totalModificationRates = new HashMap<>();
+        //if there was annotations for modifications, we want to use these...
+        if(assayHasAnnotation){
+            LOGGER.info("Using annotated modifications...");
+            annotateUsingKnownMods(consideredMods, completeIdentifications, identificationsToProcess, totalModificationRates);
+        }else{
+            LOGGER.info("No modifications annotated...Inferring from mass difference");
+            annotateUsingMassInference(consideredMods, completeIdentifications, identificationsToProcess, totalModificationRates);
+        }
+    }
+
+    private void annotateUsingKnownMods(Set<Modification> consideredMods, List<Identification> completeIdentifications, List<Identification> identificationsToProcess, HashMap<Modification, Double> totalModificationRates) {
+        if(modificationHolder==null){
+            modificationHolder=new ModificationHolder();
+        }
+        modificationHolder.addModifications(consideredMods);
+        annotate(modificationHolder, completeIdentifications, identificationsToProcess, spectrumAnnotatorResult);
+        Map<Modification, Double> estimateModificationRate = modificationService.estimateModificationRate(
+                modificationService.getUsedModifications(spectrumAnnotatorResult),
+                spectrumAnnotatorResult,
+                0.0);
+        for (Map.Entry<Modification, Double> aModificationRate : estimateModificationRate.entrySet()) {
+            totalModificationRates.put(aModificationRate.getKey(), aModificationRate.getValue());
+        }
+    }
+
     /**
      * Annotates the spectra for the given accession
      *
@@ -247,12 +280,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
      * @throws
      * com.compomics.pride_asa_pipeline.model.ParameterExtractionException
      */
-    public void annotate(String assayAccession) throws IOException, ParameterExtractionException {
-        initModifications(assayAccession, null, null);
-        initAnalyzerData(assayAccession);
-        List<Identification> completeIdentifications = identifications.getCompleteIdentifications();
-        List<Identification> identificationsToProcess = new ArrayList<>(completeIdentifications);
-        HashMap<Modification, Double> totalModificationRates = new HashMap<>();
+    public void annotateUsingMassInference(Set<Modification> consideredMods, List<Identification> completeIdentifications, List<Identification> identificationsToProcess, HashMap<Modification, Double> totalModificationRates) throws IOException, ParameterExtractionException {
         Set<Modification> nextModificationSet;
 
         //sample?
@@ -324,7 +352,25 @@ public abstract class AbstractSpectrumAnnotator<T> {
         }
     }
 
-    public Set<Modification> initModifications(String assayAccession, Resource modificationsResource, InputType inputType) throws IOException, ParameterExtractionException {
+    public boolean initModifications(String assayAccession, Resource modificationsResource, InputType inputType, Set<Modification> consideredMods) throws IOException, ParameterExtractionException {
+        AsapModificationAdapter adapter = new AsapModificationAdapter();
+        //get other modifications
+        boolean couldRetrieveFromService = false;
+
+        List<Modification> modificationsByExperimentId = FileExperimentModificationRepository.getInstance().getModificationsByExperimentId(assayAccession);
+        if (!modificationsByExperimentId.isEmpty()) {
+            for (Modification aMod : modificationsByExperimentId) {
+                consideredMods.add((Modification) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getName()));
+            }
+            couldRetrieveFromService = true;
+        }
+        if (!couldRetrieveFromService) {
+            consideredMods.addAll(inferModifications(assayAccession, modificationsResource, inputType));
+        }
+        return couldRetrieveFromService;
+    }
+
+    public Set<Modification> inferModifications(String assayAccession, Resource modificationsResource, InputType inputType) throws IOException, ParameterExtractionException {
         LOGGER.info("Loading modifications...");
         modificationHolder = new ModificationHolder();
         LinkedHashSet<Modification> sortedAnnotatedModifications = new LinkedHashSet<>();
@@ -338,13 +384,6 @@ public abstract class AbstractSpectrumAnnotator<T> {
             modRepository.setExperimentIdentifier(assayAccession);
             modRepository.loadExperimentIdentifications(assayAccession);
             sortedAnnotatedModifications.addAll(modRepository.getModificationsByExperimentId(assayAccession));
-        } else {
-            AnnotatedModificationService annotatedModService = new AnnotatedModificationService();
-            AsapModificationAdapter adapter = new AsapModificationAdapter();
-            //get other modifications
-            for (String aPTMName : annotatedModService.getAssayAnnotatedPTMs(assayAccession)) {
-                sortedAnnotatedModifications.add((Modification) PRIDEModificationFactory.getInstance().getModification(adapter, aPTMName));
-            }
         }
         //order the annotated modifications to prevalence (in case there are more than the selected batch size)
         //get all asap mods

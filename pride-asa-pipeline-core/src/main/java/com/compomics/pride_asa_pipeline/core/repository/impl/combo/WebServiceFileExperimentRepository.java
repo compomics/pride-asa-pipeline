@@ -78,6 +78,9 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
                             peakFiles.add(aFile);
                         }
                     }
+                    if(peakFiles.isEmpty()){
+                        throw new Exception("There are no spectrum files for this mzid !!!");
+                    }
                     super.addMzID(assay, identFile, peakFiles);
                 } else {
                     //@ToDo think of a better strategy for this, maybe include file name in assay identifier?

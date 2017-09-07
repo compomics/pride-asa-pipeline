@@ -109,6 +109,8 @@ public class EnzymePredictor {
      *
      */
     private void estimateBestEnzyme() {
+        enzymeFactory = EnzymeFactory.getInstance();
+        enzymeFactory.getEnzymes();
         mostLikelyEnzyme = enzymeFactory.getEnzyme("Trypsin");
         N_TerminiCount = new HashMap<>();
         C_TerminiCount = new HashMap<>();

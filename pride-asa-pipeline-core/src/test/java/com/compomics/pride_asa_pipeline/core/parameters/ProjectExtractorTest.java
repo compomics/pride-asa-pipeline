@@ -73,7 +73,7 @@ public class ProjectExtractorTest extends TestCase {
         assertTrue(identificationParameters.getFragmentIonAccuracy() > 0 && identificationParameters.getFragmentIonAccuracy() <= 1);
         System.out.println("Fragment ion acc check");
 
-        assertTrue(identificationParameters.getEnzyme().getName().toLowerCase().contains("tryp"));
+        assertTrue(identificationParameters.getDigestionPreferences().getEnzymes().get(0).getName().toLowerCase().contains("tryp"));
         System.out.println("Enzyme check");
         assertEquals(2, identificationParameters.getMinChargeSearched().value);
         assertEquals(4, identificationParameters.getMaxChargeSearched().value);

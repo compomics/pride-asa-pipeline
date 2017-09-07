@@ -100,6 +100,9 @@ public class FileParameterExtractor {
         experimentRepository = FileExperimentModificationRepository.getInstance();
         experimentRepository.setExperimentIdentifier(assay);
         modificationRepository = experimentRepository;
+        if(peakFiles.isEmpty()){
+            throw new ParameterExtractionException("There are no compatible spectrum files for this assay !!!!");
+        }
         experimentRepository.addMzID(assay, inputFile, peakFiles);
         spectrumRepository.setExperimentIdentifier(assay);
         modificationRepository.setExperimentIdentifier(assay);

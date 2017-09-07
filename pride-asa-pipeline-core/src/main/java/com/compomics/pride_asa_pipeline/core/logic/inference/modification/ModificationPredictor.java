@@ -5,6 +5,7 @@ import com.compomics.pride_asa_pipeline.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.model.modification.impl.UtilitiesPTMAdapter;
 import com.compomics.pride_asa_pipeline.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
+import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
@@ -101,15 +102,17 @@ public class ModificationPredictor {
         UtilitiesPTMAdapter adapter = new UtilitiesPTMAdapter();
         ptmSettings = new PtmSettings();
         //make sure the annotated mods are in there as well
-        List<Modification> modificationsByExperimentId = repository.getModificationsByExperimentId(assay);
+        List<Modification> modificationsByExperimentId = FileExperimentModificationRepository.getInstance().getModificationsByExperimentId(assay);
         TotalReportGenerator.setExperimentMods(modificationsByExperimentId);
         for (Modification annotatedMod : modificationsByExperimentId) {
             asapMods.put(annotatedMod.getName(), false);
         }
-        for (Modification aMod : modificationHolder.getAllModifications()) {
-            asapMods.put(aMod.getName(), false);
+        if (modificationHolder != null) {
+            for (Modification aMod : modificationHolder.getAllModifications()) {
+                asapMods.put(aMod.getName(), false);
+            }
         }
-        //and add the new ones
+        //and add any new ones
         HashSet<Double> encounteredMasses = new HashSet<>();
         for (Map.Entry<String, Boolean> aMod : asapMods.entrySet()) {
             try {

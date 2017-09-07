@@ -139,7 +139,7 @@ public class MGFExtractor {
                         TotalReportGenerator.addFailedSpectrum(aSpectrumId, "Reported spectrum by reader not found in file");
                         rw.append("\tNOT FOUND" + System.lineSeparator()).flush();
                     }
-                } catch (MGFExtractionException | TimeoutException e) {
+                } catch (NullPointerException | MGFExtractionException | TimeoutException e) {
                     //LOGGER.error(e);
                     TotalReportGenerator.addFailedSpectrum(aSpectrumId, e.getMessage());
                     rw.append("\t" + e.getMessage() + System.lineSeparator()).flush();

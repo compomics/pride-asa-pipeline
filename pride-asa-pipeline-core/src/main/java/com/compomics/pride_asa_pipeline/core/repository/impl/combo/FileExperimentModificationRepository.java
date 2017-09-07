@@ -114,7 +114,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
                                     String.valueOf(spectrumIdentification.getSpectrum().getId()),
                                     spectrumIdentification.getName());
                             identifications.add(identification);
-                        } catch (UnknownAAException ex) {
+                        } catch (UnknownAAException  | NullPointerException ex) {
                             LOGGER.error(ex);
                         }
                         aPeptide = null;
