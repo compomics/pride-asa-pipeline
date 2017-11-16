@@ -1,5 +1,6 @@
 package com.compomics.pride_asa_pipeline.core.data.extractor;
 
+import com.compomics.pride_asa_pipeline.core.bypass.WebServiceParameterInference;
 import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.logic.inference.IdentificationFilter;
 import com.compomics.pride_asa_pipeline.core.logic.inference.enzyme.EnzymePredictor;
@@ -28,6 +29,7 @@ import com.compomics.util.experiment.identification.identification_parameters.Pt
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
 import com.compomics.util.preferences.DigestionPreferences;
+import com.compomics.util.preferences.IdentificationParameters;
 import com.compomics.util.pride.PrideWebService;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,9 +57,12 @@ public class ParameterExtractor {
      */
     private DbSpectrumAnnotator spectrumAnnotator;
     /*
+    
+    */
+    /*
      * The search parameters 
      */
-    private SearchParameters parameters;
+    private IdentificationParameters parameters;
     /*
      * The quality percentile
      */
@@ -80,6 +85,12 @@ public class ParameterExtractor {
      */
     private AnalyzerData analyzerData;
 
+    
+    /**
+     * Boolean indicating if the results should be verified against the webservice
+     */
+    private boolean verifyWebService=true;
+    
           /**
      * An extractor for parameters
      *
@@ -125,7 +136,11 @@ public class ParameterExtractor {
     }
 
     private void init(String assay) throws ParameterExtractionException {
-        //get assay
+   //construct a parameter object
+           
+                SearchParameters searchParam = new SearchParameters();        
+                parameters = new IdentificationParameters(searchParam);
+//get assay
         try {
             TotalReportGenerator.setAssay(assay);
            // FileSpectrumRepository fileSpectrumRepository = new FileSpectrumRepository(assay);
@@ -176,9 +191,8 @@ public class ParameterExtractor {
                 //--------------------------------
                
 
-                //construct a parameter object
-                parameters = new SearchParameters();
-                             ArrayList<Enzyme> enzymes = new ArrayList<>();
+             
+                ArrayList<Enzyme> enzymes = new ArrayList<>();
 
                 Enzyme bestFitEnzyme=             enzymePredictor.getMostLikelyEnzyme();
                 enzymes.add(bestFitEnzyme);
@@ -188,23 +202,30 @@ public class ParameterExtractor {
                                
                 digestionPreferences.setCleavagePreference(DigestionPreferences.CleavagePreference.enzyme);
                 
-                parameters.setDigestionPreferences(digestionPreferences);
-               digestionPreferences.getShortDescription();
+                searchParam.setDigestionPreferences(digestionPreferences);
+   
+                for (Enzyme enzyme : digestionPreferences.getEnzymes()) {
+                    digestionPreferences.setSpecificity(enzyme.getName(), DigestionPreferences.Specificity.specific);
+                }
 
-                parameters.setPtmSettings(modificationPredictor.getPtmSettings());
+                searchParam.setPtmSettings(modificationPredictor.getPtmSettings());
 
-                parameters.setPrecursorAccuracy(MassShiftCalculator.findOptimalPrecursorShift(experimentIdentifications));
-                parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.PPM);
+                searchParam.setPrecursorAccuracy(MassShiftCalculator.findOptimalPrecursorShift(experimentIdentifications));
+                searchParam.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.PPM);
 
-                parameters.setMinChargeSearched(new Charge(Charge.PLUS, Math.max(minCharge,1)));
-                parameters.setMaxChargeSearched(new Charge(Charge.PLUS, Math.min(maxCharge,5)));
+                searchParam.setMinChargeSearched(new Charge(Charge.PLUS, Math.max(minCharge,1)));
+                searchParam.setMaxChargeSearched(new Charge(Charge.PLUS, Math.min(maxCharge,5)));
 
-                parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-                parameters.setFragmentIonAccuracy(MassShiftCalculator.findOptimalFragmentShift(experimentIdentifications));
+                searchParam.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
+                searchParam.setFragmentIonAccuracy(MassShiftCalculator.findOptimalFragmentShift(experimentIdentifications));
                 
-                remediateParametersWithAnnotation(assay);
-                TotalReportGenerator.setFragmentAcc(parameters.getFragmentIonAccuracy());
-                TotalReportGenerator.setPrecursorAcc(parameters.getPrecursorAccuracy());
+                //check with the webservice?
+                if(verifyWebService){
+                    WebServiceParameterInference.SyncWithAnnotation(parameters, assay);
+                }
+              
+                TotalReportGenerator.setFragmentAcc(searchParam.getFragmentIonAccuracy());
+                TotalReportGenerator.setPrecursorAcc(searchParam.getPrecursorAccuracy());
 
             }
         } catch (Exception e) {
@@ -214,73 +235,37 @@ public class ParameterExtractor {
         }
     }
 
-    public void remediateParametersWithAnnotation(String assay) throws IOException {
-        if(analyzerData==null){
-        analyzerData = getAnalyzerData(assay);
-        }
-        if (analyzerData != null) {
-            double minimalAccuracy = 0.001; //~5ppm for orbitrap family
-            if (analyzerData.getAnalyzerFamily().equals(AnalyzerData.ANALYZER_FAMILY.FT)
-                    | analyzerData.getAnalyzerFamily().equals(AnalyzerData.ANALYZER_FAMILY.TOF
-                    )) {
-                minimalAccuracy = 0.010; // ~50ppm for others?;
-            }
-          /* LOGGER.info("Remediating erronous estimations...");
-            if (parameters.getPrecursorAccuracy() < minimalAccuracy) {
-                TotalReportGenerator.setPrecursorAccMethod("Using default, minimal machine --> inferred accuracy (" + parameters.getFragmentIonAccuracy() + ") too high for " + analyzerData.getAnalyzerFamily().toString());
-                parameters.setPrecursorAccuracy(minimalAccuracy);
-                parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
-            } else if (parameters.getPrecursorAccuracy() > analyzerData.getFragmentMassError()) {
-                LOGGER.info("Remediating fragment accuracy to match " + analyzerData.getAnalyzerFamily().toString() + " analyzers.");
-                parameters.setPrecursorAccuracy(analyzerData.getFragmentMassError());
-                parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
-                TotalReportGenerator.setPrecursorAccMethod("Used annotated machine parameters : " + analyzerData.getAnalyzerFamily().toString());
-            }
-
-            if (parameters.getFragmentIonAccuracy() < parameters.getPrecursorAccuracy()) {
-                TotalReportGenerator.setFragmentAccMethod("Precursor < Fragment --> inferred accuracy (" + parameters.getFragmentIonAccuracy() + ") set to match precursor");
-                parameters.setFragmentIonAccuracy(parameters.getPrecursorAccuracy());
-                parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-            } else if (parameters.getFragmentIonAccuracy() < minimalAccuracy) {
-                TotalReportGenerator.setFragmentAccMethod("Using default, minimal machine --> inferred accuracy (" + parameters.getFragmentIonAccuracy() + ") too high for " + analyzerData.getAnalyzerFamily().toString());
-                parameters.setFragmentIonAccuracy(minimalAccuracy);
-                parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-            } else if (parameters.getFragmentIonAccuracy() > analyzerData.getFragmentMassError()) {
-                LOGGER.info("Remediating fragment accuracy to match " + analyzerData.getAnalyzerFamily().toString() + " analyzers.");
-                parameters.setFragmentIonAccuracy(analyzerData.getFragmentMassError());
-                parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-                TotalReportGenerator.setFragmentAccMethod("Used annotated machine parameters : " + analyzerData.getAnalyzerFamily().toString());
-            }*/
-
-        }
-    }
 
     private AnalyzerData getAnalyzerData(String assay) throws IOException {
-        AnalyzerData analyzerData = null;
-        try {
-            AssayDetail assayDetail = PrideWebService.getAssayDetail(assay);
-            Set<String> instrumentNames = assayDetail.getInstrumentNames();
-            analyzerData = AnalyzerData.getAnalyzerDataByAnalyzerType("");
-            if (instrumentNames.size() > 0) {
-                LOGGER.warn("There are multiple instruments, selecting lowest precursor accuraccy...");
-            }
+        AssayDetail assayDetail = PrideWebService.getAssayDetail(assay);
+        Set<String> instrumentNames = assayDetail.getInstrumentNames();
+     
+        String selectedInstrument = "";
+        if (instrumentNames.size() > 1) {
+            LOGGER.warn("There are multiple instruments, selecting lowest precursor accuraccy...");
+            analyzerData = AnalyzerData.getAnalyzerDataByAnalyzerType(instrumentNames.iterator().next());
             for (String anInstrumentName : instrumentNames) {
                 AnalyzerData temp = AnalyzerData.getAnalyzerDataByAnalyzerType(anInstrumentName);
                 //worst precursor has benefit
                 if (analyzerData.getPrecursorAccuraccy() > temp.getPrecursorAccuraccy()) {
                     analyzerData = temp;
+                    selectedInstrument = anInstrumentName;
                 }
             }
-        } catch (Exception e) {
-            LOGGER.warn("Could not retrieve analyzer data from pride webservice.");
-        }
+        } else if (instrumentNames.size() <= 1) {
+            LOGGER.warn("There are multiple instruments, selecting lowest precursor accuraccy...");
+            selectedInstrument = instrumentNames.iterator().next();
+            analyzerData = AnalyzerData.getAnalyzerDataByAnalyzerType(selectedInstrument);
+
+        } 
+        LOGGER.info("The selected instrument was : " + selectedInstrument);
         return analyzerData;
     }
 
     /*
      * Returns the inferred search parameters
      */
-    public SearchParameters getParameters() {
+    public IdentificationParameters getParameters() {
         return parameters;
     }
 
@@ -329,7 +314,8 @@ public class ParameterExtractor {
 
     public void useDefaults(String assay) throws IOException, XmlPullParserException {
         printableReports = false;
-        parameters = new SearchParameters();
+      /*  SearchParameters searchParam = new SearchParameters();
+        parameters = new IdentificationParameters(searchParam);*/
         ArrayList<Enzyme> enzymes = new ArrayList<>();
          
         Enzyme bestFitEnzyme;
@@ -343,7 +329,7 @@ public class ParameterExtractor {
                 }
                 enzymes.add(bestFitEnzyme);
                 digestionPreferences.setEnzymes(enzymes);
-                parameters.setDigestionPreferences(digestionPreferences);
+                parameters.getSearchParameters().setDigestionPreferences(digestionPreferences);
 
         PtmSettings ptmSettings = new PtmSettings();
         ModificationAdapter adapter = new UtilitiesPTMAdapter();
@@ -361,7 +347,7 @@ public class ParameterExtractor {
         } catch (ParameterExtractionException ex) {
               LOGGER.error("Could not load default modifications. Reason :" + ex);
         }
-        parameters.setPtmSettings(ptmSettings);
+        parameters.getSearchParameters().setPtmSettings(ptmSettings);
 
         //try to get from machine...
         AnalyzerData data = getAnalyzerData(assay);
@@ -374,13 +360,13 @@ public class ParameterExtractor {
             predictedFragmentMassError = data.getFragmentMassError();
         }
 
-        parameters.setPrecursorAccuracy(predictedPrecursorMassError);
-        parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
-        parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-        parameters.setFragmentIonAccuracy(predictedFragmentMassError);
+        parameters.getSearchParameters().setPrecursorAccuracy(predictedPrecursorMassError);
+        parameters.getSearchParameters().setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
+        parameters.getSearchParameters().setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
+        parameters.getSearchParameters().setFragmentIonAccuracy(predictedFragmentMassError);
 
-        parameters.setMinChargeSearched(new Charge(Charge.PLUS, 2));
-        parameters.setMaxChargeSearched(new Charge(Charge.PLUS, 5));
+        parameters.getSearchParameters().setMinChargeSearched(new Charge(Charge.PLUS, 2));
+        parameters.getSearchParameters().setMaxChargeSearched(new Charge(Charge.PLUS, 5));
 
         TotalReportGenerator.setEnzymeMethod("Defaulted");
         TotalReportGenerator.setFragmentAccMethod("Defaulted");

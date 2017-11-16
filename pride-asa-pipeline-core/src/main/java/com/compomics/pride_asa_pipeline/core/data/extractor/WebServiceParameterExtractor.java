@@ -79,7 +79,7 @@ public class WebServiceParameterExtractor {
             mgf.delete();
             //do the extraction
             LOGGER.info("Attempting to infer searchparameters");
-            parameters = extractor.getParameters();
+            parameters = extractor.getParameters().getSearchParameters();
             extractor.printReports(outputFolder);
             //remediate error
             parameterFile = new File(outputFolder, assayAccession + ".par");
@@ -92,7 +92,7 @@ public class WebServiceParameterExtractor {
                 e.printStackTrace(ps);
                 if (extractor != null) {
                     extractor.useDefaults(assayAccession);
-                    parameters = extractor.getParameters();
+                    parameters = extractor.getParameters().getSearchParameters();
                 } else {
                     throw new ParameterExtractionException("Extractor failed for unknown reason");
                 }

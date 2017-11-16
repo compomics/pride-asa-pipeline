@@ -10,6 +10,7 @@ import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.gui.waiting.waitinghandlers.WaitingHandlerCLIImpl;
 import com.compomics.util.io.compression.ZipUtils;
+import com.compomics.util.preferences.IdentificationParameters;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -68,10 +69,10 @@ public class FileParameterExtractor {
         LOGGER.info("Attempting to infer searchparameters");
         ParameterExtractor extractor = new ParameterExtractor(assay, analyzerData, modificationRepository);
         //extractor.setExperimentRepository(experimentRepository);
-        SearchParameters parameters = extractor.getParameters();
+        IdentificationParameters parameters = extractor.getParameters();
         extractor.printReports(outputFolder);
-        SearchParameters.saveIdentificationParameters(parameters, new File(outputFolder, assay + ".par"));
-        return parameters;
+        IdentificationParameters.saveIdentificationParameters(parameters, new File(outputFolder, assay + ".par"));
+        return parameters.getSearchParameters();
     }
 
     private void processSpectra() throws IOException, MGFExtractionException {

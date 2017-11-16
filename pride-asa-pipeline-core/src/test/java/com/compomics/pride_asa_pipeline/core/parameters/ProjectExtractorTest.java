@@ -64,6 +64,7 @@ public class ProjectExtractorTest extends TestCase {
         System.out.println("# ------------------------------------------------------------------");
         System.out.println("FINAL VERDICT");
         System.out.println("# ------------------------------------------------------------------");
+        System.out.println("The identification parameters are null : "+identificationParameters==null);
         System.out.println(identificationParameters.toString());
 
         //it has to be better than these reported values

@@ -10,17 +10,14 @@ import com.compomics.util.experiment.biology.PTMFactory;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
-import com.compomics.util.gui.protein.ModificationProfile;
 import com.compomics.util.preferences.DigestionPreferences;
 import com.compomics.util.preferences.GenePreferences;
 import com.compomics.util.preferences.IdentificationParameters;
 import com.compomics.util.pride.PrideWebService;
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
@@ -41,13 +38,21 @@ public class WebServiceParameterInference {
     private int minCharge = 2;
     private int maxCharge = 4;
 
+    private boolean skipEnzyme;
+
     private String assayIdentifier = "11954";
 
     public WebServiceParameterInference(String assayIdentifier) {
         this.assayIdentifier = assayIdentifier;
+        skipEnzyme = false;
     }
 
-    public void InferParameters(File outputFile) {
+    public WebServiceParameterInference(String assayIdentifier, boolean skipEnzyme) {
+        this.assayIdentifier = assayIdentifier;
+        this.skipEnzyme = skipEnzyme;
+    }
+
+    public IdentificationParameters InferParameters() throws IOException, ParameterExtractionException {
         //init variables
         IdentificationParameters idParam = new IdentificationParameters();
         SearchParameters param = new SearchParameters();
@@ -59,22 +64,18 @@ public class WebServiceParameterInference {
 
         GenePreferences genePreferences = new GenePreferences();
         idParam.setGenePreferences(genePreferences);
-        
-        
-        
+
         AssayDetail detail = null;
-        try {
-            detail = PrideWebService.getAssayDetail(assayIdentifier);
-        } catch (IOException ex) {
-            LOGGER.error("Could not contact the EBI webservice");
+
+        detail = PrideWebService.getAssayDetail(assayIdentifier);
+
+        if (detail == null) {
+            throw new ParameterExtractionException("Assay does not exist in the repository.");
         }
 
         //ANALYZER_____________________________________________________
         try {
             LOGGER.info("Acquiring analyzer data...");
-            if (detail == null) {
-                throw new ParameterExtractionException("Analyzer data could not be reached, using default...");
-            }
             AnalyzerData analyzerData = getAnalyzerData(detail);
             LOGGER.info("Instrument : " + analyzerData.getAnalyzerFamily());
             param.setPrecursorAccuracyDalton(analyzerData.getPrecursorMassError());
@@ -90,9 +91,6 @@ public class WebServiceParameterInference {
         try {
             //PTMS_____________________________________________________
             LOGGER.info("Acquiring annotated PTM");
-            if (detail == null) {
-                throw new ParameterExtractionException("PTM settings could not be inferred, using default...");
-            }
             for (String ptm : GetModifications(detail)) {
                 PTMFactory.getInstance().convertPridePtm(ptm, ptmSettings, unknownPtms, false);
             }
@@ -101,34 +99,32 @@ public class WebServiceParameterInference {
             PTMFactory.getInstance().convertPridePtm("Carbamidomethylation of C", ptmSettings, unknownPtms, false);
             PTMFactory.getInstance().convertPridePtm("Oxidation of M", ptmSettings, unknownPtms, false);
         }
+        if (!skipEnzyme) {
+            try {
+                //ENZYMES_____________________________________________________
+                LOGGER.info("Acquiring enzyme information");
+                //get enzyme
+                EnzymePredictor predictor = GetEnzymePredictor(detail);
+                ArrayList<Enzyme> enzymes = new ArrayList<>();
+                Enzyme enzyme = predictor.getMostLikelyEnzyme();
+                enzymes.add(enzyme);
 
-        try {
-            //ENZYMES_____________________________________________________
-            LOGGER.info("Acquiring enzyme information");
-            if (detail == null) {
-                throw new ParameterExtractionException("Digestion settings could not be inferred, using default...");
-            }
-            //get enzyme
-            EnzymePredictor predictor = GetEnzymePredictor(detail);
-            ArrayList<Enzyme> enzymes = new ArrayList<>();
-            Enzyme enzyme = predictor.getMostLikelyEnzyme();
-            enzymes.add(enzyme);
+                digestionPreferences.setEnzymes(enzymes);
+                digestionPreferences.setnMissedCleavages(enzymes.get(0).getName(), predictor.getMissedCleavages());
 
-            digestionPreferences.setEnzymes(enzymes);
-            digestionPreferences.setnMissedCleavages(enzymes.get(0).getName(), predictor.getMissedCleavages());
-
-        } catch (Exception e) {
-            LOGGER.error("Could not infer enzymes : " + e);
-            String defaultEnzyme = "Trypsin";
-            digestionPreferences.addEnzyme(EnzymeFactory.getDefault().getEnzyme(defaultEnzyme));
-            digestionPreferences.setnMissedCleavages(defaultEnzyme, 2);
-        } finally {
-            for (Enzyme enzyme : digestionPreferences.getEnzymes()) {
-                digestionPreferences.setSpecificity(enzyme.getName(), DigestionPreferences.Specificity.specific);
-            }
-            digestionPreferences.getXTandemFormat();
+            } catch (Exception e) {
+                LOGGER.error("Could not infer enzymes : " + e);
+                String defaultEnzyme = "Trypsin";
+                digestionPreferences.addEnzyme(EnzymeFactory.getDefault().getEnzyme(defaultEnzyme));
+                digestionPreferences.setnMissedCleavages(defaultEnzyme, 2);
+            } finally {
+                for (Enzyme enzyme : digestionPreferences.getEnzymes()) {
+                    digestionPreferences.setSpecificity(enzyme.getName(), DigestionPreferences.Specificity.specific);
+                }
+                /*            digestionPreferences.getXTandemFormat();
                         //debug mods
-            PTMFactory.getInstance().loadBackedUpModifications(param, true);
+            PTMFactory.getInstance().loadBackedUpModifications(param, true);*/
+            }
         }
 
         //if min and max charge are the same, we want to expand the range?
@@ -148,11 +144,19 @@ public class WebServiceParameterInference {
         idParam.setSearchParameters(param);
 
         System.out.println(idParam.getSearchParameters().toString());
-        try {
-            IdentificationParameters.saveIdentificationParameters(idParam, outputFile);
-        } catch (IOException ex) {
-            LOGGER.error("Could not save the parameters at " + outputFile.getAbsolutePath());
+        return idParam;
+    }
+
+    public IdentificationParameters InferParameters(File outputFile) throws IOException, ParameterExtractionException {
+        IdentificationParameters idParam = InferParameters();
+        if (outputFile != null) {
+            try {
+                IdentificationParameters.saveIdentificationParameters(idParam, outputFile);
+            } catch (IOException ex) {
+                LOGGER.error("Could not save the parameters at " + outputFile.getAbsolutePath());
+            }
         }
+        return idParam;
     }
 
     private AnalyzerData getAnalyzerData(AssayDetail assayDetail) {
@@ -219,6 +223,62 @@ public class WebServiceParameterInference {
             throw new ParameterExtractionException("Could not generate a suited enzyme predictor");
         }
         return predictor;
+    }
+
+    public static void SyncWithAnnotation(IdentificationParameters inferredParameters, String assay) {
+        try {
+            //continue
+            WebServiceParameterInference webServiceParameterInference = new WebServiceParameterInference(assay, true);
+            IdentificationParameters webServiceParameters = webServiceParameterInference.InferParameters();
+            //check if we are missing annotated modifications
+            compareModifications(inferredParameters, webServiceParameters);
+            //check if the mass accuraccy is not worse than what is annotated (the instrument ones)
+            compareMassAccuracies(inferredParameters, webServiceParameters);
+            //check the enzymes between both versions
+            compareEnzyme(inferredParameters, webServiceParameters);
+        } catch (IOException ex) {
+            LOGGER.error("Could not contact the EBI PRIDE Webservice");
+            LOGGER.error(ex);
+        } catch (ParameterExtractionException ex) {
+            LOGGER.error("Something went wrong during the extraction of parameters through the webservice !");
+            LOGGER.error(ex);
+        }
+
+    }
+
+    private static void compareModifications(IdentificationParameters inferredParameters, IdentificationParameters webServiceParameters) {
+        LOGGER.info("Comparing modifications...");
+        ArrayList<String> allInferredPTM = inferredParameters.getSearchParameters().getPtmSettings().getAllModifications();
+        ArrayList<String> annotatedPTM = webServiceParameters.getSearchParameters().getPtmSettings().getAllModifications();
+        for (String aPTM : annotatedPTM) {
+            if (!allInferredPTM.contains(aPTM)) {
+                PTM exclusiveMod = webServiceParameters.getSearchParameters().getPtmSettings().getPtm(aPTM);
+                inferredParameters.getSearchParameters().getPtmSettings().addVariableModification(exclusiveMod);
+                LOGGER.info(aPTM + " was annotated but not inferred...");
+            }
+        }
+    }
+
+    private static void compareMassAccuracies(IdentificationParameters inferredParameters, IdentificationParameters webServiceParameters) {
+        LOGGER.info("Comparing mass accuraccies");
+        double inferredPrecAcc = inferredParameters.getSearchParameters().getPrecursorAccuracyDalton();
+        double annotatedPrecAcc = webServiceParameters.getSearchParameters().getPrecursorAccuracyDalton();
+        double inferredFragAcc = inferredParameters.getSearchParameters().getFragmentIonAccuracy();
+        double annotatedFragAcc = webServiceParameters.getSearchParameters().getFragmentIonAccuracy();
+
+        if (annotatedPrecAcc < inferredPrecAcc || annotatedFragAcc < inferredFragAcc) {
+            inferredParameters.getSearchParameters().setPrecursorAccuracyDalton(annotatedPrecAcc);
+            inferredParameters.getSearchParameters().setFragmentIonAccuracy(annotatedFragAcc);
+            LOGGER.info("The annotated machine has a higher accuraccy : ");
+            LOGGER.info(inferredPrecAcc + "-->" + annotatedPrecAcc + " precursor acc (Da)");
+            LOGGER.info(inferredFragAcc + "-->" + annotatedFragAcc + " fragment acc (Da)");
+        }
+
+    }
+
+    private static void compareEnzyme(IdentificationParameters inferredParameters, IdentificationParameters webServiceParameters) {
+        //This is pointless, we are inferring this through the sequences which are identical  between the file and the webservice
+        //@TODO implement this at a later time
     }
 
 }
