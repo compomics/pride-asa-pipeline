@@ -121,6 +121,7 @@ public class WebServiceParameterInference {
                 for (Enzyme enzyme : digestionPreferences.getEnzymes()) {
                     digestionPreferences.setSpecificity(enzyme.getName(), DigestionPreferences.Specificity.specific);
                 }
+                //these are bugs introduced with new utilities
                 /*            digestionPreferences.getXTandemFormat();
                         //debug mods
             PTMFactory.getInstance().loadBackedUpModifications(param, true);*/
