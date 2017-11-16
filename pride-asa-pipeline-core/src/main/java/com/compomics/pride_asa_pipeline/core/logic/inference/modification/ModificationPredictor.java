@@ -6,6 +6,7 @@ import com.compomics.pride_asa_pipeline.model.modification.impl.UtilitiesPTMAdap
 import com.compomics.pride_asa_pipeline.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
+import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;

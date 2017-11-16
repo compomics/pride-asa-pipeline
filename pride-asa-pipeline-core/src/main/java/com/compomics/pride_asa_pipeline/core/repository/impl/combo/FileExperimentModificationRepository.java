@@ -5,6 +5,7 @@ import com.compomics.pride_asa_pipeline.model.modification.impl.AsapModification
 import com.compomics.pride_asa_pipeline.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
+import com.compomics.pride_asa_pipeline.core.util.IdentificationQueue;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
@@ -34,7 +35,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
     /**
      * The identifier for the current repository (filename or assay accession)
      */
-    private String experimentIdentifier;
+    protected String experimentIdentifier;
     /**
      * A logger instance
      */
@@ -42,31 +43,31 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
     /**
      * The modification adapter to return pride asap modificaitons
      */
-    private final AsapModificationAdapter adapter = new AsapModificationAdapter();
+    protected final AsapModificationAdapter adapter = new AsapModificationAdapter();
     /**
      * The UniMod modification factory for all modifications used in PRIDE
      */
-    private final PRIDEModificationFactory modFactory = PRIDEModificationFactory.getInstance();
+    protected final PRIDEModificationFactory modFactory = PRIDEModificationFactory.getInstance();
     /**
      * In memory list of mod occurences
      */
-    private final HashMap<uk.ac.ebi.pride.utilities.data.core.Modification, Integer> modMapping = new HashMap<>();
+    protected final HashMap<uk.ac.ebi.pride.utilities.data.core.Modification, Integer> modMapping = new HashMap<>();
     /**
      * boolean indicating experiments have been loaded before
      */
-    private boolean experimentLoaded = false;
+    protected boolean experimentLoaded = false;
     //make a singleton to fix multi passing
 
     public static FileExperimentModificationRepository INSTANCE = new FileExperimentModificationRepository();
-
+    
     private List<Identification> identifications = new ArrayList<>();
-
+    
     public static FileExperimentModificationRepository getInstance() {
         return INSTANCE;
     }
-
+    
     protected FileExperimentModificationRepository() {
-
+        
     }
 
     /*private FileExperimentModificationRepository(String experimentIdentifier) {
@@ -75,11 +76,12 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
     @Override
     public List<Identification> loadExperimentIdentifications(String experimentAccession) {
         if (!isExperimentLoaded(experimentAccession)) {
-            LOGGER.info("Setting "+experimentAccession+" as the active project");
+            LOGGER.info("Setting " + experimentAccession + " as the active project");
             setExperimentIdentifier(experimentAccession);
             identifications.clear();
             try {
                 CachedDataAccessController parser = parserCache.getParser(experimentAccession, false);
+                
                 //get all the peptide ids for the proteins
                 long proteinCount = parser.getProteinIds().size();
                 double completeRatio = 0.0;
@@ -114,7 +116,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
                                     String.valueOf(spectrumIdentification.getSpectrum().getId()),
                                     spectrumIdentification.getName());
                             identifications.add(identification);
-                        } catch (UnknownAAException  | NullPointerException ex) {
+                        } catch (UnknownAAException | NullPointerException ex) {
                             LOGGER.error(ex);
                         }
                         aPeptide = null;
@@ -132,7 +134,7 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
         experimentLoaded = true;
         return identifications;
     }
-
+    
     @Override
     public List<Modification> getModificationsByPeptideId(long peptideID) {
         List<Modification> modificationList = new ArrayList<>();
@@ -153,10 +155,10 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
         }
         return modificationList;
     }
-
+    
     @Override
     public List<Modification> getModificationsByExperimentId(String experimentId) {
-
+        
         List<Modification> modificationList = new ArrayList<>();
         if (!experimentLoaded) {
             loadExperimentIdentifications(experimentId);
@@ -177,46 +179,8 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
             }
         }
         return modificationList;
-
-
-        /*         if (modMapping.isEmpty()) {
-            try {
-                CachedDataAccessController parser = parserCache.getParser(experimentId, true);
-                for (Comparable proteinID : parser.getProteinIds()) {
-                    for (Comparable peptideID : parser.getPeptideIds(proteinID)) {
-                        List<uk.ac.ebi.pride.utilities.data.core.Modification> mods = parser.getPTMs(proteinID, peptideID);
-                        for (uk.ac.ebi.pride.utilities.data.core.Modification aMod : mods) {
-                            if (aMod != null && aMod.getName() != null) {
-                                Object modification = null;
-                                try {
-                                    modification = modFactory.getModification(adapter, aMod.getName());
-                                } catch (ParameterExtractionException ex) {
-                                    LOGGER.error("Could not load " + aMod.getName() + " .Reason :" + ex);
-                                }
-                                if (modification != null) {
-                                    modificationList.add((Modification) modification);
-                                } else {
-                                    LOGGER.warn(aMod.getName() + " was not found in the modifications");
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (TimeoutException | InterruptedException | ExecutionException ex) {
-                LOGGER.error("The parser timed out before it could deliver all the modifications");
-            }
-        } else {
-            for (Map.Entry<Comparable, List<Modification>> aPeptide : modMapping.entrySet()) {
-                for (Modification mod : aPeptide.getValue()) {
-                    if (!modificationList.contains(mod)) {
-                        modificationList.add(mod);
-                    }
-                }
-            }
-        }
-                return modificationList;*/
     }
-
+    
     public void setExperimentIdentifier(String assay) {
         if (experimentIdentifier != assay) {
             experimentLoaded = false;
@@ -224,9 +188,9 @@ public class FileExperimentModificationRepository extends FileExperimentReposito
             INSTANCE = this;
         }
     }
-
+    
     public boolean isExperimentLoaded(String assay) {
         return assay == this.experimentIdentifier && experimentLoaded;
     }
-
+    
 }

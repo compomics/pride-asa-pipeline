@@ -6,7 +6,6 @@ import com.compomics.pride_asa_pipeline.core.logic.inference.enzyme.EnzymePredic
 import com.compomics.pride_asa_pipeline.core.util.MassShiftCalculator;
 import com.compomics.pride_asa_pipeline.core.logic.inference.modification.ModificationPredictor;
 import com.compomics.pride_asa_pipeline.core.util.report.ExtractionReportGenerator;
-import com.compomics.pride_asa_pipeline.core.util.report.impl.ContaminationReportGenerator;
 import com.compomics.pride_asa_pipeline.core.util.report.impl.EnzymeReportGenerator;
 import com.compomics.pride_asa_pipeline.core.util.report.impl.ModificationReportGenerator;
 import com.compomics.pride_asa_pipeline.core.util.report.impl.TotalReportGenerator;
@@ -15,9 +14,7 @@ import com.compomics.pride_asa_pipeline.model.modification.impl.UtilitiesPTMAdap
 import com.compomics.pride_asa_pipeline.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.impl.FileResultHandlerImpl3;
 import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
-import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
-import com.compomics.pride_asa_pipeline.core.service.impl.DbModificationServiceImpl;
 import com.compomics.pride_asa_pipeline.core.service.impl.DbSpectrumServiceImpl;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;

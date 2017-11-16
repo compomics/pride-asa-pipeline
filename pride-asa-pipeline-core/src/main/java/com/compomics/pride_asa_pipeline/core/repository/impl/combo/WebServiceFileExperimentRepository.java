@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import org.apache.log4j.Logger;
+import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileSource;
 import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileType;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
@@ -34,10 +35,11 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
     private File tempFolder;
 
     /**
-     * List with allowed peakfiles (other ones do not have a parseer in ms-data-core api)
+     * List with allowed peakfiles (other ones do not have a parseer in
+     * ms-data-core api)
      */
-    private List<String> extensions = new ArrayList<>(Arrays.asList("mzxml", "mzml","mgf","dta","pkl","ms2"));
-    
+    private List<String> extensions = new ArrayList<>(Arrays.asList("mzxml", "mzml", "mgf", "dta", "pkl", "ms2"));
+
     /**
      * Creates a new File experiment repository
      */
@@ -69,7 +71,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
         List<File> identFiles = getAssayFiles(assay, ProjectFileType.RESULT);
         if (!identFiles.isEmpty()) {
             for (File identFile : identFiles) {
-                if (!identFile.getName().toLowerCase().endsWith(".xml") & !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
+                if (!identFile.getName().toLowerCase().endsWith(".xml") && !identFile.getName().toLowerCase().endsWith(".xml.gz")) {
                     List<File> peakFiles = new ArrayList<>();
                     //@ToDo check why mzid is considered a peakfile here?
                     for (File aFile : getAssayFiles(assay, ProjectFileType.PEAK)) {
@@ -78,7 +80,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
                             peakFiles.add(aFile);
                         }
                     }
-                    if(peakFiles.isEmpty()){
+                    if (peakFiles.isEmpty()) {
                         throw new Exception("There are no spectrum files for this mzid !!!");
                     }
                     super.addMzID(assay, identFile, peakFiles);
@@ -153,24 +155,25 @@ public class WebServiceFileExperimentRepository extends FileExperimentModificati
         FileDetailList assayFileDetails = PrideWebService.getAssayFileDetails(experimentAccession);
         //try to find existing result files online
         for (FileDetail assayFile : assayFileDetails.getList()) {
-            //skip raw files for now?
-            if (!assayFile.getFileName().endsWith(".raw")) {
+            LOGGER.info("Ignoring PRIDE - GENERATED filesources");
+            //skip raw files and generated files for now?
+            if (!assayFile.getFileName().endsWith(".raw") && !assayFile.getFileName().toLowerCase().contains(".pride.mgf")) {
                 if (assayFile.getFileType().equals(type)) {
                     assayFiles.add(downloadFile(assayFile));
+                    //AVOID GENERATED FILES FOR NOW
                 } else if (type.equals(ProjectFileType.PEAK)) {
-                    //   if (assayFile.getFileName().contains(".dat")) {
                     //FILTER OUT UNSUPPORTED PEAKFILES
-                    String extension = assayFile.getFileName().replace(".gz","").replace(".zip","");
-                    extension = extension.substring(extension.lastIndexOf(".")+1).toLowerCase();
-                    if(extensions.contains(extension)){
-                    assayFiles.add(downloadFile(assayFile));
-                    }else{
-                     LOGGER.info(assayFile.getFileName()+" has an unsupported file type : "+extension);  
+                    String extension = assayFile.getFileName().replace(".gz", "").replace(".zip", "");
+                    extension = extension.substring(extension.lastIndexOf(".") + 1).toLowerCase();
+                    if (extensions.contains(extension)) {
+                        assayFiles.add(downloadFile(assayFile));
+                    } else {
+                        LOGGER.info(assayFile.getFileName() + " has an unsupported file type : " + extension);
                     }//   }
                 }
             } else {
-                LOGGER.info("Skipping RAW files [might change in future update]");
-            }
+                LOGGER.info("Skipping RAW and pride generated files [might change in future update]");
+            } 
         }
         LOGGER.info("Download for " + experimentAccession + " completed");
         return assayFiles;

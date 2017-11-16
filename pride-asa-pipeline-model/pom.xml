@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>pride-asa-pipeline-model</artifactId>
-    <version>1.7.3-SNAPSHOT</version>
+    <version>1.7.4.faster</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>com.compomics.pride-asa-pipeline</groupId>
         <artifactId>pride-asa-pipeline</artifactId>
-        <version>1.7.3-SNAPSHOT</version>
+        <version>1.7.4.faster</version>
     </parent>
 
     <name>pride-asa-pipeline-model</name>   
@@ -426,12 +426,7 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
         </dependency>
-        
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>utilities</artifactId>
-        </dependency>
-        
+                
         <!--        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
@@ -512,6 +507,12 @@
             <groupId>uk.ac.ebi.pride.tools</groupId>
             <artifactId>pride-mod</artifactId>
             <version>2.0.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>utilities</artifactId>
+            <version>4.11.17</version>
             <type>jar</type>
         </dependency>
     </dependencies>

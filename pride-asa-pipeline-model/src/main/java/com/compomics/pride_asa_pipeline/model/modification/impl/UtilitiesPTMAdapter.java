@@ -1,6 +1,5 @@
 package com.compomics.pride_asa_pipeline.model.modification.impl;
 
-
 import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.model.modification.PRIDEModification;
@@ -32,7 +31,7 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
     /**
      * the targeted residues as a string
      */
-    private String targetResiduesString;
+    private ArrayList<String> targetResiduesString;
     /**
      * the atom chain for masses that contribute to the total mass
      */
@@ -113,7 +112,6 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
     public PTM convertModification(PRIDEModification mod) throws ParameterExtractionException {
         increaseMassChain = new AtomChain();
         decreaseMassChain = new AtomChain();
-        decreaseMassChain.setAddition(false);
         LOGGER.debug("Getting target residues");
         fetchTargetResidues(mod);
         LOGGER.debug("Parsing PTM composition");
@@ -139,18 +137,18 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
 
     private void fetchTargetResidues(uk.ac.ebi.pridemod.model.PTM ptm) {
         HashSet<AminoAcid> targetResidues = new HashSet<>();
-        StringBuilder targetResiduesStringBuilder = new StringBuilder();
+        ArrayList<String> targetResiduesStringBuilder = new ArrayList<>();
         for (Specificity specificity : ptm.getSpecificityCollection()) {
             if (specificity != null) {
                 if (specificity.getName() != null) {
                     if (!specificity.getName().equals(AminoAcid.NONE) && !targetResidues.contains(specificity.getName())) {
                         targetResidues.add(specificity.getName());
-                        targetResiduesStringBuilder.append(specificity.getName());
+                        targetResiduesStringBuilder.add(specificity.getName().toString());
                     }
                 }
             }
         }
-        this.targetResiduesString = targetResiduesStringBuilder.toString();
+        this.targetResiduesString = targetResiduesStringBuilder;
     }
 
     private int getModType(uk.ac.ebi.pridemod.model.PTM ptm) {

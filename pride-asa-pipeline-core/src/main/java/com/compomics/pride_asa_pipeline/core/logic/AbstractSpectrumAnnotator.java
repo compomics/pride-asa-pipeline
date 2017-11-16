@@ -11,7 +11,6 @@ import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrati
 import com.compomics.pride_asa_pipeline.core.logic.recalibration.MassRecalibrator;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.match.SpectrumMatcher;
 import com.compomics.pride_asa_pipeline.model.modification.impl.AsapModificationAdapter;
-import com.compomics.pride_asa_pipeline.model.modification.source.AnnotatedModificationService;
 import com.compomics.pride_asa_pipeline.model.modification.source.PRIDEModificationFactory;
 import com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
@@ -45,6 +44,11 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
@@ -94,6 +98,11 @@ public abstract class AbstractSpectrumAnnotator<T> {
     protected SpectrumService spectrumService;
     protected PipelineModificationService pipelineModificationService;
     protected ModificationService modificationService;
+
+    /**
+     * Timeout
+     */
+    protected AnnotationTimer annotationTimer;
 
     /**
      * The maximal size a single pass can have
@@ -248,18 +257,39 @@ public abstract class AbstractSpectrumAnnotator<T> {
         List<Identification> identificationsToProcess = new ArrayList<>(completeIdentifications);
         HashMap<Modification, Double> totalModificationRates = new HashMap<>();
         //if there was annotations for modifications, we want to use these...
-        if(assayHasAnnotation){
+        if (assayHasAnnotation) {
             LOGGER.info("Using annotated modifications...");
             annotateUsingKnownMods(consideredMods, completeIdentifications, identificationsToProcess, totalModificationRates);
-        }else{
+        } else {
             LOGGER.info("No modifications annotated...Inferring from mass difference");
-            annotateUsingMassInference(consideredMods, completeIdentifications, identificationsToProcess, totalModificationRates);
+            Thread annotationThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        annotateUsingMassInference(consideredMods, completeIdentifications, identificationsToProcess, totalModificationRates);
+                    } catch (IOException | ParameterExtractionException ex) {
+                        LOGGER.error(ex);
+                    }
+                }
+            });
+            AnnotationTimer timer = new AnnotationTimer(annotationThread);
+            timer.start();
+            while (!timer.cancel & !timer.timedOut) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    //ignore for now
+                }
+            }
+            if(timer.timedOut){
+                LOGGER.error("The modification annotation has timed out.");
+            }
         }
     }
 
-    private void annotateUsingKnownMods(Set<Modification> consideredMods, List<Identification> completeIdentifications, List<Identification> identificationsToProcess, HashMap<Modification, Double> totalModificationRates) {
-        if(modificationHolder==null){
-            modificationHolder=new ModificationHolder();
+    public void annotateUsingKnownMods(Set<Modification> consideredMods, List<Identification> completeIdentifications, List<Identification> identificationsToProcess, HashMap<Modification, Double> totalModificationRates) {
+        if (modificationHolder == null) {
+            modificationHolder = new ModificationHolder();
         }
         modificationHolder.addModifications(consideredMods);
         annotate(modificationHolder, completeIdentifications, identificationsToProcess, spectrumAnnotatorResult);
@@ -281,20 +311,10 @@ public abstract class AbstractSpectrumAnnotator<T> {
      * com.compomics.pride_asa_pipeline.model.ParameterExtractionException
      */
     public void annotateUsingMassInference(Set<Modification> consideredMods, List<Identification> completeIdentifications, List<Identification> identificationsToProcess, HashMap<Modification, Double> totalModificationRates) throws IOException, ParameterExtractionException {
+
         Set<Modification> nextModificationSet;
 
-        //sample?
-        int sampleSize = 1000;
-        if (identificationsToProcess.size() > sampleSize) {
-            LOGGER.info("Too many identifications to process, sampling " + sampleSize + " identifications");
-            Random rand = new Random();
-            identificationsToProcess.clear();
-            for (int i = 0; i < sampleSize; i++) {
-                identificationsToProcess.add(completeIdentifications.get(rand.nextInt(completeIdentifications.size())));
-            }
-        }
-
-        int totalSize = completeIdentifications.size();
+        int totalSize = identificationsToProcess.size();
         int totalExplained = 0;
         int pass = 1;
         double explanationRatio = 0.0;
@@ -346,7 +366,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
 
     }
 
-    private void mergeAnnotatorResults(SpectrumAnnotatorResult first, SpectrumAnnotatorResult second) {
+    protected void mergeAnnotatorResults(SpectrumAnnotatorResult first, SpectrumAnnotatorResult second) {
         for (Identification ident : second.getIdentifications()) {
             first.addIdentification(ident);
         }
@@ -376,7 +396,7 @@ public abstract class AbstractSpectrumAnnotator<T> {
         LinkedHashSet<Modification> sortedAnnotatedModifications = new LinkedHashSet<>();
         //load the modifications from the PRIDE annotation
         //if there is no file in the parsercache, use the webservice to get the modifications 
-        modRepository = FileExperimentModificationRepository.getInstance();
+        modRepository = FileExperimentModificationRepository.getInstance().getInstance();
         if (modRepository.isExperimentLoaded(assayAccession)) {
             LOGGER.debug("Using cached modifications");
             sortedAnnotatedModifications.addAll(modRepository.getModificationsByExperimentId(assayAccession));
