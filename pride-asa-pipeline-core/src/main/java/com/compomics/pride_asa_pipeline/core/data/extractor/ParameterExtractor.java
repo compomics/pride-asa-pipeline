@@ -97,6 +97,54 @@ public class ParameterExtractor {
      * @param assay the assay to extract
      * @param analyzerData the type of instrument used when not available through the webservice
      * @param modRepository an existing modification repository (mainly used to avoid reparsing of the file)
+     * @param considerPRIDEOnly indicating to only consider modifications as annotated in the PRIDE repository
+     * @throws ParameterExtractionException when an error occurs
+     */
+    public ParameterExtractor(String assay,AnalyzerData analyzerData,FileExperimentModificationRepository modRepository,boolean considerPRIDEOnly) throws ParameterExtractionException {
+            //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
+            ApplicationContextProvider.getInstance().setDefaultApplicationContext();
+            spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
+            spectrumAnnotator.setModificationRepository(modRepository);
+            this.analyzerData=analyzerData;
+            init(assay,considerPRIDEOnly);
+    }
+    
+       /**
+     * An extractor for parameters
+     *
+     * @param assay the assay to extract
+     * @param analyzerData the type of instrument used when not available through the webservice
+     * @param considerPRIDEOnly indicating to only consider modifications as annotated in the PRIDE repository
+     * @throws ParameterExtractionException when an error occurs
+     */
+    public ParameterExtractor(String assay,AnalyzerData analyzerData,boolean considerPRIDEOnly) throws ParameterExtractionException {
+            //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
+            ApplicationContextProvider.getInstance().setDefaultApplicationContext();
+            spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
+            this.analyzerData=analyzerData;
+            init(assay,considerPRIDEOnly);
+    }
+    /**
+     * An extractor for parameters
+     *
+     * @param assay the assay to extract
+     * @param considerPRIDEOnly indicating to only consider modifications as annotated in the PRIDE repository
+     * @throws ParameterExtractionException when an error occurs
+     */
+    public ParameterExtractor(String assay,boolean considerPRIDEOnly) throws ParameterExtractionException {
+              //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
+            ApplicationContextProvider.getInstance().setDefaultApplicationContext();
+            spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
+            init(assay,considerPRIDEOnly);    
+    }
+
+    
+              /**
+     * An extractor for parameters
+     *
+     * @param assay the assay to extract
+     * @param analyzerData the type of instrument used when not available through the webservice
+     * @param modRepository an existing modification repository (mainly used to avoid reparsing of the file)
      * @throws ParameterExtractionException when an error occurs
      */
     public ParameterExtractor(String assay,AnalyzerData analyzerData,FileExperimentModificationRepository modRepository) throws ParameterExtractionException {
@@ -105,7 +153,7 @@ public class ParameterExtractor {
             spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
             spectrumAnnotator.setModificationRepository(modRepository);
             this.analyzerData=analyzerData;
-            init(assay);
+            init(assay,false);
     }
     
        /**
@@ -120,7 +168,7 @@ public class ParameterExtractor {
             ApplicationContextProvider.getInstance().setDefaultApplicationContext();
             spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
             this.analyzerData=analyzerData;
-            init(assay);
+            init(assay,false);
     }
     /**
      * An extractor for parameters
@@ -132,10 +180,13 @@ public class ParameterExtractor {
               //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
             ApplicationContextProvider.getInstance().setDefaultApplicationContext();
             spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
-            init(assay);    
+            init(assay,false);    
     }
-
-    private void init(String assay) throws ParameterExtractionException {
+    
+    
+    
+    
+    private void init(String assay, boolean prideModsOnly) throws ParameterExtractionException {
    //construct a parameter object
            
                 SearchParameters searchParam = new SearchParameters();        
