@@ -237,7 +237,7 @@ public class ParameterExtractor {
 
                 //--------------------------------
                 // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
-                modificationPredictor = new ModificationPredictor(assay, spectrumAnnotator.getModificationHolder(),spectrumAnnotator.getModRepository());
+                modificationPredictor = new ModificationPredictor(assay, spectrumAnnotator.getModificationHolder(),spectrumAnnotator.getModRepository(),prideModsOnly);
 
                 //--------------------------------
                

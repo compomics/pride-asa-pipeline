@@ -64,10 +64,10 @@ public class FileParameterExtractor {
         //add a logger specific to this file
     }
 
-    private SearchParameters inferParameters(String assay) throws ParameterExtractionException, IOException {
+    private SearchParameters inferParameters(String assay, boolean considerOnlyAnnotatedMods) throws ParameterExtractionException, IOException {
 
         LOGGER.info("Attempting to infer searchparameters");
-        ParameterExtractor extractor = new ParameterExtractor(assay, analyzerData, modificationRepository);
+        ParameterExtractor extractor = new ParameterExtractor(assay, analyzerData, modificationRepository, considerOnlyAnnotatedMods);
         //extractor.setExperimentRepository(experimentRepository);
         IdentificationParameters parameters = extractor.getParameters();
         extractor.printReports(outputFolder);
@@ -84,7 +84,7 @@ public class FileParameterExtractor {
         mgf.delete();
     }
 
-    public SearchParameters analyzePrideXML(File inputFile, String assay) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
+    public SearchParameters analyzePrideXML(File inputFile, String assay, boolean considerOnlyAnnotatedMods) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
         LOGGER.debug("Setting up experiment repository for assay " + assay);
         experimentRepository = FileExperimentModificationRepository.getInstance();
         experimentRepository.setExperimentIdentifier(assay);
@@ -94,22 +94,30 @@ public class FileParameterExtractor {
         spectrumRepository.setExperimentIdentifier(assay);
         modificationRepository.setExperimentIdentifier(assay);
         processSpectra();
-        return inferParameters(assay);
+        return inferParameters(assay, considerOnlyAnnotatedMods);
     }
 
-    public SearchParameters analyzeMzID(File inputFile, List<File> peakFiles, String assay) throws MGFExtractionException, ParameterExtractionException, IOException, TimeoutException, InterruptedException, ExecutionException {
+    public SearchParameters analyzePrideXML(File inputFile, String assay) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
+        return analyzePrideXML(inputFile, assay, false);
+    }
+
+    public SearchParameters analyzeMzID(File inputFile, List<File> peakFiles, String assay, boolean considerOnlyAnnotatedMods) throws MGFExtractionException, ParameterExtractionException, IOException, TimeoutException, InterruptedException, ExecutionException {
         LOGGER.debug("Setting up experiment repository for assay " + assay);
         experimentRepository = FileExperimentModificationRepository.getInstance();
         experimentRepository.setExperimentIdentifier(assay);
         modificationRepository = experimentRepository;
-        if(peakFiles.isEmpty()){
+        if (peakFiles.isEmpty()) {
             throw new ParameterExtractionException("There are no compatible spectrum files for this assay !!!!");
         }
         experimentRepository.addMzID(assay, inputFile, peakFiles);
         spectrumRepository.setExperimentIdentifier(assay);
         modificationRepository.setExperimentIdentifier(assay);
         processSpectra();
-        return inferParameters(assay);
+        return inferParameters(assay, considerOnlyAnnotatedMods);
+    }
+
+    public SearchParameters analyzeMzID(File inputFile, List<File> peakFiles, String assay) throws MGFExtractionException, ParameterExtractionException, IOException, TimeoutException, InterruptedException, ExecutionException {
+        return analyzeMzID(inputFile, peakFiles, assay, false);
     }
 
 }
