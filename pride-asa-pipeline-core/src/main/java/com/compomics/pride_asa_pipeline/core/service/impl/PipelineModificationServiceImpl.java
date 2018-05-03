@@ -18,6 +18,8 @@ package com.compomics.pride_asa_pipeline.core.service.impl;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.logic.modification.ModificationMarshaller;
 import com.compomics.pride_asa_pipeline.core.logic.modification.OmssaModificationMarshaller;
+import com.compomics.pride_asa_pipeline.core.logic.modification.impl.ModificationMarshallerImpl;
+import com.compomics.pride_asa_pipeline.core.logic.modification.impl.OmssaModificationMarshallerImpl;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.Collection;
@@ -82,7 +84,8 @@ public class PipelineModificationServiceImpl implements PipelineModificationServ
     }
 
     /**
-     * Load the modifications from file. The modification set will be initialized.
+     * Load the modifications from file. The modification set will be
+     * initialized.
      *
      * @param modificationsResource the modifications resource
      * @throws JDOMException thrown in case of a xml parse exception
@@ -91,9 +94,15 @@ public class PipelineModificationServiceImpl implements PipelineModificationServ
         pipelineModifications = new HashSet<>();
         switch (inputType) {
             case PRIDE_ASAP:
+                if (modificationMarshaller == null) {
+                    modificationMarshaller = new ModificationMarshallerImpl();
+                }
                 pipelineModifications.addAll(modificationMarshaller.unmarshall(modificationsResource));
                 break;
             case OMSSA:
+                if (omssaModificationMarshaller == null) {
+                    omssaModificationMarshaller = new OmssaModificationMarshallerImpl();
+                }
                 pipelineModifications.addAll(omssaModificationMarshaller.unmarshall(modificationsResource));
         }
     }

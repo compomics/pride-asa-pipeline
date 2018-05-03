@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.compomics.pride-asa-pipeline</groupId>
     <artifactId>pride-asa-pipeline</artifactId>
-    <version>1.7.3-SNAPSHOT</version>
+    <version>2.0.0-beta-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>pride-asa-pipeline-model</module>
@@ -184,7 +184,7 @@
             <dependency>
                 <groupId>com.compomics.pride-asa-pipeline</groupId>
                 <artifactId>pride-asa-pipeline-model</artifactId>
-                <version>1.7.3-SNAPSHOT</version>
+                <version>2.0.0-beta-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -230,11 +230,11 @@
                 <version>1.4</version>
             </dependency>
 
-            <dependency>
+           <!-- <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.18</version>
-            </dependency>
+            </dependency>-->
 
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -348,12 +348,6 @@
                 <groupId>no.uib</groupId>
                 <artifactId>ols-dialog</artifactId>
                 <version>3.4.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.compomics</groupId>
-                <artifactId>RespinDataExtractor</artifactId>
-                <version>0.0.2</version>
             </dependency>
 
         </dependencies>

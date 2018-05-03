@@ -119,7 +119,7 @@ public class ModificationPredictor {
                 if (isQuantMod && modificationRate < (fixedThreshold)) {
                     LOGGER.error(amodName + " is a quant mod, but was not fixed !");
                 } else {
-                    LOGGER.info(amodName + "\t" + modificationRate);
+             //       LOGGER.info(amodName + "\t" + modificationRate);
                     asapMods.put(amodName, (modificationRate >= fixedThreshold));
                 }
             }
@@ -144,7 +144,7 @@ public class ModificationPredictor {
                     LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
                 }
             } else {
-                LOGGER.info(aMod.getKey() + " was found in the default PTMs");
+      //          LOGGER.info(aMod.getKey() + " was found in the default PTMs");
             }
         }
     }

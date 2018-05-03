@@ -20,6 +20,7 @@ import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.repository.FileResultHandler;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
+import com.compomics.pride_asa_pipeline.core.service.impl.PipelineModificationServiceImpl;
 import com.compomics.pride_asa_pipeline.core.util.MathUtils;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.*;
@@ -356,6 +357,9 @@ public class FileResultHandlerImpl implements FileResultHandler {
      */
     private void loadModifications() {
         modifications = new HashMap<>();
+        if(modificationService==null){
+            modificationService=new PipelineModificationServiceImpl();
+        }
         try {
             for (Modification modification : modificationService.loadPipelineModifications(ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file")), InputType.PRIDE_ASAP)) {
                 modifications.put(modification.getName(), modification);

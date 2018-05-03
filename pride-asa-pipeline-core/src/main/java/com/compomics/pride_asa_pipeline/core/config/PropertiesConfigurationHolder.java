@@ -15,6 +15,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.config;
 
+import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import java.io.IOException;
 import org.apache.commons.configuration.ConfigurationException;
@@ -29,16 +30,14 @@ import org.springframework.core.io.Resource;
 public class PropertiesConfigurationHolder extends PropertiesConfiguration {
 
     private static final Logger LOGGER = Logger.getLogger(PropertiesConfigurationHolder.class);
-    private static PropertiesConfigurationHolder ourInstance;
+    private static PropertiesConfigurationHolder INSTANCE;
 
     static {
         try {
+//                    ApplicationContextProvider.getInstance().setDefaultApplicationContext();
             Resource propertiesResource = ResourceUtils.getResourceByRelativePath("resources/pride-asa-pipeline-core.properties");
-            ourInstance = new PropertiesConfigurationHolder(propertiesResource);
-            
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ConfigurationException e) {
+            INSTANCE = new PropertiesConfigurationHolder(propertiesResource);          
+        } catch (IOException | ConfigurationException e) {
             LOGGER.error(e.getMessage(), e);
         }
     }
@@ -49,7 +48,7 @@ public class PropertiesConfigurationHolder extends PropertiesConfiguration {
      * @return the PropertiesConfigurationHolder instance
      */
     public static PropertiesConfigurationHolder getInstance() {
-        return ourInstance;
+        return INSTANCE;
     }
 
     private PropertiesConfigurationHolder(Resource propertiesResource) throws ConfigurationException, IOException {

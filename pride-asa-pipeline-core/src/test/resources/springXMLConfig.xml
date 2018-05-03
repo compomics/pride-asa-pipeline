@@ -7,8 +7,8 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>${property_file.source}:resources/pride-asa-pipeline-core.properties
-                </value>
+                <value>classpath:resources/pride-asa-pipeline-core.properties</value>
+           <!--  <value>classpath:resources/pride-asa-pipeline-core.properties</value>-->
             </list>
         </property>
         <property name="ignoreUnresolvablePlaceholders">
@@ -32,17 +32,6 @@
         <property name="massRecalibrator" ref="massRecalibrator"/>
         <property name="spectrumMatcher" ref="spectrumMatcher"/>
         <property name="peptideVariationsGenerator" ref="peptideVariationsGenerator"/>
-    </bean>
-
-
-    <!-- transaction beans -->
-    <bean id="prideDataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="${db.driver}"/>
-        <property name="url" value="${db.url}"/>
-        <property name="username" value="${db.username}"/>
-        <property name="password" value="${db.password}"/>
-        <property name="initialSize" value="${db.initial_pool_size}"/>
-        <property name="maxActive" value="${db.max_pool_size}"/>
     </bean>
 
     <!-- service beans -->
