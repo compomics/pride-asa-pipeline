@@ -116,6 +116,10 @@ public class ModificationConfigDialog extends javax.swing.JDialog {
         return modTypeComboBox;
     }        
 
+    public JComboBox getPrideModsComboBox(){
+        return modPRIDE;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -155,6 +159,8 @@ public class ModificationConfigDialog extends javax.swing.JDialog {
         bindingLoggingLabel = new javax.swing.JLabel();
         modTypeComboBox = new javax.swing.JComboBox();
         modTypeLabel = new javax.swing.JLabel();
+        modPRIDE = new javax.swing.JComboBox<>();
+        modPrideImportLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Modifications Configuration");
@@ -303,6 +309,10 @@ public class ModificationConfigDialog extends javax.swing.JDialog {
 
         modTypeLabel.setText("Type");
 
+        modPRIDE.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        modPrideImportLabel.setText("Import PRIDE modification");
+
         javax.swing.GroupLayout editModificationPanelLayout = new javax.swing.GroupLayout(editModificationPanel);
         editModificationPanel.setLayout(editModificationPanelLayout);
         editModificationPanelLayout.setHorizontalGroup(
@@ -317,7 +327,8 @@ public class ModificationConfigDialog extends javax.swing.JDialog {
                     .addComponent(affectedAminoAcidsLabel)
                     .addComponent(modNameLabel)
                     .addComponent(modMonoIsotopicMassShiftLabel)
-                    .addComponent(modTypeLabel))
+                    .addComponent(modTypeLabel)
+                    .addComponent(modPrideImportLabel))
                 .addGap(26, 26, 26)
                 .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, editModificationPanelLayout.createSequentialGroup()
@@ -328,23 +339,27 @@ public class ModificationConfigDialog extends javax.swing.JDialog {
                             .addComponent(removeAminoAcidButton, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(modAccessionTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
-                    .addComponent(modNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
+                    .addComponent(modAccessionTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
+                    .addComponent(modNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
                     .addComponent(bindingLoggingLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(editModificationPanelLayout.createSequentialGroup()
                         .addGap(1, 1, 1)
                         .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(modTypeComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(modAccessionValueTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
-                            .addComponent(modMonoIsotopicMassShiftTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
-                            .addComponent(modAverageMassShiftTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
-                            .addComponent(modLocationComboBox, 0, 581, Short.MAX_VALUE))))
+                            .addComponent(modAccessionValueTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 570, Short.MAX_VALUE)
+                            .addComponent(modMonoIsotopicMassShiftTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 570, Short.MAX_VALUE)
+                            .addComponent(modAverageMassShiftTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 570, Short.MAX_VALUE)
+                            .addComponent(modLocationComboBox, 0, 570, Short.MAX_VALUE)))
+                    .addComponent(modPRIDE, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         editModificationPanelLayout.setVerticalGroup(
             editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(editModificationPanelLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(modPRIDE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(modPrideImportLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(bindingLoggingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -383,7 +398,7 @@ public class ModificationConfigDialog extends javax.swing.JDialog {
                             .addComponent(modTypeLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(editModificationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, editModificationPanelLayout.createSequentialGroup()
                                 .addComponent(affectedAminoAcidsLabel)
@@ -437,6 +452,8 @@ public class ModificationConfigDialog extends javax.swing.JDialog {
     private javax.swing.JTextField modMonoIsotopicMassShiftTextField;
     private javax.swing.JLabel modNameLabel;
     private javax.swing.JTextField modNameTextField;
+    private javax.swing.JComboBox<String> modPRIDE;
+    private javax.swing.JLabel modPrideImportLabel;
     private javax.swing.JComboBox modTypeComboBox;
     private javax.swing.JLabel modTypeLabel;
     private javax.swing.JTable modifcationsTable;

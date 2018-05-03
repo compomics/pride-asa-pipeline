@@ -42,6 +42,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.*;
 
@@ -136,6 +138,8 @@ public class ModificationsController {
         try {
             modificationsBindingList = ObservableCollections.observableList(getModificationsAsList(
                     modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP)));
+            //populate the combo box
+
         } catch (JDOMParseException ex) {
             LOGGER.error(ex.getMessage(), ex);
             mainController.showMessageDialog("Import Unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
@@ -227,6 +231,25 @@ public class ModificationsController {
         bindingGroup.bind();
 
         //add listeners
+        modificationsConfigDialog.getPrideModsComboBox().addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent event) {
+                if (event.getStateChange() == ItemEvent.SELECTED) {
+                    Modification selectedMod = (Modification) event.getItem();
+                    modificationsConfigDialog.getModNameTextField().setText(selectedMod.getName());
+                    modificationsConfigDialog.getModAccessionTextField().setText(selectedMod.getAccession());
+                    modificationsConfigDialog.getModAccessionValueTextField().setText(selectedMod.getAccessionValue());
+                    modificationsConfigDialog.getModMonoIsotopicMassShiftTextField().setText(String.valueOf(selectedMod.getMonoIsotopicMassShift()));
+                    modificationsConfigDialog.getModAverageMassShiftTextField().setText(String.valueOf(selectedMod.getAverageMassShift()));
+                    modificationsConfigDialog.getModLocationComboBox().setSelectedItem(selectedMod.getLocation());
+                    modificationsConfigDialog.getModTypeComboBox().setSelectedItem(selectedMod.getType());
+                    Set<AminoAcid> affectedAminoAcids = selectedMod.getAffectedAminoAcids();
+                    AminoAcid[] acids = new AminoAcid[affectedAminoAcids.size()];
+                    modificationsConfigDialog.getAffectedAminoAcidsList().setListData(selectedMod.getAffectedAminoAcids().toArray(acids));
+                }
+            }
+        });
+
         modificationsConfigDialog.getModifcationsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent lse) {
@@ -326,14 +349,13 @@ public class ModificationsController {
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     Resource modificationsImportResource = new FileSystemResource(modificationsConfigDialog.getFileChooser().getSelectedFile());
 
-                    //import modifications and refill the binding list
                     try {
                         Set<Modification> importedModifications = modificationService.importPipelineModifications(modificationsImportResource, InputType.PRIDE_ASAP);
 
                         modificationsBindingList.clear();
                         modificationsBindingList.addAll(importedModifications);
 
-                        //select first modification
+                        //select first modificatio
                         modificationsConfigDialog.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);
                     } catch (JDOMParseException ex) {
                         LOGGER.error(ex.getMessage(), ex);
@@ -377,7 +399,8 @@ public class ModificationsController {
     }
 
     /**
-     * Gets the amino acids as list. Arrays.asList(AminoAcid.values()) doesn't work with the binding.
+     * Gets the amino acids as list. Arrays.asList(AminoAcid.values()) doesn't
+     * work with the binding.
      *
      * @return the list of amino acids
      */
@@ -389,8 +412,9 @@ public class ModificationsController {
     }
 
     /**
-     * Changes the state of the removeAminoAcidButton (enable or disabled) depending on the size of the affected amino
-     * acids of the selected modification
+     * Changes the state of the removeAminoAcidButton (enable or disabled)
+     * depending on the size of the affected amino acids of the selected
+     * modification
      *
      * @param selectedModification the selected modification
      */
@@ -403,7 +427,8 @@ public class ModificationsController {
     }
 
     /**
-     * Converter class used for binding. In case of a NumberFormatException, the value of the bound field is set 0.0
+     * Converter class used for binding. In case of a NumberFormatException, the
+     * value of the bound field is set 0.0
      */
     private class DoubleConverter extends Converter<Double, String> {
 

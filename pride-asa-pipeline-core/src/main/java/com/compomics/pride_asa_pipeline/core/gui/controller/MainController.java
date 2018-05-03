@@ -20,6 +20,8 @@ import com.compomics.pride_asa_pipeline.core.gui.view.MainFrame;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.annotation.impl.SpectrumAnnotatorImpl;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.annotation.AbstractSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModificationFactory;
+import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.examples.BareBonesBrowserLaunch;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -124,6 +126,13 @@ public class MainController implements ActionListener {
         if (((JMenuItem) actionEvent.getSource()).getText().equalsIgnoreCase("Configuration")) {
             pipelineParamsController.getPipelineConfigDialog().setVisible(true);
         } else { // modification details
+                                //import modifications and refill the binding list
+                    JComboBox prideMods = modificationsController.getModificationsConfigDialog().getPrideModsComboBox();
+                    prideMods.removeAllItems();
+                    PRIDEModificationFactory.getInstance();
+                    for (Modification mod : PRIDEModificationFactory.getAsapMods()) {
+                        prideMods.addItem(mod);
+                    };
             modificationsController.getModificationsConfigDialog().setVisible(true);
         }
     }

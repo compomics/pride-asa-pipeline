@@ -209,7 +209,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="modAccessionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -220,6 +220,7 @@
                       <Component id="modNameLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="modMonoIsotopicMassShiftLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="modTypeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="modPrideImportLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -233,19 +234,20 @@
                           <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                           <Component id="jScrollPane2" max="32767" attributes="0"/>
                       </Group>
-                      <Component id="modAccessionTextField" alignment="0" pref="582" max="32767" attributes="0"/>
-                      <Component id="modNameTextField" alignment="0" pref="582" max="32767" attributes="0"/>
+                      <Component id="modAccessionTextField" alignment="0" pref="571" max="32767" attributes="0"/>
+                      <Component id="modNameTextField" alignment="0" pref="571" max="32767" attributes="0"/>
                       <Component id="bindingLoggingLabel" alignment="1" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="modTypeComboBox" alignment="1" max="32767" attributes="0"/>
-                              <Component id="modAccessionValueTextField" alignment="0" pref="581" max="32767" attributes="0"/>
-                              <Component id="modMonoIsotopicMassShiftTextField" alignment="0" pref="581" max="32767" attributes="0"/>
-                              <Component id="modAverageMassShiftTextField" alignment="0" pref="581" max="32767" attributes="0"/>
-                              <Component id="modLocationComboBox" alignment="0" pref="581" max="32767" attributes="0"/>
+                              <Component id="modAccessionValueTextField" alignment="0" pref="570" max="32767" attributes="0"/>
+                              <Component id="modMonoIsotopicMassShiftTextField" alignment="0" pref="570" max="32767" attributes="0"/>
+                              <Component id="modAverageMassShiftTextField" alignment="0" pref="570" max="32767" attributes="0"/>
+                              <Component id="modLocationComboBox" alignment="0" pref="570" max="32767" attributes="0"/>
                           </Group>
                       </Group>
+                      <Component id="modPRIDE" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -254,7 +256,11 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="modPRIDE" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="modPrideImportLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="bindingLoggingLabel" min="-2" pref="27" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -301,7 +307,7 @@
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane2" pref="121" max="32767" attributes="0"/>
+                              <Component id="jScrollPane2" pref="106" max="32767" attributes="0"/>
                               <Component id="jScrollPane3" max="32767" attributes="0"/>
                               <Group type="102" alignment="1" attributes="0">
                                   <Component id="affectedAminoAcidsLabel" min="-2" max="-2" attributes="0"/>
@@ -527,6 +533,26 @@
         <Component class="javax.swing.JLabel" name="modTypeLabel">
           <Properties>
             <Property name="text" type="java.lang.String" value="Type"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="modPRIDE">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="4">
+                <StringItem index="0" value="Item 1"/>
+                <StringItem index="1" value="Item 2"/>
+                <StringItem index="2" value="Item 3"/>
+                <StringItem index="3" value="Item 4"/>
+              </StringArray>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JLabel" name="modPrideImportLabel">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Import PRIDE modification"/>
           </Properties>
         </Component>
       </SubComponents>
