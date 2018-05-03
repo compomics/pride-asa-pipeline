@@ -1,4 +1,17 @@
-/*
+/* 
+ * Copyright 2018 compomics.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.compomics.pride_asa_pipeline.core.service;
 
@@ -27,7 +40,7 @@ public class ModificationServiceTest {
     @Autowired
     private ModificationMarshaller modificationMarshaller;
     @Autowired
-    private DbModificationService dbModificationService;
+    private DbModificationService modificationService;
 
     /**
      * Test the case where the PRIDE modifications are not conflicting.
@@ -45,7 +58,7 @@ public class ModificationServiceTest {
         ModificationHolder modificationHolder = new ModificationHolder();
         modificationHolder.addModifications(modifications);
 
-        Set<Modification> conflictingModifications = dbModificationService.filterModifications(modificationHolder, prideModifications);
+        Set<Modification> conflictingModifications = modificationService.filterModifications(modificationHolder, prideModifications);
 
         //none of the modifications should conflict
         assertTrue(conflictingModifications.isEmpty());
@@ -68,7 +81,7 @@ public class ModificationServiceTest {
         ModificationHolder modificationHolder = new ModificationHolder();
         modificationHolder.addModifications(modifications);
 
-        Set<Modification> conflictingModifications = dbModificationService.filterModifications(modificationHolder, prideModifications);
+        Set<Modification> conflictingModifications = modificationService.filterModifications(modificationHolder, prideModifications);
 
         //2 of the 3 PRIDE modifications should conflict
         assertEquals(2, conflictingModifications.size());
@@ -91,7 +104,7 @@ public class ModificationServiceTest {
         ModificationHolder modificationHolder = new ModificationHolder();
         modificationHolder.addModifications(modifications);
 
-        Set<Modification> conflictingModifications = dbModificationService.filterModifications(modificationHolder, prideModifications);
+        Set<Modification> conflictingModifications = modificationService.filterModifications(modificationHolder, prideModifications);
 
         //3 of the 5 PRIDE modifications should conflict
         assertEquals(3, conflictingModifications.size());

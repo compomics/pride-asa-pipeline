@@ -1,19 +1,39 @@
+/* 
+ * Copyright 2018 compomics.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.compomics.pride_asa_pipeline.core.gui.controller;
 
+import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.gui.view.IdentificationsFileSelectionPanel;
-import com.compomics.pride_asa_pipeline.core.gui.view.PrideSelectionPanel;
+import com.compomics.pride_asa_pipeline.core.gui.view.PrideWebserviceSelectionPanel;
 import com.compomics.pride_asa_pipeline.core.gui.view.ResultFileSelectionPanel;
-import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
+import com.compomics.pride_asa_pipeline.core.repository.impl.combo.WebServiceFileExperimentRepository;
+import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
+import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
 import com.compomics.pride_asa_pipeline.core.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.core.service.ResultHandler;
+import com.compomics.pride_asa_pipeline.core.service.impl.SpectrumServiceImpl;
+import com.compomics.pride_asa_pipeline.core.util.PrideWebserviceUtils;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.util.pride.PrideWebService;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -22,13 +42,14 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.io.File;
-import java.util.Map;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
+import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetailList;
 
 /**
  * @author Niels Hulstaert
@@ -45,7 +66,7 @@ public class ExperimentSelectionController {
     //hold reference to swingworker for cancelling purposes
     private SwingWorker<?, Void> currentSwingWorker;
     //view
-    private PrideSelectionPanel prideSelectionPanel;
+    private PrideWebserviceSelectionPanel prideSelectionPanel;
     private ResultFileSelectionPanel resultFileSelectionPanel;
     private IdentificationsFileSelectionPanel identificationsFileSelectionPanel;
     //parent controller
@@ -57,6 +78,7 @@ public class ExperimentSelectionController {
     //services
     private ExperimentService experimentService;
     private ResultHandler resultHandler;
+//
 
     public ExperimentService getExperimentService() {
         return experimentService;
@@ -82,7 +104,7 @@ public class ExperimentSelectionController {
         this.mainController = mainController;
     }
 
-    public PrideSelectionPanel getPrideSelectionPanel() {
+    public PrideWebserviceSelectionPanel getPrideSelectionPanel() {
         return prideSelectionPanel;
     }
 
@@ -153,45 +175,36 @@ public class ExperimentSelectionController {
     }
 
     private void initPrideSelectionPanel() {
-        prideSelectionPanel = new PrideSelectionPanel();
+        prideSelectionPanel = new PrideWebserviceSelectionPanel();
 
-        //fill combo box
-        updateComboBox(experimentService.findAllExperimentAccessions());
-
-        //disable taxonomy text field
-        prideSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.FALSE);
+        //add a listener to the project field
+        prideSelectionPanel.getProjectField().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //validate the format of the string ...
+                String accession = prideSelectionPanel.getProjectField().getText().toUpperCase();
+                if (PrideWebserviceUtils.ValidateAccession(accession)) {
+                    try {
+                        //populate the experiments...
+                        updateComboBox(accession);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(prideSelectionPanel,
+                                ex.getMessage(),
+                                "Error contacting PRIDE ws",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(prideSelectionPanel,
+                            "\"" + accession + "\" is not a valid PRIDE accession",
+                            "Error contacting PRIDE ws",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        }
+        );
 
         //init include pride modifications check box
         prideSelectionPanel.getIncludePrideModificationsCheckBox().setSelected(PropertiesConfigurationHolder.getInstance().getBoolean("spectrumannotator.include_pride_modifications"));
-
-        //add action listeners
-        prideSelectionPanel.getTaxonomyFilterCheckBox().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                if (prideSelectionPanel.getTaxonomyFilterCheckBox().isSelected()) {
-                    //enable taxonomy text field
-                    prideSelectionPanel.getTaxonomyTextField().setEnabled(true);
-                    filterExperimentAccessions();
-                } else {
-                    //disable taxonomy text field
-                    prideSelectionPanel.getTaxonomyTextField().setEnabled(Boolean.FALSE);
-                    //reset combo box                    
-                    updateComboBox(experimentService.findAllExperimentAccessions());
-                    taxonomyId = null;
-                }
-            }
-        });
-
-        prideSelectionPanel.getTaxonomyTextField().addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent fe) {
-            }
-
-            @Override
-            public void focusLost(FocusEvent fe) {
-                filterExperimentAccessions();
-            }
-        });
 
         prideSelectionPanel.getIncludePrideModificationsCheckBox().addActionListener(new ActionListener() {
             @Override
@@ -207,7 +220,7 @@ public class ExperimentSelectionController {
         prideSelectionPanel.getProcessButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainController.setCurrentSpectrumAnnotator(DbSpectrumAnnotator.class);
+                mainController.setCurrentSpectrumAnnotator(ControllerMode.WEBSERVICE);
                 //execute worker
                 InitIdentificationsWorker initIdentificationsWorker = new InitIdentificationsWorker();
                 currentSwingWorker = initIdentificationsWorker;
@@ -268,7 +281,7 @@ public class ExperimentSelectionController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (resultFileSelectionPanel.getFileChooser().getSelectedFile() != null) {
-                    mainController.setCurrentSpectrumAnnotator(DbSpectrumAnnotator.class);
+                    mainController.setCurrentSpectrumAnnotator(ControllerMode.WEBSERVICE);
                     ImportPipelineResultWorker importPipelineResultWorker = new ImportPipelineResultWorker();
                     importPipelineResultWorker.execute();
                 } else {
@@ -333,7 +346,7 @@ public class ExperimentSelectionController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (identificationsFileSelectionPanel.getFileChooser().getSelectedFile() != null) {
-                    mainController.setCurrentSpectrumAnnotator(FileSpectrumAnnotator.class);
+                    mainController.setCurrentSpectrumAnnotator(ControllerMode.FILE);
                     //execute worker
                     InitIdentificationsWorker initIdentificationsWorker = new InitIdentificationsWorker();
                     currentSwingWorker = initIdentificationsWorker;
@@ -356,42 +369,28 @@ public class ExperimentSelectionController {
         });
     }
 
-    private void filterExperimentAccessions() {
-        if (!prideSelectionPanel.getTaxonomyTextField().getText().isEmpty()) {
-            try {
-                Integer newTaxonomyId = Integer.parseInt(prideSelectionPanel.getTaxonomyTextField().getText());
-                if (!taxonomyId.equals(newTaxonomyId)) {
-                    taxonomyId = newTaxonomyId;
-                    updateComboBox(experimentService.findExperimentAccessionsByTaxonomy(taxonomyId));
-                }
-            } catch (NumberFormatException e) {
-                mainController.showMessageDialog("Format Error", "Please insert a correct taxonomy ID (e.g. Homo Sapiens ID: 9606)", JOptionPane.ERROR_MESSAGE);
-                prideSelectionPanel.getTaxonomyTextField().setText("");
-            }
-        }
-    }
-
-    private void updateComboBox(Map<String, String> experimentAccessions) {
+    public void updateComboBox(String projectAccession) throws IOException {
         //empty combo box
         prideSelectionPanel.getExperimentSelectionComboBox().removeAllItems();
-        //load experiment accessions and fill combo box        
-        for (String experimentAccession : experimentAccessions.keySet()) {
-            prideSelectionPanel.getExperimentSelectionComboBox().addItem(experimentAccession + EXPERIMENT_ACCESSION_SEPARATOR + " " + experimentAccessions.get(experimentAccession));
+        //load experiment accessions and fill combo box
+        AssayDetailList assayDetails = PrideWebService.getAssayDetails(projectAccession);
+        for (AssayDetail assay : assayDetails.getList()) {
+            prideSelectionPanel.getExperimentSelectionComboBox().addItem(assay.getAssayAccession() + EXPERIMENT_ACCESSION_SEPARATOR + " " + assay.getShortLabel());
         }
     }
 
     private String getExperimentAccesion() {
         String experimentAccession = null;
-        if (mainController.getCurrentSpectrumAnnotator() instanceof FileSpectrumAnnotator) {
+        if (mainController.getCurrentMode() == ControllerMode.FILE) {
             File identificationsFile = identificationsFileSelectionPanel.getFileChooser().getSelectedFile();
-            experimentAccession = identificationsFile.getName().substring(0, identificationsFile.getName().indexOf(".xml"));
+            experimentAccession = identificationsFile.getName();
         } else {
             if (prideSelectionPanel.getExperimentSelectionComboBox().getSelectedItem() != null) {
                 String comboBoxString = prideSelectionPanel.getExperimentSelectionComboBox().getSelectedItem().toString();
                 experimentAccession = comboBoxString.substring(0, comboBoxString.indexOf(EXPERIMENT_ACCESSION_SEPARATOR));
             }
         }
-
+        LOGGER.info(experimentAccession + " was selected");
         return experimentAccession;
     }
 
@@ -402,13 +401,41 @@ public class ExperimentSelectionController {
         protected Void doInBackground() throws Exception {
             //show progress bar
             pipelineProgressController.showProgressBar(NUMBER_OF_PRIDE_PROGRESS_STEPS, "Processing.");
-            if (mainController.getCurrentSpectrumAnnotator() instanceof FileSpectrumAnnotator) {
-                ((FileSpectrumAnnotator) mainController.getCurrentSpectrumAnnotator()).initIdentifications(identificationsFileSelectionPanel.getFileChooser().getSelectedFile());
+            if (mainController.getCurrentMode() == ControllerMode.FILE) {
+                prepareFileService(identificationsFileSelectionPanel.getFileChooser().getSelectedFile());
             } else {
-                ((DbSpectrumAnnotator) mainController.getCurrentSpectrumAnnotator()).initIdentifications(getExperimentAccesion());
+                prepareWebService(getExperimentAccesion());
             }
 
             return null;
+        }
+
+        private void prepareWebService(String experimentAccession) throws Exception {
+
+            //set up the repository to cache this experiment
+            LOGGER.info("Setting up experiment repository for assay " + experimentAccession);
+            WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository();
+            experimentRepository.addAssay(experimentAccession);
+            //the cache should only have one for now?
+            String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
+            LOGGER.info(entry + " was found in the parser cache");
+            mainController.getSpectrumAnnotator().initIdentifications(entry);
+        }
+
+        private void prepareFileService(File identifciationsFile, File... peakFiles) throws Exception {
+            LOGGER.info("Setting up experiment repository for assay " + identifciationsFile.getName());
+            FileExperimentRepository experimentRepository = new FileExperimentRepository();
+
+            if (identifciationsFile.getName().toLowerCase().endsWith(".xml") && peakFiles.length == 0) {
+                experimentRepository.addPrideXMLFile(identifciationsFile.getName(), identifciationsFile);
+            } else {
+                experimentRepository.addMzID(identifciationsFile.getName(), identifciationsFile, Arrays.asList(peakFiles));
+            }
+
+            //the cache should only have one for now?
+            String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
+            LOGGER.info(entry + " was found in the parser cache");
+            mainController.getSpectrumAnnotator().initIdentifications(entry);
         }
 
         @Override
@@ -495,15 +522,26 @@ public class ExperimentSelectionController {
 
         @Override
         protected Void doInBackground() throws Exception {
-            mainController.getCurrentSpectrumAnnotator().annotate();
+
+            //TODO DE FILESPECTRUM REPOSITORY IS THE ONLY ONE SO IT IS POINTLESS TO DO ALL THE CASTING
+            
             SpectrumAnnotatorResult spectrumAnnotatorResult = mainController.getCurrentSpectrumAnnotator().getSpectrumAnnotatorResult();
             boolean writeResultToFile;
-            if (mainController.getCurrentSpectrumAnnotator() instanceof FileSpectrumAnnotator) {
+            if (mainController.getCurrentMode() == ControllerMode.FILE) {
+                String assay = identificationsFileSelectionPanel.getFileChooser().getSelectedFile().getName();
+                SpectrumServiceImpl currentService = ((SpectrumServiceImpl) mainController.getCurrentSpectrumAnnotator().getSpectrumService());
+                FileSpectrumRepository repository = (FileSpectrumRepository) currentService.getSpectrumRepository();
+                repository.setExperimentIdentifier(assay);
+                mainController.getCurrentSpectrumAnnotator().annotate(assay);
                 writeResultToFile = identificationsFileSelectionPanel.getWriteResultCheckBox().isSelected();
             } else {
+                String assay = getExperimentAccesion();
+                SpectrumServiceImpl currentService = ((SpectrumServiceImpl) mainController.getCurrentSpectrumAnnotator().getSpectrumService());
+                FileSpectrumRepository repository = (FileSpectrumRepository) currentService.getSpectrumRepository();
+                repository.setExperimentIdentifier(assay);
+                mainController.getCurrentSpectrumAnnotator().annotate(assay);
                 writeResultToFile = prideSelectionPanel.getWriteResultCheckBox().isSelected();
             }
-
             //write result to file if necessary
             if (writeResultToFile) {
                 resultHandler.writeResultToFile(spectrumAnnotatorResult);

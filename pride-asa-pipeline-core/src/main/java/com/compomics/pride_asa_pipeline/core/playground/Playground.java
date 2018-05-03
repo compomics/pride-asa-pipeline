@@ -1,10 +1,21 @@
-/*
+/* 
+ * Copyright 2018 compomics.
  *
-
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.compomics.pride_asa_pipeline.core.playground;
 
-import com.compomics.pride_asa_pipeline.core.FileCommandLineRunner;
+import com.compomics.pride_asa_pipeline.core.CommandLineRunner;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
@@ -31,16 +42,16 @@ public class Playground {
 
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(Playground.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         //load application context
         ApplicationContextProvider.getInstance().setDefaultApplicationContext();
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();        
 
-        FileCommandLineRunner fileCommandLineRunner = applicationContext.getBean("fileCommandLineRunner", FileCommandLineRunner.class);
-        fileCommandLineRunner.runFilePipeline(new File("W:\\PRIDE-DATA\\PRIDE-FTP-DOWNLOAD\\PRIDE_Exp_Complete_Ac_3659.xml"), true);
+        CommandLineRunner commandLineRunner = applicationContext.getBean("commandLineRunner", CommandLineRunner.class);
+        commandLineRunner.runPipeline(new File("W:\\PRIDE-DATA\\PRIDE-FTP-DOWNLOAD\\PRIDE_Exp_Complete_Ac_3659.xml"));
         
-        SpectrumAnnotatorResult spectrumAnnotatorResult = fileCommandLineRunner.getFileSpectrumAnnotator().getSpectrumAnnotatorResult();
-        ModificationService modificationService = fileCommandLineRunner.getFileSpectrumAnnotator().getModificationService();
+        SpectrumAnnotatorResult spectrumAnnotatorResult = commandLineRunner.getSpectrumAnnotator().getSpectrumAnnotatorResult();
+        ModificationService modificationService = commandLineRunner.getSpectrumAnnotator().getModificationService();
         Map<Modification, Integer> usedModifications = modificationService.getUsedModifications(spectrumAnnotatorResult);
         Map<Modification, Double> estimateModificationRate = modificationService.estimateModificationRate(usedModifications, spectrumAnnotatorResult, 0.05);  
         

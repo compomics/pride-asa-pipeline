@@ -1,7 +1,20 @@
+/* 
+ * Copyright 2018 compomics.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.compomics.pride_asa_pipeline.core.logic.inference.modification;
 
-import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.ModificationReportGenerator;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.UtilitiesPTMAdapter;
@@ -11,7 +24,6 @@ import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.experiment.biology.PTM;
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.compomics.util.experiment.identification.identification_parameters.PtmSettings;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 
 /**
@@ -74,28 +87,23 @@ public class ModificationPredictor {
         this.spectrumAnnotatorResult = spectrumAnnotatorResult;
         this.modificationService = modificationService;
         inferModifications();
-        try {
-            new ModificationReportGenerator(this).writeReport(reportStream);
-        } catch (IOException ex) {
-            LOGGER.error("Failed to write modification report : " + ex);
-        }
     }
 
     private void inferModifications() {
         LOGGER.info("Inferring modifications...");
 //annotate spectra
         HashMap<String, Boolean> asapMods = new HashMap<>();
-        Map<Modification, Integer> lPrideAsapModificationsMap = modificationService.getUsedModifications(spectrumAnnotatorResult);
+        Map<Modification, Integer> prideAsapModificationsMap = modificationService.getUsedModifications(spectrumAnnotatorResult);
         LOGGER.info("Estimating modification rates");
-        modificationRates = modificationService.estimateModificationRate(lPrideAsapModificationsMap, spectrumAnnotatorResult, fixedThreshold);
+        modificationRates = modificationService.estimateModificationRate(prideAsapModificationsMap, spectrumAnnotatorResult, fixedThreshold);
         boolean allowUnlimitedModifications = true;
-        if (lPrideAsapModificationsMap.size() > 6) {
+        if (prideAsapModificationsMap.size() > 6) {
             considerationThreshold = calculateConsiderationThreshold();
             LOGGER.warn("Warning, it is not recommended to search with more than 6 variable PTMs. A consideration threshold (" + considerationThreshold + ") will be applied to limit the combinations");
             allowUnlimitedModifications = false;
         }
 
-        for (Modification aMod : lPrideAsapModificationsMap.keySet()) {
+        for (Modification aMod : prideAsapModificationsMap.keySet()) {
             //correct positions for oxidation and pyro-glu
             String amodName = aMod.getName();
             if (allowUnlimitedModifications || modificationRates.get(aMod) >= considerationThreshold) {
@@ -142,7 +150,11 @@ public class ModificationPredictor {
     }
 
     private double calculateConsiderationThreshold() {
-        InferenceStatistics stats = new InferenceStatistics(modificationRates.values(), false);
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+        for (double modificationRate : modificationRates.values()) {
+            stats.addValue(modificationRate);
+        }
+
         double threshold = Math.max(0.005, stats.getPercentile(2.5));
         System.out.println("ConsiderationThreshold = " + threshold);
         return threshold;

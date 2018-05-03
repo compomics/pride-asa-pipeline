@@ -1,10 +1,24 @@
+/* 
+ * Copyright 2018 compomics.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.compomics.pride_asa_pipeline.core.gui.controller;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.gui.view.MainFrame;
-import com.compomics.pride_asa_pipeline.core.logic.AbstractSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
-import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.core.logic.spectrum.annotation.impl.SpectrumAnnotatorImpl;
+import com.compomics.pride_asa_pipeline.core.logic.spectrum.annotation.AbstractSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.util.examples.BareBonesBrowserLaunch;
 import java.awt.Dimension;
@@ -35,7 +49,10 @@ public class MainController implements ActionListener {
     /**
      * Keep track of the SpectrumAnnotator (db or identifications file)
      */
+    private ControllerMode currentMode;
+
     private AbstractSpectrumAnnotator currentSpectrumAnnotator;
+    private SpectrumAnnotatorImpl spectrumAnnotator;
     //view
     private MainFrame mainFrame;
     //child controllers
@@ -44,8 +61,6 @@ public class MainController implements ActionListener {
     private PipelineResultController pipelineResultController;
     private PipelineParamsController pipelineParamsController;
     //services
-    private DbSpectrumAnnotator dbSpectrumAnnotator;
-    private FileSpectrumAnnotator fileSpectrumAnnotator;
 
     public ExperimentSelectionController getExperimentSelectionController() {
         return experimentSelectionController;
@@ -55,29 +70,29 @@ public class MainController implements ActionListener {
         this.experimentSelectionController = experimentSelectionController;
     }
 
+    public ControllerMode getCurrentMode() {
+        return currentMode;
+    }
+
+    public void setCurrentMode(ControllerMode currentMode) {
+        this.currentMode = currentMode;
+    }
+
+    public SpectrumAnnotatorImpl getSpectrumAnnotator() {
+        return spectrumAnnotator;
+    }
+
+    public void setSpectrumAnnotator(SpectrumAnnotatorImpl spectrumAnnotator) {
+        this.spectrumAnnotator = spectrumAnnotator;
+    }
+
     public ModificationsController getModificationsController() {
         return modificationsController;
     }
 
     public void setModificationsController(ModificationsController modificationsController) {
         this.modificationsController = modificationsController;
-    }      
-
-    public DbSpectrumAnnotator getDbSpectrumAnnotator() {
-        return dbSpectrumAnnotator;
     }
-
-    public void setDbSpectrumAnnotator(DbSpectrumAnnotator dbSpectrumAnnotator) {
-        this.dbSpectrumAnnotator = dbSpectrumAnnotator;
-    }
-
-    public FileSpectrumAnnotator getFileSpectrumAnnotator() {
-        return fileSpectrumAnnotator;
-    }
-
-    public void setFileSpectrumAnnotator(FileSpectrumAnnotator fileSpectrumAnnotator) {
-        this.fileSpectrumAnnotator = fileSpectrumAnnotator;
-    }           
 
     public PipelineResultController getPipelineResultController() {
         return pipelineResultController;
@@ -97,7 +112,7 @@ public class MainController implements ActionListener {
 
     public AbstractSpectrumAnnotator getCurrentSpectrumAnnotator() {
         return currentSpectrumAnnotator;
-    }    
+    }
 
     public MainFrame getMainFrame() {
         return mainFrame;
@@ -125,9 +140,9 @@ public class MainController implements ActionListener {
 
         //workaround for better beansbinding logging issue
         org.jdesktop.beansbinding.util.logging.Logger.getLogger(ELProperty.class.getName()).setLevel(Level.SEVERE);
-        
+
         //set default currentSpectrumAnnotator
-        currentSpectrumAnnotator = dbSpectrumAnnotator;
+        currentSpectrumAnnotator = spectrumAnnotator;
 
         //init child controllers
         experimentSelectionController.init();
@@ -171,12 +186,12 @@ public class MainController implements ActionListener {
     /**
      * Set the current SpectrumAnnotator.
      *
-     * @param clazz the AbstractSpectrumAnnotator subclass
+     * @param mode The mode for the current spectrum annotator
      */
-    public void setCurrentSpectrumAnnotator(Class clazz) {
-        currentSpectrumAnnotator = (clazz == DbSpectrumAnnotator.class) ? dbSpectrumAnnotator : fileSpectrumAnnotator;
+    public void setCurrentSpectrumAnnotator(ControllerMode mode) {
+        currentMode = mode;
     }
-    
+
     public void showMessageDialog(String title, String message, int messageType) {
         if (messageType == JOptionPane.ERROR_MESSAGE) {
             //add message to JTextArea

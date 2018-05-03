@@ -10,8 +10,7 @@
     <!-- controller beans -->
     <bean id="mainController"
           class="com.compomics.pride_asa_pipeline.core.gui.controller.MainController">
-        <property name="fileSpectrumAnnotator" ref="fileSpectrumAnnotator"/>
-        <property name="dbSpectrumAnnotator" ref="dbSpectrumAnnotator"/>        
+        <property name="spectrumAnnotator" ref="spectrumAnnotator"/>     
         <property name="experimentSelectionController" ref="experimentSelectionController"/>
         <property name="modificationsController" ref="modificationsController"/>
         <property name="pipelineResultController" ref="pipelineResultController"/>
@@ -24,8 +23,8 @@
         <property name="pipelineProgressController" ref="pipelineProgressController"/>
         <property name="systematicMassErrorsController" ref="systematicMassErrorsController"/>
         <property name="modificationsMergeController" ref="modificationsMergeController"/>
-        <property name="experimentService" ref="dbExperimentService"/>
-        <property name="resultHandler" ref="dbResultHandler"/>
+        <property name="experimentService" ref="experimentService"/>
+        <property name="resultHandler" ref="resultHandler"/>
     </bean>
     
     <bean id="pipelineProgressController"
@@ -57,7 +56,7 @@
     
     <bean id="spectrumPanelFactory"
           class="com.compomics.pride_asa_pipeline.core.gui.SpectrumPanelFactory"> 
-        <property name="dbSpectrumService" ref="dbSpectrumService"/>        
+        <property name="spectrumService" ref="spectrumService"/>        
     </bean>
     
     <bean id="pipelineParamsController"

@@ -21,30 +21,24 @@
     </bean>   
     
     <!-- pipeline beans -->
-    <bean id="dbCommandLineRunner"
+    <bean id="commandLineRunner"
           class="com.compomics.pride_asa_pipeline.core.DbCommandLineRunner" lazy-init="true">
-        <property name="dbSpectrumAnnotator" ref="dbSpectrumAnnotator"/>        
-        <property name="dbResultHandler" ref="dbResultHandler"/>        
-    </bean>
-    
-    <bean id="prideXmlCommandLineRunner"
-          class="com.compomics.pride_asa_pipeline.core.PrideXmlCommandLineRunner" lazy-init="true">        
-        <property name="fileSpectrumAnnotator" ref="fileSpectrumAnnotator"/>        
-        <property name="prideXmlResultHandler" ref="prideXmlResultHandler"/>
+        <property name="spectrumAnnotator" ref="spectrumAnnotator"/>        
+        <property name="resultHandler" ref="resultHandler"/>        
     </bean>
             
-    <bean id="dbSpectrumAnnotator"
-          class="com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator" lazy-init="true">        
-        <property name="experimentService" ref="dbExperimentService"/>
-        <property name="spectrumService" ref="dbSpectrumService"/>
-        <property name="modificationService" ref="dbModificationService"/>
+    <bean id="spectrumAnnotator"
+          class="com.compomics.pride_asa_pipeline.core.quickextract.QuickSpectrumAnnotator" lazy-init="true">        
+        <property name="experimentService" ref="experimentService"/>
+        <property name="spectrumService" ref="spectrumService"/>
+        <property name="modificationService" ref="modificationService"/>
         <property name="massRecalibrator" ref="massRecalibrator"/>
         <property name="spectrumMatcher" ref="spectrumMatcher"/>
         <property name="peptideVariationsGenerator" ref="peptideVariationsGenerator"/>
     </bean>
     
     <bean id="fileSpectrumAnnotator"          
-          class="com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator" scope="prototype" init-method="initBean" lazy-init="true">        
+          class="com.compomics.pride_asa_pipeline.core.quickextract.QuickSpectrumAnnotator" scope="prototype" init-method="initBean" lazy-init="true">        
         <property name="prideXmlParser" ref="prideXmlParser"/>
         <property name="experimentService" ref="prideXmlExperimentService"/>
         <property name="spectrumService" ref="prideXmlSpectrumService"/>
@@ -65,11 +59,11 @@
     </bean>
             
     <!-- service beans -->
-    <bean id="dbExperimentService"
-          class="com.compomics.pride_asa_pipeline.core.service.impl.DbExperimentServiceImpl">
+    <bean id="experimentService"
+          class="com.compomics.pride_asa_pipeline.core.service.impl.experimentServiceImpl">
         <property name="experimentRepository" ref="experimentRepository"/>
-        <property name="spectrumService" ref="dbSpectrumService"/>
-        <property name="resultHandler" ref="dbResultHandler"/>
+        <property name="spectrumService" ref="spectrumService"/>
+        <property name="resultHandler" ref="resultHandler"/>
     </bean>
     
     <bean id="prideXmlExperimentService"
@@ -78,8 +72,8 @@
         <property name="resultHandler" ref="prideXmlResultHandler"/>
     </bean>  
     
-    <bean id="dbSpectrumService"
-          class="com.compomics.pride_asa_pipeline.core.service.impl.DbSpectrumServiceImpl">
+    <bean id="spectrumService"
+          class="com.compomics.pride_asa_pipeline.core.service.impl.spectrumServiceImpl">
         <property name="spectrumRepository" ref="spectrumRepository"/>
         <property name="spectrumPeaksCache" ref="spectrumPeaksCache"/>
     </bean>
@@ -88,7 +82,7 @@
           class="com.compomics.pride_asa_pipeline.core.service.impl.PrideXmlSpectrumServiceImpl" scope="prototype">
     </bean>        
     
-    <bean id="dbModificationService"
+    <bean id="modificationService"
           class="com.compomics.pride_asa_pipeline.core.service.impl.DbModificationServiceImpl">
         <property name="modificationMarshaller" ref="modificationMarshaller"/>
         <property name="modificationRepository" ref="modificationRepository"/>
@@ -101,7 +95,7 @@
         <property name="omssaModificationMarshaller" ref="omssaModificationMarshaller"/>
     </bean> 
     
-    <bean id="dbResultHandler"
+    <bean id="resultHandler"
           class="com.compomics.pride_asa_pipeline.core.service.impl.ResultHandlerImpl">
         <property name="fileResultHandler" ref="fileResultHandler"/>
         <property name="modificationMarshaller" ref="modificationMarshaller"/>
@@ -135,7 +129,7 @@
     
     <bean id="fileResultHandler"
           class="com.compomics.pride_asa_pipeline.core.repository.impl.FileResultHandlerImpl">  
-        <property name="modificationService" ref="dbModificationService"/>      
+        <property name="modificationService" ref="modificationService"/>      
     </bean>    
     
     <!-- encode/decode beans -->

@@ -1,3 +1,18 @@
+/* 
+ * Copyright 2018 compomics.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.compomics.pride_asa_pipeline.core;
 
 import com.compomics.pride_asa_pipeline.core.gui.controller.MainController;
@@ -37,7 +52,7 @@ public class PrideAsaPipelineStarter {
      *
      * @param commandLineArguments Commmand-line arguments.
      */
-    public static void main(String[] commandLineArguments) {
+    public static void main(String[] commandLineArguments) throws Exception {
         constructOptions();
 
         displayBlankLines(1, System.out);
@@ -95,25 +110,25 @@ public class PrideAsaPipelineStarter {
         });
     }
 
-    public static void launchCommandLineMode(String experimentAccession) {
+    public static void launchCommandLineMode(String experimentAccession) throws Exception {
         ApplicationContextProvider.getInstance().setDefaultApplicationContext();
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-        DbCommandLineRunner commandLineRunner = (DbCommandLineRunner) applicationContext.getBean("dbCommandLineRunner");
+        CommandLineRunner commandLineRunner = (CommandLineRunner) applicationContext.getBean("commandLineRunner");
         commandLineRunner.runPipeline(experimentAccession);
     }
 
-    public static void launchCommandLineMode(File experimentAccessionsFile) {
+    public static void launchCommandLineMode(File experimentAccessionsFile) throws Exception {
         ApplicationContextProvider.getInstance().setDefaultApplicationContext();
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-        DbCommandLineRunner commandLineRunner = (DbCommandLineRunner) applicationContext.getBean("dbCommandLineRunner");
+        CommandLineRunner commandLineRunner = (CommandLineRunner) applicationContext.getBean("commandLineRunner");
         commandLineRunner.runPipeline(experimentAccessionsFile);
     }
 
-    public static void launchFileCommandLineMode(File identificationsFile, boolean singleIdentificationsFile) {
+    public static void launchFileCommandLineMode(File identificationsFile, boolean singleIdentificationsFile) throws Exception {
         ApplicationContextProvider.getInstance().setDefaultApplicationContext();
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-        FileCommandLineRunner fileCommandLineRunner = (FileCommandLineRunner) applicationContext.getBean("fileCommandLineRunner");
-        fileCommandLineRunner.runFilePipeline(identificationsFile, singleIdentificationsFile);
+        CommandLineRunner commandLineRunner = (CommandLineRunner) applicationContext.getBean("commandLineRunner");
+        commandLineRunner.runPipeline(identificationsFile);
     }
 
     /**
@@ -121,7 +136,7 @@ public class PrideAsaPipelineStarter {
      *
      * @param commandLineArguments Command-line arguments to be processed.
      */
-    private static void parse(String[] commandLineArguments) {
+    private static void parse(String[] commandLineArguments) throws Exception {
         CommandLineParser cmdLineParser = new BasicParser();
         CommandLine commandLine;
         try {

@@ -1,9 +1,23 @@
+/* 
+ * Copyright 2018 compomics.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.compomics.pride_asa_pipeline.core.logic.impl;
 
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.logic.MassDeltaExplainer;
 import com.compomics.pride_asa_pipeline.core.logic.ModificationCombinationSolver;
-import com.compomics.pride_asa_pipeline.core.logic.inference.InferenceStatistics;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
@@ -16,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.pride.utilities.mol.Atom;
 
@@ -27,7 +42,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
 
     private static final Logger LOGGER = Logger.getLogger(MassDeltaExplainerImpl.class);
     private final ModificationCombinationSolver modificationCombinationSolver;
-    private final InferenceStatistics massErrorStatistics = new InferenceStatistics(true);
+    private final DescriptiveStatistics massErrorStatistics = new DescriptiveStatistics();
 
     public MassDeltaExplainerImpl(ModificationHolder modificationHolder) {
         modificationCombinationSolver = new ModificationCombinationSolverImpl(modificationHolder);
@@ -129,7 +144,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
     }
 
     @Override
-    public InferenceStatistics getExplainedMassDeltas() {
+    public DescriptiveStatistics getExplainedMassDeltas() {
         return massErrorStatistics;
     }
 }

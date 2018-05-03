@@ -1,24 +1,35 @@
+/* 
+ * Copyright 2018 compomics.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.compomics.pride_asa_pipeline.core.logic.inference;
 
-import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
-import com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator;
+
 import com.compomics.pride_asa_pipeline.core.logic.inference.enzyme.EnzymePredictor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.machine.PrecursorIonErrorPredictor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.massdeficit.FragmentIonErrorPredictor;
 import com.compomics.pride_asa_pipeline.core.logic.inference.modification.ModificationPredictor;
-import com.compomics.pride_asa_pipeline.core.logic.inference.report.impl.ModificationReportGenerator;
+import com.compomics.pride_asa_pipeline.core.logic.spectrum.annotation.impl.SpectrumAnnotatorImpl;
+import com.compomics.pride_asa_pipeline.core.model.exception.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileModificationRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository;
-import com.compomics.pride_asa_pipeline.core.service.impl.DbModificationServiceImpl;
-import com.compomics.pride_asa_pipeline.core.service.impl.DbSpectrumServiceImpl;
+import com.compomics.pride_asa_pipeline.core.service.impl.PrideModificationServiceImpl;
+import com.compomics.pride_asa_pipeline.core.service.impl.SpectrumServiceImpl;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
-import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.xmlpull.v1.XmlPullParserException;
@@ -36,15 +47,11 @@ public class ParameterExtractor {
     /*
      * The spectrum annotator
      */
-    private DbSpectrumAnnotator spectrumAnnotator;
+    private SpectrumAnnotatorImpl spectrumAnnotator;
     /*
      * The search parameters 
      */
     private SearchParameters parameters;
-    /*
-     * The quality percentile
-     */
-    private double qualityPercentile = 90;
 
     /**
      * An extractor for parameters
@@ -56,7 +63,7 @@ public class ParameterExtractor {
         try {
             //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
             ApplicationContextProvider.getInstance().setDefaultApplicationContext();
-            spectrumAnnotator = (DbSpectrumAnnotator) ApplicationContextProvider.getInstance().getBean("dbSpectrumAnnotator");
+            spectrumAnnotator = (SpectrumAnnotatorImpl) ApplicationContextProvider.getInstance().getBean("spectrumAnnotator");
             init(assay);
         } catch (IOException | XmlPullParserException e) {
             throw new ParameterExtractionException(e.getMessage());
@@ -66,8 +73,8 @@ public class ParameterExtractor {
     private void init(String assay) throws IOException, XmlPullParserException {
         //get assay
         FileSpectrumRepository fileSpectrumRepository = new FileSpectrumRepository(assay);
-        ((DbSpectrumServiceImpl) spectrumAnnotator.getSpectrumService()).setSpectrumRepository(new FileSpectrumRepository(assay));
-        ((DbModificationServiceImpl) spectrumAnnotator.getModificationService()).setModificationRepository(new FileModificationRepository(assay));
+        ((SpectrumServiceImpl) spectrumAnnotator.getSpectrumService()).setSpectrumRepository(new FileSpectrumRepository(assay));
+        ((PrideModificationServiceImpl) spectrumAnnotator.getModificationService()).setModificationRepository(new FileModificationRepository(assay));
 
         spectrumAnnotator.initIdentifications(assay);
         LOGGER.info("Spectrumannotator delivered was initialized");
@@ -84,27 +91,8 @@ public class ParameterExtractor {
         //--------------------------------
         // USE ALL THE IDENTIFICATIONS FOR THE MODIFICATIONS AS THE ALL MIGHT HAVE USEFUL INFORMATION
         ModificationPredictor modificationPredictor = new ModificationPredictor(spectrumAnnotator.getSpectrumAnnotatorResult(), spectrumAnnotator.getModificationService());
-        new ModificationReportGenerator(modificationPredictor).writeReport(System.out);
         //--------------------------------
-        //recalibrate errors
-        //precursor needs to be very accurate (considering mods / isotopes / etc)
-        LOGGER.info("Using the " + (100 - qualityPercentile) + " % best identifications for precursor estimation");
-        //USE ONLY THE HIGH QUALITY HITS FOR MASS ACCURACCIES, THESE WILL USUALLY NOT HAVE MISSING MODIFICATIONS ETC
-        List<Identification> experimentIdentifications = spectrumAnnotator.getIdentifications().getCompleteIdentifications();
-        IdentificationFilter filter = new IdentificationFilter(experimentIdentifications);
-        //fragment ion is harder, more leanway should be given
-        LOGGER.info("Using the " + 25 + " % best identifications for fragment ion estimation");
-        HashMap<Peptide, double[]> mzValueMap = new HashMap<>();
-        for (Identification anExpIdentification : filter.getTopFragmentIonHits(75)) {
-            double[] mzValuesBySpectrumId = fileSpectrumRepository.getMzValuesBySpectrumId(anExpIdentification.getSpectrumId());
-            Peptide peptide = anExpIdentification.getPeptide();
-            mzValueMap.put(peptide, mzValuesBySpectrumId);
-        }
 
-        //FragmentIonErrorPredictor fragmentIonErrorPredictor = new IterativeFragmentIonErrorPredictor(mzValueMap);
-        FragmentIonErrorPredictor fragmentIonErrorPredictor = new FragmentIonErrorPredictor(mzValueMap);
-
-        PrecursorIonErrorPredictor precursorIonErrorPredictor = new PrecursorIonErrorPredictor(filter.getTopPrecursorHits(qualityPercentile));
         //construct a parameter object
         parameters = new SearchParameters();
 
@@ -113,13 +101,13 @@ public class ParameterExtractor {
 
         parameters.setPtmSettings(modificationPredictor.getPtmSettings());
 
-        parameters.setPrecursorAccuracy(precursorIonErrorPredictor.getRecalibratedPrecursorAccuraccy());
-        parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.DA);
-        parameters.setMinChargeSearched(new Charge(Charge.PLUS, precursorIonErrorPredictor.getRecalibratedMinCharge()));
-        parameters.setMaxChargeSearched(new Charge(Charge.PLUS, precursorIonErrorPredictor.getRecalibratedMaxCharge()));
+        parameters.setPrecursorAccuracy(spectrumAnnotator.getInstrumentation().getPrecAcc());
+        parameters.setPrecursorAccuracyType(SearchParameters.MassAccuracyType.PPM);
+        parameters.setMinChargeSearched(new Charge(Charge.PLUS, spectrumAnnotator.getInstrumentation().getPossibleCharges().first()));
+        parameters.setMaxChargeSearched(new Charge(Charge.PLUS, spectrumAnnotator.getInstrumentation().getPossibleCharges().last()));
 
         parameters.setFragmentAccuracyType(SearchParameters.MassAccuracyType.DA);
-        parameters.setFragmentIonAccuracy(fragmentIonErrorPredictor.getFragmentIonAccuraccy());
+        parameters.setFragmentIonAccuracy(spectrumAnnotator.getInstrumentation().getFragAcc());
 
     }
 
@@ -127,6 +115,7 @@ public class ParameterExtractor {
      * Returns the inferred search parameters
      */
     public SearchParameters getParameters() {
+        
         return parameters;
     }
 

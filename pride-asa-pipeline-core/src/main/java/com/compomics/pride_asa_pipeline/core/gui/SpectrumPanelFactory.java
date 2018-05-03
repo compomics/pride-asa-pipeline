@@ -1,6 +1,20 @@
+/* 
+ * Copyright 2018 compomics.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.compomics.pride_asa_pipeline.core.gui;
 
-import com.compomics.pride_asa_pipeline.core.service.DbSpectrumService;
 import com.compomics.pride_asa_pipeline.core.service.SpectrumService;
 import com.compomics.pride_asa_pipeline.core.util.PeakUtils;
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
@@ -21,23 +35,14 @@ import org.springframework.dao.EmptyResultDataAccessException;
  */
 public class SpectrumPanelFactory {
 
-    private DbSpectrumService dbSpectrumService;
-    private SpectrumService fileSpectrumService;
+    private SpectrumService spectrumService;
 
-    public DbSpectrumService getDbSpectrumService() {
-        return dbSpectrumService;
+    public SpectrumService getspectrumService() {
+        return spectrumService;
     }
 
-    public void setDbSpectrumService(DbSpectrumService dbSpectrumService) {
-        this.dbSpectrumService = dbSpectrumService;
-    }
-
-    public SpectrumService getFileSpectrumService() {
-        return fileSpectrumService;
-    }
-
-    public void setFileSpectrumService(SpectrumService fileSpectrumService) {
-        this.fileSpectrumService = fileSpectrumService;
+    public void setSpectrumService(SpectrumService spectrumService) {
+        this.spectrumService = spectrumService;
     }
 
     /**
@@ -53,10 +58,10 @@ public class SpectrumPanelFactory {
         //get spectrum peaks for the selected identification
         List<Peak> peaks;
         if (isIdentificationsFile) {
-            peaks = fileSpectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
+            peaks = spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
         } else {
             try {
-                peaks = dbSpectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
+                peaks = spectrumService.getSpectrumPeaksBySpectrumId(identification.getSpectrumId());
             } catch (EmptyResultDataAccessException ex) {
                 peaks = new ArrayList<>();
             }

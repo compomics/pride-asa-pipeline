@@ -1,3 +1,18 @@
+/* 
+ * Copyright 2018 compomics.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.compomics.pride_asa_pipeline.core.gui.controller;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -11,7 +26,6 @@ import com.compomics.pride_asa_pipeline.core.gui.IdentificationsTableFormat;
 import com.compomics.pride_asa_pipeline.core.gui.SpectrumPanelFactory;
 import com.compomics.pride_asa_pipeline.core.gui.view.IdentificationsPanel;
 import com.compomics.pride_asa_pipeline.core.gui.view.SummaryPanel;
-import com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.FragmentIonAnnotation;
 import com.compomics.pride_asa_pipeline.model.Identification;
@@ -104,7 +118,7 @@ public class PipelineResultController {
         modificationColors = new HashMap<>();
         
         //set PrideXmlSpectrumService
-        spectrumPanelFactory.setFileSpectrumService(mainController.getFileSpectrumAnnotator().getSpectrumService());
+        spectrumPanelFactory.setSpectrumService(mainController.getCurrentSpectrumAnnotator().getSpectrumService());
         
         initIdentificationsPanel();
         initSummaryPanel();
@@ -213,7 +227,7 @@ public class PipelineResultController {
                     if (identificationsPanel.getIdentificationsTable().getSelectedRow() != -1) {
                         Identification identification = sortedIdentificationsList.get(identificationsPanel.getIdentificationsTable().getSelectedRow());
 
-                        SpectrumPanel spectrumPanel = spectrumPanelFactory.getSpectrumPanel(identification, mainController.getCurrentSpectrumAnnotator() instanceof FileSpectrumAnnotator);
+                        SpectrumPanel spectrumPanel = spectrumPanelFactory.getSpectrumPanel(identification, mainController.getCurrentMode()==ControllerMode.FILE);
 
                         addSpectrumPanel(spectrumPanel);
                     }

@@ -21,7 +21,7 @@
     <bean id="dbCommandLineRunner"
           class="com.compomics.pride_asa_pipeline.core.DbCommandLineRunner" lazy-init="true">
         <property name="dbSpectrumAnnotator" ref="dbSpectrumAnnotator"/>        
-        <property name="dbResultHandler" ref="dbResultHandler"/>        
+        <property name="resultHandler" ref="resultHandler"/>        
     </bean>
     
     <bean id="fileCommandLineRunner"
@@ -34,7 +34,7 @@
           class="com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator" lazy-init="true">        
         <property name="experimentService" ref="dbExperimentService"/>
         <property name="spectrumService" ref="dbSpectrumService"/>
-        <property name="modificationService" ref="dbModificationService"/>
+        <property name="modificationService" ref="modificationService"/>
         <property name="massRecalibrator" ref="massRecalibrator"/>
         <property name="spectrumMatcher" ref="spectrumMatcher"/>
         <property name="peptideVariationsGenerator" ref="peptideVariationsGenerator"/>
@@ -65,7 +65,7 @@
           class="com.compomics.pride_asa_pipeline.core.service.impl.DbExperimentServiceImpl">
         <property name="experimentRepository" ref="experimentRepository"/>
         <property name="spectrumService" ref="dbSpectrumService"/>
-        <property name="fileResultHandler" ref="dbResultHandler"/>
+        <property name="fileResultHandler" ref="resultHandler"/>
     </bean>
     
     <bean id="fileExperimentService"
@@ -84,7 +84,7 @@
           class="com.compomics.pride_asa_pipeline.core.service.impl.FileSpectrumServiceImpl">
     </bean>        
     
-    <bean id="dbModificationService"
+    <bean id="modificationService"
           class="com.compomics.pride_asa_pipeline.core.service.impl.DbModificationServiceImpl">
         <property name="modificationRepository" ref="modificationRepository"/>
         <property name="omssaModificationMarshaller" ref="omssaModificationMarshaller"/>
@@ -100,7 +100,7 @@
         <property name="modificationMarshaller" ref="modificationMarshaller"/>
     </bean>  
     
-    <bean id="dbResultHandler"
+    <bean id="resultHandler"
           class="com.compomics.pride_asa_pipeline.core.service.impl.ResultHandlerImpl">
         <property name="fileResultHandler" ref="fileResultHandler"/>
         <property name="modificationMarshaller" ref="modificationMarshaller"/>
