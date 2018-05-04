@@ -33,6 +33,9 @@ public class AsapModificationAdapter implements ModificationAdapter<Modification
 
     @Override
     public Modification convertModification(PRIDEModification mod) {
+        if(mod==null){
+            return null;
+        }
         Double averageIsotopicMass = mod.getAveDeltaMass();
         Double monoIsotopicMass = mod.getMonoDeltaMass();
         //TODO calcualte this from the formula?

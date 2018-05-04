@@ -15,6 +15,17 @@
  */
 package com.compomics.pride_asa_pipeline.core.util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -36,7 +47,7 @@ public class ResourceUtils {
      * @param relativePath the relative path of the resource
      * @return the found resource
      */
-    public static Resource getResourceByRelativePath(String relativePath) {       
+    public static Resource getResourceByRelativePath(String relativePath) {
         Resource resource = new FileSystemResource(relativePath);
 
         if (!resource.exists()) {
@@ -68,4 +79,28 @@ public class ResourceUtils {
 
         return isExistingResource;
     }
+
+    /**
+     * Copy a file from internal source to destination.
+     *
+     * @return True if succeeded , False if not
+     */
+    public static File ExportToWorkingDirectory(String resource) throws IOException {
+
+        InputStream source = ResourceUtils.class.getResourceAsStream(resource);
+        String target = resource.substring(resource.lastIndexOf("/") + 1);
+
+        File destination = new File(FileSystems.getDefault().getPath(".").toAbsolutePath().toString() + "/" + target);
+
+        if (destination.exists()) {
+            return destination;
+        }
+        System.out.println("Copying ->" + resource + "\n\tto ->" + destination);
+
+        Files.copy(source, destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+        return destination;
+
+    }
+
 }

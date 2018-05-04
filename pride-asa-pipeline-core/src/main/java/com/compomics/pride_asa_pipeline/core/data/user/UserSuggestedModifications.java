@@ -20,6 +20,7 @@ import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModi
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -27,14 +28,16 @@ import java.util.Set;
  */
 public class UserSuggestedModifications {
 
+    private static final Logger LOGGER = Logger.getLogger(UserSuggestedModifications.class);
+
     private static UserSuggestedModifications instance;
-        /**
+    /**
      * The modification adapter to return pride asap modificaitons
      */
     private final AsapModificationAdapter adapter = new AsapModificationAdapter();
-    
-    private  Set<Modification> modifications = new HashSet<>();
-    
+
+    private Set<Modification> modifications = new HashSet<>();
+
     private UserSuggestedModifications() {
 
     }
@@ -46,12 +49,18 @@ public class UserSuggestedModifications {
         return instance;
     }
 
-    public void addModification(String modificationName){
-                modifications.add((Modification) PRIDEModificationFactory.getInstance().getModification(adapter, modificationName));
+    public void addModification(String modificationName) {
+        String capitalizedModificationName = modificationName.toUpperCase().charAt(0)+modificationName.substring(1,modificationName.length());
+        Modification mod = (Modification) PRIDEModificationFactory.getInstance().getModification(adapter, capitalizedModificationName);
+        if (mod == null) {
+            LOGGER.error(modificationName + " was not found in the PRIDEModification Factory...");
+        } else {
+            modifications.add(mod);
+        }
     }
-    
-    public Set<Modification> getAdditionalModifications(){
+
+    public Set<Modification> getAdditionalModifications() {
         return modifications;
     }
-    
+
 }

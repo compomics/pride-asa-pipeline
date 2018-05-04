@@ -47,8 +47,8 @@ public class LocalProjectExtractor {
     private static final Logger LOGGER = Logger.getLogger(LocalProjectExtractor.class);
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
-        File outputFolder = new File("C:\\Users\\Kenneth\\Desktop\\MzID_Test\\download");
-        File inputFile = new File("C:\\Users\\davy\\Desktop\\Thesis\\PeptideShaker_Example_Dataset.xml");
+        File outputFolder = new File("D:\\Compomics\\pride-asa-pipeline-core-2.0.0-beta-SNAPSHOT\\Output");
+        File inputFile = new File("D:\\Compomics\\pride-asa-pipeline-core-2.0.0-beta-SNAPSHOT\\PeptideShaker_Example_Dataset.xml");
         UserSuggestedModifications.getInstance().addModification("Phospho");
         SearchParameters analyze = new LocalProjectExtractor(outputFolder).analyze(inputFile);
         System.out.println(analyze);

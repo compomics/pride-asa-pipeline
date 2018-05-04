@@ -7,7 +7,7 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath:resources/pride-asa-pipeline-core.properties</value>
+                <value>./resources/pride-asa-pipeline-core.properties</value>
            <!--  <value>classpath:resources/pride-asa-pipeline-core.properties</value>-->
             </list>
         </property>

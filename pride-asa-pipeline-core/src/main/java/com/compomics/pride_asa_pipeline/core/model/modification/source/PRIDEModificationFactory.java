@@ -18,12 +18,14 @@ package com.compomics.pride_asa_pipeline.core.model.modification.source;
 import com.compomics.pride_asa_pipeline.core.model.modification.ModificationAdapter;
 import com.compomics.pride_asa_pipeline.core.model.modification.PRIDEModification;
 import com.compomics.pride_asa_pipeline.core.model.modification.impl.AsapModificationAdapter;
+import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.io.json.JsonMarshaller;
 import com.compomics.util.pride.PrideWebService;
 import com.compomics.util.pride.prideobjects.webservice.query.PrideFilter;
 import com.google.gson.reflect.TypeToken;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -100,7 +102,14 @@ public class PRIDEModificationFactory {
         try {
             if (mode.equals(INIT_MODE.OFFLINE)) {
                 //TODO TURN THIS INTO A STREAM
-                File jsonLib = new ClassPathResource("resources/pride_mods.json").getFile();
+                File jsonLib;
+                try{
+                jsonLib = new ClassPathResource("resources/pride_mods.json").getFile();
+                }catch(FileNotFoundException fex){
+                LOGGER.warn("The class resource could not be found, exporting the default to the working directory");
+                jsonLib =ResourceUtils.ExportToWorkingDirectory("/resources/pride_mods.json");
+               // jsonLib.deleteOnExit();
+                }
                 init(jsonLib);
                 //  jsonLib.delete();
             } else {

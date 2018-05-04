@@ -68,6 +68,9 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
 
     @Override
     public PTM convertModification(PRIDEModification mod) {
+        if (mod == null) {
+            return null;
+        }
         increaseMassChain = new AtomChain();
         decreaseMassChain = new AtomChain();
         decreaseMassChain.setAddition(false);
@@ -241,8 +244,8 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
             return false;
         }
         return true;
-    }   
-    
+    }
+
     private void parseFormulaPRIDEFormat(String formula) {
         //preprocess formula...
         formula = formula.toUpperCase()
