@@ -15,6 +15,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic.recalibration;
 
+import com.compomics.pride_asa_pipeline.core.logic.recalibration.impl.MassRecalibratorImpl;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
@@ -45,7 +46,7 @@ public class MassRecalibratorTest {
     
     private Collection<Peptide> peptides;
 
-    private MassRecalibrator massRecalibrator;
+    private MassRecalibrator massRecalibrator = new MassRecalibratorImpl();
     private AnalyzerData analyzerData;
 
     @Before

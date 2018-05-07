@@ -15,6 +15,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic.spectrum.filter;
 
+import com.compomics.pride_asa_pipeline.core.logic.spectrum.filter.impl.PeakNoiseFilter;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,7 +34,7 @@ import org.junit.Test;
 public class NoiseFilterTest {
 
     private static List<Peak> peakList;
-    private NoiseFilter noiseFilter;
+    private NoiseFilter noiseFilter = new PeakNoiseFilter();
 
     @BeforeClass
     public static void setUponce() throws Exception {

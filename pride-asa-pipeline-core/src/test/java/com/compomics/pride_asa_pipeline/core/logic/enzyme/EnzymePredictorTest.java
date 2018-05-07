@@ -73,7 +73,7 @@ public class EnzymePredictorTest {
     }
 
     @Before
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         File fastaFile = getFileFromResources("uniprot-human_reviewed_december_13_concatenated_target_decoy.fasta.zip");
         File enzymeFile = new File(EnzymePredictorTest.class.getClassLoader().getResource("searchGUI_enzymes.xml").toURI());
         sequenceFactory = SequenceFactory.getInstance();

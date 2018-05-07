@@ -21,6 +21,8 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.Assert.*;
+
+import com.compomics.pride_asa_pipeline.core.logic.spectrum.filter.impl.NoiseThresholdFinderImpl;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,7 +34,7 @@ public class NoiseThresholdFinderTest {
     private static double[] values_1;
     private static double[] values_2;
     private static double[] values_3;
-    private NoiseThresholdFinder noiseTresholdFinder;
+    private NoiseThresholdFinder noiseTresholdFinder = new NoiseThresholdFinderImpl();
 
     @BeforeClass
     public static void setUponce() throws Exception {

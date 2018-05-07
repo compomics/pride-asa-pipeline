@@ -16,6 +16,7 @@
 package com.compomics.pride_asa_pipeline.core.model;
 
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
+import com.compomics.pride_asa_pipeline.core.service.impl.PipelineModificationServiceImpl;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
@@ -37,7 +38,7 @@ import org.junit.Test;
 
 public class ModificationCombinationTest {
 
-    private PipelineModificationService modificationService;
+    private PipelineModificationService modificationService = new PipelineModificationServiceImpl();
 
     @Test
     public void testEqualsAndHashCode() throws JDOMException, URISyntaxException {

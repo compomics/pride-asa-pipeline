@@ -17,6 +17,7 @@ package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
+import com.compomics.pride_asa_pipeline.core.service.impl.PipelineModificationServiceImpl;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
@@ -45,16 +46,16 @@ public class ModificationCombinationSolverTest {
 
     private static final String peptideSequenceString = "AAKENNYLENNART";
     private ModificationCombinationSolver modificationCombinationSolver;
-    private PipelineModificationService modificationService;
+    private PipelineModificationService modificationService = new PipelineModificationServiceImpl();
 
     @Before
-    public void initialize() throws IOException, JDOMException, URISyntaxException {
+    public void setUp() throws IOException, JDOMException, URISyntaxException {
         //Use @Before instead of @BeforeClass because @Autowired doesn't work with static,
         //so check if the modification holder is already set.
         if (modificationCombinationSolver == null) {
             //add the pipeline modifications
             ModificationHolder modificationHolder = new ModificationHolder();
-            File modificationsResource = new File(ModificationCombinationSolverTest.class.getClassLoader().getResource("modification.pipeline_modifications_file").toURI());
+            File modificationsResource = ResourceUtils.getInternalResource("resources/pride_asap_modifications.xml");
             modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP));
 
             modificationCombinationSolver = new ModificationCombinationSolverImpl(modificationHolder);

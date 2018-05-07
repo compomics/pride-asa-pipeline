@@ -16,6 +16,8 @@
 package com.compomics.pride_asa_pipeline.core.service;
 
 import com.compomics.pride_asa_pipeline.core.logic.modification.ModificationMarshaller;
+import com.compomics.pride_asa_pipeline.core.logic.modification.impl.ModificationMarshallerImpl;
+import com.compomics.pride_asa_pipeline.core.service.impl.PrideModificationServiceImpl;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
 
@@ -24,6 +26,7 @@ import java.net.URISyntaxException;
 import java.util.Set;
 import static org.junit.Assert.*;
 import org.jdom2.JDOMException;
+import org.junit.Before;
 import org.junit.Test;
 
 
@@ -35,6 +38,12 @@ public class ModificationServiceTest {
 
     private ModificationMarshaller modificationMarshaller;
     private DbModificationService modificationService;
+
+    @Before
+    public void setup() throws JDOMException {
+        modificationMarshaller = new ModificationMarshallerImpl();
+        modificationService = new PrideModificationServiceImpl();
+    }
 
     /**
      * Test the case where the PRIDE modifications are not conflicting.

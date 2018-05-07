@@ -17,6 +17,7 @@ package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
+import com.compomics.pride_asa_pipeline.core.service.impl.PipelineModificationServiceImpl;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
@@ -43,7 +44,7 @@ public class ModCombSolverEqualMassesTest {
 
     private ModificationCombinationSolver modificationCombinationSolver;
 
-    private PipelineModificationService modificationService;
+    private PipelineModificationService modificationService = new PipelineModificationServiceImpl();
 
     @Before
     public void initialize() throws IOException, JDOMException, URISyntaxException {

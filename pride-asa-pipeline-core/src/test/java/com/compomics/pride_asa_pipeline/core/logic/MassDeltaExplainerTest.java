@@ -17,6 +17,7 @@ package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
+import com.compomics.pride_asa_pipeline.core.service.impl.PipelineModificationServiceImpl;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
@@ -53,14 +54,14 @@ public class MassDeltaExplainerTest {
 
     private static final double MASS_ERROR = -2;
     private MassDeltaExplainer massDeltaExplainer;
-    private PipelineModificationService modificationService;
+    private PipelineModificationService modificationService = new PipelineModificationServiceImpl();
     private MassRecalibrationResult massRecalibrationResult;
 
     @Before
     public void initialize() throws IOException, JDOMException, URISyntaxException {
         //add the pipeline modifications
         ModificationHolder modificationHolder = new ModificationHolder();
-        File modificationsResource = new File(MassDeltaExplainerTest.class.getClassLoader().getResource("modification.pipeline_modifications_file").toURI());
+        File modificationsResource = ResourceUtils.getInternalResource("resources/pride_asap_modifications.xml");
         modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP));
 
         massDeltaExplainer = new MassDeltaExplainerImpl(modificationHolder);

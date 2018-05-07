@@ -16,6 +16,7 @@
 package com.compomics.pride_asa_pipeline.core.model;
 
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
+import com.compomics.pride_asa_pipeline.core.service.impl.PipelineModificationServiceImpl;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
@@ -44,7 +45,7 @@ import org.junit.Test;
 
 public class ModifiedPeptideTest {
 
-    private PipelineModificationService modificationService;
+    private PipelineModificationService modificationService = new PipelineModificationServiceImpl();
 
     /**
      * Test the ion mass ladder with one NT modification
@@ -332,7 +333,7 @@ public class ModifiedPeptideTest {
      */
     @Test
     public void testEquals() throws UnknownAAException, IOException, JDOMException, URISyntaxException {
-        File modificationsResource = new File(ModifiedPeptideTest.class.getClassLoader().getResource("modification.pipeline_modifications_file").toURI());
+        File modificationsResource = ResourceUtils.getInternalResource("resources/pride_asap_modifications.xml");
         Set<Modification> modifications = modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP);
 
         Peptide peptide = new Peptide(1, 1256, new AminoAcidSequence("AAAKENKKNYYY"));

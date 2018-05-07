@@ -49,7 +49,7 @@ public class ParameterExtractorTest extends TestCase {
     }
 
     private File getFileFromResources(String fileName) throws IOException, URISyntaxException {
-        File testResource = new File(ParameterExtractor.class.getResource(fileName).toURI());
+        File testResource = new File(ParameterExtractorTest.class.getClassLoader().getResource(fileName).toURI());
         if (testResource.getName().endsWith(".zip")) {
             ZipUtils.unzip(testResource, testResource.getParentFile(), null);
             testResource = new File(testResource.getAbsolutePath().replace(".zip", ""));

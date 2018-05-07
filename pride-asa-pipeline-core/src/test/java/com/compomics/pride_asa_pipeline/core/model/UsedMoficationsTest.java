@@ -15,6 +15,8 @@
  */
 package com.compomics.pride_asa_pipeline.core.model;
 
+import com.compomics.pride_asa_pipeline.core.repository.impl.FileResultHandlerImpl;
+import com.compomics.pride_asa_pipeline.core.service.impl.PrideModificationServiceImpl;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
@@ -38,9 +40,10 @@ import static org.junit.Assert.*;
  */
 public class UsedMoficationsTest {
 
-    private DbModificationService modificationService;
+    private DbModificationService modificationService = new PrideModificationServiceImpl();
 
-    private FileResultHandler fileResultHandler;
+    private FileResultHandler fileResultHandler = new FileResultHandlerImpl();
+
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -59,8 +62,7 @@ public class UsedMoficationsTest {
         assertEquals(19, spectrumAnnotatorResult.getIdentifications().size());
         assertEquals(2, spectrumAnnotatorResult.getUnmodifiedPrecursors().size());
         assertEquals(12, spectrumAnnotatorResult.getModifiedPrecursors().size());        
-        assertEquals(5, spectrumAnnotatorResult.getUnexplainedIdentifications().size());        
-
+        assertEquals(5, spectrumAnnotatorResult.getUnexplainedIdentifications().size());
         Map<Modification, Integer> usedModifications = modificationService.getUsedModifications(spectrumAnnotatorResult);
         assertEquals(3, usedModifications.size());
 
