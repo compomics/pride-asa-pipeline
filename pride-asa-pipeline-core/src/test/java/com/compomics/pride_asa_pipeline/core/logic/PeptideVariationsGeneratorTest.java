@@ -15,7 +15,9 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic;
 
+import com.compomics.pride_asa_pipeline.core.logic.impl.PeptideVariationsGeneratorImpl;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
+import com.compomics.pride_asa_pipeline.core.service.impl.PipelineModificationServiceImpl;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.ModificationFacade;
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
@@ -23,10 +25,12 @@ import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
-import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
+
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
 import static org.junit.Assert.*;
@@ -40,16 +44,16 @@ import org.junit.Test;
  */
 public class PeptideVariationsGeneratorTest {
 
-    private PeptideVariationsGenerator peptideVariationsGenerator;
+    private PeptideVariationsGenerator peptideVariationsGenerator = new PeptideVariationsGeneratorImpl();
 
-    private PipelineModificationService modificationService;
+    private PipelineModificationService modificationService = new PipelineModificationServiceImpl();
 
     private Set<Modification> modifications;
 
     @Before
-    public void loadModifications() throws IOException, JDOMException {
+    public void loadModifications() throws IOException, JDOMException, URISyntaxException {
         if (modifications == null) {
-            Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));            
+            File modificationsResource = ResourceUtils.getInternalResource("resources/pride_asap_modifications.xml");
             modifications = modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP);
         }
     }

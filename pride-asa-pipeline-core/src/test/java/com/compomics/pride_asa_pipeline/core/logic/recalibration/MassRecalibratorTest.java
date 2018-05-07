@@ -30,16 +30,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 
 /**
  * @author Niels Hulstaert Hulstaert
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
+
 public class MassRecalibratorTest {
 
     private static final String[] aminoAcidSequenceStrings = new String[]{"AAAAAAWWWWWWWW", "KRRKKRKDKKKKKKKKKKKKKKK",
@@ -48,7 +44,7 @@ public class MassRecalibratorTest {
     private static final double[] massDeltas = new double[]{-50, 10, 25, 19, -70, 2, 6, -3, 8, 11};
     
     private Collection<Peptide> peptides;
-    @Autowired
+
     private MassRecalibrator massRecalibrator;
     private AnalyzerData analyzerData;
 

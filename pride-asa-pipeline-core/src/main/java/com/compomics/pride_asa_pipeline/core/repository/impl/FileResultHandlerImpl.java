@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -143,7 +144,11 @@ public class FileResultHandlerImpl implements FileResultHandler {
             spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
             //load modifications if necessary
             if (modifications == null) {
-                loadModifications();
+                try {
+                    loadModifications();
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
             }
 
             String line;
@@ -355,13 +360,13 @@ public class FileResultHandlerImpl implements FileResultHandler {
     /**
      * loads pipeline modifications in order to map the modification names in the result file to the right modification
      */
-    private void loadModifications() {
+    private void loadModifications() throws URISyntaxException {
         modifications = new HashMap<>();
         if(modificationService==null){
             modificationService=new PipelineModificationServiceImpl();
         }
         try {
-            for (Modification modification : modificationService.loadPipelineModifications(ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file")), InputType.PRIDE_ASAP)) {
+            for (Modification modification : modificationService.loadPipelineModifications(ResourceUtils.getInternalResource("resources/pride_asap_modifications.xml"), InputType.PRIDE_ASAP)) {
                 modifications.put(modification.getName(), modification);
             }
         } catch (JDOMException ex) {

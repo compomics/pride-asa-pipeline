@@ -19,6 +19,9 @@ import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
+
+import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -26,7 +29,6 @@ import java.util.Set;
 import static org.junit.Assert.*;
 import org.jdom2.JDOMException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  *
@@ -38,8 +40,8 @@ public class ModificationCombinationTest {
     private PipelineModificationService modificationService;
 
     @Test
-    public void testEqualsAndHashCode() throws JDOMException {
-        Resource modificationsResource = ResourceUtils.getResourceByRelativePath("modifications_equal_mass.xml");
+    public void testEqualsAndHashCode() throws JDOMException, URISyntaxException {
+        File modificationsResource = new File(ModificationCombinationTest.class.getClassLoader().getResource("modifications_equal_mass.xml").toURI());
         Set<Modification> modifications = modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP);
 
         //create 2 modification combinations with the same modifications, but in a different order in the modification list

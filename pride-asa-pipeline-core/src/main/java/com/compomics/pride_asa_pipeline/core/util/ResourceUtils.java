@@ -16,20 +16,14 @@
 package com.compomics.pride_asa_pipeline.core.util;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import org.apache.log4j.Logger;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+
 
 /**
  *
@@ -47,19 +41,21 @@ public class ResourceUtils {
      * @param relativePath the relative path of the resource
      * @return the found resource
      */
-    public static Resource getResourceByRelativePath(String relativePath) {
-        Resource resource = new FileSystemResource(relativePath);
+    public static File getResourceByRelativePath(String relativePath) {
 
-        if (!resource.exists()) {
-            //try to find it on the classpath
-            resource = new ClassPathResource(relativePath);
-
-            if (!resource.exists()) {
-                resource = null;
-            }
-        }
+        File resource = new File(relativePath);
 
         return resource;
+    }
+
+    public static File getInternalResource(String name){
+        try {
+            File resource = new File(ResourceUtils.class.getClassLoader().getResource(name).toURI());
+            return resource;
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -72,7 +68,7 @@ public class ResourceUtils {
     public static boolean isExistingFile(String relativePath) {
         boolean isExistingResource = Boolean.FALSE;
 
-        Resource resource = new FileSystemResource(relativePath);
+        File resource = new File(relativePath);
         if (resource.exists()) {
             isExistingResource = true;
         }

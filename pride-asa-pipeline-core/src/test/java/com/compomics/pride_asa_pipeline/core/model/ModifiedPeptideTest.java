@@ -26,27 +26,24 @@ import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
+
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
 import static org.junit.Assert.*;
 import org.jdom2.JDOMException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 
 /**
  *
  * @author Niels Hulstaert Hulstaert
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
+
 public class ModifiedPeptideTest {
 
-    @Autowired
     private PipelineModificationService modificationService;
 
     /**
@@ -334,8 +331,8 @@ public class ModifiedPeptideTest {
      *
      */
     @Test
-    public void testEquals() throws UnknownAAException, IOException, JDOMException {
-        Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
+    public void testEquals() throws UnknownAAException, IOException, JDOMException, URISyntaxException {
+        File modificationsResource = new File(ModifiedPeptideTest.class.getClassLoader().getResource("modification.pipeline_modifications_file").toURI());
         Set<Modification> modifications = modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP);
 
         Peptide peptide = new Peptide(1, 1256, new AminoAcidSequence("AAAKENKKNYYY"));

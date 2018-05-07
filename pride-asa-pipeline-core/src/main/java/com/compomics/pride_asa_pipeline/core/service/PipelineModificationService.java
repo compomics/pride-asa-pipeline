@@ -18,8 +18,8 @@ package com.compomics.pride_asa_pipeline.core.service;
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import org.jdom2.JDOMException;
-import org.springframework.core.io.Resource;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Set;
 
@@ -40,7 +40,7 @@ public interface PipelineModificationService {
      * does not exist or could not be parsed.
      * @throws JDOMException
      */
-    Set<Modification> loadPipelineModifications(Resource modificationsResource, InputType inputType) throws JDOMException;
+    Set<Modification> loadPipelineModifications(File modificationsResource, InputType inputType) throws JDOMException;
 
     /**
      * Saves the pipeline modifications to the pride_asap_modifications.xml resource.
@@ -48,7 +48,7 @@ public interface PipelineModificationService {
      * @param modificationsResource the modifications XML resource
      * @param pipelineModifications the collections of pipeline modifications
      */
-    void savePipelineModifications(Resource modificationsResource, Collection<Modification> pipelineModifications);
+    void savePipelineModifications(File modificationsResource, Collection<Modification> pipelineModifications);
 
     /**
      * Imports the pipeline modifications from a given the modifications resource.
@@ -58,5 +58,5 @@ public interface PipelineModificationService {
      * @return the modifications set
      * @throws JDOMException
      */
-    Set<Modification> importPipelineModifications(Resource modificationsResource, InputType inputType) throws JDOMException;
+    Set<Modification> importPipelineModifications(File modificationsResource, InputType inputType) throws JDOMException;
 }

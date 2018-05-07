@@ -24,33 +24,20 @@ import static org.junit.Assert.*;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-/**
- * Created by IntelliJ IDEA. User: niels Date: 28/10/11 Time: 16:42 To change
- * this template use File | Settings | File Templates.
- */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
+
+
 public class NoiseThresholdFinderTest {
 
     private static double[] values_1;
     private static double[] values_2;
     private static double[] values_3;
-    @Autowired
     private NoiseThresholdFinder noiseTresholdFinder;
 
     @BeforeClass
     public static void setUponce() throws Exception {
-        Resource resource = new ClassPathResource("Filter_TestData_1.txt");
-        File file = resource.getFile();
-
-        BufferedReader br = new BufferedReader(new FileReader(file));
+        File resource = new File(NoiseThresholdFinderTest.class.getClassLoader().getResource("Filter_TestData_1.txt").toURI());
+        BufferedReader br = new BufferedReader(new FileReader(resource));
 
         String line = null;
         List valuesList = new ArrayList<Double>();
@@ -61,10 +48,8 @@ public class NoiseThresholdFinderTest {
 
         br.close();
 
-        resource = new ClassPathResource("Filter_TestData_2.txt");
-        file = resource.getFile();
-
-        br = new BufferedReader(new FileReader(file));
+        resource = new File(NoiseThresholdFinderTest.class.getClassLoader().getResource("Filter_TestData_2.txt").toURI());
+        br = new BufferedReader(new FileReader(resource));
 
         line = null;
         valuesList = new ArrayList<Double>();
@@ -75,10 +60,9 @@ public class NoiseThresholdFinderTest {
 
         br.close();
 
-        resource = new ClassPathResource("Filter_TestData_3.txt");
-        file = resource.getFile();
+        resource =  new File(NoiseThresholdFinderTest.class.getClassLoader().getResource("Filter_TestData_3.txt").toURI());
 
-        br = new BufferedReader(new FileReader(file));
+        br = new BufferedReader(new FileReader(resource));
 
         line = null;
         valuesList = new ArrayList<Double>();

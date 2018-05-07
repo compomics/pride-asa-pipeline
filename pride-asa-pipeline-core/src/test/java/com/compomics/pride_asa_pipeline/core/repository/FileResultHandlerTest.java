@@ -16,6 +16,7 @@
 package com.compomics.pride_asa_pipeline.core.repository;
 
 
+import com.compomics.pride_asa_pipeline.core.repository.impl.FileResultHandlerImpl;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
@@ -44,7 +45,7 @@ import org.jdom2.JDOMException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+
 
 /**
  *
@@ -53,7 +54,7 @@ import org.junit.runner.RunWith;
 
 public class FileResultHandlerTest {
 
-    private FileResultHandler fileResultHandler;
+    private FileResultHandler fileResultHandler = new FileResultHandlerImpl();
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 

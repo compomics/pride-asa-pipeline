@@ -25,7 +25,11 @@ import com.compomics.pride_asa_pipeline.model.Modification;
 import static com.compomics.pride_asa_pipeline.model.Modification.Location.C_TERMINAL;
 import static com.compomics.pride_asa_pipeline.model.Modification.Location.NON_TERMINAL;
 import static com.compomics.pride_asa_pipeline.model.Modification.Location.N_TERMINAL;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -111,7 +115,7 @@ public class OmssaModificationMarshallerImpl implements OmssaModificationMarshal
         return locationType;
     }
 
-    public static void main(String[] args) throws JDOMException {
+    public static void main(String[] args) throws JDOMException, URISyntaxException {
         OmssaModificationMarshallerImpl omssaModificationMarshallerImpl = new OmssaModificationMarshallerImpl();
         Set<Modification> unmarshall = omssaModificationMarshallerImpl.unmarshall(ResourceUtils.getResourceByRelativePath("/resources/searchGUI_to_pride_mods_common.xml"));
         for (Modification aMod : unmarshall) {
@@ -123,16 +127,16 @@ public class OmssaModificationMarshallerImpl implements OmssaModificationMarshal
      * Unmarshalls the given modifications XML resource and returns a set of
      * modifications
      *
-     * @param modificationsResource the OMSSA (or searchGUI) modifications XML resource to be parsed
+     * @param  searchGuiModificationsResource
      * @return the set of modifications
      * @exception JDOMException
      */
     @Override
-    public Set<Modification> unmarshall(Resource searchGuiModificationsResource) throws JDOMException {
+    public Set<Modification> unmarshall(File searchGuiModificationsResource) throws JDOMException {
         SAXBuilder builder = new SAXBuilder();
         Document document = null;
         try {
-            document = builder.build(searchGuiModificationsResource.getInputStream());
+            document = builder.build(new FileInputStream(searchGuiModificationsResource));
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }

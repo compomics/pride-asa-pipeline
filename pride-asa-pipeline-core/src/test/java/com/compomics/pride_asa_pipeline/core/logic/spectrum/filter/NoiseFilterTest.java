@@ -25,7 +25,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  *
@@ -38,10 +37,9 @@ public class NoiseFilterTest {
 
     @BeforeClass
     public static void setUponce() throws Exception {
-        Resource resource = new ClassPathResource("Filter_TestData_1.txt");
-        File file = resource.getFile();
+        File resource = new File(NoiseFilter.class.getClassLoader().getResource("Filter_TestData_1.txt").toURI());
 
-        BufferedReader br = new BufferedReader(new FileReader(file));
+        BufferedReader br = new BufferedReader(new FileReader(resource));
         peakList = new ArrayList<Peak>();
 
         String line = null;

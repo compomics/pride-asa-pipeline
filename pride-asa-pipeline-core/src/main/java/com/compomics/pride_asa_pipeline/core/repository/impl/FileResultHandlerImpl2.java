@@ -30,6 +30,7 @@ import org.jdom2.JDOMException;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -373,7 +374,7 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
             for (Modification modification : modificationService.loadPipelineModifications(ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file")), InputType.PRIDE_ASAP)) {
                 modifications.put(modification.getName(), modification);
             }
-        } catch (JDOMException ex) {
+        } catch (JDOMException  ex) {
             LOGGER.error(ex.getMessage(), ex);
         }
     }

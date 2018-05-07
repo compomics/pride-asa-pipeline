@@ -40,6 +40,8 @@ import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
 import com.compomics.util.experiment.biology.Ion;
 import com.compomics.util.experiment.biology.IonFactory;
+
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -159,7 +161,7 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
     }
 
     @Override
-    public Set<Modification> initModifications(Resource modificationsResource, InputType inputType) {
+    public Set<Modification> initModifications(File modificationsResource, InputType inputType) {
         if (!areModificationsLoaded) {
             areModificationsLoaded = true;
             modificationHolder = new ModificationHolder();

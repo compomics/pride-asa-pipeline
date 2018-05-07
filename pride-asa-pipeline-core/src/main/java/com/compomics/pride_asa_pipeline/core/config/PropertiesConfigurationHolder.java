@@ -15,13 +15,16 @@
  */
 package com.compomics.pride_asa_pipeline.core.config;
 
-import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
+
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
-import org.springframework.core.io.Resource;
+
 
 /**
  * Created by IntelliJ IDEA. User: niels Date: 9/11/11 Time: 13:41 To change
@@ -35,9 +38,9 @@ public class PropertiesConfigurationHolder extends PropertiesConfiguration {
     static {
         try {
 //                    ApplicationContextProvider.getInstance().setDefaultApplicationContext();
-            Resource propertiesResource = ResourceUtils.getResourceByRelativePath("resources/pride-asa-pipeline-core.properties");
+            File propertiesResource = new File(PropertiesConfigurationHolder.class.getClassLoader().getResource("resources/pride-asa-pipeline-core.properties").toURI());
             INSTANCE = new PropertiesConfigurationHolder(propertiesResource);          
-        } catch (IOException | ConfigurationException e) {
+        } catch (IOException | ConfigurationException | URISyntaxException e) {
             LOGGER.error(e.getMessage(), e);
         }
     }
@@ -51,7 +54,7 @@ public class PropertiesConfigurationHolder extends PropertiesConfiguration {
         return INSTANCE;
     }
 
-    private PropertiesConfigurationHolder(Resource propertiesResource) throws ConfigurationException, IOException {
-        super(propertiesResource.getURL());
+    private PropertiesConfigurationHolder(File propertiesResource) throws ConfigurationException, IOException {
+        super(propertiesResource);
     }
 }
