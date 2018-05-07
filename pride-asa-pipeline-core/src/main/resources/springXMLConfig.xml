@@ -3,12 +3,12 @@
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <!-- Property placeholder-->
+ <!-- Property placeholder-->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>./resources/pride-asa-pipeline-core.properties</value>
-           <!--  <value>classpath:resources/pride-asa-pipeline-core.properties</value>-->
+                <value>${property_file.source}:resources/pride-asa-pipeline-core.properties
+                </value>
             </list>
         </property>
         <property name="ignoreUnresolvablePlaceholders">

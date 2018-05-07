@@ -19,7 +19,6 @@ import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.IdentificationScore;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.math3.
@@ -32,13 +31,28 @@ import org.apache.log4j.Logger;
  */
 public class IdentificationFilter {
 
+    /*
+    The collection of identifications that should be considered
+    */
     private final Collection<Identification> identifications;
+    /**
+     * The logging instqnce
+     */
     private static final Logger LOGGER = Logger.getLogger(IdentificationFilter.class);
 
+    /**
+     * An identification filter to exclude identifications below a certain percentile
+     * @param identifications 
+     */
     public IdentificationFilter(Collection<Identification> identifications) {
         this.identifications = identifications;
     }
 
+    /**
+     * Returns the top ranked precursor hits
+     * @param percentile the threshold percentile value
+     * @return a list of identifications that are above this percentile
+     */
     public List<Identification> getTopPrecursorHits(double percentile) {
         List<Identification> topIdentifications = new ArrayList<>();
         if (identifications.size() > 30) {
@@ -62,6 +76,12 @@ public class IdentificationFilter {
         return topIdentifications;
     }
 
+    
+     /**
+     * Returns the top ranked precursor hits
+     * @param percentile the threshold percentile value
+     * @return a list of identifications that are above this percentile
+     */
     public List<Identification> getTopFragmentIonHits(double percentile) {
         List<Identification> topIdentifications = new ArrayList<>();
         if (identifications.size() > 30) {

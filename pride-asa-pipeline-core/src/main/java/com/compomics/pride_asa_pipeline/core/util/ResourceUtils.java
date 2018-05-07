@@ -83,7 +83,9 @@ public class ResourceUtils {
     /**
      * Copy a file from internal source to destination.
      *
+     * @param resource the resource relative path in the jar
      * @return True if succeeded , False if not
+     * @throws java.io.IOException
      */
     public static File ExportToWorkingDirectory(String resource) throws IOException {
 
@@ -95,12 +97,8 @@ public class ResourceUtils {
         if (destination.exists()) {
             return destination;
         }
-        System.out.println("Copying ->" + resource + "\n\tto ->" + destination);
-
         Files.copy(source, destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
         return destination;
-
     }
 
 }
