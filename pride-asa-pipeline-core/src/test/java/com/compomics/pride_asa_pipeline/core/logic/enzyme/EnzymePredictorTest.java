@@ -63,7 +63,7 @@ public class EnzymePredictorTest {
     }
 
     private File getFileFromResources(String fileName) throws IOException, URISyntaxException {
-        File testResource = new File(EnzymePredictorTest.class.getResource(fileName).toURI());
+        File testResource = new File(EnzymePredictorTest.class.getClassLoader().getResource(fileName).toURI());
         if (testResource.getName().endsWith(".zip")) {
             ZipUtils.unzip(testResource, testResource.getParentFile(), null);
             testResource = new File(testResource.getAbsolutePath().replace(".zip", ""));

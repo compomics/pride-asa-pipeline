@@ -16,6 +16,7 @@
 package com.compomics.pride_asa_pipeline.core.logic.recalibration;
 
 import com.compomics.pride_asa_pipeline.core.logic.recalibration.impl.MassRecalibratorImpl;
+import com.compomics.pride_asa_pipeline.core.logic.recalibration.impl.SimpleMassWindowFinder;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
@@ -46,12 +47,17 @@ public class MassRecalibratorTest {
     
     private Collection<Peptide> peptides;
 
-    private MassRecalibrator massRecalibrator = new MassRecalibratorImpl();
+    private MassRecalibrator massRecalibrator;
     private AnalyzerData analyzerData;
 
     @Before
-    public void initialize() throws UnknownAAException, AASequenceMassUnknownException {
+    public void setUp() throws UnknownAAException, AASequenceMassUnknownException {
         peptides = new ArrayList<Peptide>();
+
+        MassWindowFinder finderMass = new SimpleMassWindowFinder();
+
+        massRecalibrator = new MassRecalibratorImpl();
+        massRecalibrator.setMassWindowFinder(finderMass);
 
         //set considered charge states
         Set<Integer> consideredChargeStates = new HashSet<Integer>();
