@@ -17,14 +17,14 @@ package com.compomics.pride_asa_pipeline.model;
 
 import com.compomics.pride_asa_pipeline.model.util.ResourceUtils;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 import javax.swing.event.SwingPropertyChangeSupport;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.log4j.Logger;
-import org.springframework.core.io.Resource;
 
 /**
  * Date: 11-Jan-2008
@@ -64,12 +64,12 @@ public class Modification implements Comparable<Modification>, ModificationFacad
 
     static {
         try {
-            Resource propertiesResource = ResourceUtils.getResourceByRelativePath("resources/pride-asa-pipeline-model.properties");
-            PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration(propertiesResource.getURL());
-
-            useMonoIsotopicMass = propertiesConfiguration.getBoolean("modification.use_monoisotopic_mass");
-        } catch (IOException | ConfigurationException e) {
-            //do nothing
+            URL propertiesResource = Modification.class.getClassLoader().getResource("resources/pride-asa-pipeline-model.properties");
+            Properties properties = new Properties();
+            properties.load(new FileInputStream(new File(propertiesResource.toURI())));
+            useMonoIsotopicMass = Boolean.parseBoolean(properties.getProperty("modification.use_monoisotopic_mass"));
+        } catch (Exception e) {
+            System.out.println("Worng properties file");
         }
     }
 

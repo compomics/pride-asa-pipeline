@@ -15,7 +15,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.repository;
 
-import com.compomics.pride_asa_pipeline.core.repository.FileResultHandler;
+
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
@@ -34,6 +34,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -44,21 +45,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author Niels Hulstaert
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
+
 public class FileResultHandlerTest {
 
-    @Autowired
     private FileResultHandler fileResultHandler;
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -152,10 +146,10 @@ public class FileResultHandlerTest {
     }
 
     @Test
-    public void testReadResult() throws IOException {
-        Resource testDataResource = new ClassPathResource("FileResultHandler_TestData.txt");
+    public void testReadResult() throws IOException, URISyntaxException {
+        File testDataResource = new File(FileResultHandlerTest.class.getClassLoader().getResource("FileResultHandler_TestData.txt").toURI());
 
-        SpectrumAnnotatorResult spectrumAnnotatorResult = fileResultHandler.readResult(testDataResource.getFile());
+        SpectrumAnnotatorResult spectrumAnnotatorResult = fileResultHandler.readResult(testDataResource);
 
         assertNotNull(spectrumAnnotatorResult);
         assertEquals("FileResultHandler_TestData", spectrumAnnotatorResult.getExperimentAccession());

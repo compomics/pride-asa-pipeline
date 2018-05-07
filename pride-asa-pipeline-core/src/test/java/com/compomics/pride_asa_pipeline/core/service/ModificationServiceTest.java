@@ -18,28 +18,22 @@ package com.compomics.pride_asa_pipeline.core.service;
 import com.compomics.pride_asa_pipeline.core.logic.modification.ModificationMarshaller;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
-import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
+
+import java.io.File;
+import java.net.URISyntaxException;
 import java.util.Set;
 import static org.junit.Assert.*;
 import org.jdom2.JDOMException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 
 /**
  *
  * @author Niels Hulstaert Hulstaert
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
 public class ModificationServiceTest {
 
-    @Autowired
     private ModificationMarshaller modificationMarshaller;
-    @Autowired
     private DbModificationService modificationService;
 
     /**
@@ -48,9 +42,11 @@ public class ModificationServiceTest {
      * @throws JDOMException
      */
     @Test
-    public void testFilterModifications_1() throws JDOMException {
-        Resource modificationsResource = ResourceUtils.getResourceByRelativePath("resources/pride_asap_modifications.xml");
-        Resource prideModificationsResource = ResourceUtils.getResourceByRelativePath("conflicting_pride_asap_modifications_1.xml");
+    public void testFilterModifications_1() throws JDOMException, URISyntaxException {
+        File modificationsResource = new File(ModificationServiceTest.class.getClassLoader().getResource("resources/pride_asap_modifications.xml").toURI());
+
+        File prideModificationsResource = new File(ModificationServiceTest.class.getClassLoader().getResource("conflicting_pride_asap_modifications_1.xml").toURI());
+
         Set<Modification> modifications = modificationMarshaller.unmarshall(modificationsResource);
         Set<Modification> prideModifications = modificationMarshaller.unmarshall(prideModificationsResource);
 
@@ -71,9 +67,10 @@ public class ModificationServiceTest {
      * @throws JDOMException
      */
     @Test
-    public void testFilterModifications_2() throws JDOMException {
-        Resource modificationsResource = ResourceUtils.getResourceByRelativePath("resources/pride_asap_modifications.xml");
-        Resource prideModificationsResource = ResourceUtils.getResourceByRelativePath("conflicting_pride_asap_modifications_2.xml");
+    public void testFilterModifications_2() throws JDOMException, URISyntaxException {
+        File modificationsResource = new File(ModificationServiceTest.class.getClassLoader().getResource("resources/pride_asap_modifications.xml").toURI());
+        File prideModificationsResource = new File(ModificationServiceTest.class.getClassLoader().getResource("conflicting_pride_asap_modifications_2.xml").toURI());
+
         Set<Modification> modifications = modificationMarshaller.unmarshall(modificationsResource);
         Set<Modification> prideModifications = modificationMarshaller.unmarshall(prideModificationsResource);
 
@@ -94,9 +91,9 @@ public class ModificationServiceTest {
      * @throws JDOMException
      */
     @Test
-    public void testFilterModifications_3() throws JDOMException {
-        Resource modificationsResource = ResourceUtils.getResourceByRelativePath("resources/pride_asap_modifications.xml");
-        Resource prideModificationsResource = ResourceUtils.getResourceByRelativePath("conflicting_pride_asap_modifications_3.xml");
+    public void testFilterModifications_3() throws JDOMException, URISyntaxException {
+        File modificationsResource = new File(ModificationServiceTest.class.getClassLoader().getResource("resources/pride_asap_modifications.xml").toURI());
+        File prideModificationsResource = new File(ModificationServiceTest.class.getClassLoader().getResource("conflicting_pride_asap_modifications_3.xml").toURI());
         Set<Modification> modifications = modificationMarshaller.unmarshall(modificationsResource);
         Set<Modification> prideModifications = modificationMarshaller.unmarshall(prideModificationsResource);
 

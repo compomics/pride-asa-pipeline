@@ -27,20 +27,14 @@ import static org.junit.Assert.*;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author Niels Hulstaert Hulstaert
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
+
 public class ModificationCombinationTest {
 
-    @Autowired
     private PipelineModificationService modificationService;
 
     @Test

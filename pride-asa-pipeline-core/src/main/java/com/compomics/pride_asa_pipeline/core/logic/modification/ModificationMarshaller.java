@@ -16,10 +16,11 @@
 package com.compomics.pride_asa_pipeline.core.logic.modification;
 
 import com.compomics.pride_asa_pipeline.model.Modification;
+
+import java.io.File;
 import java.util.Collection;
 import java.util.Set;
 import org.jdom2.JDOMException;
-import org.springframework.core.io.Resource;
 
 /**
  *
@@ -35,7 +36,7 @@ public interface ModificationMarshaller {
      * @return the set of modifications
      * @exception JDOMException
      */
-    Set<Modification> unmarshall(Resource modificationsResource) throws JDOMException;
+    Set<Modification> unmarshall(File modificationsResource) throws JDOMException;
 
     /**
      * Marshalls the collection of modifications to given XML file.
@@ -43,5 +44,5 @@ public interface ModificationMarshaller {
      * @param modificationsResource the modifications resource
      * @param modifications the modifications collection
      */
-    void marshall(Resource modificationsResource, Collection<Modification> modifications);
+    void marshall(File modificationsResource, Collection<Modification> modifications);
 }

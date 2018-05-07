@@ -23,14 +23,11 @@ import com.compomics.pride_asa_pipeline.core.service.DbModificationService;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -39,14 +36,10 @@ import static org.junit.Assert.*;
  *
  * @author Niels Hulstaert Hulstaert
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
 public class UsedMoficationsTest {
 
-    @Autowired
     private DbModificationService modificationService;
-    
-    @Autowired
+
     private FileResultHandler fileResultHandler;
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -55,10 +48,10 @@ public class UsedMoficationsTest {
      * Test the ion mass ladder with one NT modification
      */
     @Test
-    public void testIonMassLadder_1() throws UnknownAAException, AASequenceMassUnknownException, IOException {
-        Resource testDataResource = new ClassPathResource("FileResultHandler_TestData_2.txt");
+    public void testIonMassLadder_1() throws UnknownAAException, AASequenceMassUnknownException, IOException, URISyntaxException {
+        File testDataResource = new File(UsedMoficationsTest.class.getClassLoader().getResource("FileResultHandler_TestData_2.txt").toURI());
 
-        SpectrumAnnotatorResult spectrumAnnotatorResult = fileResultHandler.readResult(testDataResource.getFile());
+        SpectrumAnnotatorResult spectrumAnnotatorResult = fileResultHandler.readResult(testDataResource);
 
         assertNotNull(spectrumAnnotatorResult);
         assertEquals("FileResultHandler_TestData_2", spectrumAnnotatorResult.getExperimentAccession());

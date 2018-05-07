@@ -23,15 +23,18 @@ import com.compomics.util.experiment.identification.protein_sequences.SequenceFa
 import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import junit.framework.TestCase;
-import org.springframework.core.io.ClassPathResource;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Kenneth Verheggen
  */
-public class EnzymePredictorTest extends TestCase {
+public class EnzymePredictorTest {
 
     private Enzyme testingEnzyme;
     private Enzyme testingEnzyme2;
@@ -40,10 +43,6 @@ public class EnzymePredictorTest extends TestCase {
     private SequenceFactory sequenceFactory;
     private EnzymeFactory enzymeFactory;
     private Enzyme testingEnzyme5;
-
-    public EnzymePredictorTest(String testName) {
-        super(testName);
-    }
 
     private List<String> mockUpPeptideDigestion(Enzyme enzyme, int sampleSize) throws Exception {
         List<String> peptideList = new ArrayList<>();
@@ -63,8 +62,8 @@ public class EnzymePredictorTest extends TestCase {
         return peptideList;
     }
 
-    private File getFileFromResources(String fileName) throws IOException {
-        File testResource = new ClassPathResource(fileName).getFile();
+    private File getFileFromResources(String fileName) throws IOException, URISyntaxException {
+        File testResource = new File(EnzymePredictorTest.class.getResource(fileName).toURI());
         if (testResource.getName().endsWith(".zip")) {
             ZipUtils.unzip(testResource, testResource.getParentFile(), null);
             testResource = new File(testResource.getAbsolutePath().replace(".zip", ""));
@@ -73,11 +72,10 @@ public class EnzymePredictorTest extends TestCase {
         return testResource;
     }
 
-    @Override
+    @Before
     protected void setUp() throws Exception {
-        super.setUp();
         File fastaFile = getFileFromResources("uniprot-human_reviewed_december_13_concatenated_target_decoy.fasta.zip");
-        File enzymeFile = new ClassPathResource("searchGUI_enzymes.xml").getFile();
+        File enzymeFile = new File(EnzymePredictorTest.class.getClassLoader().getResource("searchGUI_enzymes.xml").toURI());
         sequenceFactory = SequenceFactory.getInstance();
         sequenceFactory.loadFastaFile(fastaFile, null);
         enzymeFactory = EnzymeFactory.getInstance();
@@ -89,55 +87,57 @@ public class EnzymePredictorTest extends TestCase {
         testingEnzyme5 = enzymeFactory.getEnzyme("Chymotrypsin (FYWL)");
     }
 
+    @Test
     public void testTrypsin() throws Exception {
         System.out.println("Test Trypsin");
         List<String> peptides = mockUpPeptideDigestion(testingEnzyme, 300);
         EnzymePredictor predictor = new EnzymePredictor(peptides);
         Enzyme bestGuess = predictor.getMostLikelyEnzyme();
         System.out.println("Outcome = " + bestGuess.getName());
-        assertTrue(bestGuess.getName().toUpperCase().contains("TRYP"));
+        Assert.assertTrue(bestGuess.getName().toUpperCase().contains("TRYP"));
     }
 
+    @Test
     public void testArgC() throws Exception {
         System.out.println("Test ARG-C");
         List<String> peptides = mockUpPeptideDigestion(testingEnzyme2, 300);
         EnzymePredictor predictor = new EnzymePredictor(peptides);
         Enzyme bestGuess = predictor.getMostLikelyEnzyme();
         System.out.println("Outcome = " + bestGuess.getName());
-        assertTrue(bestGuess.getName().toUpperCase().contains("ARG-C"));
+        Assert.assertTrue(bestGuess.getName().toUpperCase().contains("ARG-C"));
     }
 
+    @Test
     public void testLysC() throws Exception {
         System.out.println("Test LYS-C");
         List<String> peptides = mockUpPeptideDigestion(testingEnzyme3, 300);
         EnzymePredictor predictor = new EnzymePredictor(peptides);
         Enzyme bestGuess = predictor.getMostLikelyEnzyme();
         System.out.println("Outcome = " + bestGuess.getName());
-        assertTrue(bestGuess.getName().toUpperCase().contains("LYS-C"));
+        Assert.assertTrue(bestGuess.getName().toUpperCase().contains("LYS-C"));
 
     }
 
+    @Test
     public void testPepsin() throws Exception {
         System.out.println("Test PEPSIN");
         List<String> peptides = mockUpPeptideDigestion(testingEnzyme4, 300);
         EnzymePredictor predictor = new EnzymePredictor(peptides);
         Enzyme bestGuess = predictor.getMostLikelyEnzyme();
         System.out.println("Outcome = " + bestGuess.getName());
-        assertTrue(bestGuess.getName().toUpperCase().contains("PEPSIN"));
+        Assert.assertTrue(bestGuess.getName().toUpperCase().contains("PEPSIN"));
     }
 
+    @Test
     public void testChymoTrypsin() throws Exception {
         System.out.println("Test ChymoTrypsin");
         List<String> peptides = mockUpPeptideDigestion(testingEnzyme5, 300);
         EnzymePredictor predictor = new EnzymePredictor(peptides);
         Enzyme bestGuess = predictor.getMostLikelyEnzyme();
         System.out.println("Outcome = " + bestGuess.getName());
-        assertTrue(bestGuess.getName().toUpperCase().contains("CHYMOTRYP"));
+        Assert.assertTrue(bestGuess.getName().toUpperCase().contains("CHYMOTRYP"));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
+
 
 }
