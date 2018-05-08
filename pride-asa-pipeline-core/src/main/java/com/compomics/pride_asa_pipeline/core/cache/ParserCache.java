@@ -79,7 +79,7 @@ public class ParserCache {
             if (identificationsFile.getName().toUpperCase().endsWith(".XML")) {
                 PrideXmlControllerImpl prideXmlControllerImpl = new PrideXmlControllerImpl(identificationsFile);
                 parserCache.put(experimentAccession, prideXmlControllerImpl);
-                peakFileCache.put(experimentAccession, Arrays.asList(new File[]{identificationsFile}));
+                peakFileCache.put(experimentAccession, Arrays.asList(identificationsFile));
             } else {
                 parserCache.put(experimentAccession, new MzIdentMLControllerImpl(identificationsFile, inMemory));
             }
@@ -145,7 +145,7 @@ public class ParserCache {
         CachedDataAccessController controller = parserCache.get(experimentName);
         if (controller instanceof MzIdentMLControllerImpl) {
             ((MzIdentMLControllerImpl) controller).addMSController(peakFiles);
-            List<File> peakFileList = peakFileCache.getOrDefault(experimentName, new ArrayList<File>());
+            List<File> peakFileList = peakFileCache.getOrDefault(experimentName, new ArrayList<>());
             peakFileList.addAll(peakFiles);
             peakFileCache.put(experimentName, peakFileList);
         }

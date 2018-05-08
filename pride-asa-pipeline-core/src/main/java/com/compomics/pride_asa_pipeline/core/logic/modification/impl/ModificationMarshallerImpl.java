@@ -19,9 +19,8 @@ import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolde
 import com.compomics.pride_asa_pipeline.core.logic.modification.ModificationMarshaller;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+
+import java.io.*;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,12 +65,12 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
     }
 
     @Override
-    public Set<Modification> unmarshall(Resource modificationsResource) throws JDOMException {
+    public Set<Modification> unmarshall(File modificationsResource) throws JDOMException {
         SAXBuilder builder = new SAXBuilder(schemaFactory);
 
         Document document = null;
         try {
-            document = builder.build(modificationsResource.getInputStream());
+            document = builder.build( new BufferedInputStream( new FileInputStream(modificationsResource)));
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -115,7 +114,7 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
     }
 
     @Override
-    public void marshall(Resource modificationsResource, Collection<Modification> modifications) {
+    public void marshall(File modificationsResource, Collection<Modification> modifications) {
         try {
             //add root element
             Document doc = new Document();
@@ -178,7 +177,7 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
 
             XMLOutputter xmlOutputter = new XMLOutputter();
             xmlOutputter.setFormat(Format.getPrettyFormat());
-            OutputStream outputStream = new FileOutputStream(modificationsResource.getFile());
+            OutputStream outputStream = new FileOutputStream(modificationsResource);
             xmlOutputter.output(doc, outputStream);
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage(), ex);

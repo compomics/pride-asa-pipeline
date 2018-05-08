@@ -23,7 +23,7 @@ import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperiment
 import com.compomics.util.experiment.identification.identification_parameters.SearchParameters;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
+
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -73,8 +73,6 @@ public class FileRunner {
             System.out.println(analyze);
             SearchParameters.saveIdentificationParameters(analyze, new File(outputFolder,inputFile.getName()+".par"));
         } catch (MGFExtractionException ex) {
-            LOGGER.error(ex);
-        } catch (MzXMLParsingException | JMzReaderException | XmlPullParserException | ClassNotFoundException | GOBOParseException ex) {
             LOGGER.error(ex);
         } catch (Exception ex) {
             LOGGER.error(ex);

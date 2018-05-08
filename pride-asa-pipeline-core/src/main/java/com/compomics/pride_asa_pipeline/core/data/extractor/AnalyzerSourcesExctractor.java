@@ -30,7 +30,7 @@ public class AnalyzerSourcesExctractor implements ResultSetExtractor<Map<String,
 
     @Override
     public Map<String, String> extractData(ResultSet rs) throws SQLException, DataAccessException {
-        Map<String, String> analyzerSourceMap = new HashMap<String, String>();
+        Map<String, String> analyzerSourceMap = new HashMap<>();
         while (rs.next()) {
             analyzerSourceMap.put(rs.getString("accession"), rs.getString("value"));
         }

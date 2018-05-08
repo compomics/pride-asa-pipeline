@@ -16,7 +16,6 @@
 package com.compomics.pride_asa_pipeline.core.logic.impl;
 
 import com.compomics.pride_asa_pipeline.core.logic.CombinationGenerator;
-import com.compomics.pride_asa_pipeline.core.logic.CombinationGenerator;
 import com.compomics.pride_asa_pipeline.core.logic.ZenArcher;
 import com.compomics.pride_asa_pipeline.core.util.MathUtils;
 import java.util.*;
@@ -37,9 +36,9 @@ public class ZenArcherImpl implements ZenArcher {
     @Override
     public Set<List<Double>> computeCombinations(double[] values, int sizeCombination) {
         CombinationGenerator generator = new CombinationGenerator(values.length, sizeCombination);
-        Set<List<Double>> results = new HashSet<List<Double>>();
+        Set<List<Double>> results = new HashSet<>();
         while (generator.hasMore()) {
-            List<Double> combination = new ArrayList<Double>();
+            List<Double> combination = new ArrayList<>();
             int[] indices = generator.getNext();
             for (int index : indices) {
                 combination.add(values[index]);

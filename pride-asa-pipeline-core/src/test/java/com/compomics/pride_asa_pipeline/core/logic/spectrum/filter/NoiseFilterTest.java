@@ -15,6 +15,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic.spectrum.filter;
 
+import com.compomics.pride_asa_pipeline.core.logic.spectrum.filter.impl.PeakNoiseFilter;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,31 +26,21 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author Niels Hulstaert Hulstaert
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
 public class NoiseFilterTest {
 
     private static List<Peak> peakList;
-    @Autowired
-    private NoiseFilter noiseFilter;
+    private NoiseFilter noiseFilter = new PeakNoiseFilter();
 
     @BeforeClass
     public static void setUponce() throws Exception {
-        Resource resource = new ClassPathResource("Filter_TestData_1.txt");
-        File file = resource.getFile();
+        File resource = new File(NoiseFilter.class.getClassLoader().getResource("Filter_TestData_1.txt").toURI());
 
-        BufferedReader br = new BufferedReader(new FileReader(file));
+        BufferedReader br = new BufferedReader(new FileReader(resource));
         peakList = new ArrayList<Peak>();
 
         String line = null;

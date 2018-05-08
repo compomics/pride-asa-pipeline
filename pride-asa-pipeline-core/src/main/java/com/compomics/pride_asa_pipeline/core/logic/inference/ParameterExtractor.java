@@ -63,7 +63,7 @@ public class ParameterExtractor {
         try {
             //load the spectrumAnnotator ---> make sure to use the right springXMLConfig using the webservice repositories
             ApplicationContextProvider.getInstance().setDefaultApplicationContext();
-            spectrumAnnotator = (SpectrumAnnotatorImpl) ApplicationContextProvider.getInstance().getBean("spectrumAnnotator");
+            spectrumAnnotator = ApplicationContextProvider.getInstance().getBean("spectrumAnnotator");
             init(assay);
         } catch (IOException | XmlPullParserException e) {
             throw new ParameterExtractionException(e.getMessage());

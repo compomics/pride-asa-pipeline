@@ -116,7 +116,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
                     //add all newly found combinations (if any) to the set of all modifications for this peptide
                     if (combinations != null && combinations.size() > 0) {
                         if (possibleExplainedIdentifications.get(identification) == null) {
-                            possibleExplainedIdentifications.put(identification, new HashSet<ModificationCombination>());
+                            possibleExplainedIdentifications.put(identification, new HashSet<>());
                         }
                         possibleExplainedIdentifications.get(identification).addAll(combinations);
                     } else {

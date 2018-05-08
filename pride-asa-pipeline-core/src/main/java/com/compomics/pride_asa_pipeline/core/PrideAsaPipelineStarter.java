@@ -15,7 +15,6 @@
  */
 package com.compomics.pride_asa_pipeline.core;
 
-import com.compomics.pride_asa_pipeline.core.gui.controller.MainController;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
 import java.awt.EventQueue;
 import java.io.File;
@@ -61,55 +60,6 @@ public class PrideAsaPipelineStarter {
         parse(commandLineArguments);
     }
 
-    public static void launchGuiMode() {
-        /*
-         * Set the Nimbus look and feel
-         */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /*
-         * If Nimbus (introduced in Java SE 6) is not available, stay with the
-         * default look and feel. For details see
-         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            //LOGGER.error(ex.getMessage(), ex);
-        } catch (InstantiationException ex) {
-            //LOGGER.error(ex.getMessage(), ex);
-        } catch (IllegalAccessException ex) {
-            //LOGGER.error(ex.getMessage(), ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            //LOGGER.error(ex.getMessage(), ex);
-        }
-        //</editor-fold>
-
-        /*
-         * Create and display the form
-         */
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //set GUI application context
-                    ApplicationContextProvider.getInstance().setApplicationContext(new ClassPathXmlApplicationContext("guiSpringXMLConfig.xml"));
-                    ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-                    MainController mainController = (MainController) applicationContext.getBean("mainController");
-                    mainController.init();
-                } catch (CannotGetJdbcConnectionException ex) {
-                    JOptionPane.showMessageDialog(null, "Cannot establish a connection to the PRIDE public database, the application will not start."
-                            + "\n" + "Make sure you have an active internet connection and/or check your firewall settings.", "Error", JOptionPane.ERROR_MESSAGE);
-                    System.exit(0);
-                }
-            }
-        });
-    }
-
     public static void launchCommandLineMode(String experimentAccession) throws Exception {
         ApplicationContextProvider.getInstance().setDefaultApplicationContext();
         ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
@@ -141,9 +91,6 @@ public class PrideAsaPipelineStarter {
         CommandLine commandLine;
         try {
             commandLine = cmdLineParser.parse(options, commandLineArguments);
-            if (commandLine.getOptions().length == 0) {
-                launchGuiMode();
-            }
             if (commandLine.hasOption('h')) {
                 printHelp(
                         options, 80, "Help", "End of Help",

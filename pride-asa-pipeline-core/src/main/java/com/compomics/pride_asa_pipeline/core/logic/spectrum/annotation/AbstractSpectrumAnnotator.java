@@ -42,6 +42,8 @@ import com.compomics.pride_asa_pipeline.model.ModifiedPeptide;
 import com.compomics.pride_asa_pipeline.model.Peak;
 import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.model.PipelineExplanationType;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import org.springframework.core.io.Resource;
+
 
 /**
  * @author Kenneth Verheggen
@@ -315,7 +317,7 @@ public abstract class AbstractSpectrumAnnotator {
      * @param inputType the type of modifications resource
      * @return the modifications found in pride
      */
-    public abstract Set<Modification> initModifications(Resource modificationsResource, InputType inputType);
+    public abstract Set<Modification> initModifications(File modificationsResource, InputType inputType);
 
     /**
      * Clears the pipeline resources.

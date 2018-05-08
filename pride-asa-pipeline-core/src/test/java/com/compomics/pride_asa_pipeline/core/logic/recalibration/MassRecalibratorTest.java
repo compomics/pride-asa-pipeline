@@ -15,6 +15,8 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic.recalibration;
 
+import com.compomics.pride_asa_pipeline.core.logic.recalibration.impl.MassRecalibratorImpl;
+import com.compomics.pride_asa_pipeline.core.logic.recalibration.impl.SimpleMassWindowFinder;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.core.model.MassRecalibrationResult;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
@@ -30,16 +32,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 
 /**
  * @author Niels Hulstaert Hulstaert
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
+
 public class MassRecalibratorTest {
 
     private static final String[] aminoAcidSequenceStrings = new String[]{"AAAAAAWWWWWWWW", "KRRKKRKDKKKKKKKKKKKKKKK",
@@ -48,13 +46,18 @@ public class MassRecalibratorTest {
     private static final double[] massDeltas = new double[]{-50, 10, 25, 19, -70, 2, 6, -3, 8, 11};
     
     private Collection<Peptide> peptides;
-    @Autowired
+
     private MassRecalibrator massRecalibrator;
     private AnalyzerData analyzerData;
 
     @Before
-    public void initialize() throws UnknownAAException, AASequenceMassUnknownException {
+    public void setUp() throws UnknownAAException, AASequenceMassUnknownException {
         peptides = new ArrayList<Peptide>();
+
+        MassWindowFinder finderMass = new SimpleMassWindowFinder();
+
+        massRecalibrator = new MassRecalibratorImpl();
+        massRecalibrator.setMassWindowFinder(finderMass);
 
         //set considered charge states
         Set<Integer> consideredChargeStates = new HashSet<Integer>();

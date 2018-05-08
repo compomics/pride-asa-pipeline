@@ -22,11 +22,12 @@ import com.compomics.pride_asa_pipeline.core.logic.modification.impl.Modificatio
 import com.compomics.pride_asa_pipeline.core.logic.modification.impl.OmssaModificationMarshallerImpl;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.model.Modification;
+
+import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.jdom2.JDOMException;
-import org.springframework.core.io.Resource;
 
 /**
  * @author Niels Hulstaert
@@ -57,7 +58,7 @@ public class PipelineModificationServiceImpl implements PipelineModificationServ
     }
 
     @Override
-    public Set<Modification> loadPipelineModifications(Resource modificationsResource, InputType inputType) throws JDOMException {
+    public Set<Modification> loadPipelineModifications(File modificationsResource, InputType inputType) throws JDOMException {
         //return the modifications or first unmarshall them from the specified
         //configuration file if not done so before
         if (pipelineModifications == null) {
@@ -67,7 +68,7 @@ public class PipelineModificationServiceImpl implements PipelineModificationServ
     }
 
     @Override
-    public void savePipelineModifications(Resource modificationsResource, Collection<Modification> newPipelineModifications) {
+    public void savePipelineModifications(File modificationsResource, Collection<Modification> newPipelineModifications) {
         modificationMarshaller.marshall(modificationsResource, newPipelineModifications);
         //replace the current pipeline modifications
         pipelineModifications.clear();
@@ -77,7 +78,7 @@ public class PipelineModificationServiceImpl implements PipelineModificationServ
     }
 
     @Override
-    public Set<Modification> importPipelineModifications(Resource modificationsResource, InputType inputType) throws JDOMException {
+    public Set<Modification> importPipelineModifications(File modificationsResource, InputType inputType) throws JDOMException {
         Set<Modification> modifications = modificationMarshaller.unmarshall(modificationsResource);
         loadPipelineModifications(modificationsResource, inputType);
         return modifications;
@@ -90,7 +91,7 @@ public class PipelineModificationServiceImpl implements PipelineModificationServ
      * @param modificationsResource the modifications resource
      * @throws JDOMException thrown in case of a xml parse exception
      */
-    private void loadPipelineModificationsFromResource(Resource modificationsResource, InputType inputType) throws JDOMException {
+    private void loadPipelineModificationsFromResource(File modificationsResource, InputType inputType) throws JDOMException {
         pipelineModifications = new HashSet<>();
         switch (inputType) {
             case PRIDE_ASAP:

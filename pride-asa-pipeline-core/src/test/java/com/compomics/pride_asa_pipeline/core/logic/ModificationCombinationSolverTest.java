@@ -17,6 +17,7 @@ package com.compomics.pride_asa_pipeline.core.logic;
 
 import com.compomics.pride_asa_pipeline.core.logic.modification.InputType;
 import com.compomics.pride_asa_pipeline.core.model.ModificationHolder;
+import com.compomics.pride_asa_pipeline.core.service.impl.PipelineModificationServiceImpl;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.AminoAcidSequence;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
@@ -26,39 +27,35 @@ import com.compomics.pride_asa_pipeline.core.logic.impl.ModificationCombinationS
 import com.compomics.pride_asa_pipeline.core.model.ModificationCombination;
 import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
+
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author Niels Hulstaert Hulstaert
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
+
 public class ModificationCombinationSolverTest {
 
     private static final String peptideSequenceString = "AAKENNYLENNART";
     private ModificationCombinationSolver modificationCombinationSolver;
-    @Autowired
-    private PipelineModificationService modificationService;
+    private PipelineModificationService modificationService = new PipelineModificationServiceImpl();
 
     @Before
-    public void initialize() throws IOException, JDOMException {
+    public void setUp() throws IOException, JDOMException, URISyntaxException {
         //Use @Before instead of @BeforeClass because @Autowired doesn't work with static,
         //so check if the modification holder is already set.
         if (modificationCombinationSolver == null) {
             //add the pipeline modifications
             ModificationHolder modificationHolder = new ModificationHolder();
-            Resource modificationsResource = ResourceUtils.getResourceByRelativePath(PropertiesConfigurationHolder.getInstance().getString("modification.pipeline_modifications_file"));
+            File modificationsResource = ResourceUtils.getInternalResource("resources/pride_asap_modifications.xml");
             modificationHolder.addModifications(modificationService.loadPipelineModifications(modificationsResource, InputType.PRIDE_ASAP));
 
             modificationCombinationSolver = new ModificationCombinationSolverImpl(modificationHolder);

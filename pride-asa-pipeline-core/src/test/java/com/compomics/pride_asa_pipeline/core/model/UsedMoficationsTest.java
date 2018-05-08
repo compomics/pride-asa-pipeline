@@ -15,6 +15,8 @@
  */
 package com.compomics.pride_asa_pipeline.core.model;
 
+import com.compomics.pride_asa_pipeline.core.repository.impl.FileResultHandlerImpl;
+import com.compomics.pride_asa_pipeline.core.service.impl.PrideModificationServiceImpl;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.AASequenceMassUnknownException;
 import com.compomics.pride_asa_pipeline.model.UnknownAAException;
@@ -23,14 +25,11 @@ import com.compomics.pride_asa_pipeline.core.service.DbModificationService;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -39,15 +38,12 @@ import static org.junit.Assert.*;
  *
  * @author Niels Hulstaert Hulstaert
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
 public class UsedMoficationsTest {
 
-    @Autowired
-    private DbModificationService modificationService;
-    
-    @Autowired
-    private FileResultHandler fileResultHandler;
+    private DbModificationService modificationService = new PrideModificationServiceImpl();
+
+    private FileResultHandler fileResultHandler = new FileResultHandlerImpl();
+
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -55,10 +51,10 @@ public class UsedMoficationsTest {
      * Test the ion mass ladder with one NT modification
      */
     @Test
-    public void testIonMassLadder_1() throws UnknownAAException, AASequenceMassUnknownException, IOException {
-        Resource testDataResource = new ClassPathResource("FileResultHandler_TestData_2.txt");
+    public void testIonMassLadder_1() throws UnknownAAException, AASequenceMassUnknownException, IOException, URISyntaxException {
+        File testDataResource = new File(UsedMoficationsTest.class.getClassLoader().getResource("FileResultHandler_TestData_2.txt").toURI());
 
-        SpectrumAnnotatorResult spectrumAnnotatorResult = fileResultHandler.readResult(testDataResource.getFile());
+        SpectrumAnnotatorResult spectrumAnnotatorResult = fileResultHandler.readResult(testDataResource);
 
         assertNotNull(spectrumAnnotatorResult);
         assertEquals("FileResultHandler_TestData_2", spectrumAnnotatorResult.getExperimentAccession());
@@ -66,8 +62,7 @@ public class UsedMoficationsTest {
         assertEquals(19, spectrumAnnotatorResult.getIdentifications().size());
         assertEquals(2, spectrumAnnotatorResult.getUnmodifiedPrecursors().size());
         assertEquals(12, spectrumAnnotatorResult.getModifiedPrecursors().size());        
-        assertEquals(5, spectrumAnnotatorResult.getUnexplainedIdentifications().size());        
-
+        assertEquals(5, spectrumAnnotatorResult.getUnexplainedIdentifications().size());
         Map<Modification, Integer> usedModifications = modificationService.getUsedModifications(spectrumAnnotatorResult);
         assertEquals(3, usedModifications.size());
 

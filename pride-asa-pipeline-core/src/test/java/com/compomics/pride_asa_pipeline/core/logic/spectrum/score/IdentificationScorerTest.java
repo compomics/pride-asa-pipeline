@@ -15,6 +15,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.logic.spectrum.score;
 
+import com.compomics.pride_asa_pipeline.core.logic.spectrum.score.impl.IdentificationScorerImpl;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.AnnotationData;
@@ -30,21 +31,11 @@ import java.util.List;
 import java.util.Set;
 import static org.junit.Assert.*;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-/**
- * Created by IntelliJ IDEA. User: niels Date: 13/12/11 Time: 16:59 To change
- * this template use File | Settings | File Templates.
- */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:springXMLConfig.xml")
+
 public class IdentificationScorerTest {
 
-    @Autowired
-    private IdentificationScorer identificationScorer;
+    private IdentificationScorer identificationScorer = new IdentificationScorerImpl();
 
     /**
      * Test the scoring of an unmodified peptide

@@ -27,8 +27,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+
 
 /**
  *
@@ -74,7 +73,7 @@ public class ResultHandlerImpl implements ResultHandler {
 
     @Override
     public void writeUsedModificationsToFile(String experimentAccession, Set<Modification> usedModifications) {
-        Resource usedModificationsResource = new FileSystemResource(PropertiesConfigurationHolder.getInstance().getString("results_path") + File.separator + experimentAccession + "_mods.xml");
+        File usedModificationsResource = new File((PropertiesConfigurationHolder.getInstance().getString("results_path") + File.separator + experimentAccession + "_mods.xml"));
         modificationMarshaller.marshall(usedModificationsResource, usedModifications);
     }
 

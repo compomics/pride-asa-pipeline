@@ -21,11 +21,11 @@ import com.compomics.util.experiment.identification.identification_parameters.Se
 import com.compomics.util.io.compression.ZipUtils;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import junit.framework.TestCase;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -48,8 +48,8 @@ public class ParameterExtractorTest extends TestCase {
         super.tearDown();
     }
 
-    private File getFileFromResources(String fileName) throws IOException {
-        File testResource = new ClassPathResource(fileName).getFile();
+    private File getFileFromResources(String fileName) throws IOException, URISyntaxException {
+        File testResource = new File(ParameterExtractorTest.class.getClassLoader().getResource(fileName).toURI());
         if (testResource.getName().endsWith(".zip")) {
             ZipUtils.unzip(testResource, testResource.getParentFile(), null);
             testResource = new File(testResource.getAbsolutePath().replace(".zip", ""));

@@ -162,7 +162,7 @@ public class MathUtils {
         if (values == null) {
             throw new IllegalArgumentException("No null value allowed!");
         }
-        List<Double> result = new ArrayList<Double>(values.length);
+        List<Double> result = new ArrayList<>(values.length);
         for (double value : values) {
             result.add(value);
         }
