@@ -411,7 +411,7 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
                                 break;
                         }
                         if (currentIon != null) {
-                            TreeSet<Double> masses = observedMasses.getOrDefault(currentIon, new TreeSet<Double>());
+                            TreeSet<Double> masses = observedMasses.getOrDefault(currentIon, new TreeSet<>());
                             masses.add(observedMass);
                             observedMasses.put(currentIon, masses);
                         }
@@ -438,7 +438,7 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
                                         break;
                                 }
                                 if (currentIon != null) {
-                                    TreeSet<Double> masses = theoreticalMasses.getOrDefault(currentIon, new TreeSet<Double>());
+                                    TreeSet<Double> masses = theoreticalMasses.getOrDefault(currentIon, new TreeSet<>());
                                     masses.add(theoreticMass);
                                     theoreticalMasses.put(currentIon, masses);
                                 }

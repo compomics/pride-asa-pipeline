@@ -73,7 +73,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
         }
 
         //the set that will hold the list of modification combinations
-        HashSet<ModificationCombination> modificationCombinations = new HashSet<ModificationCombination>();
+        HashSet<ModificationCombination> modificationCombinations = new HashSet<>();
 
         //generates the PeptideModificationHolder for the given peptide.
         //For performance purposes, the previous PeptideModificationHolders are cached
@@ -101,7 +101,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
 
         //loop over all possible modification combinations for the given peptide
         for (ModificationCombination candidateModificationCombination : peptideModificationHolder.getCandidateModificationCombinations()) {
-            Set<List<Double>> modificationCombinationMasses = new HashSet<List<Double>>();
+            Set<List<Double>> modificationCombinationMasses = new HashSet<>();
             //The combinationSizeLimit is variable and unbounded. It will increase until convergence
             //is achieved in IdentificationMassDeltaExplainer, so we need to ensure that it doesn't 
             //go beyond the actual number of modifications possible on a given peptide.
@@ -160,7 +160,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
 
         //the result will be a list of one (or potentially more than one) ModificationCombination
         //containing modifications that correspond to the provided masses.
-        List<ModificationCombination> modificationCombinations = new ArrayList<ModificationCombination>();
+        List<ModificationCombination> modificationCombinations = new ArrayList<>();
         //we assume one ModComb will be enough. We will add the mapped modifications
         //to this one and only create more ModCombs if necessary.
         ModificationCombination initialModificationCombination = new ModificationCombination();
@@ -290,8 +290,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
             //as provided by allPossibilities
             for (Modification modification : possibleModifications.get(sequenceIndex)) {
 
-                List<Modification> currentCandidateModifications = new ArrayList<>();
-                currentCandidateModifications.addAll(candidateModifications);
+                List<Modification> currentCandidateModifications = new ArrayList<>(candidateModifications);
                 currentCandidateModifications.add(modification);
                 //recurse
                 if (sequenceIndex < possibleModifications.size() - 1) {
@@ -332,7 +331,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
      */
     private void generateCandidateModificationCombinations(PeptideModificationHolder peptideModificationHolder) {
         HashSet<ModificationCombination> modificationCombinations = new HashSet<>();
-        calculateModificationCombinations(0, peptideModificationHolder.getModifications(), modificationCombinations, new ArrayList<Modification>());
+        calculateModificationCombinations(0, peptideModificationHolder.getModifications(), modificationCombinations, new ArrayList<>());
 
         //store the possible modification combinations in the peptide modification holder
         peptideModificationHolder.setCandidateModificationCombinations(modificationCombinations);

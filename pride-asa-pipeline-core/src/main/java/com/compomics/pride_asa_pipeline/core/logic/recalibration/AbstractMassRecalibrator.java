@@ -112,7 +112,7 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
      * @return the list of peptides
      */
     public List<Peptide> findPrecursorsWithCharge(Collection<Peptide> peptides, int charge) {
-        List<Peptide> precs = new ArrayList<Peptide>();
+        List<Peptide> precs = new ArrayList<>();
         for (Peptide peptide : peptides) {
             if (peptide.getCharge() == charge) {
                 precs.add(peptide);
@@ -128,7 +128,7 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
      * @return the usable peptide with a specific charge
      */
     public List<Peptide> findUsablePeptides(List<Peptide> peptidesByCharge) {
-        List<Peptide> peptides = new ArrayList<Peptide>();
+        List<Peptide> peptides = new ArrayList<>();
         //get threshold value from configuration file
         double threshold = PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.mass_delta_threshold");
         for (Peptide peptide : peptidesByCharge) {
@@ -154,7 +154,7 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
      * @throws AASequenceMassUnknownException
      */
     public List<Double> getMassErrors(List<Peptide> peptides) throws AASequenceMassUnknownException {
-        List<Double> errors = new ArrayList<Double>();
+        List<Double> errors = new ArrayList<>();
         for (Peptide peptide : peptides) {
             errors.add(peptide.calculateMassDelta());
         }
@@ -171,7 +171,7 @@ public abstract class AbstractMassRecalibrator implements MassRecalibrator {
      * @return the filtered mass errors
      */
     protected List<Double> filterMassErrors(List<Double> massErrors, double lower, double upper) {
-        List<Double> errors = new ArrayList<Double>();
+        List<Double> errors = new ArrayList<>();
         for (Double massError : massErrors) {
             if (massError >= lower && massError <= upper) {
                 errors.add(massError);

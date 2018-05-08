@@ -43,7 +43,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.springframework.core.io.Resource;
 
 /**
  * Created by IntelliJ IDEA. User: niels Date: 17/11/11 Time: 9:54 To change

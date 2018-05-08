@@ -247,20 +247,18 @@ public class PRIDEModificationFactory {
         LinkedHashMap<String, PRIDEModification> modificationMap1 = factory.getModificationMap();
         //sort them according to frequency (the default comparator)
         TreeSet<PRIDEModification> mods = new TreeSet<>();
-        for (PRIDEModification aMod : modificationMap1.values()) {
-            mods.add(aMod);
-        }
+        mods.addAll(modificationMap1.values());
         //save them to a file
         JsonMarshaller marshaller = new JsonMarshaller();
         marshaller.saveObjectToJson(mods, jsonFile);
     }
 
     public static TreeSet<PRIDEModification> getFromPRIDE() throws InterruptedException, IOException {
-        return getFromPRIDE(new ArrayList<PrideFilter>());
+        return getFromPRIDE(new ArrayList<>());
     }
 
     public static TreeSet<PRIDEModification> getFromPRIDE(File outputFile) throws InterruptedException, IOException {
-        return getFromPRIDE(outputFile, new ArrayList<PrideFilter>());
+        return getFromPRIDE(outputFile, new ArrayList<>());
     }
 
     public static TreeSet<PRIDEModification> getFromPRIDE(Collection<PrideFilter> prideFilters) throws InterruptedException, IOException {

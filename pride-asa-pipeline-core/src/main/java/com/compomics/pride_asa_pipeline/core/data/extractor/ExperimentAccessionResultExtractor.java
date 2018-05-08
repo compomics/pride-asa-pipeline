@@ -30,7 +30,7 @@ public class ExperimentAccessionResultExtractor implements ResultSetExtractor<Ma
 
     @Override
     public Map<String, String> extractData(ResultSet rs) throws SQLException, DataAccessException {
-        Map<String, String> experimentAccessions = new LinkedHashMap<String, String>();
+        Map<String, String> experimentAccessions = new LinkedHashMap<>();
         while (rs.next()) {
             experimentAccessions.put(rs.getString("accession"), rs.getString("title"));
         }

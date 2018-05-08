@@ -55,6 +55,7 @@ public class ChoiceIterable<T> implements Iterable<T[]> {
      * @param sampleSize
      * @param input
      */
+    @SafeVarargs
     public ChoiceIterable(int sampleSize, T... input) {
         this.sampleSize = sampleSize;
         this.input = input.clone();

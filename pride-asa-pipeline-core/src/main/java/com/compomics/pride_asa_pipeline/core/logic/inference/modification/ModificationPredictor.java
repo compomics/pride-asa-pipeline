@@ -75,7 +75,7 @@ public class ModificationPredictor {
     /**
      * A list of UNIMOD quant related terms
      */
-    private final List<Integer> quantAccessions = Arrays.asList(new Integer[]{258, 259, 267, 367, 687, 365, 866, 730, 532, 730, 533, 731, 739, 738, 737, 984, 985, 1341, 1342});
+    private final List<Integer> quantAccessions = Arrays.asList(258, 259, 267, 367, 687, 365, 866, 730, 532, 730, 533, 731, 739, 738, 737, 984, 985, 1341, 1342);
 
     public ModificationPredictor(SpectrumAnnotatorResult spectrumAnnotatorResult, ModificationService modificationService) {
         this.spectrumAnnotatorResult = spectrumAnnotatorResult;

@@ -191,7 +191,7 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
                 for (int compoundIndex = 0; compoundIndex < compounds.length; compoundIndex++) {
                     //put the isotope ints seperatly
                     String aCompound = compounds[compoundIndex];
-                    String isotope = "0";
+                    StringBuilder isotope = new StringBuilder("0");
                     int i = 0;
                     char currentChar;
                     while (compoundIndex < aCompound.length()) {
@@ -199,7 +199,7 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
                         if (!Character.isDigit(currentChar)) {
                             break;
                         } else {
-                            isotope += currentChar;
+                            isotope.append(currentChar);
                         }
                         i++;
                     }
@@ -223,7 +223,7 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
                     }
                     AtomImpl atom;
                     if (!currentAtom.isEmpty()) {
-                        atom = new AtomImpl(Atom.getAtom(currentAtom), Integer.parseInt(isotope));
+                        atom = new AtomImpl(Atom.getAtom(currentAtom), Integer.parseInt(isotope.toString()));
                         if (compoundOccurence > 0) {
                             increaseMassChain.append(atom, compoundOccurence);
                         } else {

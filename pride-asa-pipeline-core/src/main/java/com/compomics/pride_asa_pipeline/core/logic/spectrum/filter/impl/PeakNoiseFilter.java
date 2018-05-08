@@ -34,7 +34,7 @@ public class PeakNoiseFilter implements NoiseFilter {
         if (peaks == null) {
             return null;
         }
-        List<Peak> result = new ArrayList<Peak>();
+        List<Peak> result = new ArrayList<>();
         for (Peak peak : peaks) {
             //add the peak to the peak list if the peak intensity > threshold
             //and if the MZ ratio is not in 18D range of experimental precursor mass
