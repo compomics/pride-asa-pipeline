@@ -68,7 +68,7 @@ public class ChartFactory {
         //create new precursor mass delta dataset
         HistogramDataset precMassDeltasDataset = new HistogramDataset();
         precMassDeltasDataset.setType(HistogramType.FREQUENCY);
-
+        
         //sort array in order to find min and max values
         Arrays.sort(precursorMassDeltaValues);
         precMassDeltasDataset.addSeries("precursorMassDeltaSeries", precursorMassDeltaValues, NUMBER_OF_PRECURSOR_MASS_DELTA_BINS, precursorMassDeltaValues[0] - 0.5, precursorMassDeltaValues[precursorMassDeltaValues.length - 1] + 0.5);

@@ -468,14 +468,18 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
         }
 //PERCENTILE CAN NOT BE 0
         double currentPercentile = 0.001;
-        while (currentPercentile < 100) {
-            double spread = Math.abs(fragmentErrors.getPercentile(currentPercentile)) - fragmentErrors.getPercentile(currentPercentile + 0.5);
+        double tmpPercentile;
+        while (currentPercentile < 100) {    
+            //clamp at 100
+            tmpPercentile=Math.min(100,currentPercentile + 0.5);
+
+            double spread = Math.abs(fragmentErrors.getPercentile(currentPercentile)) - fragmentErrors.getPercentile(tmpPercentile);
             if (spread < fragmentErrors.getStandardDeviation()) {
                 break;
             }
             currentPercentile += 0.5;
         }
-        return (Math.ceil(fragmentErrors.getPercentile(currentPercentile) * 100d) / 100d);
+        return (Math.ceil(fragmentErrors.getPercentile(Math.min(100,currentPercentile)) * 100d) / 100d);
     }
 
     /**

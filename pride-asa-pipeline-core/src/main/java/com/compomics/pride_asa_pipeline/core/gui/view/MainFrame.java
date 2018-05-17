@@ -107,11 +107,11 @@ public class MainFrame extends javax.swing.JFrame {
         prideSelectionParentPanel.setOpaque(false);
         prideSelectionParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));
         prideSelectionParentPanel.setLayout(new java.awt.GridBagLayout());
-        experimentSelectionTabbedPane.addTab("PRIDE", prideSelectionParentPanel);
+        experimentSelectionTabbedPane.addTab("Web Service", prideSelectionParentPanel);
 
         identificationsFileSelectionParentPanel.setOpaque(false);
         identificationsFileSelectionParentPanel.setLayout(new java.awt.GridBagLayout());
-        experimentSelectionTabbedPane.addTab("PRIDE XML", identificationsFileSelectionParentPanel);
+        experimentSelectionTabbedPane.addTab("Local File", identificationsFileSelectionParentPanel);
 
         fileSelectionParentPanel.setOpaque(false);
         fileSelectionParentPanel.setPreferredSize(new java.awt.Dimension(20, 20));

@@ -43,7 +43,7 @@
                       <Component id="includePrideModificationsCheckBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                       <Component id="writeResultCheckBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="144" max="32767" attributes="0"/>
+                      <EmptySpace pref="198" max="32767" attributes="0"/>
                       <Component id="experimentProcessButton" min="-2" pref="100" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -72,7 +72,7 @@
                   <Component id="writeResultCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="experimentProcessButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="23" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>

@@ -169,8 +169,8 @@
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="PRIDE">
-                        <Property name="tabTitle" type="java.lang.String" value="PRIDE"/>
+                      <JTabbedPaneConstraints tabName="Web Service">
+                        <Property name="tabTitle" type="java.lang.String" value="Web Service"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
@@ -183,8 +183,8 @@
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="PRIDE XML">
-                        <Property name="tabTitle" type="java.lang.String" value="PRIDE XML"/>
+                      <JTabbedPaneConstraints tabName="Local File">
+                        <Property name="tabTitle" type="java.lang.String" value="Local File"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>

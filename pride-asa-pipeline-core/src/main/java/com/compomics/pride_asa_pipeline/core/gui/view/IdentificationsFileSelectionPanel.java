@@ -15,10 +15,12 @@
  */
 package com.compomics.pride_asa_pipeline.core.gui.view;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 
 /**
  *
@@ -28,6 +30,7 @@ import javax.swing.JLabel;
 public class IdentificationsFileSelectionPanel extends javax.swing.JPanel {
 
     private JFileChooser fileChooser;
+    private JFileChooser peakFileChooser;
 
     /**
      * Creates new form FileSelectionPanel
@@ -35,10 +38,46 @@ public class IdentificationsFileSelectionPanel extends javax.swing.JPanel {
     public IdentificationsFileSelectionPanel() {
         initComponents();
         fileChooser = new JFileChooser();
+        peakFileChooser = new JFileChooser();
+        fileTypeButtonGroup.add(mzIDRadioButton);
+        fileTypeButtonGroup.add(prideXMLradioButton);
+        TogglePeakFileInput(!prideXMLradioButton.isSelected());
     }
 
     public JFileChooser getFileChooser() {
         return fileChooser;
+    }
+
+    public JFileChooser getPeakFileChooser() {
+        return peakFileChooser;
+    }
+
+    public JLabel getFileSelectionLabel() {
+        return fileSelectionLabel;
+    }
+
+    public ButtonGroup getFileTypeButtonGroup() {
+        return fileTypeButtonGroup;
+    }
+
+    public JRadioButton getMzIDRadioButton() {
+        return mzIDRadioButton;
+    }
+
+    public JLabel getPeakFileNameLabel() {
+        return peakFileNameLabel;
+    }
+
+    public JLabel getPeakFileSelectionLabel() {
+        return peakFileSelectionLabel;
+    }
+
+    public JRadioButton getPrideXMLradioButton() {
+        return prideXMLradioButton;
+    }
+
+    public JButton getSelectPeakFileButton() {
+        return selectPeakFileButton;
     }
 
     public JLabel getFileNameLabel() {
@@ -55,11 +94,11 @@ public class IdentificationsFileSelectionPanel extends javax.swing.JPanel {
 
     public JCheckBox getIncludeIdentificationsFileModificationsCheckBox() {
         return includeIdentificationsFileModificationsCheckBox;
-    }     
+    }
 
     public JCheckBox getWriteResultCheckBox() {
         return writeResultCheckBox;
-    }        
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -70,12 +109,18 @@ public class IdentificationsFileSelectionPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        fileTypeButtonGroup = new javax.swing.ButtonGroup();
         fileSelectionLabel = new javax.swing.JLabel();
         processButton = new javax.swing.JButton();
         fileNameLabel = new javax.swing.JLabel();
         selectFileButton = new javax.swing.JButton();
         includeIdentificationsFileModificationsCheckBox = new javax.swing.JCheckBox();
         writeResultCheckBox = new javax.swing.JCheckBox();
+        peakFileSelectionLabel = new javax.swing.JLabel();
+        peakFileNameLabel = new javax.swing.JLabel();
+        selectPeakFileButton = new javax.swing.JButton();
+        prideXMLradioButton = new javax.swing.JRadioButton();
+        mzIDRadioButton = new javax.swing.JRadioButton();
 
         setOpaque(false);
         setPreferredSize(new java.awt.Dimension(50, 50));
@@ -103,26 +148,61 @@ public class IdentificationsFileSelectionPanel extends javax.swing.JPanel {
         writeResultCheckBox.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         writeResultCheckBox.setIconTextGap(15);
 
+        peakFileSelectionLabel.setText("Select peak File(s)");
+
+        peakFileNameLabel.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(204, 204, 204), 1, true));
+
+        selectPeakFileButton.setText("Browse");
+        selectPeakFileButton.setMaximumSize(new java.awt.Dimension(80, 25));
+        selectPeakFileButton.setMinimumSize(new java.awt.Dimension(80, 25));
+        selectPeakFileButton.setPreferredSize(new java.awt.Dimension(80, 25));
+
+        prideXMLradioButton.setSelected(true);
+        prideXMLradioButton.setText("PRIDEXML");
+        prideXMLradioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                prideXMLradioButtonActionPerformed(evt);
+            }
+        });
+
+        mzIDRadioButton.setText("MZID");
+        mzIDRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mzIDRadioButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(fileSelectionLabel)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(fileNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(selectFileButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 646, Short.MAX_VALUE)
+                        .addComponent(processButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(peakFileNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(selectPeakFileButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 293, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(writeResultCheckBox)
-                            .addComponent(includeIdentificationsFileModificationsCheckBox)
-                            .addComponent(processButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(fileSelectionLabel)
+                            .addComponent(peakFileSelectionLabel))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(prideXMLradioButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(includeIdentificationsFileModificationsCheckBox))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(mzIDRadioButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(writeResultCheckBox)))
                 .addContainerGap())
         );
 
@@ -131,29 +211,62 @@ public class IdentificationsFileSelectionPanel extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(selectFileButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(fileSelectionLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(fileNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
-                .addComponent(includeIdentificationsFileModificationsCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(writeResultCheckBox)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(selectPeakFileButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(peakFileSelectionLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(peakFileNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(includeIdentificationsFileModificationsCheckBox)
+                    .addComponent(prideXMLradioButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(writeResultCheckBox)
+                    .addComponent(mzIDRadioButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(processButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void prideXMLradioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prideXMLradioButtonActionPerformed
+        TogglePeakFileInput(false);
+    }//GEN-LAST:event_prideXMLradioButtonActionPerformed
+
+    private void mzIDRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mzIDRadioButtonActionPerformed
+        TogglePeakFileInput(true);
+    }//GEN-LAST:event_mzIDRadioButtonActionPerformed
+
+    private void TogglePeakFileInput(boolean visible) {
+        peakFileNameLabel.setVisible(visible);
+        peakFileSelectionLabel.setVisible(visible);
+        selectPeakFileButton.setVisible(visible);
+        revalidate();
+    }
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel fileNameLabel;
     private javax.swing.JLabel fileSelectionLabel;
+    private javax.swing.ButtonGroup fileTypeButtonGroup;
     private javax.swing.JCheckBox includeIdentificationsFileModificationsCheckBox;
+    private javax.swing.JRadioButton mzIDRadioButton;
+    private javax.swing.JLabel peakFileNameLabel;
+    private javax.swing.JLabel peakFileSelectionLabel;
+    private javax.swing.JRadioButton prideXMLradioButton;
     private javax.swing.JButton processButton;
     private javax.swing.JButton selectFileButton;
+    private javax.swing.JButton selectPeakFileButton;
     private javax.swing.JCheckBox writeResultCheckBox;
     // End of variables declaration//GEN-END:variables
 }

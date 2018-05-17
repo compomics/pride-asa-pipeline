@@ -126,7 +126,7 @@ public class PrideWebserviceSelectionPanel extends javax.swing.JPanel {
                         .addComponent(includePrideModificationsCheckBox)
                         .addGap(10, 10, 10)
                         .addComponent(writeResultCheckBox)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 144, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 198, Short.MAX_VALUE)
                         .addComponent(experimentProcessButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -148,7 +148,7 @@ public class PrideWebserviceSelectionPanel extends javax.swing.JPanel {
                     .addComponent(includePrideModificationsCheckBox)
                     .addComponent(writeResultCheckBox)
                     .addComponent(experimentProcessButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables

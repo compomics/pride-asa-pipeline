@@ -15,6 +15,8 @@
  */
 package com.compomics.pride_asa_pipeline.core.util;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,4 +32,24 @@ public class PrideWebserviceUtils {
         Matcher m = projectPattern.matcher(project);
         return m.matches();
     }
+
+    public static boolean isWebServiceReachable() {
+        try {
+            //make a URL to a known source
+            URL url = new URL("https://www.ebi.ac.uk:443/pride/ws/archive");
+
+            //open a connection to that source
+            HttpURLConnection urlConnect = (HttpURLConnection) url.openConnection();
+
+            //trying to retrieve data from the source. If there
+            //is no connection, this line will fail
+            Object objData = urlConnect.getContent();
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
