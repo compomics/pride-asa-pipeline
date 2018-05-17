@@ -23,7 +23,6 @@ import java.util.Set;
 import javax.swing.event.SwingPropertyChangeSupport;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 
 /**

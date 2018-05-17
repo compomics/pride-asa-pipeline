@@ -188,7 +188,6 @@ public abstract class AbstractSpectrumAnnotator {
         //create new map with only the precursors that carry a significant mass delta
         //and were we have possible modification combinations
         Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap = new HashMap<>();
-        PipelineProgressMonitor.info("Loading modifications");
         annotateModifications(convertToUseCase(modificationHolder.getAllModifications()), modifiedPrecursors, unmodifiedPrecursors, completeIdentifications, unexplainedIdentifications, significantMassDeltaExplanationsMap);
         //set the master results into the spectrumAnnotator result
         spectrumAnnotatorResult.setUnexplainedIdentifications(unexplainedIdentifications);

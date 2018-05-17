@@ -15,6 +15,7 @@
  */
 package com.compomics.pride_asa_pipeline.model.util;
 
+
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;

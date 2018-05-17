@@ -211,7 +211,6 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
             List<Identification> unexplainedIdentifications,
             Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap) {
         modificationHolder = new ModificationHolder();
-        PipelineProgressMonitor.info("Loading modifications");
         //add the non-conflicting modifications found in pride for the given experiment
         if (!prideModifications.isEmpty()) {
             Set<Modification> conflictingModifications = modificationService.filterModifications(modificationHolder, prideModifications);
@@ -225,7 +224,7 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
         ///////////////////////////////////////////////////////////////////////
         //SECOND STEP: find all the modification combinations that could
         //              explain a given mass delta (if there is one) -> Zen Archer
-        PipelineProgressMonitor.info("finding modification combinations");
+        PipelineProgressMonitor.processInfo("Inferring modifications");
         //set fragment mass error for the identification scorer
         Map<Identification, Set<ModificationCombination>> massDeltaExplanationsMap = findModificationCombinations(spectrumAnnotatorResult.getMassRecalibrationResult(), identifications);
         PipelineProgressMonitor.debug("Finished finding modification combinations");

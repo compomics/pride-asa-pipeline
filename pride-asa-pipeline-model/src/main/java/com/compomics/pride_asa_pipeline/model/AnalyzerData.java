@@ -17,12 +17,14 @@ package com.compomics.pride_asa_pipeline.model;
 
 import org.apache.log4j.Logger;
 
+
 /**
  * @author Florian Reisinger Date: 08-Aug-2009
  * @since 0.1
  */
 public class AnalyzerData {
     
+    private static final Logger LOGGER = Logger.getLogger(AnalyzerData.class);
     private double prec_acc;
     private double frag_acc;
 
@@ -66,8 +68,6 @@ public class AnalyzerData {
         }
 
     }
-
-    private static final Logger LOGGER = Logger.getLogger(AnalyzerData.class);
 
     //instrument mass error on precursor ions
     private Double precursorMassError;

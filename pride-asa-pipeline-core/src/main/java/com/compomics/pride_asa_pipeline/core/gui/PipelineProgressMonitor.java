@@ -16,7 +16,6 @@
 package com.compomics.pride_asa_pipeline.core.gui;
 
 import com.compomics.pride_asa_pipeline.core.gui.controller.PipelineProgressController;
-import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Level;
@@ -30,14 +29,14 @@ public class PipelineProgressMonitor {
 
     private static PipelineProgressController pipelineProgressController;
     private static ExecutorService executorService = Executors.newSingleThreadExecutor();
-    
+    public static Level LEVEL = Level.INFO;
+
     public static void setPipelineProgressController(PipelineProgressController pipelineProgressController) {
         PipelineProgressMonitor.pipelineProgressController = pipelineProgressController;
     }
 
-    public static void LogProcess(final String message, Level logLevel) {
-        GetLogger().log(logLevel, message);
-        if (pipelineProgressController != null) {
+    private static void LogProcess(final String message, Level logLevel) {
+        if (pipelineProgressController != null && logLevel.isGreaterOrEqual(LEVEL)) {
             executorService.submit(new Runnable() {
 
                 @Override
@@ -57,23 +56,28 @@ public class PipelineProgressMonitor {
     }
 
     public static void error(String message) {
-        LogProcess(message, Level.ERROR);
+        GetLogger().error(message);
     }
 
     public static void info(String message) {
+        GetLogger().info(message);
+    }
+
+    public static void processInfo(String message) {
+        info(message);
         LogProcess(message, Level.INFO);
     }
 
     public static void debug(String message) {
-        LogProcess(message, Level.DEBUG);
+        GetLogger().debug(message);
     }
 
     public static void warn(String message) {
-        LogProcess(message, Level.WARN);
+        GetLogger().debug(message);
     }
 
     public static void fatal(String message) {
-        LogProcess(message, Level.FATAL);
+        GetLogger().fatal(message);
     }
 
     private static Logger GetLogger() {

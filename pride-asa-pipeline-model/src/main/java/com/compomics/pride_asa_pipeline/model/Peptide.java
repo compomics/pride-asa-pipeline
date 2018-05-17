@@ -17,6 +17,7 @@ package com.compomics.pride_asa_pipeline.model;
 
 import org.apache.log4j.Logger;
 
+
 /**
  * @author Florian Reisinger Date: 20-Aug-2009
  * @since 0.1

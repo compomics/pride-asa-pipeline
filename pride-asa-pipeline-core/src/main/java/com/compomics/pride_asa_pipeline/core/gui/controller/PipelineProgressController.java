@@ -15,7 +15,7 @@
  */
 package com.compomics.pride_asa_pipeline.core.gui.controller;
 
-import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressAppender;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import com.compomics.pride_asa_pipeline.core.util.GuiUtils;
 import com.compomics.util.gui.waiting.waitinghandlers.ProgressDialogX;
 import java.awt.Toolkit;
@@ -48,7 +48,7 @@ public class PipelineProgressController extends WindowAdapter {
     public void init() {
         progressFinished = Boolean.FALSE;
         //set this controller in PipelineProgressAppender
-        PipelineProgressAppender.setPipelineProgressController(this);
+        PipelineProgressMonitor.setPipelineProgressController(this);
     }
 
     public void showProgressBar(int numberOfProgressSteps, String progressHeaderText) {
