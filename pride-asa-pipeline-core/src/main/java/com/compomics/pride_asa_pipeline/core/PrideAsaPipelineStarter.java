@@ -17,6 +17,7 @@ package com.compomics.pride_asa_pipeline.core;
 
 import com.compomics.pride_asa_pipeline.core.gui.controller.MainController;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
+import com.compomics.pride_asa_pipeline.core.util.PrideWebserviceUtils;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
@@ -95,17 +96,24 @@ public class PrideAsaPipelineStarter {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                try {
-                    //set GUI application context
-                    ApplicationContextProvider.getInstance().setApplicationContext(new ClassPathXmlApplicationContext("guiSpringXMLConfig.xml"));
-                    ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-                    MainController mainController = (MainController) applicationContext.getBean("mainController");
-                    mainController.init();
-                } catch (CannotGetJdbcConnectionException ex) {
+                // try {
+
+                if (!PrideWebserviceUtils.isWebServiceReachable()) {
+
+                    JOptionPane.showMessageDialog(null, "Cannot establish a connection to the PRIDE webservice."
+                            + "\n" + "You will not be able to run pride asap through the web service and operations will be limited to local files.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+
+                //set GUI application context
+                ApplicationContextProvider.getInstance().setApplicationContext(new ClassPathXmlApplicationContext("guiSpringXMLConfig.xml"));
+                ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+                MainController mainController = (MainController) applicationContext.getBean("mainController");
+                mainController.init();
+                /*   } catch (CannotGetJdbcConnectionException ex) {
                     JOptionPane.showMessageDialog(null, "Cannot establish a connection to the PRIDE public database, the application will not start."
                             + "\n" + "Make sure you have an active internet connection and/or check your firewall settings.", "Error", JOptionPane.ERROR_MESSAGE);
                     System.exit(0);
-                }
+                }*/
             }
         });
     }
