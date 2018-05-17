@@ -34,7 +34,7 @@ import com.compomics.pride_asa_pipeline.core.util.PrideWebserviceUtils;
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.util.pride.PrideWebService;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
@@ -57,8 +57,7 @@ import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetailList;
  * @author Harald Barsnes
  */
 public class ExperimentSelectionController {
-    
-    private static final Logger LOGGER = Logger.getLogger(ExperimentSelectionController.class);
+   
     private static final String EXPERIMENT_ACCESSION_SEPARATOR = ":";
     private static final int NUMBER_OF_PRIDE_PROGRESS_STEPS = 5;
     private static final int NUMBER_OF_FILE_PROGRESS_STEPS = 2;
@@ -156,7 +155,7 @@ public class ExperimentSelectionController {
             try {
                 updateComboBox("PXD000674");
             } catch (IOException ex) {
-                LOGGER.error(ex);
+                PipelineProgressMonitor.error(ex);
             }
         }
         
@@ -406,7 +405,7 @@ public class ExperimentSelectionController {
                 experimentAccession = comboBoxString.substring(0, comboBoxString.indexOf(EXPERIMENT_ACCESSION_SEPARATOR));
             }
         }
-        LOGGER.info(experimentAccession + " was selected");
+        PipelineProgressMonitor.info(experimentAccession + " was selected");
         return experimentAccession;
     }
 
@@ -430,17 +429,17 @@ public class ExperimentSelectionController {
         private void prepareWebService(String experimentAccession) throws Exception {
 
             //set up the repository to cache this experiment
-            LOGGER.info("Setting up experiment repository for assay " + experimentAccession);
+            PipelineProgressMonitor.info("Setting up experiment repository for assay " + experimentAccession);
             WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository();
             experimentRepository.addAssay(experimentAccession);
             //the cache should only have one for now?
             String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
-            LOGGER.info(entry + " was found in the parser cache");
+            PipelineProgressMonitor.info(entry + " was found in the parser cache");
             mainController.getSpectrumAnnotator().initIdentifications(entry);
         }
         
         private void prepareFileService(File identifciationsFile, File... peakFiles) throws Exception {
-            LOGGER.info("Setting up experiment repository for assay " + identifciationsFile.getName());
+            PipelineProgressMonitor.info("Setting up experiment repository for assay " + identifciationsFile.getName());
             FileExperimentRepository experimentRepository = new FileExperimentRepository();
             
             if (identificationsFileSelectionPanel.getPrideXMLradioButton().isSelected()) {
@@ -451,7 +450,7 @@ public class ExperimentSelectionController {
 
             //the cache should only have one for now?
             String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
-            LOGGER.info(entry + " was found in the parser cache");
+            PipelineProgressMonitor.info(entry + " was found in the parser cache");
             mainController.getSpectrumAnnotator().initIdentifications(entry);
         }
         
@@ -479,13 +478,13 @@ public class ExperimentSelectionController {
                 }
             } catch (InterruptedException ex) {
                 onAnnotationCanceled();
-                LOGGER.error(ex.getMessage(), ex);
+                PipelineProgressMonitor.error(ex.getMessage(), ex);
             } catch (ExecutionException ex) {
                 onAnnotationCanceled();
-                LOGGER.error(ex.getMessage(), ex);
+                PipelineProgressMonitor.error(ex.getMessage(), ex);
                 mainController.showMessageDialog("Unexpected Error", "An expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
             } catch (CancellationException ex) {
-                LOGGER.info("annotation for experiment " + getExperimentAccesion() + " cancelled.");
+                PipelineProgressMonitor.info("annotation for experiment " + getExperimentAccesion() + " cancelled.");
             }
         }
     }
@@ -524,13 +523,13 @@ public class ExperimentSelectionController {
                 }
             } catch (InterruptedException ex) {
                 onAnnotationCanceled();
-                LOGGER.error(ex.getMessage(), ex);
+                PipelineProgressMonitor.error(ex.getMessage(), ex);
             } catch (ExecutionException ex) {
                 onAnnotationCanceled();
-                LOGGER.error(ex.getMessage(), ex);
+                PipelineProgressMonitor.error(ex.getMessage(), ex);
                 mainController.showMessageDialog("Unexpected Error", "An expected error occured: " + ex.getMessage() + ", please try to restart the application.", JOptionPane.ERROR_MESSAGE);
             } catch (CancellationException ex) {
-                LOGGER.info("annotation for experiment " + getExperimentAccesion() + " cancelled.");
+                PipelineProgressMonitor.info("annotation for experiment " + getExperimentAccesion() + " cancelled.");
             }
         }
     }
@@ -582,10 +581,10 @@ public class ExperimentSelectionController {
                 resultFileSelectionPanel.getProcessButton().setEnabled(true);
             } catch (InterruptedException | ExecutionException ex) {
                 onAnnotationCanceled();
-                LOGGER.error(ex.getMessage(), ex);
+                PipelineProgressMonitor.error(ex.getMessage(), ex);
                 mainController.showUnexpectedErrorDialog(ex.getMessage());
             } catch (CancellationException ex) {
-                LOGGER.info("annotation for experiment " + getExperimentAccesion() + " canceled.");
+                PipelineProgressMonitor.info("annotation for experiment " + getExperimentAccesion() + " canceled.");
             }
         }
     }
@@ -598,9 +597,9 @@ public class ExperimentSelectionController {
             //show progress bar
             pipelineProgressController.showProgressBar(NUMBER_OF_FILE_PROGRESS_STEPS, "Importing.");
             
-            LOGGER.info("Importing pipeline result file " + resultFileSelectionPanel.getFileChooser().getSelectedFile().getName());
+            PipelineProgressMonitor.info("Importing pipeline result file " + resultFileSelectionPanel.getFileChooser().getSelectedFile().getName());
             SpectrumAnnotatorResult spectrumAnnotatorResult = resultHandler.readResultFromFile(resultFileSelectionPanel.getFileChooser().getSelectedFile());
-            LOGGER.info("Finished importing pipeline result file " + resultFileSelectionPanel.getFileChooser().getSelectedFile().getName());
+            PipelineProgressMonitor.info("Finished importing pipeline result file " + resultFileSelectionPanel.getFileChooser().getSelectedFile().getName());
             
             return spectrumAnnotatorResult;
         }
@@ -612,11 +611,11 @@ public class ExperimentSelectionController {
                 mainController.getCurrentSpectrumAnnotator().setSpectrumAnnotatorResult(spectrumAnnotatorResult);
                 mainController.onAnnotationFinished();
             } catch (InterruptedException | ExecutionException ex) {
-                LOGGER.error(ex.getMessage(), ex);
+                PipelineProgressMonitor.error(ex.getMessage(), ex);
                 mainController.showUnexpectedErrorDialog(ex.getMessage());
                 onAnnotationCanceled();
             } catch (CancellationException ex) {
-                LOGGER.info("Importing pipeline results for experiment " + getExperimentAccesion() + " cancelled.");
+                PipelineProgressMonitor.info("Importing pipeline results for experiment " + getExperimentAccesion() + " cancelled.");
             } finally {
                 //hide progress bar
                 pipelineProgressController.hideProgressDialog();

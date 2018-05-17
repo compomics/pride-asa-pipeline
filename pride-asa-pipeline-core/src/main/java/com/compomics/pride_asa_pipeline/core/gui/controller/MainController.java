@@ -36,7 +36,8 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import javax.swing.*;
-import org.apache.log4j.Logger;
+import org.apache.log4j.BasicConfigurator;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.jdesktop.beansbinding.ELProperty;
 
 /**
@@ -46,7 +47,6 @@ import org.jdesktop.beansbinding.ELProperty;
  */
 public class MainController implements ActionListener {
 
-    private static final Logger LOGGER = Logger.getLogger(MainController.class);
     //model
     /**
      * Keep track of the SpectrumAnnotator (db or identifications file)
@@ -126,18 +126,19 @@ public class MainController implements ActionListener {
         if (((JMenuItem) actionEvent.getSource()).getText().equalsIgnoreCase("Configuration")) {
             pipelineParamsController.getPipelineConfigDialog().setVisible(true);
         } else { // modification details
-                                //import modifications and refill the binding list
-                    JComboBox prideMods = modificationsController.getModificationsConfigDialog().getPrideModsComboBox();
-                    prideMods.removeAllItems();
-                    PRIDEModificationFactory.getInstance();
-                    for (Modification mod : PRIDEModificationFactory.getAsapMods()) {
-                        prideMods.addItem(mod);
-                    };
+            //import modifications and refill the binding list
+            JComboBox prideMods = modificationsController.getModificationsConfigDialog().getPrideModsComboBox();
+            prideMods.removeAllItems();
+            PRIDEModificationFactory.getInstance();
+            for (Modification mod : PRIDEModificationFactory.getAsapMods()) {
+                prideMods.addItem(mod);
+            };
             modificationsController.getModificationsConfigDialog().setVisible(true);
         }
     }
 
     public void init() {
+       // BasicConfigurator.configure();
         // check for new version
         checkForNewVersion(getVersion());
 
@@ -163,7 +164,7 @@ public class MainController implements ActionListener {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                LOGGER.error(e.getMessage(), e);
+                PipelineProgressMonitor.error(e.getMessage(), e);
                 showUnexpectedErrorDialog(e.getMessage());
                 onAnnotationCanceled();
             }
@@ -228,11 +229,15 @@ public class MainController implements ActionListener {
 
     public void onAnnotationFinished() {
         SpectrumAnnotatorResult spectrumAnnotatorResult = currentSpectrumAnnotator.getSpectrumAnnotatorResult();
-        pipelineResultController.update(spectrumAnnotatorResult);
+        if (spectrumAnnotatorResult.getIdentifications().size() > 0) {
+            pipelineResultController.update(spectrumAnnotatorResult);
+        }else{
+            showMessageDialog("Inprocessable dataset","This dataset has provided no useable identifications",JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public void onAnnotationCanceled() {
-        LOGGER.info("Annotation canceled.");
+        PipelineProgressMonitor.info("Annotation canceled.");
         currentSpectrumAnnotator.clearPipeline();
         currentSpectrumAnnotator.clearTmpResources();
     }

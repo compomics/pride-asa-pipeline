@@ -43,7 +43,7 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
  */
 public class PrideAsaPipelineStarter {
 
-    //private static final Logger LOGGER = Logger.getLogger(PrideAsaPipelineStarter.class);
+    //private static final Logger LOGGER = PipelineProgressMonitorgetLogger(PrideAsaPipelineStarter.class);
     private static final String HEADER = "[Pride automtic spectrum annotation pipeline]\n";
     private static final String USAGE = "java -jar <jar file name>";
     private static Options options;
@@ -80,13 +80,13 @@ public class PrideAsaPipelineStarter {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            //LOGGER.error(ex.getMessage(), ex);
+            //PipelineProgressMonitor.error(ex.getMessage(), ex);
         } catch (InstantiationException ex) {
-            //LOGGER.error(ex.getMessage(), ex);
+            //PipelineProgressMonitor.error(ex.getMessage(), ex);
         } catch (IllegalAccessException ex) {
-            //LOGGER.error(ex.getMessage(), ex);
+            //PipelineProgressMonitor.error(ex.getMessage(), ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            //LOGGER.error(ex.getMessage(), ex);
+            //PipelineProgressMonitor.error(ex.getMessage(), ex);
         }
         //</editor-fold>
 

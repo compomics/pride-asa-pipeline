@@ -23,7 +23,7 @@ import com.compomics.pride_asa_pipeline.core.service.PipelineModificationService
 import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.jdesktop.beansbinding.*;
 import org.jdesktop.observablecollections.ObservableCollections;
 import org.jdesktop.observablecollections.ObservableList;
@@ -52,7 +52,6 @@ import java.util.*;
  */
 public class ModificationsController {
 
-    private static final Logger LOGGER = Logger.getLogger(ModificationsController.class);
     //model
     private Resource modificationsResource;
     private BindingGroup bindingGroup;
@@ -141,11 +140,11 @@ public class ModificationsController {
             //populate the combo box
 
         } catch (JDOMParseException ex) {
-            LOGGER.error(ex.getMessage(), ex);
+            PipelineProgressMonitor.error(ex.getMessage(), ex);
             mainController.showMessageDialog("Import Unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
                     + "\n" + "Error on line " + ex.getLineNumber() + ", message: " + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
         } catch (JDOMException ex) {
-            LOGGER.error(ex.getMessage(), ex);
+            PipelineProgressMonitor.error(ex.getMessage(), ex);
             mainController.showMessageDialog("Import Unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
                     + "\n" + "Error message: " + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
         }
@@ -358,11 +357,11 @@ public class ModificationsController {
                         //select first modificatio
                         modificationsConfigDialog.getModifcationsTable().getSelectionModel().setSelectionInterval(0, 0);
                     } catch (JDOMParseException ex) {
-                        LOGGER.error(ex.getMessage(), ex);
+                        PipelineProgressMonitor.error(ex.getMessage(), ex);
                         mainController.showMessageDialog("Import Unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
                                 + "\n" + "Error on line " + ex.getLineNumber() + ", message: " + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
                     } catch (JDOMException ex) {
-                        LOGGER.error(ex.getMessage(), ex);
+                        PipelineProgressMonitor.error(ex.getMessage(), ex);
                         mainController.showMessageDialog("Import Unsuccessful", "The modifications file could not be imported. Please check the validity of the file. "
                                 + "\n" + "Error message: " + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
                     }

@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -46,8 +46,6 @@ import org.springframework.core.io.Resource;
  * this template use File | Settings | File Templates.
  */
 public class OmssaModificationMarshallerImpl implements OmssaModificationMarshaller {
-
-    private static final Logger LOGGER = Logger.getLogger(OmssaModificationMarshallerImpl.class);
 
     @Override
     public UserModCollection marshallModifications(Set<Modification> modificationSet) {
@@ -134,7 +132,7 @@ public class OmssaModificationMarshallerImpl implements OmssaModificationMarshal
         try {
             document = builder.build(searchGuiModificationsResource.getInputStream());
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            PipelineProgressMonitor.error(e.getMessage(), e);
         }
 
         HashMap<Modification, Integer> result = new HashMap<>();
@@ -197,7 +195,7 @@ public class OmssaModificationMarshallerImpl implements OmssaModificationMarshal
                     if (type != null) {
                         modification.setType(type);
                     }
-                    LOGGER.info("Unmarshalled " + modification.getName());
+                    PipelineProgressMonitor.info("Unmarshalled " + modification.getName());
                     Element rarity = modificationElement.getChild("MSModSpec_occurence");
                     int occurencesInPride = 0;
                     if (rarity != null) {

@@ -33,7 +33,7 @@ import java.util.Properties;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 /**
  * This class maps a Mascot Generic File to memory. It allows for search ad
@@ -43,9 +43,6 @@ import org.apache.log4j.Logger;
  * @version $Id: MascotGenericFile.java,v 1.3 2007/03/08 10:14:19 kenny Exp $
  */
 public class MascotGenericFile extends SpectrumFileAncestor {
-    // Class specific log4j logger for MascotGenericFile instances.
-
-    private static Logger logger = Logger.getLogger(MascotGenericFile.class);
     /**
      * This variable holds the comments for this MascotGenericFile.
      */
@@ -344,7 +341,7 @@ public class MascotGenericFile extends SpectrumFileAncestor {
             sw.close();
         } catch (IOException ioe) {
             // No exceptions are expected here.
-            logger.error(ioe.getMessage(), ioe);
+            PipelineProgressMonitor.error(ioe.getMessage(), ioe);
         }
         return result;
     }
@@ -366,7 +363,7 @@ public class MascotGenericFile extends SpectrumFileAncestor {
             sw.close();
         } catch (IOException ioe) {
             // No exceptions are expected here.
-            logger.error(ioe.getMessage(), ioe);
+            PipelineProgressMonitor.error(ioe.getMessage(), ioe);
         }
         return result;
     }
@@ -524,7 +521,7 @@ public class MascotGenericFile extends SpectrumFileAncestor {
                             iCharges.put(mass, new Integer(charge));
                         }
                     } else {
-                        logger.error("\n\nUnrecognized line at line number " + lineCount + ": '" + line + "'!\n");
+                        PipelineProgressMonitor.error("\n\nUnrecognized line at line number " + lineCount + ": '" + line + "'!\n");
                     }
                 }
             }
@@ -534,7 +531,7 @@ public class MascotGenericFile extends SpectrumFileAncestor {
             br.close();
         } catch (IOException ioe) {
             // We do not expect IOException when using a StringReader.
-            logger.error(ioe.getMessage(), ioe);
+            PipelineProgressMonitor.error(ioe.getMessage(), ioe);
         }
     }
 

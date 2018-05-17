@@ -37,14 +37,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 /**
  * @author Niels Hulstaert
  */
 public class PrideExperimentServiceImpl extends ExperimentServiceImpl implements PrideExperimentService {
 
-    private static final Logger LOGGER = Logger.getLogger(PrideExperimentServiceImpl.class);
     private SpectrumService spectrumService;
     private boolean iFirstMfgFile;
 
@@ -97,10 +96,10 @@ public class PrideExperimentServiceImpl extends ExperimentServiceImpl implements
 
     @Override
     public void getSpectraAsMgfFile(String experimentAccession, File mgfFile, boolean rebuildCache) {
-        LOGGER.debug(String.format("writing spectra from experiment %s to %s", experimentAccession, mgfFile.getAbsolutePath()));
+        PipelineProgressMonitor.debug(String.format("writing spectra from experiment %s to %s", experimentAccession, mgfFile.getAbsolutePath()));
 
         if (rebuildCache) {
-            LOGGER.debug(String.format("rebuilding spectrum cache for experiment %s", experimentAccession));
+            PipelineProgressMonitor.debug(String.format("rebuilding spectrum cache for experiment %s", experimentAccession));
             buildSpectrumCacheForExperiment(experimentAccession);
         }
 
@@ -113,15 +112,15 @@ public class PrideExperimentServiceImpl extends ExperimentServiceImpl implements
             outputStream = new BufferedOutputStream(new FileOutputStream(mgfFile));
             writeCachedSpectra(outputStream, experimentAccession);
         } catch (FileNotFoundException e) {
-            LOGGER.error(e.getMessage(), e);
+            PipelineProgressMonitor.error(e.getMessage(), e);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            PipelineProgressMonitor.error(e.getMessage(), e);
         } finally {
             if (outputStream != null) {
                 try {
                     outputStream.close();
                 } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
+                    PipelineProgressMonitor.error(e.getMessage(), e);
                 }
             }
         }
@@ -135,7 +134,7 @@ public class PrideExperimentServiceImpl extends ExperimentServiceImpl implements
     private void buildSpectrumCacheForExperiment(String experimentAccession) {
 
         //clear the existing cache
-        LOGGER.debug(String.format("clearing spectrum cache before starting to cache all spectra for experiment %s", experimentAccession));
+        PipelineProgressMonitor.debug(String.format("clearing spectrum cache before starting to cache all spectra for experiment %s", experimentAccession));
        // spectrumService.clearCache();
 
         //get spectra metadata
@@ -156,7 +155,7 @@ public class PrideExperimentServiceImpl extends ExperimentServiceImpl implements
 
         if (lSpectrumidCacheList.size() > 0) {
           //  spectrumService.cacheSpectra(lSpectrumidCacheList);
-            LOGGER.debug(String.format("added %s entries to the spectrum Cache", lSpectrumidCacheList.size()));
+            PipelineProgressMonitor.debug(String.format("added %s entries to the spectrum Cache", lSpectrumidCacheList.size()));
         }
 
     }
@@ -203,7 +202,7 @@ public class PrideExperimentServiceImpl extends ExperimentServiceImpl implements
             }
             mascotGenericFile.writeToStream(aOutputStream);
         }
-        LOGGER.debug(String.format("finished writing %d spectra to %s", spectraMetadata.size(), mascotGenericFile.getFilename()));
+        PipelineProgressMonitor.debug(String.format("finished writing %d spectra to %s", spectraMetadata.size(), mascotGenericFile.getFilename()));
 
     }
 

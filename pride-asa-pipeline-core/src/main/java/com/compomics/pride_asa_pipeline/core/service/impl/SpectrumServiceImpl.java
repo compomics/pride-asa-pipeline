@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 /**
  *
@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
  */
 public class SpectrumServiceImpl implements SpectrumService {
 
-    private static final Logger LOGGER = Logger.getLogger(SpectrumServiceImpl.class);
     
     private SpectrumRepository spectrumRepository;
     private Cache<String, List<Peak>> spectrumPeaksCache;

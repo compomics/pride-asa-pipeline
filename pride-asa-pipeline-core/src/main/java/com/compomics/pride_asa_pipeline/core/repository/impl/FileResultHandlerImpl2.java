@@ -25,7 +25,7 @@ import com.compomics.pride_asa_pipeline.core.util.ResourceUtils;
 import com.compomics.pride_asa_pipeline.model.*;
 import com.compomics.pride_asa_pipeline.model.comparator.FragmentIonAnnotationComparator;
 import com.google.common.base.Joiner;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.jdom2.JDOMException;
 
 import java.io.*;
@@ -37,7 +37,6 @@ import java.util.*;
  */
 public class FileResultHandlerImpl2 implements FileResultHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(FileResultHandlerImpl2.class);
     private static final String COLUMN_DELIMITER = "\t";
     private static final String SCORE_OPEN = "(";
     private static final String SCORE_CLOSE = ")";
@@ -136,11 +135,11 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
                             + COLUMN_DELIMITER + modificationsString);
                     pw.println();
                 } catch (AASequenceMassUnknownException ex) {
-                    LOGGER.error(ex.getMessage(), ex);
+                    PipelineProgressMonitor.error(ex.getMessage(), ex);
                 }
             }
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            PipelineProgressMonitor.error(e.getMessage(), e);
         }
     }
 
@@ -150,7 +149,7 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
 
         try (BufferedReader br = new BufferedReader(new FileReader(resultFile))) {
             String experimentAccession = resultFile.getName().substring(0, resultFile.getName().lastIndexOf(".txt"));
-            LOGGER.info("Start reading pipeline result file for experiment " + experimentAccession);
+            PipelineProgressMonitor.info("Start reading pipeline result file for experiment " + experimentAccession);
             spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
             //load modifications if necessary
             if (modifications == null) {
@@ -200,13 +199,13 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
                     spectrumAnnotatorResult.addIdentification(identification);
                 }
             }
-            LOGGER.info("Finished reading " + spectrumAnnotatorResult.getNumberOfIdentifications() + " identifications for experiment " + experimentAccession);
+            PipelineProgressMonitor.info("Finished reading " + spectrumAnnotatorResult.getNumberOfIdentifications() + " identifications for experiment " + experimentAccession);
         } catch (UnknownAAException e) {
-            LOGGER.error(e.getMessage(), e);
+            PipelineProgressMonitor.error(e.getMessage(), e);
         } catch (FileNotFoundException e) {
-            LOGGER.error(e.getMessage(), e);
+            PipelineProgressMonitor.error(e.getMessage(), e);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            PipelineProgressMonitor.error(e.getMessage(), e);
         }
 
         return spectrumAnnotatorResult;
@@ -374,7 +373,7 @@ public class FileResultHandlerImpl2 implements FileResultHandler {
                 modifications.put(modification.getName(), modification);
             }
         } catch (JDOMException ex) {
-            LOGGER.error(ex.getMessage(), ex);
+            PipelineProgressMonitor.error(ex.getMessage(), ex);
         }
     }
 

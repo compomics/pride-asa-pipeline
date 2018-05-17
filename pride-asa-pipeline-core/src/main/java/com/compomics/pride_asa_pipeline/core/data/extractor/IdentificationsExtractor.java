@@ -23,7 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -32,8 +32,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
  * @author Niels Hulstaert
  */
 public class IdentificationsExtractor implements ResultSetExtractor<List<Identification>> {
-
-    private static final Logger LOGGER = Logger.getLogger(IdentificationsExtractor.class);
 
     @Override
     public List<Identification> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -62,7 +60,7 @@ public class IdentificationsExtractor implements ResultSetExtractor<List<Identif
                 
                 identifications.add(new Identification(peptide, accession, spectrumId, spectrumRef));
             } catch (UnknownAAException ex) {
-                LOGGER.info("Got peptide with unknown amino acid!");
+                PipelineProgressMonitor.info("Got peptide with unknown amino acid!");
             }
         }
 

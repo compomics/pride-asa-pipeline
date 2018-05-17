@@ -37,7 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 /**
  *
@@ -45,7 +45,6 @@ import org.apache.log4j.Logger;
  */
 public abstract class ModificationServiceImpl implements ModificationService {
 
-    private static final Logger LOGGER = Logger.getLogger(ModificationServiceImpl.class);
     private static final String[] MS1_MODIFICATION_NAMES = {"itraq", "tmt"};
     protected OmssaModificationMarshaller omssaModificationMarshaller;
 
@@ -202,7 +201,7 @@ public abstract class ModificationServiceImpl implements ModificationService {
         for (Modification modification : modifications) {
             //only look for non-terminal mods            
             if (modification.getLocation().equals(Modification.Location.NON_TERMINAL) && modification.getAffectedAminoAcids().size() > MAX_AFFECTED_AMINO_ACIDS) {
-                LOGGER.info("Excluded PRIDE modification " + modification.getAccession() + " (" + modification.getName() + ") with too many affected amino acids.");
+                PipelineProgressMonitor.info("Excluded PRIDE modification " + modification.getAccession() + " (" + modification.getName() + ") with too many affected amino acids.");
                 conflictingModifications.add(modification);
             }
         }
@@ -218,7 +217,7 @@ public abstract class ModificationServiceImpl implements ModificationService {
                         //third, check for same affected amino acids
                         for (AminoAcid aminoAcid : modificationsArray[i].getAffectedAminoAcids()) {
                             if (modificationsArray[j].getAffectedAminoAcids().contains(aminoAcid)) {
-                                LOGGER.info("Excluded PRIDE modification " + modificationsArray[j].getAccession() + " (" + modificationsArray[j].getName() + ") with equal mass.");
+                                PipelineProgressMonitor.info("Excluded PRIDE modification " + modificationsArray[j].getAccession() + " (" + modificationsArray[j].getName() + ") with equal mass.");
                                 conflictingModifications.add(modificationsArray[j]);
                                 //break as soon as one of the affected amino acids is the same
                                 break;
@@ -239,7 +238,7 @@ public abstract class ModificationServiceImpl implements ModificationService {
                         //third, check for same affected amino acids
                         for (AminoAcid aminoAcid : modification.getAffectedAminoAcids()) {
                             if (modificationToCheck.getAffectedAminoAcids().contains(aminoAcid)) {
-                                LOGGER.info("Excluded PRIDE modification " + modificationToCheck.getAccession() + " (" + modificationToCheck.getName() + ") with equal mass.");
+                                PipelineProgressMonitor.info("Excluded PRIDE modification " + modificationToCheck.getAccession() + " (" + modificationToCheck.getName() + ") with equal mass.");
                                 conflictingModifications.add(modificationToCheck);
                                 //break as soon as one of the affected amino acids is the same
                                 break;

@@ -21,7 +21,7 @@ import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 /**
@@ -30,7 +30,6 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
  */
 public class JdbcExperimentRepository extends JdbcDaoSupport implements ExperimentRepository {
 
-    private static final Logger LOGGER = Logger.getLogger(JdbcExperimentRepository.class);
     private static final String SELECT_EXPERIMENT_ACCESSIONS = new StringBuilder()
             .append("select exp.accession as accession, exp.title as title ")
             .append("from pride_experiment exp")
@@ -185,41 +184,41 @@ public class JdbcExperimentRepository extends JdbcDaoSupport implements Experime
 
     @Override
     public List<Identification> loadExperimentIdentifications(String experimentAccession) {
-        LOGGER.debug("Start loading identifications for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Start loading identifications for experiment " + experimentAccession);
         List<Identification> identifications = getJdbcTemplate().query(SELECT_EXPERIMENT_IDENTIFICATIONS, new IdentificationsExtractor(), new Object[]{experimentAccession});
-        LOGGER.debug("Finished loading " + identifications.size() + " identifications for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Finished loading " + identifications.size() + " identifications for experiment " + experimentAccession);
         return identifications;
     }
 
     @Override
     public long getNumberOfSpectra(String experimentAccession) {
-        LOGGER.debug("Start counting number of spectra for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Start counting number of spectra for experiment " + experimentAccession);
         long numberOfSpectra = getJdbcTemplate().queryForLong(NUMBER_OF_SPECTRA, experimentAccession);
-        LOGGER.debug("Finished counting number of spectra for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Finished counting number of spectra for experiment " + experimentAccession);
         return numberOfSpectra;
     }
 
     @Override
     public List<String> getProteinAccessions(String experimentAccession) {
-        LOGGER.debug("Start retrieving protein accessions for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Start retrieving protein accessions for experiment " + experimentAccession);
         List<String> proteinAccesions = getJdbcTemplate().queryForList(SELECT_PROTEIN_ACCESSIONS, new Object[]{experimentAccession}, String.class);
-        LOGGER.debug("Start retrieving protein accessions for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Start retrieving protein accessions for experiment " + experimentAccession);
         return proteinAccesions;
     }
 
     @Override
     public long getNumberOfPeptides(String experimentAccession) {
-        LOGGER.debug("Start counting number of peptides for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Start counting number of peptides for experiment " + experimentAccession);
         long numberOfPeptides = getJdbcTemplate().queryForLong(NUMBER_OF_PEPTIDES, experimentAccession);
-        LOGGER.debug("Finished counting number of peptides for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Finished counting number of peptides for experiment " + experimentAccession);
         return numberOfPeptides;
     }
 
     @Override
     public List<Map<String, Object>> getSpectraMetadata(String experimentAccession) {
-        LOGGER.debug("Start retrieving spectra metadata for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Start retrieving spectra metadata for experiment " + experimentAccession);
         List<Map<String, Object>> spectraMetadata = getJdbcTemplate().queryForList(SELECT_SPECTRA_METADATA, experimentAccession);
-        LOGGER.debug("Finished retrieving spectrum metadata for experiment for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Finished retrieving spectrum metadata for experiment for experiment " + experimentAccession);
         return spectraMetadata;
     }
 

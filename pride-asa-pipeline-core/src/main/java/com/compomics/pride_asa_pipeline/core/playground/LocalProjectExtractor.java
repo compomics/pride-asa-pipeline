@@ -25,7 +25,7 @@ import com.compomics.util.experiment.identification.identification_parameters.Se
 import java.io.File;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.geneontology.oboedit.dataadapter.GOBOParseException;
 import org.xmlpull.v1.XmlPullParserException;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
@@ -41,10 +41,6 @@ public class LocalProjectExtractor {
      * The output folder for the extraction
      */
     private final File outputFolder;
-    /**
-     * The Logger instance
-     */
-    private static final Logger LOGGER = Logger.getLogger(LocalProjectExtractor.class);
 
     public static void main(String[] args) throws IOException, ParseException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, InterruptedException, Exception {
         File outputFolder = new File("D:\\Compomics\\pride-asa-pipeline-core-2.0.0-beta-SNAPSHOT\\Output");
@@ -59,10 +55,10 @@ public class LocalProjectExtractor {
     }
 
     public SearchParameters analyze(File inputFile) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
-        LOGGER.info("Setting up experiment repository for assay " + inputFile.getName());
+        PipelineProgressMonitor.info("Setting up experiment repository for assay " + inputFile.getName());
         FileExperimentRepository experimentRepository = new FileExperimentRepository();
         experimentRepository.addPrideXMLFile(inputFile.getName(), inputFile);
-        LOGGER.info("Attempting to infer searchparameters");
+        PipelineProgressMonitor.info("Attempting to infer searchparameters");
         ParameterExtractor extractor = new ParameterExtractor(inputFile.getName());
         return extractor.getParameters();
     }

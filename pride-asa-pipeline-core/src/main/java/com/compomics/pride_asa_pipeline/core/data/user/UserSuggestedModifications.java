@@ -20,15 +20,13 @@ import com.compomics.pride_asa_pipeline.core.model.modification.source.PRIDEModi
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 /**
  *
  * @author Kenneth Verheggen
  */
 public class UserSuggestedModifications {
-
-    private static final Logger LOGGER = Logger.getLogger(UserSuggestedModifications.class);
 
     private static UserSuggestedModifications instance;
     /**
@@ -53,7 +51,7 @@ public class UserSuggestedModifications {
         String capitalizedModificationName = modificationName.toUpperCase().charAt(0)+modificationName.substring(1,modificationName.length());
         Modification mod = (Modification) PRIDEModificationFactory.getInstance().getModification(adapter, capitalizedModificationName);
         if (mod == null) {
-            LOGGER.error(modificationName + " was not found in the PRIDEModification Factory...");
+            PipelineProgressMonitor.error(modificationName + " was not found in the PRIDEModification Factory...");
         } else {
             modifications.add(mod);
         }

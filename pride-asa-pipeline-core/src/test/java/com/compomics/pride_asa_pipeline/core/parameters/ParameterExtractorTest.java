@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import junit.framework.TestCase;
 import org.apache.log4j.Level;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 

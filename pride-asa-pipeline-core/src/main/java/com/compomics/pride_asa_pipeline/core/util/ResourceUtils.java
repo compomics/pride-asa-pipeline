@@ -26,7 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -37,7 +37,6 @@ import org.springframework.core.io.Resource;
  */
 public class ResourceUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(ResourceUtils.class);
 
     /**
      * Gets a resource by its relative path. If the resource is not found on the

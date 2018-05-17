@@ -28,7 +28,7 @@ import com.compomics.pride_asa_pipeline.model.Peptide;
 import com.compomics.pride_asa_pipeline.core.util.PeakUtils;
 import java.util.List;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 /**
  * @author Florian Reisinger Date: 08-Oct-2009
@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
  */
 public class SpectrumMatcherImpl implements SpectrumMatcher {
 
-    private static final Logger LOGGER = Logger.getLogger(SpectrumMatcherImpl.class);
     /**
      * The identiciation scorer; scores the peptide spectrum match
      */
@@ -96,7 +95,7 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
         double bestScore = -1;
         for (ModifiedPeptide modifiedPeptide : modifiedPeptides) {
             if (modifiedPeptide == null) {
-                LOGGER.info("null as modified peptide in variations collection for precursor!");
+                PipelineProgressMonitor.info("null as modified peptide in variations collection for precursor!");
             }
             //score the modified peptide against the spectrum peaks
             annotationData = this.matchPeptide(modifiedPeptide, peakFilterResult.getFilteredPeaks(), fragmentMassError);
@@ -111,12 +110,12 @@ public class SpectrumMatcherImpl implements SpectrumMatcher {
 
         //return the best scoring ModifiedPeptide as the best match        
         if (bestMatch != null) {
-            //LOGGER.info("Best matching peptide: " + bestMatch.getSequence() + " with score: " + bestScore);
+            //PipelineProgressMonitor.info("Best matching peptide: " + bestMatch.getSequence() + " with score: " + bestScore);
             //set annotation data noise threshold
             annotationData.setNoiseThreshold(peakFilterResult.getNoiseThreshold());
             modifiedPeptidesMatchResult = new ModifiedPeptidesMatchResult(bestMatch, bestAnnotationData);
         } else {
-            LOGGER.info("best match: null");
+            PipelineProgressMonitor.info("best match: null");
         }
 
         return modifiedPeptidesMatchResult;

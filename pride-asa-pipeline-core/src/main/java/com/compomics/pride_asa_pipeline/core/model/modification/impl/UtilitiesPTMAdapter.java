@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import uk.ac.ebi.pridemod.model.Specificity;
 import uk.ac.ebi.pridemod.model.Specificity.AminoAcid;
 import uk.ac.ebi.pridemod.model.Specificity.Position;
@@ -61,10 +61,6 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
      * The regex pattern for atypical pride formulatae
      */
     private static final Pattern prideFormatPattern = Pattern.compile("([A-Z][a-z]?[0-9]?\\s[0-9]*)");
-    /**
-     * A logger
-     */
-    private static final Logger LOGGER = Logger.getLogger(UtilitiesPTMAdapter.class);
 
     @Override
     public PTM convertModification(PRIDEModification mod) {
@@ -74,12 +70,12 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
         increaseMassChain = new AtomChain();
         decreaseMassChain = new AtomChain();
         decreaseMassChain.setAddition(false);
-        LOGGER.debug("Getting target residues");
+        PipelineProgressMonitor.debug("Getting target residues");
         fetchTargetResidues(mod);
-        LOGGER.debug("Parsing PTM composition");
+        PipelineProgressMonitor.debug("Parsing PTM composition");
         parseFormula(mod.getFormula(), " ");
         AminoAcidPattern pattern = new AminoAcidPattern(targetResiduesString);
-        LOGGER.debug("Inferring modification type");
+        PipelineProgressMonitor.debug("Inferring modification type");
         int type = getModType(mod);
         return new PTM(type, mod.getName(), mod.getAccession(), increaseMassChain, decreaseMassChain, pattern);
     }
@@ -163,7 +159,7 @@ public class UtilitiesPTMAdapter implements ModificationAdapter<PTM> {
     }
 
     private void parseFormula(String formula, String atomSeparator) {
-        LOGGER.info("Converting " + formula);
+        PipelineProgressMonitor.info("Converting " + formula);
         if (formula != null && !formula.equalsIgnoreCase("none")) {
             if (formula.length() == 1) {
                 AtomImpl atom;

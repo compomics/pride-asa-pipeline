@@ -33,7 +33,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import uk.ac.ebi.pride.tools.dta_parser.DtaFile;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReader;
 import uk.ac.ebi.pride.tools.jmzreader.JMzReaderException;
@@ -55,7 +55,6 @@ import uk.ac.ebi.pride.tools.pride_wrapper.PRIDEXmlWrapper;
 public class MGFExtractor {
 
     JMzReader jMzReader;
-    private final static Logger LOGGER = Logger.getLogger(MGFExtractor.class);
     public File inputFile;
     private Integer maxPrecursorCharge = 5;
     private Integer minPrecursorCharge = 1;
@@ -75,11 +74,11 @@ public class MGFExtractor {
 //the prideFTP should be checked before this...
     private void init(File inputFile) throws MGFExtractionException {
         this.inputFile = inputFile;
-        LOGGER.info("Getting parser for " + inputFile.getName());
+        PipelineProgressMonitor.info("Getting parser for " + inputFile.getName());
         try {
             jMzReader = getJMzReader(inputFile);
         } catch (ClassNotFoundException | MzXMLParsingException | JMzReaderException ex) {
-            LOGGER.error("Could not initiate spectrum extraction !");
+            PipelineProgressMonitor.error("Could not initiate spectrum extraction !");
             throw new MGFExtractionException(ex.getMessage());
         }
     }
@@ -124,7 +123,7 @@ public class MGFExtractor {
      * @throws JMzReaderException
      */
     public File extractMGF(File outputFile, OutputStream reportStream, long timeout) throws MGFExtractionException {
-        LOGGER.info("Extraction of mgf started...");
+        PipelineProgressMonitor.info("Extraction of mgf started...");
         try (FileWriter w = new FileWriter(outputFile);
                 BufferedWriter bw = new BufferedWriter(w);
                 OutputStreamWriter rw = new OutputStreamWriter(reportStream);) {
@@ -151,15 +150,15 @@ public class MGFExtractor {
                         rw.append("\tNOT FOUND" + System.lineSeparator()).flush();
                     }
                 } catch (MGFExtractionException | TimeoutException e) {
-                    LOGGER.error(e);
+                    PipelineProgressMonitor.error(e);
                     rw.append("\t" + e.getMessage() + System.lineSeparator()).flush();
                 }
             }
             rw.append("Total usable \t" + validSpectrumCount + System.lineSeparator()).flush();
         } catch (Exception ex) {
-            LOGGER.error(ex);
+            PipelineProgressMonitor.error(ex);
         }
-        LOGGER.info("Extraction completed");
+        PipelineProgressMonitor.info("Extraction completed");
         return outputFile;
     }
 
@@ -249,7 +248,7 @@ public class MGFExtractor {
             boolean cancel = futureResult.cancel(true);
             retriever.interrupt();
             if (!cancel) {
-                LOGGER.error("Could not clear the thread for " + spectrumID);
+                PipelineProgressMonitor.error("Could not clear the thread for " + spectrumID);
             }
             //for safety kill the service pool?
             service.shutdownNow();
@@ -271,35 +270,35 @@ public class MGFExtractor {
         String extension = FilenameUtils.getExtension(inputFile.getAbsolutePath());
         switch (extension.toLowerCase()) {
             case "mzxml":
-                LOGGER.info("Detected mzXml file extension.");
+                PipelineProgressMonitor.info("Detected mzXml file extension.");
                 parser = new MzXMLFile(inputFile);
                 break;
             case "mzml":
-                LOGGER.info("Detected mzml file extension.");
+                PipelineProgressMonitor.info("Detected mzml file extension.");
                 parser = new MzMlWrapper(inputFile);
                 break;
             case "dta":
-                LOGGER.info("Detected dta file extension.");
+                PipelineProgressMonitor.info("Detected dta file extension.");
                 parser = new DtaFile(inputFile);
                 break;
             case "mgf":
-                LOGGER.info("Detected mgf file extension.");
+                PipelineProgressMonitor.info("Detected mgf file extension.");
                 parser = new MgfFile(inputFile);
                 break;
             case "ms2":
-                LOGGER.info("Detected ms2 file extension.");
+                PipelineProgressMonitor.info("Detected ms2 file extension.");
                 parser = new Ms2File(inputFile);
                 break;
             case "mzData":
-                LOGGER.info("Detected mzData file extension.");
+                PipelineProgressMonitor.info("Detected mzData file extension.");
                 parser = new MzDataFile(inputFile);
                 break;
             case "xml":
-                LOGGER.info("Detected xml file extension.");
+                PipelineProgressMonitor.info("Detected xml file extension.");
                 parser = new PRIDEXmlWrapper(inputFile);
                 break;
             case "pkl":
-                LOGGER.info("Detected pkl file extension.");
+                PipelineProgressMonitor.info("Detected pkl file extension.");
                 parser = new PklFile(inputFile);
                 break;
             default:

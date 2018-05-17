@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 /**
  *
@@ -40,10 +40,6 @@ import org.apache.log4j.Logger;
  */
 public class ModificationPredictor {
 
-    /**
-     * LOGGER
-     */
-    private static final Logger LOGGER = Logger.getLogger(ModificationPredictor.class);
     /*
      * The used SpectrumAnnotatorResult
      */
@@ -90,16 +86,16 @@ public class ModificationPredictor {
     }
 
     private void inferModifications() {
-        LOGGER.info("Inferring modifications...");
+        PipelineProgressMonitor.info("Inferring modifications...");
 //annotate spectra
         HashMap<String, Boolean> asapMods = new HashMap<>();
         Map<Modification, Integer> prideAsapModificationsMap = modificationService.getUsedModifications(spectrumAnnotatorResult);
-        LOGGER.info("Estimating modification rates");
+        PipelineProgressMonitor.info("Estimating modification rates");
         modificationRates = modificationService.estimateModificationRate(prideAsapModificationsMap, spectrumAnnotatorResult, fixedThreshold);
         boolean allowUnlimitedModifications = true;
         if (prideAsapModificationsMap.size() > 6) {
             considerationThreshold = calculateConsiderationThreshold();
-            LOGGER.warn("Warning, it is not recommended to search with more than 6 variable PTMs. A consideration threshold (" + considerationThreshold + ") will be applied to limit the combinations");
+            PipelineProgressMonitor.warn("Warning, it is not recommended to search with more than 6 variable PTMs. A consideration threshold (" + considerationThreshold + ") will be applied to limit the combinations");
             allowUnlimitedModifications = false;
         }
 
@@ -117,9 +113,9 @@ public class ModificationPredictor {
                     }
                 }
                 if (isQuantMod && modificationRate < (fixedThreshold)) {
-                    LOGGER.error(amodName + " is a quant mod, but was not fixed !");
+                    PipelineProgressMonitor.error(amodName + " is a quant mod, but was not fixed !");
                 } else {
-             //       LOGGER.info(amodName + "\t" + modificationRate);
+             //       PipelineProgressMonitor.info(amodName + "\t" + modificationRate);
                     asapMods.put(amodName, (modificationRate >= fixedThreshold));
                 }
             }
@@ -131,7 +127,7 @@ public class ModificationPredictor {
             ArrayList<String> unknownPTM = new ArrayList<>();
             PTMFactory.getInstance().convertPridePtm(aMod.getKey(), ptmSettings, unknownPTM, false);
             if (!unknownPTM.isEmpty()) {
-                LOGGER.info(aMod.getKey() + " is not a standard modification. Converting to utilities object");
+                PipelineProgressMonitor.info(aMod.getKey() + " is not a standard modification. Converting to utilities object");
                 PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
                 if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
                     encounteredMasses.add(aUtilitiesMod.getRoundedMass());
@@ -141,10 +137,10 @@ public class ModificationPredictor {
                         ptmSettings.addVariableModification(aUtilitiesMod);
                     }
                 } else {
-                    LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
+                    PipelineProgressMonitor.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
                 }
             } else {
-      //          LOGGER.info(aMod.getKey() + " was found in the default PTMs");
+      //          PipelineProgressMonitor.info(aMod.getKey() + " was found in the default PTMs");
             }
         }
     }

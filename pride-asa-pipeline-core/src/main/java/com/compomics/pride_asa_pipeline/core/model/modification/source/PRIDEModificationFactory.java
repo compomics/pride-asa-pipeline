@@ -40,7 +40,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.springframework.core.io.ClassPathResource;
 import uk.ac.ebi.pridemod.ModReader;
 import uk.ac.ebi.pridemod.model.UniModPTM;
@@ -51,10 +51,6 @@ import uk.ac.ebi.pridemod.model.UniModPTM;
  */
 public class PRIDEModificationFactory {
 
-    /**
-     * a logger
-     */
-    private static final Logger LOGGER = Logger.getLogger(PRIDEModificationFactory.class);
     /**
      * The maximal amount of modifications the factory can load
      */
@@ -106,7 +102,7 @@ public class PRIDEModificationFactory {
                 try{
                 jsonLib = new ClassPathResource("resources/pride_mods.json").getFile();
                 }catch(FileNotFoundException fex){
-                LOGGER.warn("The class resource could not be found, exporting the default to the working directory");
+                PipelineProgressMonitor.warn("The class resource could not be found, exporting the default to the working directory");
                 jsonLib =ResourceUtils.ExportToWorkingDirectory("/resources/pride_mods.json");
                // jsonLib.deleteOnExit();
                 }
@@ -116,7 +112,7 @@ public class PRIDEModificationFactory {
                 init();
             }
         } catch (IOException | InterruptedException ex) {
-            LOGGER.error(ex);
+            PipelineProgressMonitor.error(ex);
         }
     }
 
@@ -235,7 +231,7 @@ public class PRIDEModificationFactory {
 
     private static TreeSet<PRIDEModification> getFromFile(File inputFile) throws IOException {
         JsonMarshaller marshaller = new JsonMarshaller();
-        LOGGER.debug("Getting modifications from file...");
+        PipelineProgressMonitor.debug("Getting modifications from file...");
         java.lang.reflect.Type type = new TypeToken<TreeSet<PRIDEModification>>() {
         }.getType();
         return (TreeSet<PRIDEModification>) marshaller.fromJson(type, inputFile);
@@ -291,7 +287,7 @@ public class PRIDEModificationFactory {
                     }
                 }
             } catch (ExecutionException ex) {
-                LOGGER.error(ex);
+                PipelineProgressMonitor.error(ex);
                 ex.printStackTrace();
             }
         }

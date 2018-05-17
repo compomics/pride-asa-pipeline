@@ -51,7 +51,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.springframework.core.io.Resource;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 import uk.ac.ebi.pride.utilities.data.core.CvParam;
@@ -65,7 +65,6 @@ import uk.ac.ebi.pride.utilities.data.core.Spectrum;
  */
 public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
 
-    private static final Logger LOGGER = Logger.getLogger(SpectrumAnnotatorImpl.class);
     /**
      * The modification adapter to return pride asap modificaitons
      */
@@ -112,24 +111,24 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
     @Override
     public void initIdentifications(String experimentAccession) {
         currentExperiment = experimentAccession;
-        LOGGER.info("USING " + SpectrumAnnotatorImpl.class);
+        PipelineProgressMonitor.info("USING " + SpectrumAnnotatorImpl.class);
         areModificationsLoaded = false;
         parser = ParserCache.getInstance().getParser(currentExperiment, inMemory);
-        LOGGER.debug("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Creating new SpectrumAnnotatorResult for experiment " + experimentAccession);
         spectrumAnnotatorResult = new SpectrumAnnotatorResult(experimentAccession);
-        LOGGER.debug("Loading instrument data from experiment...");
+        PipelineProgressMonitor.debug("Loading instrument data from experiment...");
         preloadInstrument();
-        LOGGER.debug("Loading charge states for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Loading charge states for experiment " + experimentAccession);
         initChargeStates();
-        LOGGER.info("loading identifications for experiment " + experimentAccession);
+        PipelineProgressMonitor.info("loading identifications for experiment " + experimentAccession);
         loadExperimentIdentifications(experimentAccession);
-        LOGGER.debug("Finished loading identifications for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Finished loading identifications for experiment " + experimentAccession);
         ///////////////////////////////////////////////////////////////////////
         //FIRST STEP: find the systematic mass error (if there is one)
         //get analyzer data
-        LOGGER.info("finding systematic mass errors");
+        PipelineProgressMonitor.info("finding systematic mass errors");
         MassRecalibrationResult massRecalibrationResult = findSystematicMassError(identifications.getCompletePeptides());
-        LOGGER.debug("Finished finding systematic mass errors:" + "\n" + massRecalibrationResult.toString());
+        PipelineProgressMonitor.debug("Finished finding systematic mass errors:" + "\n" + massRecalibrationResult.toString());
         spectrumAnnotatorResult.setMassRecalibrationResult(massRecalibrationResult);
     }
 
@@ -146,7 +145,7 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
                 massSpectrometer));
 
         inferCharges(source);
-        LOGGER.info("Detected instrument : " + massSpectrometer
+        PipelineProgressMonitor.info("Detected instrument : " + massSpectrometer
                 + "-" + sourceName
                 + "-" + detector
                 + " [" + instrumentation.getPossibleCharges().first().toString() + " to " + instrumentation.getPossibleCharges().last().toString() + "]");
@@ -180,10 +179,10 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
             //also include user suggested modifications...
             Set<Modification> additionalModifications = UserSuggestedModifications.getInstance().getAdditionalModifications();
             if (!additionalModifications.isEmpty()) {
-                LOGGER.info("Loaded user specified modifications :");
+                PipelineProgressMonitor.info("Loaded user specified modifications :");
                 for (Modification mod : additionalModifications) {
                     modificationHolder.addModification(mod);
-                    LOGGER.info(mod.getName());
+                    PipelineProgressMonitor.info(mod.getName());
                 }
             }
         }
@@ -212,7 +211,7 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
             List<Identification> unexplainedIdentifications,
             Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap) {
         modificationHolder = new ModificationHolder();
-        LOGGER.info("Loading modifications");
+        PipelineProgressMonitor.info("Loading modifications");
         //add the non-conflicting modifications found in pride for the given experiment
         if (!prideModifications.isEmpty()) {
             Set<Modification> conflictingModifications = modificationService.filterModifications(modificationHolder, prideModifications);
@@ -226,10 +225,10 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
         ///////////////////////////////////////////////////////////////////////
         //SECOND STEP: find all the modification combinations that could
         //              explain a given mass delta (if there is one) -> Zen Archer
-        LOGGER.info("finding modification combinations");
+        PipelineProgressMonitor.info("finding modification combinations");
         //set fragment mass error for the identification scorer
         Map<Identification, Set<ModificationCombination>> massDeltaExplanationsMap = findModificationCombinations(spectrumAnnotatorResult.getMassRecalibrationResult(), identifications);
-        LOGGER.debug("Finished finding modification combinations");
+        PipelineProgressMonitor.debug("Finished finding modification combinations");
 
         //the returned possibleExplanations map will contain all precursors for which a
         //possible explanation was found or which do not need to be explained (e.g. the
@@ -238,13 +237,13 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
         //modification, but nevertheless could not be explained!
         int explainedIdentificationsSize = massDeltaExplanationsMap.size();
         int completeIdentificationsSize = unexplainedBuffer.size();
-        LOGGER.debug("Precursors for which no modification combination could be found: " + (completeIdentificationsSize - explainedIdentificationsSize));
+        PipelineProgressMonitor.debug("Precursors for which no modification combination could be found: " + (completeIdentificationsSize - explainedIdentificationsSize));
         unexplainedIdentifications = getUnexplainedIdentifications(unexplainedBuffer, massDeltaExplanationsMap.keySet());
         for (Identification identification : unexplainedIdentifications) {
             try {
-                LOGGER.debug("Unresolved precursor: " + identification.getPeptide().toString() + " with mass delta: " + identification.getPeptide().calculateMassDelta());
+                PipelineProgressMonitor.debug("Unresolved precursor: " + identification.getPeptide().toString() + " with mass delta: " + identification.getPeptide().calculateMassDelta());
             } catch (AASequenceMassUnknownException e) {
-                LOGGER.error(e.getMessage(), e);
+                PipelineProgressMonitor.error(e.getMessage(), e);
             }
         }
 
@@ -263,8 +262,8 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
             }
         }
 
-        LOGGER.debug("Precursors with possible modification(s): " + significantMassDeltaExplanationsMap.size());
-        LOGGER.debug("Precursors with mass delta smaller than mass error (probably unmodified): " + unmodifiedPrecursors.size());
+        PipelineProgressMonitor.debug("Precursors with possible modification(s): " + significantMassDeltaExplanationsMap.size());
+        PipelineProgressMonitor.debug("Precursors with mass delta smaller than mass error (probably unmodified): " + unmodifiedPrecursors.size());
 
         ///////////////////////////////////////////////////////////////////////
         //THIRD STEP:  find all possible precursor variations (taking all
@@ -274,18 +273,18 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
         //ToDo: is best suitable to explain a spectrum.
         //ToDo: Maybe looking at the spectrum early on to eliminate some combinations or
         //ToDo: to get ideas about likely explanations would help?
-        LOGGER.info("finding precursor variations");
+        PipelineProgressMonitor.info("finding precursor variations");
         Map<Identification, Set<ModifiedPeptide>> modifiedPrecursorVariations = findPrecursorVariations(significantMassDeltaExplanationsMap);
-        LOGGER.debug("finished finding precursor variations");
+        PipelineProgressMonitor.debug("finished finding precursor variations");
         //For each of these 'variations' we then calculate all possible fragment ions.
 
         ///////////////////////////////////////////////////////////////////////
         //FOURTH STEP:  create theoretical fragment ions for all precursors
         //               match them onto the peaks in the spectrum and decide
         //               which one is the best 'explanation'
-        LOGGER.info("finding best matches");
+        PipelineProgressMonitor.info("finding best matches");
         modifiedPrecursors.addAll(findBestMatches(modifiedPrecursorVariations));
-        LOGGER.info("finished finding best matches");
+        PipelineProgressMonitor.info("finished finding best matches");
         //remove all explained in this step
         unexplainedBuffer.removeAll(spectrumAnnotatorResult.getUnmodifiedPrecursors());
         unexplainedBuffer.removeAll(spectrumAnnotatorResult.getModifiedPrecursors());
@@ -323,10 +322,10 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
 //        String path_tmp = PropertiesConfigurationHolder.getInstance().getString("results_path_tmp");
 //        File tempDir = new File(path_tmp);
 //        try {
-//            LOGGER.debug(String.format("clearing tmp resources from folder '%s'", tempDir.getAbsolutePath()));
+//            PipelineProgressMonitor.debug(String.format("clearing tmp resources from folder '%s'", tempDir.getAbsolutePath()));
 //            Files.deleteDirectoryContents(tempDir);
 //        } catch (IOException e) {
-//            LOGGER.error(e.getMessage(), e);
+//            PipelineProgressMonitor.error(e.getMessage(), e);
 //        }
     }
 
@@ -350,7 +349,7 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
         DescriptiveStatistics precursorInferenceStatistics = new DescriptiveStatistics();
 
         for (Identification anIdentification : filteredIdentifications) {
-            //   LOGGER.info(anIdentification.getAnnotationData().getIdentificationScore().getMatchingPeaks() + " - "+anIdentification.getAnnotationData().getIdentificationScore().getTotalPeaks());
+            //   PipelineProgressMonitor.info(anIdentification.getAnnotationData().getIdentificationScore().getMatchingPeaks() + " - "+anIdentification.getAnnotationData().getIdentificationScore().getTotalPeaks());
             if (anIdentification.getPipelineExplanationType() != PipelineExplanationType.UNEXPLAINED) {
                 try {
 
@@ -364,13 +363,13 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
                             precursorInferenceStatistics.addValue(ppm);
                         }
                     } catch (AASequenceMassUnknownException ex) {
-                        LOGGER.warn(anIdentification.getPeptide().getSequenceString() + " contains unknown amino acids and will be skipped");
+                        PipelineProgressMonitor.warn(anIdentification.getPeptide().getSequenceString() + " contains unknown amino acids and will be skipped");
                     }
 
                     //          }
                 } catch (NullPointerException e) {
                     //this can happen if there are no unmodified and identified peptides?
-                    //  LOGGER.error("Not able to extract for " + anIdentification);
+                    //  PipelineProgressMonitor.error("Not able to extract for " + anIdentification);
                 }
             }
         }
@@ -497,14 +496,14 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
             //check the possible charges and reduce them to 1 in case they were searched with...
             if (detectedCharges[1] > 1) {
                 //we may have an issue here...maldi does not usually produce higher ions so this is a non standard study
-                LOGGER.warn("The detected ion source was MALDI and usually does not produce ions above charge state 1+, ignoring higher states");
+                PipelineProgressMonitor.warn("The detected ion source was MALDI and usually does not produce ions above charge state 1+, ignoring higher states");
             }
             instrumentation.getPossibleCharges().add(1);
         } else if (source.contains(ControlledVocabulary.ESI.getTerm())) {
 
             if (detectedCharges[0] == 1) {
                 //we may have an issue here...esi does not usually produce lower ions so this is a non standard study
-                LOGGER.warn("The detected ion source was ESI and usually does not produce singly charged ions, ignoring single charge state");
+                PipelineProgressMonitor.warn("The detected ion source was ESI and usually does not produce singly charged ions, ignoring single charge state");
             }
             for (int i = Math.max(2, detectedCharges[0]); i <= detectedCharges[1] + 1; i++) {
                 instrumentation.getPossibleCharges().add(i);
@@ -525,7 +524,7 @@ public class SpectrumAnnotatorImpl extends AbstractSpectrumAnnotator {
         TreeSet<Integer> charges = new TreeSet<>();
         for (Comparable spectrumID : parser.getSpectrumIds()) {
             if (charges.size() >= 1000) {
-                LOGGER.info("Sampled 1000 spectra");
+                PipelineProgressMonitor.info("Sampled 1000 spectra");
                 break;
             }
             Spectrum spectrumById = parser.getSpectrumById(spectrumID);

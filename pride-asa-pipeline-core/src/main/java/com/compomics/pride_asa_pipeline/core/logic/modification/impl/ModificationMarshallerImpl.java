@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -52,7 +52,6 @@ import org.springframework.core.io.Resource;
  */
 public class ModificationMarshallerImpl implements ModificationMarshaller {
 
-    private static final Logger LOGGER = Logger.getLogger(ModificationMarshallerImpl.class);
     private XMLReaderXSDFactory schemaFactory;
 
     public ModificationMarshallerImpl() throws JDOMException {
@@ -61,7 +60,7 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
             URL modificationsSchemaURL = resource.getURL();
             schemaFactory = new XMLReaderXSDFactory(modificationsSchemaURL);
         } catch (IOException ex) {
-            LOGGER.error(ex.getMessage(), ex);
+            PipelineProgressMonitor.error(ex.getMessage(), ex);
         }
     }
 
@@ -73,7 +72,7 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
         try {
             document = builder.build(modificationsResource.getInputStream());
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            PipelineProgressMonitor.error(e.getMessage(), e);
         }
 
         Set<Modification> result = new HashSet<>();
@@ -181,7 +180,7 @@ public class ModificationMarshallerImpl implements ModificationMarshaller {
             OutputStream outputStream = new FileOutputStream(modificationsResource.getFile());
             xmlOutputter.output(doc, outputStream);
         } catch (IOException ex) {
-            LOGGER.error(ex.getMessage(), ex);
+            PipelineProgressMonitor.error(ex.getMessage(), ex);
         }
     }
 

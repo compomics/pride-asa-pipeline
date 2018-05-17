@@ -17,6 +17,7 @@ package com.compomics.pride_asa_pipeline.core;
 
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import com.compomics.pride_asa_pipeline.core.config.PropertiesConfigurationHolder;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import com.compomics.pride_asa_pipeline.core.logic.spectrum.annotation.AbstractSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.core.repository.impl.combo.WebServiceFileExperimentRepository;
 import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperimentRepository;
@@ -29,7 +30,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -37,7 +37,6 @@ import org.apache.log4j.Logger;
  */
 public class CommandLineRunner {
 
-    private static final Logger LOGGER = Logger.getLogger(CommandLineRunner.class);
     private AbstractSpectrumAnnotator spectrumAnnotator;
     private ResultHandler resultHandler;
 
@@ -59,18 +58,18 @@ public class CommandLineRunner {
 
     public void runPipeline(String experimentAccession) throws Exception {
         //set up the repository to cache this experiment
-        LOGGER.info("Setting up experiment repository for assay " + experimentAccession);
+        PipelineProgressMonitor.info("Setting up experiment repository for assay " + experimentAccession);
         WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository();
         experimentRepository.addAssay(experimentAccession);
         //the cache should only have one for now?
         String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
-        LOGGER.info(entry + " was found in the parser cache");
+        PipelineProgressMonitor.info(entry + " was found in the parser cache");
         execute(experimentAccession);
     }
 
         public void runPipeline(File identifciationsFile,File...peakFiles) throws Exception {
         //set up the repository to cache this experiment
-        LOGGER.info("Setting up experiment repository for assay " + identifciationsFile.getName());
+        PipelineProgressMonitor.info("Setting up experiment repository for assay " + identifciationsFile.getName());
         FileExperimentRepository experimentRepository = new FileExperimentRepository();
         if(identifciationsFile.getName().toLowerCase().endsWith(".xml") && peakFiles.length==0){
                    experimentRepository.addPrideXMLFile(identifciationsFile.getName(),identifciationsFile);
@@ -80,7 +79,7 @@ public class CommandLineRunner {
  
         //the cache should only have one for now?
         String entry = ParserCache.getInstance().getLoadedFiles().keySet().iterator().next();
-        LOGGER.info(entry + " was found in the parser cache");
+        PipelineProgressMonitor.info(entry + " was found in the parser cache");
         execute(identifciationsFile.getName());
     }
     
@@ -97,12 +96,12 @@ public class CommandLineRunner {
 
             //check if the experiment has "useful" identifications
             if (spectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
-                LOGGER.warn("No useful identifications were found for experiment " + experimentAccession + ". This experiment will be skipped.");
+                PipelineProgressMonitor.warn("No useful identifications were found for experiment " + experimentAccession + ". This experiment will be skipped.");
                 spectrumAnnotator.clearPipeline();
             } else {
                 //check if the maximum systematic mass error is exceeded
                 if (spectrumAnnotator.getSpectrumAnnotatorResult().getMassRecalibrationResult().exceedsMaximumSystematicMassError()) {
-                    LOGGER.warn("One or more systematic mass error exceed the maximum value of " + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error") + ", experiment " + experimentAccession + " will be skipped.");
+                    PipelineProgressMonitor.warn("One or more systematic mass error exceed the maximum value of " + PropertiesConfigurationHolder.getInstance().getDouble("massrecalibrator.maximum_systematic_mass_error") + ", experiment " + experimentAccession + " will be skipped.");
                     spectrumAnnotator.clearPipeline();
                 } else {
                     //continue with the annotiation
@@ -113,7 +112,7 @@ public class CommandLineRunner {
                 }
             }
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            PipelineProgressMonitor.error(e.getMessage(), e);
         }
     }
 
@@ -141,9 +140,9 @@ public class CommandLineRunner {
                 experimentAccessions.add(line);
             }
         } catch (FileNotFoundException e) {
-            LOGGER.error(e.getMessage(), e);
+            PipelineProgressMonitor.error(e.getMessage(), e);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            PipelineProgressMonitor.error(e.getMessage(), e);
         }
 
         return experimentAccessions;

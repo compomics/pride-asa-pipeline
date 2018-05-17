@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import javax.swing.JOptionPane;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.ELProperty;
@@ -41,7 +41,6 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class PipelineParamsController {
 
-    private static final Logger LOGGER = Logger.getLogger(PipelineParamsController.class);
     //model
     private BindingGroup bindingGroup;
     private ObservableList<PropertyGuiWrapper> propertyGuiWrapperBindingList;
@@ -100,7 +99,7 @@ public class PipelineParamsController {
                     PropertiesConfigurationHolder.getInstance().save();
                     mainController.showMessageDialog("Save Successful", "The pipeline parameters were saved successfully.", JOptionPane.INFORMATION_MESSAGE);
                 } catch (ConfigurationException ex) {
-                    LOGGER.error(ex.getMessage(), ex);
+                    PipelineProgressMonitor.error(ex.getMessage(), ex);
                     mainController.showMessageDialog("Save Unsuccessful", "The pipeline settings could not be saved to file. "
                             + "\n" + "Please check if a \"pride_asa_pipeline.properties\" file exists in the \"resources\" folder. "
                             + "\n" + "The settings will however be used in the pipeline.", JOptionPane.WARNING_MESSAGE);
@@ -119,9 +118,9 @@ public class PipelineParamsController {
                     propertyGuiWrapperBindingList.clear();
                     initPropertyGuiWrappersBindingList();
                 } catch (ConfigurationException ex) {
-                    LOGGER.error(ex.getMessage(), ex);
+                    PipelineProgressMonitor.error(ex.getMessage(), ex);
                 } catch (IOException ex) {
-                    LOGGER.error(ex.getMessage(), ex);
+                    PipelineProgressMonitor.error(ex.getMessage(), ex);
                 }
             }
         });

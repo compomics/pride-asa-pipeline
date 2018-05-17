@@ -23,7 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.math3.
 stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 /**
  *
@@ -35,10 +35,6 @@ public class IdentificationFilter {
     The collection of identifications that should be considered
     */
     private final Collection<Identification> identifications;
-    /**
-     * The logging instqnce
-     */
-    private static final Logger LOGGER = Logger.getLogger(IdentificationFilter.class);
 
     /**
      * An identification filter to exclude identifications below a certain percentile
@@ -57,7 +53,7 @@ public class IdentificationFilter {
         List<Identification> topIdentifications = new ArrayList<>();
         if (identifications.size() > 30) {
             double threshold = getPrecursorThreshold(percentile);
-            LOGGER.info("Only retaining identifications above " + threshold);
+            PipelineProgressMonitor.info("Only retaining identifications above " + threshold);
             for (Identification anIdentification : identifications) {
                 try {
                     IdentificationScore identificationScore = anIdentification.getAnnotationData().getIdentificationScore();
@@ -86,7 +82,7 @@ public class IdentificationFilter {
         List<Identification> topIdentifications = new ArrayList<>();
         if (identifications.size() > 30) {
             double threshold = getFragmentIonThreshold(percentile);
-            LOGGER.info("Only retaining identifications above " + threshold);
+            PipelineProgressMonitor.info("Only retaining identifications above " + threshold);
             for (Identification anIdentification : identifications) {
                 try {
                     IdentificationScore identificationScore = anIdentification.getAnnotationData().getIdentificationScore();
@@ -135,7 +131,7 @@ public class IdentificationFilter {
                 }
             } catch (NullPointerException e) {
                 //then there is no scoring information known?
-                // LOGGER.warn(e);
+                // PipelineProgressMonitor.warn(e);
             }
         }
         if (statistics.getN() == 0) {

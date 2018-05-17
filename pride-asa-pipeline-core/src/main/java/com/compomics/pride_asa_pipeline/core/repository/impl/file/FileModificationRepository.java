@@ -22,7 +22,7 @@ import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 
 /**
@@ -35,10 +35,6 @@ public class FileModificationRepository extends ParserCacheConnector implements 
      * The identifier for the current repository (filename or assay accession)
      */
     private String experimentIdentifier;
-    /**
-     * A logger instance
-     */
-    private static final Logger LOGGER = Logger.getLogger(FileModificationRepository.class);
     /**
      * The modification adapter to return pride asap modificaitons
      */

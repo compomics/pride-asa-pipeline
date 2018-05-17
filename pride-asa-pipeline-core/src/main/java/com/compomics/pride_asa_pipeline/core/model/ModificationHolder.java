@@ -15,7 +15,6 @@
  */
 package com.compomics.pride_asa_pipeline.core.model;
 
-import com.compomics.pride_asa_pipeline.core.data.user.UserSuggestedModifications;
 import com.compomics.pride_asa_pipeline.model.AminoAcid;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.Collection;
@@ -24,7 +23,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
 
 /**
  * A construct to hold all registered modifications ordered by their possible
@@ -36,7 +34,6 @@ import org.apache.log4j.Logger;
  */
 public class ModificationHolder {
 
-    private Logger LOGGER = Logger.getLogger(ModificationHolder.class);
     private Map<AminoAcid, Set<Modification>> nonTerminalMods;
     private Map<AminoAcid, Set<Modification>> nTerminalMods;
     private Map<AminoAcid, Set<Modification>> cTerminalMods;

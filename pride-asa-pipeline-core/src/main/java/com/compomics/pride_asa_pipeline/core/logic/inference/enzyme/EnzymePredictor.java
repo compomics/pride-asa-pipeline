@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -42,11 +41,7 @@ public class EnzymePredictor {
      * The enzyme factory
      */
     private static EnzymeFactory enzymeFactory;
-    /**
-     * A logger
-     */
-    private static final Logger LOGGER = Logger.getLogger(EnzymePredictor.class);
-    /**
+   /**
      * boolean indicating if this project is fit for searches
      */
     private boolean suitedForSearching = true;

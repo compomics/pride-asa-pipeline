@@ -19,14 +19,13 @@ import com.compomics.pride_asa_pipeline.core.repository.ExperimentRepository;
 import com.compomics.pride_asa_pipeline.core.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.core.service.ResultHandler;
 import java.util.*;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 /**
  * @author Niels Hulstaert
  */
 public abstract class ExperimentServiceImpl implements ExperimentService {
 
-    private static final Logger LOGGER = Logger.getLogger(ExperimentServiceImpl.class);
     protected static final String MALDI_SOURCE_ACCESSION = "PSI:1000075";
     protected ExperimentRepository experimentRepository;
     protected ResultHandler resultHandler;

@@ -23,7 +23,7 @@ import com.compomics.util.pride.PrideWebService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 
 /**
@@ -32,7 +32,6 @@ import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
  */
 public class WSModificationRepository implements ModificationRepository {
 
-    private static final Logger LOGGER = Logger.getLogger(WSModificationRepository.class);
 
     @Override
     public List<Modification> getModificationsByPeptideId(long peptideId) {
@@ -41,7 +40,7 @@ public class WSModificationRepository implements ModificationRepository {
 
     @Override
     public List<Modification> getModificationsByExperimentId(String experimentId) {
-        LOGGER.debug("Loading modifications for experimentid " + experimentId);
+        PipelineProgressMonitor.debug("Loading modifications for experimentid " + experimentId);
         List<Modification> modifications = new ArrayList<>();
         AsapModificationAdapter adapter = new AsapModificationAdapter();
         try {
@@ -49,10 +48,10 @@ public class WSModificationRepository implements ModificationRepository {
             for (String aPtmName : assayDetail.getPtmNames()) {
                 PRIDEModificationFactory.getInstance().getModification(adapter, aPtmName);
             }
-            LOGGER.debug("Finished loading modifications for pride experiment with id " + experimentId);
+            PipelineProgressMonitor.debug("Finished loading modifications for pride experiment with id " + experimentId);
             return modifications;
         } catch (IOException ex) {
-            LOGGER.error(ex);
+            PipelineProgressMonitor.error(ex);
         }
         return modifications;
     }

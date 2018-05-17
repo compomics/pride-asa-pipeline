@@ -18,7 +18,6 @@ package com.compomics.pride_asa_pipeline.core.data.mapper;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
@@ -27,8 +26,7 @@ import org.springframework.jdbc.core.RowMapper;
  */
 public class AnalyzerDataMapper implements RowMapper<AnalyzerData> {
 
-    private static final Logger LOGGER = Logger.getLogger(AnalyzerDataMapper.class);
-
+  
     @Override
     public AnalyzerData mapRow(ResultSet rs, int i) throws SQLException {
         AnalyzerData analyzerData = null;

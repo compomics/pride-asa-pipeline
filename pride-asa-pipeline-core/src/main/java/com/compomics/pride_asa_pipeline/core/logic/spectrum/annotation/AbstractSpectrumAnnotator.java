@@ -48,18 +48,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Kenneth Verheggen
  */
 public abstract class AbstractSpectrumAnnotator {
-
-    /**
-     * The logger
-     */
-    private static final Logger LOGGER = Logger.getLogger(AbstractSpectrumAnnotator.class);
 
     /**
      * The considered charge states.
@@ -193,7 +188,7 @@ public abstract class AbstractSpectrumAnnotator {
         //create new map with only the precursors that carry a significant mass delta
         //and were we have possible modification combinations
         Map<Identification, Set<ModificationCombination>> significantMassDeltaExplanationsMap = new HashMap<>();
-        LOGGER.info("Loading modifications");
+        PipelineProgressMonitor.info("Loading modifications");
         annotateModifications(convertToUseCase(modificationHolder.getAllModifications()), modifiedPrecursors, unmodifiedPrecursors, completeIdentifications, unexplainedIdentifications, significantMassDeltaExplanationsMap);
         //set the master results into the spectrumAnnotator result
         spectrumAnnotatorResult.setUnexplainedIdentifications(unexplainedIdentifications);
@@ -230,10 +225,10 @@ public abstract class AbstractSpectrumAnnotator {
         ///////////////////////////////////////////////////////////////////////
         //SECOND STEP: find all the modification combinations that could
         //              explain a given mass delta (if there is one) -> Zen Archer
-        LOGGER.info("finding modification combinations");
+        PipelineProgressMonitor.info("finding modification combinations");
         //set fragment mass error for the identification scorer
         Map<Identification, Set<ModificationCombination>> massDeltaExplanationsMap = findModificationCombinations(spectrumAnnotatorResult.getMassRecalibrationResult(), identifications);
-        LOGGER.debug("Finished finding modification combinations");
+        PipelineProgressMonitor.debug("Finished finding modification combinations");
 
         //the returned possibleExplanations map will contain all precursors for which a
         //possible explanation was found or which do not need to be explained (e.g. the
@@ -242,13 +237,13 @@ public abstract class AbstractSpectrumAnnotator {
         //modification, but nevertheless could not be explained!
         int explainedIdentificationsSize = massDeltaExplanationsMap.size();
         int completeIdentificationsSize = unexplainedModifications.size();
-        LOGGER.debug("Precursors for which no modification combination could be found: " + (completeIdentificationsSize - explainedIdentificationsSize));
+        PipelineProgressMonitor.debug("Precursors for which no modification combination could be found: " + (completeIdentificationsSize - explainedIdentificationsSize));
         unexplainedIdentifications = getUnexplainedIdentifications(unexplainedModifications, massDeltaExplanationsMap.keySet());
         for (Identification identification : unexplainedIdentifications) {
             try {
-                LOGGER.debug("Unresolved precursor: " + identification.getPeptide().toString() + " with mass delta: " + identification.getPeptide().calculateMassDelta());
+                PipelineProgressMonitor.debug("Unresolved precursor: " + identification.getPeptide().toString() + " with mass delta: " + identification.getPeptide().calculateMassDelta());
             } catch (AASequenceMassUnknownException e) {
-                LOGGER.error(e.getMessage(), e);
+                PipelineProgressMonitor.error(e.getMessage(), e);
             }
         }
 
@@ -267,8 +262,8 @@ public abstract class AbstractSpectrumAnnotator {
             }
         }
 
-        LOGGER.debug("Precursors with possible modification(s): " + significantMassDeltaExplanationsMap.size());
-        LOGGER.debug("Precursors with mass delta smaller than mass error (probably unmodified): " + unmodifiedPrecursors.size());
+        PipelineProgressMonitor.debug("Precursors with possible modification(s): " + significantMassDeltaExplanationsMap.size());
+        PipelineProgressMonitor.debug("Precursors with mass delta smaller than mass error (probably unmodified): " + unmodifiedPrecursors.size());
 
         ///////////////////////////////////////////////////////////////////////
         //THIRD STEP:  find all possible precursor variations (taking all
@@ -278,18 +273,18 @@ public abstract class AbstractSpectrumAnnotator {
         //ToDo: is best suitable to explain a spectrum.
         //ToDo: Maybe looking at the spectrum early on to eliminate some combinations or
         //ToDo: to get ideas about likely explanations would help?
-        LOGGER.info("finding precursor variations");
+        PipelineProgressMonitor.info("finding precursor variations");
         Map<Identification, Set<ModifiedPeptide>> modifiedPrecursorVariations = findPrecursorVariations(significantMassDeltaExplanationsMap);
-        LOGGER.debug("finished finding precursor variations");
+        PipelineProgressMonitor.debug("finished finding precursor variations");
         //For each of these 'variations' we then calculate all possible fragment ions.
 
         ///////////////////////////////////////////////////////////////////////
         //FOURTH STEP:  create theoretical fragment ions for all precursors
         //               match them onto the peaks in the spectrum and decide
         //               which one is the best 'explanation'
-        LOGGER.info("finding best matches");
+        PipelineProgressMonitor.info("finding best matches");
         modifiedPrecursors.addAll(findBestMatches(modifiedPrecursorVariations));
-        LOGGER.debug("finished finding best matches");
+        PipelineProgressMonitor.debug("finished finding best matches");
         //remove all explained in this step
         unexplainedModifications.removeAll(spectrumAnnotatorResult.getUnmodifiedPrecursors());
         unexplainedModifications.removeAll(spectrumAnnotatorResult.getModifiedPrecursors());
@@ -349,7 +344,7 @@ public abstract class AbstractSpectrumAnnotator {
         } catch (AASequenceMassUnknownException e) {
             //this should not happen here, since we only handle 'complete precursors' where
             //all the amino acids have a known mass
-            LOGGER.error("ERROR! Could not calculate masses for all (complete) precursors!");
+            PipelineProgressMonitor.error("ERROR! Could not calculate masses for all (complete) precursors!");
             throw new IllegalStateException("Could not calculate masses for all (complete) precursors!");
         }
         return massRecalibrationResult;
@@ -406,7 +401,7 @@ public abstract class AbstractSpectrumAnnotator {
             Set<ModifiedPeptide> precursorVariationsSet = peptideVariationsGenerator.generateVariations(identificationSet.getPeptide(), modifications);
             precursorVariations.put(identificationSet, precursorVariationsSet);
         }
-        LOGGER.debug("Peptide variations found for " + precursorVariations.size() + " peptides.");
+        PipelineProgressMonitor.debug("Peptide variations found for " + precursorVariations.size() + " peptides.");
 
         return precursorVariations;
     }
@@ -441,7 +436,7 @@ public abstract class AbstractSpectrumAnnotator {
                 identification.setPipelineExplanationType(PipelineExplanationType.MODIFIED);
                 bestMatches.add(identification);
             } else {
-                LOGGER.info("No best match found for precursor: " + identification.getPeptide());
+                PipelineProgressMonitor.info("No best match found for precursor: " + identification.getPeptide());
                 //add to unexplained identifications
                 identification.setPipelineExplanationType(PipelineExplanationType.UNEXPLAINED);
                 spectrumAnnotatorResult.getUnexplainedIdentifications().add(identification);

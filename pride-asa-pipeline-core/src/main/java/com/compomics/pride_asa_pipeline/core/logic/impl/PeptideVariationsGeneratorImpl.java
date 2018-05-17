@@ -26,7 +26,6 @@ import com.compomics.pride_asa_pipeline.model.Peptide;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import org.apache.log4j.Logger;
 
 /**
  * @author Florian Reisinger Date: 29-Sep-2009
@@ -34,7 +33,6 @@ import org.apache.log4j.Logger;
  */
 public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerator {
 
-    private static final Logger LOGGER = Logger.getLogger(PeptideVariationsGeneratorImpl.class);
 
     @Override
     public Set<ModifiedPeptide> generateVariations(Peptide precursor, Set<ModificationCombination> modifications) {
@@ -181,7 +179,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
                     combinedModifiedPeptides.add(combinedModifiedPeptide);
                 } else {
                     //ToDo: maybe report the rubbish result
-                //    LOGGER.warn("Non-sensical modification combination in ModifiedPeptide.");
+                //    PipelineProgressMonitor.warn("Non-sensical modification combination in ModifiedPeptide.");
                 }
                 //go on to the next combination
 
@@ -223,7 +221,7 @@ public class PeptideVariationsGeneratorImpl implements PeptideVariationsGenerato
             if (numberOfModifiableLocations < occurances) {
                 //we have more modifications of this kind than we have modifiable AAs??
                 throw new IllegalStateException("Can not have more modifications than there are modifiable AAs.");
-                //LOGGER.warn("Can not have more modifications than there are modifiable AAs.");
+                //PipelineProgressMonitor.warn("Can not have more modifications than there are modifiable AAs.");
             } else if (numberOfModifiableLocations == occurances) {
                 //all the affectable locations are affected (easy solution)
                 //we only need to create one ModifiedPeptide were all the affectable AA are modified

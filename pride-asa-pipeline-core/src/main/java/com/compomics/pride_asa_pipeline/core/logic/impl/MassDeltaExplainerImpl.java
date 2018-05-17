@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import uk.ac.ebi.pride.utilities.mol.Atom;
 
 /**
@@ -40,7 +40,6 @@ import uk.ac.ebi.pride.utilities.mol.Atom;
  */
 public class MassDeltaExplainerImpl implements MassDeltaExplainer {
 
-    private static final Logger LOGGER = Logger.getLogger(MassDeltaExplainerImpl.class);
     private final ModificationCombinationSolver modificationCombinationSolver;
     private final DescriptiveStatistics massErrorStatistics = new DescriptiveStatistics();
 
@@ -133,7 +132,7 @@ public class MassDeltaExplainerImpl implements MassDeltaExplainer {
             previousExplainedRatio = currentExplainedRatio;
             //calculate the new ratio of explained precursors
             currentExplainedRatio = (double) possibleExplainedIdentifications.keySet().size() / (double) identifications.size();
-            LOGGER.debug("Explanation ratio with " + modificationCombinationSizeLimit + " modifications: " + currentExplainedRatio);
+            PipelineProgressMonitor.debug("Explanation ratio with " + modificationCombinationSizeLimit + " modifications: " + currentExplainedRatio);
 
             //increase the number of considered modifications for the next round in case we are not reaching the convergence
             modificationCombinationSizeLimit++;

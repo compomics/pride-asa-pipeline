@@ -20,7 +20,7 @@ import com.compomics.pride_asa_pipeline.core.data.mapper.PrecursorModificationMa
 import com.compomics.pride_asa_pipeline.core.repository.ModificationRepository;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import java.util.List;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 /**
@@ -28,7 +28,6 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
  */
 public class JdbcModificationRepository extends JdbcDaoSupport implements ModificationRepository {
 
-    private static final Logger LOGGER = Logger.getLogger(JdbcModificationRepository.class);
     private static final String SELECT_MODIFICATION_BY_PEPTIDE_ID = new StringBuilder()
             .append("select ")
             .append("modif.accession, modif.location, modif_param.name, pep.sequence, mass_del.mass_delta_value ")
@@ -62,17 +61,17 @@ public class JdbcModificationRepository extends JdbcDaoSupport implements Modifi
 
     @Override
     public List<Modification> getModificationsByPeptideId(long peptideId) {
-        LOGGER.debug("Loading modifications for precursor with peptide id " + peptideId);
+        PipelineProgressMonitor.debug("Loading modifications for precursor with peptide id " + peptideId);
         List<Modification> modifications = getJdbcTemplate().query(SELECT_MODIFICATION_BY_PEPTIDE_ID, new PrecursorModificationMapper(), new Object[]{peptideId});
-        LOGGER.debug("Finished loading modifications for precursor with peptide id " + peptideId);
+        PipelineProgressMonitor.debug("Finished loading modifications for precursor with peptide id " + peptideId);
         return modifications;
     }
 
     @Override
     public List<Modification> getModificationsByExperimentId(String experimentId) {
-        LOGGER.debug("Loading modifications for experimentid " + experimentId);
+        PipelineProgressMonitor.debug("Loading modifications for experimentid " + experimentId);
         List<Modification> modifications = getJdbcTemplate().query(SELECT_MODIFICATION_BY_EXPERIMENT_ID, new ExperimentModificationMapper(), new Object[]{experimentId});
-        LOGGER.debug("Finished loading modifications for pride experiment with id " + experimentId);
+        PipelineProgressMonitor.debug("Finished loading modifications for pride experiment with id " + experimentId);
         return modifications;
     }
 }

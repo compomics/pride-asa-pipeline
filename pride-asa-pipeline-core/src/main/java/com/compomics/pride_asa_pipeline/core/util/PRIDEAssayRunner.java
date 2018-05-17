@@ -30,7 +30,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 /**
  *
@@ -39,7 +39,6 @@ import org.apache.log4j.Logger;
 public class PRIDEAssayRunner {
 
     private static Options options;
-    private static final Logger LOGGER = Logger.getLogger(PRIDEAssayRunner.class);
 
     private static File outputFolder;
     private static File identificationsFile;
@@ -133,7 +132,7 @@ public class PRIDEAssayRunner {
 
     private static void ExecuteLocalCommand() throws ParameterExtractionException {
         FileExperimentRepository experimentRepository = new FileExperimentRepository();
-        LOGGER.info("Setting up experiment repository for assay " + identificationsFile.getName());
+        PipelineProgressMonitor.info("Setting up experiment repository for assay " + identificationsFile.getName());
         //load the user mods
         for (String modName : modList) {
             UserSuggestedModifications.getInstance().addModification(modName);
@@ -144,17 +143,17 @@ public class PRIDEAssayRunner {
         } else {
             experimentRepository.addMzID(identificationsFile.getName(), identificationsFile, peakFileList);
         }
-        LOGGER.info("Attempting to infer searchparameters");
+        PipelineProgressMonitor.info("Attempting to infer searchparameters");
         ParameterExtractor extractor = new ParameterExtractor(identificationsFile.getName());
         result = extractor.getParameters();
 
     }
 
     private static void ExecuteWSCommand() throws Exception {
-        LOGGER.info("Setting up experiment repository for assay " + assayAccession);
+        PipelineProgressMonitor.info("Setting up experiment repository for assay " + assayAccession);
         WebServiceFileExperimentRepository experimentRepository = new WebServiceFileExperimentRepository();
         experimentRepository.addAssay(assayAccession);
-        LOGGER.info("Attempting to infer searchparameters");
+        PipelineProgressMonitor.info("Attempting to infer searchparameters");
         ParameterExtractor extractor = new ParameterExtractor(assayAccession);
         result = extractor.getParameters();
     }

@@ -56,7 +56,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.jfree.chart.ChartPanel;
 
 /**
@@ -66,7 +66,6 @@ import org.jfree.chart.ChartPanel;
  */
 public class PipelineResultController {
 
-    private static final Logger LOGGER = Logger.getLogger(PipelineResultController.class);
     private static final Color[] MODIFICATIONS_AVAILABLE_COLORS = {new Color(255, 215, 0), new Color(238, 130, 238), new Color(255, 140, 0), new Color(46, 139, 87), new Color(205, 92, 92)};
     //model
     private SpectrumAnnotatorResult spectrumAnnotatorResult;
@@ -173,7 +172,7 @@ public class PipelineResultController {
                 try {
                     precursorMassDeltaValues[i] = spectrumAnnotatorResult.getIdentifications().get(i).getPeptide().calculateMassDelta();
                 } catch (AASequenceMassUnknownException ex) {
-                    LOGGER.error(ex.getMessage(), ex);
+                    PipelineProgressMonitor.error(ex.getMessage(), ex);
                 }
                 fragmentMassDeltaValues.addAll(calculateFragmentIonMassDeltas(spectrumAnnotatorResult.getIdentifications().get(i)));
                 b1IonCoverageValues[i] = calculateIonCoverages(spectrumAnnotatorResult.getIdentifications().get(i)).get(FragmentIonAnnotation.IonType.B_ION)[0];

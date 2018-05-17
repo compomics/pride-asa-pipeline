@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 /**
  * @author Florian Reisinger Date: 25-Aug-2009
@@ -42,7 +42,6 @@ import org.apache.log4j.Logger;
  */
 public class ModificationCombinationSolverImpl implements ModificationCombinationSolver {
 
-    private static final Logger LOGGER = Logger.getLogger(ModificationCombinationSolverImpl.class);
     private ModificationHolder modificationHolder;
     private Cache<String, PeptideModificationHolder> peptideModificationHolderCache;
     private ZenArcher zenArcher;
@@ -50,7 +49,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
     public ModificationCombinationSolverImpl(ModificationHolder modificationHolder) {
         if (modificationHolder == null || modificationHolder.getNumberOfModifications() < 1) {
             //no modifications to choose from!
-            LOGGER.error("ERROR: no selection for all possible modifications has been provided!");
+            PipelineProgressMonitor.error("ERROR: no selection for all possible modifications has been provided!");
             throw new IllegalArgumentException("The provided ModificationSelection does not contain any modifications!");
         }
         this.modificationHolder = modificationHolder;
@@ -60,7 +59,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
 
     @Override
     public Set<ModificationCombination> findModificationCombinations(Peptide peptide, int bagSize, double massToExplain, double deviation) {
-        LOGGER.debug("Finding modifications for percursor: " + peptide.getSequenceString());
+        PipelineProgressMonitor.debug("Finding modifications for percursor: " + peptide.getSequenceString());
 
         //check if we can increase the bag size (number of possible modifications) on this peptide
         //note: the max number of possible mods is: peptide length + 2, since each residue can hold
@@ -68,7 +67,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
         if (bagSize > peptide.getSequence().length() + 2) {
             //the bag size is already bigger than the possible number of modifications on this peptide!
             //ToDo: maybe replace with exception and check at call time of method ??
-            LOGGER.debug("bag size exceeded peptide length for peptide: " + peptide.getSequenceString());
+            PipelineProgressMonitor.debug("bag size exceeded peptide length for peptide: " + peptide.getSequenceString());
             return null;
         }
 
@@ -77,19 +76,19 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
 
         //generates the PeptideModificationHolder for the given peptide.
         //For performance purposes, the previous PeptideModificationHolders are cached
-        LOGGER.debug("Generating peptide modification holder for peptide " + peptide.getSequenceString());
+        PipelineProgressMonitor.debug("Generating peptide modification holder for peptide " + peptide.getSequenceString());
         PeptideModificationHolder peptideModificationHolder = generatePeptideMoficationHolder(peptide.getSequence());
 
         //check if we got possible modifications for the current peptide
         if (peptideModificationHolder.getModifications() == null || peptideModificationHolder.getModifications().isEmpty()) {
             //might be the case that there can not be any modifications for a peptide
             //ToDo: is that a valid case? or are there always mods possible?
-            LOGGER.info("no modifications possible for peptide: " + peptide.getSequence());
+            PipelineProgressMonitor.info("no modifications possible for peptide: " + peptide.getSequence());
             return null;
         }
 
         if (peptideModificationHolder.getCandidateModificationCombinations().size() <= 0) {
-            LOGGER.info("no modifications possible for peptide: " + peptide.getSequence());
+            PipelineProgressMonitor.info("no modifications possible for peptide: " + peptide.getSequence());
         }
 
         //The zen archer will try and find combinations of PTMs that will explain the mass delta
@@ -177,7 +176,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
                 addToModificationCombinations(modificationCombinations, mappedModifications.iterator().next());
             } else {
                 //report that and then try to compensate
-                LOGGER.debug("WARNING: more than one modifications map to the mass '" + combinationMass + "'. Trying to take all possibilities into account.");
+                PipelineProgressMonitor.debug("WARNING: more than one modifications map to the mass '" + combinationMass + "'. Trying to take all possibilities into account.");
                 //whenever we have more than one possible modification for the mass,
                 //we have to create a duplicate of the current ModComb(s) for each of the
                 //possibilities and add one of the mapped mods each
@@ -252,7 +251,7 @@ public class ModificationCombinationSolverImpl implements ModificationCombinatio
             peptideModificationHolder.setPossibleModifications(possibleModifications);
 
             //generate the candidate modification combinations and add them to the PeptideModificationHolder
-            LOGGER.debug("Generating candidate modification combination for peptide " + sequence.toString());
+            PipelineProgressMonitor.debug("Generating candidate modification combination for peptide " + sequence.toString());
             generateCandidateModificationCombinations(peptideModificationHolder);
 
             //add to cache

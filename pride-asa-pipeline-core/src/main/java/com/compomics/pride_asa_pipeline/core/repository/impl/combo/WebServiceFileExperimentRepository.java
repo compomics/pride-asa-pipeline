@@ -27,7 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileType;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
@@ -38,10 +38,6 @@ import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
  */
 public class WebServiceFileExperimentRepository extends FileExperimentRepository {
 
-    /**
-     * A logger instance
-     */
-    private static final Logger LOGGER = Logger.getLogger(FileExperimentRepository.class);
     /**
      * A temporary folder to store downloaded identification files
      */
@@ -76,7 +72,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
             } else {
                 super.addPrideXMLFile(assay, identFile);
             }
-            LOGGER.info("Added " + assay + " - " + identFile.getName());
+            PipelineProgressMonitor.info("Added " + assay + " - " + identFile.getName());
         } else {
             throw new FileNotFoundException("No identification file was found for assay number " + assay);
         }
@@ -94,7 +90,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
             temp = new File(tempFolder, downloadFile.getName().replace(".gz", ""));
         }
         if (temp != null && !temp.exists()) {
-            LOGGER.debug("Downloading : " + url.getPath());
+            PipelineProgressMonitor.debug("Downloading : " + url.getPath());
             downloader.downloadFile(url.getPath(), downloadFile);
             if (downloadFile.getAbsolutePath().endsWith(".gz")) {
                 gunzip(downloadFile, temp);
@@ -114,7 +110,7 @@ public class WebServiceFileExperimentRepository extends FileExperimentRepository
             gzis.close();
             outputFile.deleteOnExit();
         } catch (IOException ex) {
-            LOGGER.error(ex);
+            PipelineProgressMonitor.error(ex);
         }
     }
 

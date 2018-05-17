@@ -16,6 +16,7 @@
 package com.compomics.pride_asa_pipeline.core.playground;
 
 import com.compomics.pride_asa_pipeline.core.CommandLineRunner;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import com.compomics.pride_asa_pipeline.core.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.core.service.ModificationService;
 import com.compomics.pride_asa_pipeline.core.spring.ApplicationContextProvider;
@@ -40,25 +41,22 @@ import org.springframework.context.ApplicationContext;
  */
 public class Playground {
 
-    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(Playground.class);
-
     public static void main(String[] args) throws Exception {
         //load application context
         ApplicationContextProvider.getInstance().setDefaultApplicationContext();
-        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();        
+        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
 
         CommandLineRunner commandLineRunner = applicationContext.getBean("commandLineRunner", CommandLineRunner.class);
         commandLineRunner.runPipeline(new File("W:\\PRIDE-DATA\\PRIDE-FTP-DOWNLOAD\\PRIDE_Exp_Complete_Ac_3659.xml"));
-        
+
         SpectrumAnnotatorResult spectrumAnnotatorResult = commandLineRunner.getSpectrumAnnotator().getSpectrumAnnotatorResult();
         ModificationService modificationService = commandLineRunner.getSpectrumAnnotator().getModificationService();
         Map<Modification, Integer> usedModifications = modificationService.getUsedModifications(spectrumAnnotatorResult);
-        Map<Modification, Double> estimateModificationRate = modificationService.estimateModificationRate(usedModifications, spectrumAnnotatorResult, 0.05);  
-        
+        Map<Modification, Double> estimateModificationRate = modificationService.estimateModificationRate(usedModifications, spectrumAnnotatorResult, 0.05);
+
 //        PrideXmlSpectrumAnnotator prideXmlSpectrumAnnotator = (PrideXmlSpectrumAnnotator) applicationContext.getBean("prideXmlSpectrumAnnotator");
 //        PrideXmlExperimentService iPrideService = prideXmlSpectrumAnnotator.getExperimentService();
 //        iPrideService.init(new File("C:\\Users\\niels\\Desktop\\ExampleDataSets\\PRIDE_Exp_Complete_Ac_15346.xml"));
-        
         System.out.println("test");
     }
 
@@ -91,14 +89,14 @@ public class Playground {
             }
 
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(Playground.class.getName()).log(Level.SEVERE, null, ex);
+            PipelineProgressMonitor.error(ex);
         } catch (IOException ex) {
-            Logger.getLogger(Playground.class.getName()).log(Level.SEVERE, null, ex);
+            PipelineProgressMonitor.error(ex);
         } finally {
             try {
                 bufferedReader.close();
             } catch (IOException ex) {
-                Logger.getLogger(Playground.class.getName()).log(Level.SEVERE, null, ex);
+                PipelineProgressMonitor.error(ex);
             }
         }
 

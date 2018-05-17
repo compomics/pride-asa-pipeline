@@ -31,7 +31,7 @@ import com.compomics.util.experiment.massspectrometry.Charge;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.xmlpull.v1.XmlPullParserException;
 
 /**
@@ -40,10 +40,6 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 public class ParameterExtractor {
 
-    /*
-     * The Logger
-     */
-    private static final Logger LOGGER = Logger.getLogger(ParameterExtractor.class);
     /*
      * The spectrum annotator
      */
@@ -77,7 +73,7 @@ public class ParameterExtractor {
         ((PrideModificationServiceImpl) spectrumAnnotator.getModificationService()).setModificationRepository(new FileModificationRepository(assay));
 
         spectrumAnnotator.initIdentifications(assay);
-        LOGGER.info("Spectrumannotator delivered was initialized");
+        PipelineProgressMonitor.info("Spectrumannotator delivered was initialized");
         spectrumAnnotator.annotate(assay);
         //--------------------------------
 

@@ -18,7 +18,6 @@ package com.compomics.pride_asa_pipeline.core.model;
 import com.compomics.pride_asa_pipeline.core.cache.ParserCache;
 import java.io.File;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 /**
  * A class that has to be extended by classes that communicate with the parser
@@ -32,10 +31,6 @@ public abstract class ParserCacheConnector {
      * The parser cache
      */
     protected ParserCache parserCache = ParserCache.getInstance();
-    /**
-     * The Logger instance
-     */
-    private static final Logger LOGGER = Logger.getLogger(ParserCacheConnector.class);
 
     /**
      * Adds a prideXML file to the cache

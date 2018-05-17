@@ -22,7 +22,7 @@ import com.compomics.pride_asa_pipeline.core.repository.SpectrumRepository;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 import java.util.HashMap;
@@ -34,7 +34,6 @@ import java.util.Map;
  */
 public class JdbcSpectrumRepository extends JdbcDaoSupport implements SpectrumRepository {
 
-    private static final Logger LOGGER = Logger.getLogger(JdbcSpectrumRepository.class);
     private static final String SELECT_SPECTRUM_MZVALUES_BY_SPECTRUM_ID = new StringBuilder()
             .append("select binary_array.data_precision as data_precision, binary_array.data_endian as data_endian, base_64.base_64_data as base_64_data from ")
             .append("mzdata_spectrum spec, mzdata_binary_array binary_array, mzdata_base_64_data base_64 ")
@@ -62,21 +61,21 @@ public class JdbcSpectrumRepository extends JdbcDaoSupport implements SpectrumRe
 
     @Override
     public double[] getMzValuesBySpectrumId(String spectrumId) {
-        LOGGER.debug("Loading mz values for spectrum " + spectrumId);
+        PipelineProgressMonitor.debug("Loading mz values for spectrum " + spectrumId);
         double[] mzValues = getJdbcTemplate().queryForObject(SELECT_SPECTRUM_MZVALUES_BY_SPECTRUM_ID, new Base64DecoderMapper(), spectrumId);
         return mzValues;
     }
 
     @Override
     public double[] getIntensitiesBySpectrumId(String spectrumId) {
-        LOGGER.debug("Loading intensities for spectrum " + spectrumId);
+        PipelineProgressMonitor.debug("Loading intensities for spectrum " + spectrumId);
         double[] intensities = getJdbcTemplate().queryForObject(SELECT_SPECTRUM_INTENSITIES_BY_SPECTRUM_ID, new Base64DecoderMapper(), spectrumId);
         return intensities;
     }
 
     @Override
     public Map<String, List<Peak>> getPeakMapsBySpectrumIdList(List<String> spectrumIds) {
-        LOGGER.debug("Loading peaks for spectrum list with size " + spectrumIds.size());
+        PipelineProgressMonitor.debug("Loading peaks for spectrum list with size " + spectrumIds.size());
 
         String spectrumIdString = Joiner.on(",").join(spectrumIds);
 

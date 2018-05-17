@@ -34,10 +34,14 @@ public class PipelineProgressAppender extends WriterAppender {
         PipelineProgressAppender.pipelineProgressController = pipelineProgressController;
     }
 
+    public PipelineProgressAppender(){
+        
+    }
+    
     @Override
     public void append(LoggingEvent event) {
         final String message = this.layout.format(event);
-
+        System.out.println("IT is passing here" + message);
         //check if the controller is initialized
         if(pipelineProgressController != null) {
             executorService.submit(new Runnable() {

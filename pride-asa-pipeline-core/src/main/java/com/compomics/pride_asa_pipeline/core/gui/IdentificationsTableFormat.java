@@ -27,7 +27,7 @@ import com.google.common.base.Joiner;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 /**
  *
@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
  */
 public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
 
-    private static final Logger LOGGER = Logger.getLogger(IdentificationsTableFormat.class);
     public static final String N_TERM_PREFIX = "NT_";
     public static final String C_TERM_PREFIX = "CT_";
     public static final String MODS_OPEN = "(";
@@ -169,7 +168,7 @@ public class IdentificationsTableFormat implements AdvancedTableFormat<Object> {
                 massDelta = MathUtils.roundDoubleAsBigDecimal(massDeltaValueWithMods, MathUtils.NUMBER_OF_DECIMALS).toPlainString() + " " + UNMOD_MASS_DELTA_OPEN + massDelta + UNMOD_MASS_DELTA_CLOSE;
             }
         } catch (AASequenceMassUnknownException ex) {
-            LOGGER.error(ex.getMessage(), ex);
+            PipelineProgressMonitor.error(ex.getMessage(), ex);
         }
 
         return massDelta;

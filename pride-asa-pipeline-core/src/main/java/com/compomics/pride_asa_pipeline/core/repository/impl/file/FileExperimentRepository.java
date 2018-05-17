@@ -25,7 +25,7 @@ import com.compomics.pride_asa_pipeline.model.UnknownAAException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 import uk.ac.ebi.pride.utilities.data.core.SpectrumIdentification;
 
@@ -38,11 +38,6 @@ import uk.ac.ebi.pride.utilities.data.core.SpectrumIdentification;
  * @author Kenneth Verheggen
  */
 public class FileExperimentRepository extends ParserCacheConnector implements ExperimentRepository {
-
-    /**
-     * A logger instance
-     */
-    private static final Logger LOGGER = Logger.getLogger(FileExperimentRepository.class);
 
     /**
      * Creates a new File experiment repository
@@ -83,7 +78,7 @@ public class FileExperimentRepository extends ParserCacheConnector implements Ex
                             spectrumIdentification.getName());
                     identifications.add(identification);
                 } catch (UnknownAAException ex) {
-                    LOGGER.error(ex);
+                    PipelineProgressMonitor.error(ex);
                 }
             }
         }

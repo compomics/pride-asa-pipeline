@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetailList;
 import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetail;
@@ -43,8 +43,6 @@ import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetailList;
  * @author Kenneth Verheggen
  */
 public class WSExperimentRepository implements ExperimentRepository {
-
-    private static final Logger LOGGER = Logger.getLogger(WSExperimentRepository.class);
 
     @Override
     public Map<String, String> findAllExperimentAccessions() {
@@ -68,14 +66,14 @@ public class WSExperimentRepository implements ExperimentRepository {
                 }
             }
         } catch (IOException ex) {
-            LOGGER.error(ex);
+            PipelineProgressMonitor.error(ex);
         }
         return allExperimentsAccessions;
     }
 
     @Override
     public List<Identification> loadExperimentIdentifications(String experimentAccession) {
-        LOGGER.debug("Start loading identifications for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Start loading identifications for experiment " + experimentAccession);
         List<Identification> identifications = new ArrayList<>();
         try {
             PsmDetailList psmByAssay = PrideWebService.getPSMsByAssay(experimentAccession);
@@ -86,12 +84,12 @@ public class WSExperimentRepository implements ExperimentRepository {
                     Identification ident = new Identification(peptide, aDetail.getExperimentalMZ().toString(), aDetail.getReportedID(), aDetail.getSpectrumID());
                     identifications.add(ident);
                 } catch (UnknownAAException ex) {
-                    LOGGER.error(ex);
+                    PipelineProgressMonitor.error(ex);
                 }
             }
-            LOGGER.debug("Finished loading " + identifications.size() + " identifications for experiment " + experimentAccession);
+            PipelineProgressMonitor.debug("Finished loading " + identifications.size() + " identifications for experiment " + experimentAccession);
         } catch (IOException ex) {
-            LOGGER.error(ex);
+            PipelineProgressMonitor.error(ex);
         }
 
         return identifications;
@@ -99,42 +97,42 @@ public class WSExperimentRepository implements ExperimentRepository {
 
     @Override
     public long getNumberOfSpectra(String experimentAccession) {
-        LOGGER.debug("Start counting number of spectra for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Start counting number of spectra for experiment " + experimentAccession);
         long numberOfSpectra = 0;
         try {
             numberOfSpectra = PrideWebService.getAssayDetail(experimentAccession).getTotalSpectrumCount();
-            LOGGER.debug("Finished counting number of spectra for experiment " + experimentAccession);
+            PipelineProgressMonitor.debug("Finished counting number of spectra for experiment " + experimentAccession);
         } catch (IOException ex) {
-            LOGGER.error(ex);
+            PipelineProgressMonitor.error(ex);
         }
         return numberOfSpectra;
     }
 
     @Override
     public List<String> getProteinAccessions(String experimentAccession) {
-        LOGGER.debug("Start retrieving protein accessions for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Start retrieving protein accessions for experiment " + experimentAccession);
         List<String> proteinAccessions = new ArrayList<>();
         try {
             ProteinDetailList proteinIdentificationByAssay = PrideWebService.getProteinIdentificationByAssay(experimentAccession);
             for (ProteinDetail proteinDetail : proteinIdentificationByAssay.getList()) {
                 proteinAccessions.add(proteinDetail.getAccession());
             }
-            LOGGER.debug("Start retrieving protein accessions for experiment " + experimentAccession);
+            PipelineProgressMonitor.debug("Start retrieving protein accessions for experiment " + experimentAccession);
         } catch (IOException ex) {
-            LOGGER.error(ex);
+            PipelineProgressMonitor.error(ex);
         }
         return proteinAccessions;
     }
 
     @Override
     public long getNumberOfPeptides(String experimentAccession) {
-        LOGGER.debug("Start counting number of peptides for experiment " + experimentAccession);
+        PipelineProgressMonitor.debug("Start counting number of peptides for experiment " + experimentAccession);
         long numberOfPeptides = 0;
         try {
             numberOfPeptides = PrideWebService.getAssayDetail(experimentAccession).getPeptideCount();
-            LOGGER.debug("Finished counting number of peptides for experiment " + experimentAccession);
+            PipelineProgressMonitor.debug("Finished counting number of peptides for experiment " + experimentAccession);
         } catch (IOException ex) {
-            LOGGER.error(ex);
+            PipelineProgressMonitor.error(ex);
         }
         return numberOfPeptides;
     }

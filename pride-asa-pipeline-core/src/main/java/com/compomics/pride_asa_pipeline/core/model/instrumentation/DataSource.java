@@ -20,7 +20,7 @@ import com.compomics.pride_asa_pipeline.core.repository.impl.file.FileExperiment
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import java.io.File;
 import java.util.TreeSet;
-import org.apache.log4j.Logger;
+import com.compomics.pride_asa_pipeline.core.gui.PipelineProgressMonitor;
 
 import uk.ac.ebi.pride.utilities.data.controller.impl.ControllerImpl.CachedDataAccessController;
 import uk.ac.ebi.pride.utilities.data.core.CvParam;
@@ -44,8 +44,6 @@ public class DataSource {
     //read from the file
     private final String experiment;
     private final MassSpecInstrumentation instrumentation = new MassSpecInstrumentation();
-
-    private static final Logger LOGGER = Logger.getLogger(DataSource.class);
 
     public DataSource(File prideXML) {
         experiment = prideXML.getName();
@@ -72,7 +70,7 @@ public class DataSource {
                 massSpectrometer));
 
         inferCharges(source);
-        LOGGER.info("Detected instrument : " + massSpectrometer
+        PipelineProgressMonitor.info("Detected instrument : " + massSpectrometer
                 + "-" + sourceName
                 + "-" + detector
                 + " [" + instrumentation.getPossibleCharges().first().toString() + " to " + instrumentation.getPossibleCharges().last().toString() + "]");
@@ -103,14 +101,14 @@ public class DataSource {
             //check the possible charges and reduce them to 1 in case they were searched with...
             if (detectedCharges[1] > 1) {
                 //we may have an issue here...maldi does not usually produce higher ions so this is a non standard study
-                LOGGER.warn("The detected ion source was MALDI and usually does not produce ions above charge state 1+, ignoring higher states");
+                PipelineProgressMonitor.warn("The detected ion source was MALDI and usually does not produce ions above charge state 1+, ignoring higher states");
             }
             instrumentation.getPossibleCharges().add(1);
         } else if (source.contains(ControlledVocabulary.ESI.getTerm())) {
 
             if (detectedCharges[0] == 1) {
                 //we may have an issue here...esi does not usually produce lower ions so this is a non standard study
-                LOGGER.warn("The detected ion source was ESI and usually does not produce singly charged ions, ignoring single charge state");
+                PipelineProgressMonitor.warn("The detected ion source was ESI and usually does not produce singly charged ions, ignoring single charge state");
             }
             for (int i = Math.max(2, detectedCharges[0]); i <= detectedCharges[1] + 1; i++) {
                 instrumentation.getPossibleCharges().add(i);
@@ -126,7 +124,7 @@ public class DataSource {
         TreeSet<Integer> charges = new TreeSet<>();
         for (Comparable spectrumID : parser.getSpectrumIds()) {
             if (charges.size() >= 1000) {
-                LOGGER.info("Sampled 1000 spectra");
+                PipelineProgressMonitor.info("Sampled 1000 spectra");
                 break;
             }
             Spectrum spectrumById = parser.getSpectrumById(spectrumID);
